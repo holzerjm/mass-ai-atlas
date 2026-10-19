@@ -567,10 +567,10 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 <section id="view-directory" class="view">
   <div class="dir-controls">
     <input class="dir-search" id="dirSearch" type="text" placeholder="Search by name, tag, or keyword…">
-    <select class="dir-select" id="dirStage">
+    <select class="dir-select" id="dirStage" aria-label="Filter by founder stage">
       <option value="">Any founder stage</option>
     </select>
-    <select class="dir-select" id="dirSort">
+    <select class="dir-select" id="dirSort" aria-label="Sort organizations">
       <option value="name">Sort: A → Z</option>
       <option value="cat">Sort: Category</option>
       <option value="new">Sort: Recently added</option>
@@ -1871,8 +1871,11 @@ document.addEventListener("keydown", e=>{ if(e.key === "Escape" && tourStep >= 0
 // On load: honor #<view> and ?entry=<id>; unknown values are silently ignored.
 (function(){
   const h = location.hash.slice(1);
-  if(["map","galaxy","journey","directory"].includes(h) && h !== currentView) switchView(h);
+  // Read ?entry= BEFORE switching view. switchView() ends in updateURL(), which
+  // deletes ?entry= while no drawer is open — so reading it afterwards found
+  // nothing and a shared "?entry=<id>#directory" link silently lost its entry.
   const e = new URLSearchParams(location.search).get("entry");
+  if(["map","galaxy","journey","directory"].includes(h) && h !== currentView) switchView(h);
   if(e && byId[e]) openDrawer(e);
 })();
 </script>

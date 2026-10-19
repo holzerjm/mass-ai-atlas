@@ -13,3 +13,7 @@ events.json
 
 # npm dependencies (run: npm ci)
 node_modules/
+
+# Playwright output (run: npm run test:e2e)
+test-results/
+playwright-report/
