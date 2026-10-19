@@ -17,6 +17,11 @@ is deployed, and nobody editing `data/entities.yml` needs to install anything.
 
 ---
 
+> **In CI.** `.github/workflows/e2e.yml` runs this suite on every pull request. It is
+> deliberately **not** a required check while there is no history on GitHub runners — see
+> the note below. Promote it by adding `e2e` to the required status checks of the `main`
+> ruleset; nothing in the workflow changes.
+
 > **A note on workers.** Every spec renders a WebGL basemap and the Galaxy canvas, so
 > the suite is sensitive to how many browsers run at once. The config uses 4 locally
 > and 2 in CI. On a machine with less GPU headroom those still contend and a spec can

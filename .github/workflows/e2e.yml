@@ -1,0 +1,63 @@
+# Browser suite (see docs/testing.md). 28 tests over the four views, deep links,
+# the shortlist, the events page and accessibility.
+#
+# NOT a required check, on purpose, and that is the whole point of this file.
+#
+# Every spec renders a WebGL basemap and the Galaxy canvas, so the suite is
+# sensitive to how many browsers run at once. Locally, on a machine with less GPU
+# headroom, `axe: galaxy view` fails under parallel workers and passes 3/3 when run
+# alone. Whether that happens on a GitHub runner is unknown — so this runs and
+# reports, and nobody is blocked by it, until there is enough history to say.
+#
+# To promote it once the history looks clean: add "e2e" to the required status
+# checks of the `main` ruleset. To demote it again: remove it. Nothing in this file
+# changes either way.
+#
+# Unlike deploy/weekly-events/monthly-health, this is deliberately NOT restricted to
+# the upstream repository: a copy made from this template should absolutely run it.
+name: Browser tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # The browser is ~130 MB and changes only when @playwright/test does, so key
+      # the cache on the lockfile.
+      - name: Cache the Playwright browser
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      # A cache hit restores the browser but not its OS libraries, which are not in
+      # the cached path.
+      - name: Install browser OS dependencies
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - run: npm run test:e2e
+
+      # The HTML report is what makes a failure diagnosable without a local repro.
+      - name: Upload the report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
