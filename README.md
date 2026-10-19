@@ -25,6 +25,10 @@ spots within a five-minute walk.
 Every entry and view is linkable — `?entry=csail` opens straight to an organization,
 `#galaxy` to a view (there's a 🔗 Copy link button in each entry's drawer).
 
+> **Building on this as a template?** Start with [HACKATHON.md](HACKATHON.md): setup, the
+> architecture on one page, where to extend it, and what to change because it is still
+> pointed at The Open Accelerator.
+
 ## Run it
 
 It's a static site — no build step.

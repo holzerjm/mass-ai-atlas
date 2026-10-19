@@ -37,7 +37,14 @@ concurrency:
 
 jobs:
   draft:
-    if: github.event.label.name == 'bot:draft'
+    # This repository is also a GitHub template. A copy made from it is a new repo
+    # with Actions enabled but none of TOA's deploy target, Slack webhooks or bot
+    # credentials, so this job could only fail there. Skip it instead of handing a
+    # team a red X they did not cause. Upstream, nothing changes.
+    # NOTE: if the atlas ever moves to a TOA organization, update this slug or the
+    # job stops running here too. It is the only place the slug is hardcoded.
+    # publish `needs: draft`, so guarding draft skips the whole flow in a copy.
+    if: github.repository == 'holzerjm/mass-ai-atlas' && github.event.label.name == 'bot:draft'
     runs-on: ubuntu-latest
     permissions:
       contents: read

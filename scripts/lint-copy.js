@@ -30,7 +30,7 @@ const fs = require("fs");
 const path = require("path");
 
 const REPO = path.join(__dirname, "..");
-const DEFAULT_FILES = ["index.html", "events/index.html", "README.md"];
+const DEFAULT_FILES = ["index.html", "events/index.html", "README.md", "HACKATHON.md"];
 
 // A number (optionally "160+" / "1,200") followed by up to two words and then a
 // noun that means "organizations in this atlas". Two words covers "160+ verified

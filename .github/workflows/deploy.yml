@@ -28,6 +28,13 @@ on:
 
 jobs:
   deploy:
+    # This repository is also a GitHub template. A copy made from it is a new repo
+    # with Actions enabled but none of TOA's deploy target, Slack webhooks or bot
+    # credentials, so this job could only fail there. Skip it instead of handing a
+    # team a red X they did not cause. Upstream, nothing changes.
+    # NOTE: if the atlas ever moves to a TOA organization, update this slug or the
+    # job stops running here too. It is the only place the slug is hardcoded.
+    if: github.repository == 'holzerjm/mass-ai-atlas'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
