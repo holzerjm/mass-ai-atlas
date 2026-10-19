@@ -1,0 +1,39 @@
+# Code owners — Mass AI Atlas
+#
+# Today the atlas has one maintainer, so everything routes to @holzerjm. That makes
+# review requests automatic; it does not by itself block anything.
+#
+# ⚠️  Do NOT turn on "Require review from Code Owners" in the `main` ruleset while this
+# file names a single person. GitHub never counts an author's approval of their own PR
+# and the ruleset has no bypass list, so the only maintainer could no longer merge
+# anything.
+#
+# Planned two-person rule, once a second owner exists (a team with at least two members,
+# replacing @holzerjm below):
+#
+#   - The narrative and data files — the founder-stage tips in data/stages.yml,
+#     user-visible copy in index.html, README.md, CONTRIBUTING.md, MAINTAINING.md and
+#     docs/ — are approved by someone other than the person who wrote the change, so no
+#     one person can reword the project's own framing alone.
+#   - CODEOWNERS matches files, not lines, so assigning data/entities.yml to the team
+#     means every maintainer-authored data change gets a second reviewer. Community PRs
+#     are unaffected in practice: the author is not a maintainer, so one maintainer
+#     approval is already a second person. If that proves too heavy for routine rota
+#     updates, narrow it with a CI check rather than dropping the rule.
+#   - .github/ (the workflows and this file) stays with the owners team, so the rule
+#     cannot be edited away by the same person it constrains.
+#
+# Syntax: the last matching pattern wins; owners need write access to the repo, or the
+# line is ignored.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+*                           @holzerjm
+
+# When the second owner exists, replace the line above with the team and add, e.g.:
+# /data/                    @<toa-org>/atlas-editors
+# /index.html               @<toa-org>/atlas-editors
+# /README.md                @<toa-org>/atlas-editors
+# /CONTRIBUTING.md          @<toa-org>/atlas-editors
+# /MAINTAINING.md           @<toa-org>/atlas-editors
+# /docs/                    @<toa-org>/atlas-editors
+# /.github/                 @<toa-org>/atlas-maintainers

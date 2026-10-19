@@ -96,6 +96,11 @@ Accelerator. Change these before you go far:
   enable private vulnerability reporting under **Settings → Code security**, or the
   primary route has nothing behind it.
 - **`CODE_OF_CONDUCT.md`** names `conduct@the-open-accelerator.com`. Change it.
+- **Run `scripts/setup-labels.sh <owner/repo>` first.** Labels do **not** come with a
+  template copy, and GitHub *silently* drops a label an issue form asks for when it does
+  not exist — so the suggest and flag forms would quietly arrive unlabelled, and the
+  suggestion bot (which only runs on `bot:draft`) would never fire. The script is
+  idempotent; run it once after creating your repo.
 - **Branding** — the header, footer and logo are TOA's. The `GH_REPO` constant in the app
   script builds the "Suggest an entry" link; point it at your repo.
 
