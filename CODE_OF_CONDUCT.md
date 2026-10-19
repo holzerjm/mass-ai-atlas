@@ -64,6 +64,10 @@ doing so.
 Report abusive, harassing, or otherwise unacceptable behavior to
 **conduct@the-open-accelerator.com**.
 
+> **Running a copy of this template?** That address reaches The Open Accelerator, not you.
+> Replace it before you invite anyone to contribute — an unanswered report is worse than no
+> policy at all.
+
 All reports will be reviewed and investigated promptly and fairly. Maintainers are obliged
 to respect the privacy and security of anyone who reports an incident. If a report concerns
 a maintainer, it will be handled by someone else.

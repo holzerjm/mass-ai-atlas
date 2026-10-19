@@ -91,8 +91,10 @@ Accelerator. Change these before you go far:
   and the suggestion bot — are guarded with `if: github.repository == 'holzerjm/mass-ai-atlas'`.
   They will skip in your copy rather than fail. Delete them, or replace the guard with your own
   repo and supply your own secrets. **`validate` is deliberately not guarded** — you want it.
-- **`SECURITY.md`** points at this repository's private reporting and TOA's contact page.
-  Repoint both at yourself.
+- **`SECURITY.md`** uses relative GitHub links, so its advisory and issue routes already
+  point at *your* repo. Two things still need you: replace the TOA fallback contact, and
+  enable private vulnerability reporting under **Settings → Code security**, or the
+  primary route has nothing behind it.
 - **`CODE_OF_CONDUCT.md`** names `conduct@the-open-accelerator.com`. Change it.
 - **Branding** — the header, footer and logo are TOA's. The `GH_REPO` constant in the app
   script builds the "Suggest an entry" link; point it at your repo.
