@@ -12,7 +12,7 @@ MA AI Hub, Red Hat & IBM).
 
 [![A 19-second tour: searching the Map over the Boston area, an entry's drawer with the places to meet nearby, the whole-Commonwealth view, the Galaxy of connections, the Founder Journey, and the Directory filtered to equity-free money](docs/demo.gif)](https://the-open-accelerator.com/ecosystem/)
 
-**Four ways to explore nearly 200 verified organizations:**
+**Four ways to explore the Massachusetts AI ecosystem:**
 
 - 🗺️ **Map** — every VC, lab, accelerator and community pinned across Massachusetts
 - ✨ **Galaxy** — an animated network of how the ecosystem connects (spinouts, funds, hosts)

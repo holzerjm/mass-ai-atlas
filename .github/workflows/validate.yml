@@ -20,6 +20,11 @@ jobs:
       - run: npm ci
       - name: Validate data/ against the schemas
         run: node scripts/validate.js
+      # Dependency-free, so it runs even before npm ci. Catches a count typed into
+      # prose, which is how the footer came to claim 101 organizations for months
+      # while the atlas listed 171.
+      - name: Copy lint (no hand-typed organization counts)
+        run: node scripts/lint-copy.js
       - name: Freshness report (informational, never fails the build)
         continue-on-error: true
         run: node scripts/stale.js >> "$GITHUB_STEP_SUMMARY"

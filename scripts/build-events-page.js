@@ -22,13 +22,16 @@ const twConfig = between("tailwind.config = {", "</script>");
 const bootstrap = between("<script>(function(){try{if(localStorage.getItem('toa-atlas-theme')", "</script>");
 const header = between("<!-- ============ STANDARD TOA SITE HEADER ============ -->", "</header>");
 const mobileNav = between("<!-- Mobile Nav Overlay -->", "</div>");
-// The atlas page fills #footCount from the dataset at runtime; this page ships no
-// such script, so the lifted markup would keep whatever literal is inside the span.
-// It read "101 organizations" for months. Bake the real number in at build time.
-const { DATA } = require("./load-data").loadData();
+// The atlas page fills #footCount from the dataset at runtime. This page ships no
+// such script, so any number lifted into it can only go stale — it read "101
+// organizations" for months. Baking the real count in at build time (as this did)
+// only moved the problem: nothing in CI re-runs this generator, so the number was
+// correct once and then frozen. Drop the clause instead; the atlas page still
+// shows a live count, and scripts/lint-copy.js keeps a literal from creeping back.
 const footerRaw = between('<footer class="footer">', "</footer>");
-const footer = footerRaw.replace(/<span id="footCount">[^<]*<\/span>/, String(DATA.length));
-if (footer === footerRaw) throw new Error("footer: #footCount span not found in index.html — the count would ship stale");
+const COUNT_CLAUSE = /\s*·\s*<span id="footCount"[^>]*>[^<]*<\/span>\s*organizations across Massachusetts\./;
+const footer = footerRaw.replace(COUNT_CLAUSE, ".");
+if (footer === footerRaw) throw new Error("footer: the #footCount clause was not found in index.html — the events page would ship a count it cannot keep current");
 const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color:var(--gold);text-decoration:none}");
 // chrome script: from toggleMobileMenu's containing <script> to the updateLogos sync call
 const scriptStart = src.lastIndexOf("<script>", src.indexOf("function toggleMobileMenu"));
@@ -202,6 +205,5 @@ ${chromeJs}
 </html>
 `;
 fs.writeFileSync(REPO + "/events/index.html", page);
-console.log("events/index.html assembled:", page.length, "bytes;",
-  DATA.length, "organizations; chrome pieces: header",
+console.log("events/index.html assembled:", page.length, "bytes; chrome pieces: header",
   header.length, "· mobileNav", mobileNav.length, "· footer", footer.length, "· js", chromeJs.length);
