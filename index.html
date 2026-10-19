@@ -606,7 +606,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     </div>
     <b>Mass AI Atlas</b> · A project of <a href="https://the-open-accelerator.com" target="_blank" rel="noopener">The Open Accelerator</a> · Curated June 2026 · <span id="footCount">101</span> organizations across Massachusetts.<br>
     Some pin locations are approximate (nearest neighborhood) and community groups move between venues — always check the official site before visiting.<br>
-    Know something we missed? <a href="#" onclick="suggestEntry();return false">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a href="https://github.com/holzerjm/boston-ai-atlas" target="_blank" rel="noopener">GitHub</a>.
+    Know something we missed? <a href="#" onclick="suggestEntry();return false">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a href="https://github.com/holzerjm/mass-ai-atlas" target="_blank" rel="noopener">GitHub</a>.
   </div>
 </footer>
 
@@ -693,7 +693,7 @@ const cLabel = c => CATS[c].label;
 const byId = Object.fromEntries(DATA.map(d => [d.id, d]));
 
 /* ---------- community contributions (GitHub-native) ---------- */
-const GH_REPO = "holzerjm/boston-ai-atlas"; // ← set to your GitHub org/repo after publishing
+const GH_REPO = "holzerjm/mass-ai-atlas"; // ← set to your GitHub org/repo after publishing
 const ghIssueUrl = (template, params={}) => {
   const q = new URLSearchParams({template, ...params});
   return `https://github.com/${GH_REPO}/issues/new?${q.toString()}`;

@@ -169,16 +169,16 @@ Run the page locally and check, in **both themes**:
 - Live page: <https://the-open-accelerator.com/ecosystem/> (toggle the theme)
 - Code: `index.html` — search for `OpenFreeMap vector basemap` (basemap block,
   `MAP_STYLES`, `makeBasemap`, `setMapTiles`)
-- Dark style: [`map-style-dark.json`](https://raw.githubusercontent.com/holzerjm/boston-ai-atlas/main/map-style-dark.json)
+- Dark style: [`map-style-dark.json`](https://raw.githubusercontent.com/holzerjm/mass-ai-atlas/main/map-style-dark.json)
 - The migration commit: `c811833` "Migrate basemap to OpenFreeMap" in
-  <https://github.com/holzerjm/boston-ai-atlas>
+  <https://github.com/holzerjm/mass-ai-atlas>
 
 ## 7. Kickoff prompt for a Claude Code session
 
 Paste something like this into the session that owns the page being migrated:
 
 > Migrate this page's map from CARTO to OpenFreeMap by following
-> https://raw.githubusercontent.com/holzerjm/boston-ai-atlas/main/docs/carto-to-openfreemap.md
+> https://raw.githubusercontent.com/holzerjm/mass-ai-atlas/main/docs/carto-to-openfreemap.md
 > exactly — keep Leaflet as the engine, use the pinned library versions from the
 > playbook, copy the atlas's `map-style-dark.json` if the page has a dark theme,
 > and run the playbook's verification checklist in both themes with a preview

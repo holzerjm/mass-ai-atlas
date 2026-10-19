@@ -118,7 +118,7 @@ ${mobileNav}
   <div class="topnav">
     <a href="../">🗺️ The Atlas</a>
     <a href="https://the-open-accelerator.com/calendar/">🗓️ TOA's own calendar</a>
-    <a href="https://github.com/holzerjm/boston-ai-atlas/issues/new?template=suggest-event.yml" target="_blank" rel="noopener">➕ Add your event</a>
+    <a href="https://github.com/holzerjm/mass-ai-atlas/issues/new?template=suggest-event.yml" target="_blank" rel="noopener">➕ Add your event</a>
     <span class="meta" id="genLine">loading…</span>
   </div>
 
@@ -127,10 +127,10 @@ ${mobileNav}
   <div class="contrib" id="add">
     <h3>Get your event on this list</h3>
     <p>Three ways, easiest first: run your events on a public
-    <b>Luma calendar</b> and <a href="https://github.com/holzerjm/boston-ai-atlas/issues/new?template=suggest-event.yml">tell us its address</a>
+    <b>Luma calendar</b> and <a href="https://github.com/holzerjm/mass-ai-atlas/issues/new?template=suggest-event.yml">tell us its address</a>
     (we'll ingest everything you publish, forever) · submit it to
     <a href="https://luma.com/toa">TOA's Luma calendar</a> (admin-approved) · or
-    <a href="https://github.com/holzerjm/boston-ai-atlas/issues/new?template=suggest-event.yml">suggest a one-off event</a>.
+    <a href="https://github.com/holzerjm/mass-ai-atlas/issues/new?template=suggest-event.yml">suggest a one-off event</a>.
     AI-relevant, Greater Boston, open to the community — that's the whole bar.</p>
   </div>
 

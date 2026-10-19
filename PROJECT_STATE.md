@@ -9,7 +9,7 @@ issues #12/#13; 21 VCs from the MGMT Boston sweep; LabCentral via the suggestion
 first run (PR #15); 15 gov/space/student orgs; then the first link-rot sweep fixed 19
 URLs and retired three defunct orgs (BUMIC → replaced by BU AI Society; Cogito acquired
 by Verint; XLR8 defunct).
-Repo: <https://github.com/holzerjm/boston-ai-atlas> · Live: <https://the-open-accelerator.com/ecosystem/>
+Repo: <https://github.com/holzerjm/mass-ai-atlas> · Live: <https://the-open-accelerator.com/ecosystem/>
 
 ---
 
@@ -149,7 +149,7 @@ transparent moderation, contribution history, on-brand for an open-source accele
 
 - In-app **➕ Suggest an entry** (nav) and **🚩 Flag** (every detail drawer) open prefilled
   GitHub issue forms. `const GH_REPO` in `index.html` controls the target repo —
-  currently `holzerjm/boston-ai-atlas`. **Update it if the repo ever moves to a TOA org.**
+  currently `holzerjm/mass-ai-atlas`. **Update it if the repo ever moves to a TOA org.**
 - `.github/ISSUE_TEMPLATE/suggest-entry.yml` — structured form incl. category dropdown,
   stage checkboxes, spam/affiliation confirmations.
 - `.github/ISSUE_TEMPLATE/flag-entry.yml` — reason dropdown + source link; the entry id is

@@ -13,13 +13,13 @@
 # if the workflow is not active, it is re-enabled before dispatching.
 #
 # Needs a fine-grained personal access token with ONLY
-#   Repository access: holzerjm/boston-ai-atlas
+#   Repository access: holzerjm/mass-ai-atlas
 #   Permissions:       Actions → Read and write
 # stored (mode 600) in $TOKEN_FILE. Optional: a Slack incoming-webhook URL in
 # $ALERT_FILE — failures are then posted there as well as logged.
 #
 # Install (as the forge user on the origin server):
-#   mkdir -p ~/bin ~/.local/log ~/.config/boston-ai-atlas && chmod 700 ~/.config/boston-ai-atlas
+#   mkdir -p ~/bin ~/.local/log ~/.config/mass-ai-atlas && chmod 700 ~/.config/mass-ai-atlas
 #   cp scripts/trigger-weekly-events.sh ~/bin/ && chmod +x ~/bin/trigger-weekly-events.sh
 #   crontab -e →  1 11 * * 1  ~/bin/trigger-weekly-events.sh >> ~/.local/log/weekly-events.log 2>&1
 #                 1 12 * * 1  (same)      # 11:01 UTC = 7am EDT, 12:01 UTC = 7am EST; the gate skips the wrong one
@@ -27,9 +27,15 @@
 #                 1 12 * * 2  (same)      # Tuesday retry if Monday never happened
 set -euo pipefail
 
-REPO="holzerjm/boston-ai-atlas"
+REPO="holzerjm/mass-ai-atlas"
 WORKFLOW="weekly-events.yml"
-CONF="${CONF:-$HOME/.config/boston-ai-atlas}"
+CONF="${CONF:-$HOME/.config/mass-ai-atlas}"
+# Installs that predate the boston-ai-atlas → mass-ai-atlas rename keep their
+# existing config dir, so the server needs no directory move. Written as an `if`
+# because a bare `[ ... ] && ...` returning 1 would trip set -e and the ERR trap.
+if [ ! -d "$CONF" ] && [ -d "$HOME/.config/boston-ai-atlas" ]; then
+  CONF="$HOME/.config/boston-ai-atlas"
+fi
 TOKEN_FILE="${TOKEN_FILE:-$CONF/github-token}"
 ALERT_FILE="${ALERT_FILE:-$CONF/alert-webhook}"
 ATTEMPTS="${ATTEMPTS:-3}"

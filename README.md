@@ -1,6 +1,6 @@
 # Mass AI Atlas
 
-[![Validate atlas data](https://github.com/holzerjm/boston-ai-atlas/actions/workflows/validate.yml/badge.svg)](https://github.com/holzerjm/boston-ai-atlas/actions/workflows/validate.yml)
+[![Validate atlas data](https://github.com/holzerjm/mass-ai-atlas/actions/workflows/validate.yml/badge.svg)](https://github.com/holzerjm/mass-ai-atlas/actions/workflows/validate.yml)
 [![Organizations](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fthe-open-accelerator.com%2Fecosystem%2Fatlas.json&query=%24.total&label=organizations&color=60a5fa)](data/entities.yml)
 [![Live site](https://img.shields.io/badge/live-the--open--accelerator.com%2Fecosystem-EE0000)](https://the-open-accelerator.com/ecosystem/)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-4ade80)](CONTRIBUTING.md)

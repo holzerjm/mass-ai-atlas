@@ -22,7 +22,7 @@ const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
 const SOURCES = JSON.parse(fs.readFileSync(path.join(ROOT, "events-sources.json"), "utf8"));
-const UA = "boston-ai-atlas-events/1.0 (github.com/holzerjm/boston-ai-atlas; weekly)";
+const UA = "mass-ai-atlas-events/1.0 (github.com/holzerjm/mass-ai-atlas; weekly)";
 
 const argv = process.argv.slice(2);
 const argN = (flag, dflt) => { const i = argv.indexOf(flag); return i !== -1 && argv[i+1] ? argv[i+1] : dflt; };
@@ -229,7 +229,7 @@ function matchAtlas(list) {
     schema: 1,
     generated: NOW.toISOString(),
     window_days: DAYS,
-    source: "https://github.com/holzerjm/boston-ai-atlas",
+    source: "https://github.com/holzerjm/mass-ai-atlas",
     credits: "Luma discover approach builds on github.com/nkpng2k/startup-event-scraper (Apache-2.0)",
     errors,
     total: clean.length,

@@ -156,7 +156,7 @@ function geocode(q) {
     const req = https.get({
       host: "nominatim.openstreetmap.org",
       path: "/search?" + qs.toString(),
-      headers: { "User-Agent": "boston-ai-atlas-bot/1.0 (github.com/holzerjm/boston-ai-atlas)" },
+      headers: { "User-Agent": "mass-ai-atlas-bot/1.0 (github.com/holzerjm/mass-ai-atlas)" },
       timeout: 10000,
     }, (res) => {
       let buf = "";

@@ -3,7 +3,7 @@
 ## Reporting a vulnerability
 
 Report it privately through GitHub:
-**[open a draft security advisory](https://github.com/holzerjm/boston-ai-atlas/security/advisories/new)**.
+**[open a draft security advisory](https://github.com/holzerjm/mass-ai-atlas/security/advisories/new)**.
 That channel is private between you and the maintainers, and it is the route we prefer.
 
 If you cannot use GitHub, reach us through
@@ -64,7 +64,7 @@ behavior:
 ## What is not a security issue
 
 - An entry that is out of date, wrong, or missing. Use the **🚩 Flag** button on the entry,
-  or [open an issue](https://github.com/holzerjm/boston-ai-atlas/issues/new/choose).
+  or [open an issue](https://github.com/holzerjm/mass-ai-atlas/issues/new/choose).
 - A dead or redirected link. The monthly health check already sweeps these.
 - An organization you believe should not be listed. That is an editorial decision; see
   `MAINTAINING.md`.

@@ -20,7 +20,7 @@ const out = {
   schema: 1,
   generated: new Date().toISOString(),
   title: "Mass AI Atlas — verified organizations of Massachusetts' AI ecosystem",
-  source: "https://github.com/holzerjm/boston-ai-atlas",
+  source: "https://github.com/holzerjm/mass-ai-atlas",
   website: "https://the-open-accelerator.com/ecosystem/",
   license: "CC BY 4.0 — (c) The Open Accelerator; attribution required",
   license_url: "https://creativecommons.org/licenses/by/4.0/",

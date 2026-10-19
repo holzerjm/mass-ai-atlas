@@ -80,7 +80,7 @@ post regardless — for example to publish a just-approved event mid-week:
 Actions tab → *Weekly events refresh* → *Run workflow*, or:
 
 ```bash
-gh workflow run "Weekly events refresh" --repo holzerjm/boston-ai-atlas
+gh workflow run "Weekly events refresh" --repo holzerjm/mass-ai-atlas
 ```
 
 **Test locally without shipping anything:**
@@ -100,7 +100,7 @@ node scripts/fetch-events.js          # writes events.json locally, prints a per
 2. **TOA's Luma calendar** — community members can submit at
    [luma.com/toa](https://luma.com/toa) (admin-approved); that calendar is
    already an ingested source.
-3. **A one-off** — the [suggest-event issue form](https://github.com/holzerjm/boston-ai-atlas/issues/new?template=suggest-event.yml)
+3. **A one-off** — the [suggest-event issue form](https://github.com/holzerjm/mass-ai-atlas/issues/new?template=suggest-event.yml)
    (label `event-suggestion`), which a maintainer turns into an
    `events-manual.json` entry or a new source calendar.
 
@@ -145,9 +145,9 @@ node scripts/fetch-events.js          # writes events.json locally, prints a per
   re-run it.
 - The server trigger authenticates with a **fine-grained GitHub token** that can
   do exactly one thing — start Actions workflows in this repo — stored at
-  `~/.config/boston-ai-atlas/github-token` on `toa-forge` (mode 600). Optionally
+  `~/.config/mass-ai-atlas/github-token` on `toa-forge` (mode 600). Optionally
   put a Slack incoming-webhook URL (the deploy channel's works) in
-  `~/.config/boston-ai-atlas/alert-webhook` and the script will post there when
+  `~/.config/mass-ai-atlas/alert-webhook` and the script will post there when
   a dispatch fails, instead of only logging to `~/.local/log/weekly-events.log`.
   The script also re-enables the workflow if GitHub disabled it for inactivity.
   Fine-grained tokens expire (one year at most). For the last two weeks before expiry the
