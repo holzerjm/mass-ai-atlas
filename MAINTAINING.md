@@ -447,6 +447,7 @@ the reasoning is open rather than a silent judgment.
 | **NineTwoThree AI Studio** | Every fact checked out; it is a paid AI development agency. The atlas lists places a founder can get something — funding, space, compute, mentorship, community, talent, customers — not vendors who sell to them. Admitting one agency admits every dev shop in Boston. |
 | **Lux Capital** | Listed until October 2026, then removed: its own contact page says New York and Silicon Valley, and no Massachusetts office could be found. It backs Massachusetts companies, but so do dozens of out-of-state funds; a pin implies a presence. |
 | **Y Combinator (Boston alumni)** | Listed until October 2026, then removed. Not an organisation with a Massachusetts presence but a category of founders: its `loc` read "Remote / SF (Boston-based founders)" and its `url` was a filtered list of YC companies rather than a front door. YC alumni belong in the atlas as their own entries — several already are. |
+| **Fennec Design Studio** | Self-submitted via the entry form, October 2026 (#48). Real, Grafton MA, and candid about its own method — but a paid consultancy, with packages priced from $17,000 for a two-to-three-week engagement. Out under the vendor rule, same as NineTwoThree. It also does not claim to be an AI organisation: it describes AI as speeding up synthesis rather than replacing judgment, and bills itself as workflow and systems consulting. Its founder perk for Open Accelerator companies belongs in the perks marketplace, not the atlas — see #51. |
 
 The rules those add up to:
 
