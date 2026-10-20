@@ -41,3 +41,11 @@ test("the events page footer claims no organization count", async ({ page }) => 
   await expect(page.locator("#footCount")).toHaveCount(0);
   await expect(page.locator("footer")).not.toHaveText(/\d[\d,]*\s+organi[sz]ations/i);
 });
+
+// Same for the curation month, and for the same reason: this page has no script, so
+// a date lifted into it can only rot. It read "Curated June 2026" into October.
+test("the events page footer claims no curation date", async ({ page }) => {
+  await page.goto("./events/");
+  await expect(page.locator("#footCurated")).toHaveCount(0);
+  await expect(page.locator("footer")).not.toHaveText(/Curated/i);
+});

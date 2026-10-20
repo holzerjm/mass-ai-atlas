@@ -30,8 +30,15 @@ const mobileNav = between("<!-- Mobile Nav Overlay -->", "</div>");
 // shows a live count, and scripts/lint-copy.js keeps a literal from creeping back.
 const footerRaw = between('<footer class="footer">', "</footer>");
 const COUNT_CLAUSE = /\s*·\s*<span id="footCount"[^>]*>[^<]*<\/span>\s*organizations across Massachusetts\./;
-const footer = footerRaw.replace(COUNT_CLAUSE, ".");
-if (footer === footerRaw) throw new Error("footer: the #footCount clause was not found in index.html — the events page would ship a count it cannot keep current");
+const withoutCount = footerRaw.replace(COUNT_CLAUSE, ".");
+if (withoutCount === footerRaw) throw new Error("footer: the #footCount clause was not found in index.html — the events page would ship a count it cannot keep current");
+// Same reasoning for the curation month. The atlas page fills #footCurated from the
+// newest lastVerified in the data; this page has no script, so a month lifted into
+// it could only rot — it said "Curated June 2026" into October. Drop the clause
+// rather than bake in a date nothing regenerates.
+const CURATED_CLAUSE = /\s*·\s*Curated\s*<span id="footCurated"[^>]*>[^<]*<\/span>/;
+const footer = withoutCount.replace(CURATED_CLAUSE, "");
+if (footer === withoutCount) throw new Error("footer: the #footCurated clause was not found in index.html — the events page would ship a curation date it cannot keep current");
 const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color:var(--gold);text-decoration:none}");
 // chrome script: from toggleMobileMenu's containing <script> to the updateLogos sync call
 const scriptStart = src.lastIndexOf("<script>", src.indexOf("function toggleMobileMenu"));

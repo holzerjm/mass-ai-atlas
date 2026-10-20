@@ -6,6 +6,11 @@
  * promised "160+" (both found in the v2.0 review, Sept 2026). Counts on the page
  * are now computed from DATA; this keeps new prose from reintroducing them.
  *
+ * The curation DATE in that same sentence outlived the count fix by a month — it
+ * still read "Curated June 2026" in October, because only the number had been
+ * made computed. It now comes from the newest lastVerified in the data, and the
+ * second pattern here keeps a typed month from returning.
+ *
  *   node scripts/lint-copy.js                # index.html, events/index.html, README.md
  *   node scripts/lint-copy.js some/file.html # any files (fixtures, tests)
  *
@@ -42,7 +47,15 @@ const COUNT_RE = /(?<![\w.#-])(\d[\d,]*(?:[ \t]*\+)?)[ \t\n]+(?:[A-Za-z][\w'’-
 // read as spaces). At most one separator, and the number must stand alone, so
 // dates ("entries: 2026-09") and ids ("entries v2") do not trip it.
 const NOUN_FIRST_RE = /\b(organi[sz]ations?|orgs|entries|listings)[ \t\n]*(?:[:=|(–—][ \t\n|]*)?(\d[\d,]*\+?)(?![\w.\/:-])/gi;
-const PATTERNS = [COUNT_RE, NOUN_FIRST_RE];
+// A curation month typed into prose: "Curated June 2026", "Curated Jun 2026",
+// "Curated 2026-06". Only "Curated" leads it — "Updated"/"Last reviewed" appear in
+// maintainer docs about process, where a literal date is correct.
+const CURATED_RE = /\bCurated[ \t\n]+(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[ \t\n]+\d{4}|\d{4}-\d{2})\b/gi;
+const PATTERNS = [
+  { re: COUNT_RE, kind: "count" },
+  { re: NOUN_FIRST_RE, kind: "count" },
+  { re: CURATED_RE, kind: "curation date" },
+];
 const VISIBLE_ATTRS = /\b(?:alt|title|aria-label|aria-description|placeholder|content|value)\s*=\s*("[^"]*"|'[^']*')/gi;
 
 // Blank a span of text but keep its newlines, so offsets and line numbers in the
@@ -94,22 +107,24 @@ function findCounts(masked, original) {
   const hits = [];
   const lineOf = (i) => original.slice(0, i).split("\n").length;
   // report the original text (with its ** or <b>), which is what someone will grep for
-  const push = (index, len) => {
+  const push = (index, len, kind) => {
     const line = lineOf(index);
     const src = original.split("\n")[line - 1];
     if (/lint-copy:\s*ignore/.test(src)) return;
-    hits.push({ line, text: original.slice(index, index + len).replace(/\s+/g, " ").trim() });
+    hits.push({ line, kind, text: original.slice(index, index + len).replace(/\s+/g, " ").trim() });
   };
   // 1) attribute values people see (tooltips, alt text, unfurl descriptions)
   for (const tag of masked.matchAll(/<[A-Za-z][^>]*>/g)) {
     for (const a of tag[0].matchAll(VISIBLE_ATTRS)) {
       const valStart = tag.index + a.index + a[0].indexOf(a[1]);
-      for (const re of PATTERNS) for (const c of a[1].matchAll(re)) push(valStart + c.index, c[0].length);
+      for (const { re, kind } of PATTERNS)
+        for (const c of a[1].matchAll(re)) push(valStart + c.index, c[0].length, kind);
     }
   }
   // 2) text content: tags become spaces so "<b>101</b> organizations" still reads
   const text = masked.replace(/<[^>]*>/g, blank);
-  for (const re of PATTERNS) for (const c of text.matchAll(re)) push(c.index, c[0].length);
+  for (const { re, kind } of PATTERNS)
+    for (const c of text.matchAll(re)) push(c.index, c[0].length, kind);
   return hits.sort((a, b) => a.line - b.line);
 }
 
@@ -132,9 +147,11 @@ for (const f of files) {
 }
 
 if (problems.length) {
-  for (const p of problems) console.error(`${p.file}:${p.line}: hand-typed count "${p.text}"`);
-  console.error(`\nlint-copy: ${problems.length} hand-typed organization count(s). ` +
-    `Compute it from DATA instead (see footerFacts() in index.html), or drop the number.`);
+  for (const p of problems) console.error(`${p.file}:${p.line}: hand-typed ${p.kind} "${p.text}"`);
+  const kinds = [...new Set(problems.map((p) => p.kind))].join(" and ");
+  console.error(`\nlint-copy: ${problems.length} hand-typed ${kinds} claim(s). ` +
+    `Compute it from the data instead (see the stats block in index.html, which fills ` +
+    `#footCount and #footCurated), or drop it.`);
   process.exit(1);
 }
-console.log(`lint-copy: OK — no hand-typed organization counts in ${files.join(", ")}`);
+console.log(`lint-copy: OK — no hand-typed counts or curation dates in ${files.join(", ")}`);

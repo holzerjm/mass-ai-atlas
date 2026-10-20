@@ -101,6 +101,22 @@ test("footer #footCount shows the live entry count", async ({ page }) => {
   await expect(page.locator("#footCount")).toHaveText(new RegExp(`\\b${DATA.length}\\b`));
 });
 
+// The count's twin: "Curated <month>" was left hand-typed when the count was fixed,
+// so it still read June 2026 in October. It now renders the newest lastVerified in
+// the data. Derived here the same way the page does, so the test tracks the data
+// rather than a month someone has to remember to update.
+test("footer #footCurated shows the newest verification month", async ({ page }) => {
+  const MONTHS = ["January","February","March","April","May","June",
+                  "July","August","September","October","November","December"];
+  const newest = DATA.map((d) => d.lastVerified).filter(Boolean).sort().pop();
+  const [y, m] = newest.split("-");
+  await page.goto("./");
+  await waitForApp(page);
+  await expect(page.locator("#footCurated")).toHaveText(`${MONTHS[+m - 1]} ${y}`);
+  // the placeholder must actually have been replaced
+  await expect(page.locator("#footCurated")).not.toHaveText("—");
+});
+
 test("every entry opens a drawer with its name", async ({ page }) => {
   // cheap full sweep: one bad entry (a missing CATS key, a stage number with no
   // STAGES row) throws inside openDrawer and would only show for that org
