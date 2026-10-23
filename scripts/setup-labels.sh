@@ -24,12 +24,21 @@
 set -euo pipefail
 
 REPO="${1:-}"
-SET_REPO=0
-[[ "${2:-}" == "--set-repo" ]] && SET_REPO=1
+# Pointing the page at your own repository is the DEFAULT, because forgetting it
+# is silent and lands on someone else's repository (see the GH_REPO block below).
+# It is a no-op when they already match, so the original repo is unaffected.
+SET_REPO=1
+case "${2:-}" in
+  --keep-repo) SET_REPO=0 ;;
+  --set-repo)  SET_REPO=1 ;;   # accepted for anyone following older notes
+  "")          ;;
+  *) echo "Unknown option: $2" >&2; exit 2 ;;
+esac
 if [[ ! "$REPO" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
-  echo "Usage: $0 <owner/repo> [--set-repo]   e.g. $0 holzerjm/mass-ai-atlas" >&2
-  echo "  --set-repo also rewrites GH_REPO in index.html so the contribution" >&2
-  echo "             buttons point at your copy instead of the original." >&2
+  echo "Usage: $0 <owner/repo> [--keep-repo]   e.g. $0 holzerjm/mass-ai-atlas" >&2
+  echo "  Creates the four issue-form labels, and points index.html's GH_REPO at" >&2
+  echo "  <owner/repo> so this copy's contribution buttons open issues on it." >&2
+  echo "  --keep-repo  leave GH_REPO alone (warns if it points somewhere else)." >&2
   exit 2
 fi
 command -v gh >/dev/null || { echo "The GitHub CLI (gh) is not installed: https://cli.github.com" >&2; exit 1; }
@@ -68,13 +77,27 @@ if [[ -z "$CURRENT" ]]; then
   echo "⚠ Could not find 'const GH_REPO' in $HTML — check the contribution buttons by hand." >&2
 elif [[ "$CURRENT" == "$REPO" ]]; then
   echo "✓ index.html GH_REPO already points at $REPO"
-elif [[ "${SET_REPO:-0}" == "1" ]]; then
+elif [[ "$SET_REPO" == "1" ]]; then
   perl -pi -e "s{^const GH_REPO = \"\Q$CURRENT\E\"}{const GH_REPO = \"$REPO\"}" "$HTML"
-  echo "✓ index.html GH_REPO: $CURRENT -> $REPO (commit this)"
+  echo "✓ index.html GH_REPO: $CURRENT -> $REPO"
+  # events/index.html is GENERATED from index.html and carries the same links, so
+  # rewriting one without the other leaves the tree failing its own contract test
+  # (tests/events.spec.js). Regenerate here rather than leaving it to be remembered.
+  GEN="$(dirname "$0")/build-events-page.js"
+  if command -v node >/dev/null 2>&1 && [[ -f "$GEN" ]]; then
+    if node "$GEN" >/dev/null 2>&1; then
+      echo "✓ events/index.html regenerated to match"
+    else
+      echo "⚠ Could not regenerate events/index.html — run: node scripts/build-events-page.js" >&2
+    fi
+  else
+    echo "⚠ node not found — run: node scripts/build-events-page.js so the events page follows" >&2
+  fi
+  echo "  Commit both files."
 else
   echo
-  echo "⚠ index.html still points at $CURRENT, not $REPO."
-  echo "  The + Suggest an entry and flag buttons on your page will open issues"
-  echo "  on $CURRENT, not on your copy."
-  echo "  Fix it:  $0 $REPO --set-repo     (or edit 'const GH_REPO' in index.html)"
+  echo "⚠ index.html still points at $CURRENT, not $REPO (--keep-repo was given)."
+  echo "  The + Suggest an entry and flag buttons on your page, and the events"
+  echo "  page's + Add your event link, will open issues on $CURRENT."
+  echo "  Change your mind with:  $0 $REPO"
 fi

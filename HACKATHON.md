@@ -30,7 +30,7 @@ npm run test:e2e            # the browser suite (needs: npx playwright install c
 One more step if you made this repository from the template: run
 
 ```bash
-scripts/setup-labels.sh <owner/repo> --set-repo   # e.g. scripts/setup-labels.sh you/your-atlas --set-repo
+scripts/setup-labels.sh <owner/repo>     # e.g. scripts/setup-labels.sh you/your-atlas
 ```
 
 once. It fixes the two things a copy does not inherit.
@@ -39,11 +39,11 @@ once. It fixes the two things a copy does not inherit.
 form asks for when it does not exist — so until you run this, suggestions arrive unlabelled
 and the suggestion bot never sees them.
 
-**The repository your page points at.** `--set-repo` rewrites `GH_REPO` in `index.html`.
-Leave it alone and the ➕ Suggest an entry button, every entry's 🚩 flag, and the events
-page's ➕ Add your event link all open issues on **this** repository rather than yours.
-Commit the change, and re-run `node scripts/build-events-page.js` so the events page
-follows.
+**The repository your page points at.** It rewrites `GH_REPO` in `index.html` and
+regenerates `events/index.html` to match. Skip this and the ➕ Suggest an entry button,
+every entry's 🚩 flag, and the events page's ➕ Add your event link all open issues on
+**this** repository rather than yours — silently, because the page works either way.
+Commit both files. (`--keep-repo` opts out, and says what it is leaving behind.)
 
 It is idempotent; running it twice is harmless. The rest of what to change in your own copy
 is in [Make it yours](#make-it-yours).
