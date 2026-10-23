@@ -27,6 +27,17 @@ node scripts/lint-copy.js   # no hand-typed organization counts in prose
 npm run test:e2e            # the browser suite (needs: npx playwright install chromium)
 ```
 
+One more step if you made this repository from the template: run
+
+```bash
+scripts/setup-labels.sh <owner/repo>     # e.g. scripts/setup-labels.sh you/your-atlas
+```
+
+once. Labels do not come with a copy, and GitHub **silently drops** a label an issue form
+asks for when it does not exist — so until you run this, suggestions arrive unlabelled and
+the suggestion bot never sees them. It is idempotent; running it twice is harmless. The rest
+of what to change in your own copy is in [Make it yours](#make-it-yours).
+
 ## The shape of it
 
 There is no build step, no framework, no database, no server-side code and no accounts. That
@@ -34,7 +45,7 @@ is deliberate, and it is why you can read the whole thing in an afternoon.
 
 When someone opens the page:
 
-1. The browser loads `index.html` — one hand-written file, HTML + CSS + vanilla JS, ~158 KB.
+1. The browser loads `index.html` — one hand-written file, HTML + CSS + vanilla JS, ~160 KB.
 2. It fetches six files from `data/`: three data files and their three JSON Schemas.
 3. `atlas-data.js` parses the YAML and validates every file **in the browser**.
 4. On failure the page shows a banner. On success the data becomes globals and the app runs.
