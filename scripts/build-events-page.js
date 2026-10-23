@@ -8,6 +8,16 @@ const path = require("path");
 const REPO = path.join(__dirname, "..");
 const src = fs.readFileSync(REPO + "/index.html", "utf8");
 
+// The contribution links below must point at whichever repository this copy IS,
+// not at the one it was copied from. index.html's `const GH_REPO` is the single
+// place that decides; read it rather than hardcoding, so that setting GH_REPO
+// (or running scripts/setup-labels.sh --set-repo) fixes the atlas page AND this
+// one together. Hardcoded here until 2026-10-23, when a dry run of the hackathon
+// setup path found a copy's "Add your event" links filing issues upstream.
+const GH_REPO = (src.match(/^const GH_REPO = "([^"]+)"/m) || [])[1];
+if (!GH_REPO) throw new Error("GH_REPO: `const GH_REPO = \"owner/repo\"` was not found in index.html — the events page would ship contribution links pointing at someone else's repository");
+const issueUrl = (template) => `https://github.com/${GH_REPO}/issues/new?template=${template}`;
+
 function between(startMark, endMark, from = 0) {
   const a = src.indexOf(startMark, from);
   if (a === -1) throw new Error("start not found: " + startMark);
@@ -128,7 +138,7 @@ ${mobileNav}
   <div class="topnav">
     <a href="../">🗺️ The Atlas</a>
     <a href="https://the-open-accelerator.com/calendar/">🗓️ TOA's own calendar</a>
-    <a href="https://github.com/holzerjm/mass-ai-atlas/issues/new?template=suggest-event.yml" target="_blank" rel="noopener">➕ Add your event</a>
+    <a href="${issueUrl("suggest-event.yml")}" target="_blank" rel="noopener">➕ Add your event</a>
     <span class="meta" id="genLine">loading…</span>
   </div>
 
@@ -137,10 +147,10 @@ ${mobileNav}
   <div class="contrib" id="add">
     <h3>Get your event on this list</h3>
     <p>Three ways, easiest first: run your events on a public
-    <b>Luma calendar</b> and <a href="https://github.com/holzerjm/mass-ai-atlas/issues/new?template=suggest-event.yml">tell us its address</a>
+    <b>Luma calendar</b> and <a href="${issueUrl("suggest-event.yml")}">tell us its address</a>
     (we'll ingest everything you publish, forever) · submit it to
     <a href="https://luma.com/toa">TOA's Luma calendar</a> (admin-approved) · or
-    <a href="https://github.com/holzerjm/mass-ai-atlas/issues/new?template=suggest-event.yml">suggest a one-off event</a>.
+    <a href="${issueUrl("suggest-event.yml")}">suggest a one-off event</a>.
     AI-relevant, Greater Boston, open to the community — that's the whole bar.</p>
   </div>
 

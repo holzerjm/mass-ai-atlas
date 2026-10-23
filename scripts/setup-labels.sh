@@ -24,8 +24,12 @@
 set -euo pipefail
 
 REPO="${1:-}"
+SET_REPO=0
+[[ "${2:-}" == "--set-repo" ]] && SET_REPO=1
 if [[ ! "$REPO" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
-  echo "Usage: $0 <owner/repo>   e.g. $0 holzerjm/mass-ai-atlas" >&2
+  echo "Usage: $0 <owner/repo> [--set-repo]   e.g. $0 holzerjm/mass-ai-atlas" >&2
+  echo "  --set-repo also rewrites GH_REPO in index.html so the contribution" >&2
+  echo "             buttons point at your copy instead of the original." >&2
   exit 2
 fi
 command -v gh >/dev/null || { echo "The GitHub CLI (gh) is not installed: https://cli.github.com" >&2; exit 1; }
@@ -45,3 +49,32 @@ for row in "${LABELS[@]}"; do
   echo "✓ $name"
 done
 echo "Labels in place on $REPO. Check: gh label list --repo $REPO"
+
+# ---------------------------------------------------------------------------
+# The other thing a copy does not inherit: index.html's GH_REPO.
+#
+# Both community buttons (+ Suggest an entry, and the flag on every entry) build
+# their URL from `const GH_REPO` in index.html. Left at the upstream default, a
+# copy's buttons file issues on SOMEONE ELSE'S repository — silently, because the
+# page looks and behaves correctly either way. Found during the 2026-10-23 dry
+# run of the hackathon setup path.
+#
+# This script already knows the repo you meant, so it is the right place to say so.
+# ---------------------------------------------------------------------------
+HTML="$(dirname "$0")/../index.html"
+CURRENT="$(sed -n 's/^const GH_REPO = "\([^"]*\)".*/\1/p' "$HTML" | head -1)"
+
+if [[ -z "$CURRENT" ]]; then
+  echo "⚠ Could not find 'const GH_REPO' in $HTML — check the contribution buttons by hand." >&2
+elif [[ "$CURRENT" == "$REPO" ]]; then
+  echo "✓ index.html GH_REPO already points at $REPO"
+elif [[ "${SET_REPO:-0}" == "1" ]]; then
+  perl -pi -e "s{^const GH_REPO = \"\Q$CURRENT\E\"}{const GH_REPO = \"$REPO\"}" "$HTML"
+  echo "✓ index.html GH_REPO: $CURRENT -> $REPO (commit this)"
+else
+  echo
+  echo "⚠ index.html still points at $CURRENT, not $REPO."
+  echo "  The + Suggest an entry and flag buttons on your page will open issues"
+  echo "  on $CURRENT, not on your copy."
+  echo "  Fix it:  $0 $REPO --set-repo     (or edit 'const GH_REPO' in index.html)"
+fi
