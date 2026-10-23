@@ -1,5 +1,6 @@
-# Browser suite (see docs/testing.md). 28 tests over the four views, deep links,
+# Browser suite (see docs/testing.md). Covers the four views, deep links,
 # the shortlist, the events page and accessibility.
+# (`npx playwright test --list` prints the current count; don't type it here.)
 #
 # NOT a required check, on purpose, and that is the whole point of this file.
 #

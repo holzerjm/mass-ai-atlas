@@ -24,7 +24,7 @@ events pipeline at deploy time and is not in git; the page handles its absence.
 ```bash
 node scripts/validate.js    # the data rules
 node scripts/lint-copy.js   # no hand-typed organization counts in prose
-npm run test:e2e            # 28 browser tests (needs: npx playwright install chromium)
+npm run test:e2e            # the browser suite (needs: npx playwright install chromium)
 ```
 
 ## The shape of it
@@ -50,7 +50,7 @@ build artifact in between.
 | `data/*.schema.yml` | JSON Schema for each — these are a safety control, not just a type check |
 | `atlas-data.js` | the shared loader, used by the page and by every script |
 | `scripts/` | validate, exports, link check, freshness rota, the events pipeline |
-| `tests/` | 28 Playwright tests over the four views, deep links, shortlist, events, accessibility |
+| `tests/` | about 30 Playwright tests over the four views, deep links, shortlist, events, accessibility |
 
 Map stack: Leaflet 1.9.4 with a MapLibre GL 5.24.0 vector basemap from OpenFreeMap (keyless),
 markercluster 1.5.3. All from CDNs — there is nothing to bundle.
