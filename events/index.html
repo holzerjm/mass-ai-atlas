@@ -93,6 +93,14 @@ tailwind.config = {
 .toa-links a{color:var(--gold);text-decoration:none;font-weight:600}
 .toa-links a:hover{text-decoration:underline}
 .footer a{color:var(--gold);text-decoration:none}
+    /* Make inline links distinguishable without relying on colour alone. */
+  #add p a,
+  .footer-inner a,
+  #list .atlas {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: var(--muted);
+  }
   @media (max-width:520px){h1{font-size:29px}.ev{flex-direction:column;gap:4px}.ev .time{min-width:0}}
 </style>
 </head>
