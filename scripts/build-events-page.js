@@ -124,6 +124,14 @@ ${bootstrap}
   .contrib a:hover{text-decoration:underline}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 ${footerCss}
+    /* Make inline links distinguishable without relying on colour alone. */
+  #add p a,
+  .footer-inner a,
+  #list .atlas {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: var(--muted);
+  }
   @media (max-width:520px){h1{font-size:29px}.ev{flex-direction:column;gap:4px}.ev .time{min-width:0}}
 </style>
 </head>
