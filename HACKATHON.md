@@ -190,6 +190,19 @@ moved on, merge it into your branch and run the suite again before you trust the
 went green against a tree that no longer existed: two other changes had edited the same block
 of CSS while it sat open, and nothing in its own run could have told you so.
 
+## What happens to your pull request
+
+Nothing has to be merged here to count. This is a template: the copy you made is yours, and
+most of what gets built on it belongs there rather than upstream.
+
+If you do open a pull request against this repository, expect it to be reviewed properly rather
+than quickly. Merging to `main` publishes to the live site within a couple of minutes, so a
+change is judged on whether it should be public, not only on whether it is green. An open pull
+request is not a rejection.
+
+Entries in `data/entities.yml` take the slowest path of all. Each one is a public claim about a
+real organization, and `lastVerified` means a person checked it.
+
 ---
 
 *Mass AI Atlas — The Open Accelerator, with Red Hat, the Massachusetts AI Hub, and IBM.
