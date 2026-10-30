@@ -79,7 +79,8 @@ ${bootstrap}
   :root{--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
     --muted:#9aa1ab;--faint:#9ca3af;--gold:#ffc600;--red:#ff5c45;--ok:#4ade80}
   html:not(.dark){--bg:#faf9f7;--panel:#ffffff;--panel2:#f3f1ee;--line:#e2ddd6;--text:#1c1a17;
-    --muted:#5d574e;--faint:#6b6255;--gold:#b45309;--red:#ee0000;--ok:#15803d}
+    --muted:#5d574e;--faint:#6b6255;--gold:#b45309;--red:#cc0000;--ok:#15803d}
+  /* light --red is darkened from brand #ee0000, which reads 4.31:1 on this ground */
   *{margin:0;padding:0;box-sizing:border-box}
   /* Tailwind preflight is off (matching the atlas): restore the border base
      its utilities rely on, and the link reset for the ported chrome. */
