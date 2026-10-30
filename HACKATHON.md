@@ -185,6 +185,11 @@ If a browser test fails, re-run it with `--workers=1` before believing it. Every
 WebGL basemap, and under parallel workers a test can fail for lack of frames rather than a real
 defect. Retries are off on purpose so flakes stay visible.
 
+Green checks only prove your change works against the commit you branched from. If `main` has
+moved on, merge it into your branch and run the suite again before you trust them. One fix here
+went green against a tree that no longer existed: two other changes had edited the same block
+of CSS while it sat open, and nothing in its own run could have told you so.
+
 ---
 
 *Mass AI Atlas — The Open Accelerator, with Red Hat, the Massachusetts AI Hub, and IBM.
