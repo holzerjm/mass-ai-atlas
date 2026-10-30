@@ -160,6 +160,21 @@ Starting points, not a prescription:
 - Embed a filtered slice of the map somewhere else.
 - Something the atlas is not: this is a map. It is not a CRM, a newsletter, or a matchmaker.
 
+## The brief is a floor
+
+Some of the open issues are labelled `good first issue`. Each says what is wrong, which file to
+change, and how to check that you fixed it. Treat the measurement in one as a starting point
+rather than a boundary.
+
+A contrast bug on the events page was filed against the dark theme, measured at 3.72–4.09:1.
+The contributor who fixed it checked the light theme as well, which the issue had not asked
+for, and found it worse — 3.53:1. Both were the same one-line change. That unasked-for check is
+what exposed the larger gap: the accessibility gate scans the dark theme only, which is
+deliberate and documented, and it had been hiding three more failures on that same page.
+
+An issue is written by someone who looked once. Measure it yourself before you trust the number
+in it.
+
 ## Before you call it done
 
 ```bash
