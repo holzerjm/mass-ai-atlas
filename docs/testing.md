@@ -192,24 +192,35 @@ Not gated yet:
 
 ---
 
-## CI (`.github/workflows/validate.yml`)
+## CI (`.github/workflows/validate.yml` and `e2e.yml`)
 
-Runs on PRs and pushes to `main` that touch `data/`, `index.html`,
-`events/**`, `map-style-dark.json`, `README.md`, `scripts/**`, `tests/**`,
-`package*.json`, `playwright.config.js` or the workflow itself. `README.md` is
-there for the copy lint, which checks it: without it a README-only PR could
-merge a hand-typed count and the next unrelated PR would go red for it.
+Two workflows run on every pull request, and **neither is path-filtered**. That is
+deliberate: a path-filtered required status check never reports on a PR outside its
+paths, and would block that PR forever. On pushes to `main`, **Validate atlas data** is
+limited to `data/**`, `scripts/**`, `atlas-data.js`, `package.json` and
+`package-lock.json`; **Browser tests** has no path filter there either.
 
-| Job | What it does |
-|---|---|
-| `validate` | `node scripts/validate.js` + the freshness report (unchanged) |
-| `badge` | on pushes to `main`, regenerates `badge.json` (unchanged) |
-| `lint-copy` | `node scripts/lint-copy.js` — fails if user-visible copy in `index.html`, `events/index.html` or `README.md` hand-types an organisation count |
-| `e2e` | `npm ci`, `npx playwright install --with-deps chromium`, `npm run test:e2e`; on failure uploads `playwright-report/` + `test-results/` (traces, screenshots) as the **playwright-report** artifact, kept 14 days |
+| Workflow | Job | What it does |
+|---|---|---|
+| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count; then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
+| Browser tests | `e2e` | `npm ci`, Chromium restored from a cache keyed on the lockfile, `npm run test:e2e`; on failure uploads `playwright-report/` as the **playwright-report** artifact, kept 7 days |
+
+**Only `validate` is a required status check** on `main`. Browser tests runs and reports
+but gates nothing, on purpose — the comment at the top of `e2e.yml` says why, and what to
+change to promote it.
+
+CI retries a failed test twice (`retries: CI ? 2 : 0`). Locally it does not, so a flake
+stays visible while you work.
+
+A pull request from someone who has not contributed to this repository before lands with
+both workflows in `action_required`. They do not run until a maintainer presses *Approve
+and run workflows* on the PR's Checks tab, so "no checks reported" on such a PR is not a
+red build.
 
 To read a CI failure: open the run → Artifacts → download
-**playwright-report** → unzip → `npx playwright show-report <folder>`. The trace
-of each failed test replays it step by step.
+**playwright-report** → unzip → `npx playwright show-report <folder>`. `trace:
+"retain-on-failure"` puts a trace inside the report for each failed test, so it replays
+step by step.
 
 ---
 
