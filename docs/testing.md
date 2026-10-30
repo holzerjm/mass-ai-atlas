@@ -186,10 +186,9 @@ Not gated yet:
   dark theme only. On the baseline, the light theme had 19 serious
   `color-contrast` nodes on the map and 207 in the Directory (category chips,
   card text), plus 3 `link-in-text-block`; gating those views still needs a
-  contrast pass on the light palette.
-- **Events page:** scanned in both dark and light themes. The events page is a
-  separate, smaller surface, so its light-theme scan can gate independently of
-  the atlas views.
+  contrast pass on the light palette. The events page is a separate and much
+  smaller surface, so it is already gated in both themes (above) and does not
+  wait on that pass.
 
 ---
 
