@@ -156,6 +156,7 @@
   why: A fast-growing AI program in the geographic center of Boston's student population.
   tags: [education, research]
   stages: [1]
+  links: [iaifi]
   offers: [talent]
   added: 2026-06
   lastVerified: 2026-09
@@ -856,6 +857,7 @@
   why: Health-data AI at unicorn scale, headquartered in Cambridge.
   tags: [healthcare]
   stages: []
+  links: [nvidia-bos]
   offers: [talent]
   added: 2026-06
   lastVerified: 2026-06
@@ -1895,6 +1897,7 @@
   facts: [[Check size, $10K–$100K; up to $1M match], [Terms, SAFEs; match needs qualifying term sheet], [Focus, MIT-alumni founders only]]
   tags: [MIT, pre-seed]
   stages: [4]
+  links: [gc, glasswing, polaris, underscore]
   offers: [funding]
   applyBy: rolling
   added: 2026-08
@@ -2317,7 +2320,7 @@
   facts: [[Cohort size, Up to 10 a year (12 in 2024-25); 10 in 2026-27], [Program length, Full-year memberships; cohort starts in fall], [Equity, 'No fee; award is memberships, not investment'], [Terms, 'Free Chamber + WorcLab membership, SCORE mentor'], [Focus, 'Innovative, scalable ideas; all ages; generalist'], [Stage, Pre-launch to early revenue]]
   tags: [equity-free, coworking, incubator, founders]
   stages: [2, 3]
-  links: []
+  links: [worclab]
   offers: [space, mentorship, community]
   added: 2026-10
   lastVerified: 2026-10
