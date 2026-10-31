@@ -1,0 +1,10 @@
+# node scripts/validate.js on branch proposals, 2026-10-31T17:45Z
+Mass AI Atlas — validating 197 entries, 11 categories
+
+Warnings:
+  ⚠ [toa] applyBy 2026-10-25 has passed — set the next deadline or remove it
+  ⚠ [masscec] applyBy 2026-10-20 has passed — set the next deadline or remove it
+
+PASSED: data/ is valid.
+# node scripts/lint-copy.js
+lint-copy: OK — no hand-typed counts or curation dates in index.html, events/index.html, README.md, HACKATHON.md

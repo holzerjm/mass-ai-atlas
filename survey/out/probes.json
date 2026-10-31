@@ -1,0 +1,32 @@
+{
+  "measured_at": "2026-10-31T17:45:02.806Z",
+  "data_commit": "0ef9f7d",
+  "approved_links": 7,
+  "before": {
+    "entries": 197,
+    "no_links": 104,
+    "isolated": 74
+  },
+  "after": {
+    "entries": 197,
+    "no_links": 100,
+    "isolated": 69
+  },
+  "calibration": {
+    "high": {
+      "approved": 6,
+      "decided": 11,
+      "rate": 0.55
+    },
+    "medium": {
+      "approved": 1,
+      "decided": 3,
+      "rate": 0.33
+    },
+    "low": {
+      "approved": 0,
+      "decided": 6,
+      "rate": 0
+    }
+  }
+}
