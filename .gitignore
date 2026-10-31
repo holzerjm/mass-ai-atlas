@@ -24,3 +24,4 @@ survey/cache/
 __pycache__/
 # frozen Atlas copy the chatbot reads (the bare atlas.json rule above would hide it)
 !chatbot/data/atlas.json
+.venv/
