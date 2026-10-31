@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mass AI Atlas · 3D Lenses</title>
+<meta name="description" content="A tiltable 3D map of Massachusetts' AI ecosystem with a credibility lens (how sure are we about each pin?) and the Galaxy's connections drawn as arcs on the real map.">
+<link rel="icon" type="image/png" href="https://the-open-accelerator.com/images/Logo-OpenAccelerator-Favicon-RGB.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.css">
+<style>
+:root{
+  --bg:#070b16; --panel:rgba(12,18,34,.94); --panel2:#111a30; --line:rgba(148,163,184,.22);
+  --text:#e6ecff; --muted:#9aa7c7; --gold:#fbbf24;
+  --hi:#4ade80; --mid:#fbbf24; --lo:#f87171;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:"Red Hat Display",system-ui,sans-serif}
+a{color:var(--gold)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#map{position:fixed;inset:0}
+
+.bar{position:fixed;top:12px;left:12px;right:12px;z-index:5;display:flex;gap:10px;align-items:center;flex-wrap:wrap;pointer-events:none}
+.bar > *{pointer-events:auto}
+.brand{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:800;white-space:nowrap}
+.brand a{color:var(--muted);text-decoration:none;font-weight:600;margin-right:8px}
+.brand span{color:var(--gold)}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{background:none;border:0;padding:7px 12px;border-radius:9px;cursor:pointer;color:var(--muted);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--panel2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
+.search{position:relative;flex:1;min-width:200px;max-width:340px}
+.search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.results{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;max-height:260px;overflow:auto;display:none}
+.results button{display:block;width:100%;text-align:left;background:none;border:0;padding:7px 12px;cursor:pointer}
+.results button:hover,.results button:focus{background:var(--panel2)}
+
+.panel{position:fixed;left:12px;top:120px;z-index:4;width:290px;max-height:calc(100vh - 96px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.panel h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.panel h2:first-child{margin-top:0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:14px}
+.row select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 6px}
+.switch{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;margin:6px 0}
+.legend{font-size:13px;line-height:1.7}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px;vertical-align:-1px}
+.legend .halo{background:radial-gradient(circle,rgba(251,191,36,.55),rgba(251,191,36,.05));width:16px;height:16px;vertical-align:-3px}
+.stat{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:13px}
+.stat b{text-align:right}
+.weak button{display:flex;justify-content:space-between;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:6px 0;cursor:pointer;text-align:left;font-size:13px}
+.weak button:hover{color:var(--gold)}
+.pill{display:inline-block;min-width:34px;text-align:center;border-radius:999px;padding:1px 7px;font-weight:700;font-size:12px;color:#0b1020}
+.note{font-size:12px;color:var(--muted);line-height:1.5}
+.collapse{display:none}
+
+.card{position:fixed;right:12px;top:72px;z-index:4;width:360px;max-height:calc(100vh - 96px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:none}
+.card.open{display:block}
+.card .close{position:absolute;top:10px;right:10px;background:none;border:0;font-size:20px;cursor:pointer;color:var(--muted)}
+.card h3{margin:0 28px 2px 0;font-size:20px}
+.card .cat{font-size:13px;font-weight:700}
+.card .loc{font-size:13px;color:var(--muted);margin:4px 0 10px}
+.score{display:flex;align-items:center;gap:12px;margin:10px 0;padding:10px;border-radius:10px;background:var(--panel2)}
+.score .num{font-size:30px;font-weight:800}
+.bar-track{height:6px;border-radius:3px;background:rgba(148,163,184,.25);overflow:hidden;margin-top:4px}
+.bar-fill{height:100%}
+.sig{list-style:none;padding:0;margin:6px 0 0;font-size:13px}
+.sig li{display:grid;grid-template-columns:22px 1fr auto;gap:6px;padding:6px 0;border-bottom:1px solid var(--line)}
+.sig .pts{font-weight:700;white-space:nowrap}
+.sig .src{display:block;font-size:12px}
+.conn button{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px 4px 3px 0;cursor:pointer;font-size:12px}
+.conn button.oneway{border-style:dashed;color:var(--muted)}
+.ev{font-size:13px;margin:4px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.actions a{font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;text-decoration:none}
+
+.tip{position:fixed;z-index:6;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:13px;display:none;max-width:260px}
+.toggle-panel{display:none}
+@media (max-width:760px){
+  .panel{top:auto;bottom:12px;left:12px;right:12px;width:auto;max-height:42vh}
+  .panel.min .collapse-body{display:none}
+  .toggle-panel{display:block;background:none;border:0;color:var(--gold);font-weight:700;padding:0;margin-bottom:6px;cursor:pointer}
+  .card{left:12px;right:12px;width:auto;top:auto;bottom:12px;max-height:60vh}
+  .search{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<div id="map" role="application" aria-label="3D map of Massachusetts AI organizations. Use the search box or the 'Least certain entries' list to open any organization's card."></div>
+
+<div class="bar">
+  <div class="brand"><a href="./">← Atlas</a>Mass <span>AI Atlas</span> · 3D Lenses</div>
+  <div class="seg" role="group" aria-label="Lens">
+    <button type="button" data-lens="category" aria-pressed="false">Category</button>
+    <button type="button" data-lens="trust" aria-pressed="true">Credibility</button>
+    <button type="button" data-lens="links" aria-pressed="false">Connections</button>
+  </div>
+  <div class="seg" role="group" aria-label="Map area">
+    <button type="button" data-view="boston" aria-pressed="true">Boston</button>
+    <button type="button" data-view="state" aria-pressed="false">Commonwealth</button>
+  </div>
+  <div class="search">
+    <input id="q" type="search" placeholder="Find an organization…" autocomplete="off" aria-label="Find an organization" aria-controls="results">
+    <div class="results" id="results" role="listbox"></div>
+  </div>
+</div>
+
+<aside class="panel" id="panel" aria-label="Map controls">
+  <button class="toggle-panel" id="togglePanel" aria-expanded="true">▾ Controls</button>
+  <div class="collapse-body">
+  <h2>3D</h2>
+  <label class="switch"><input type="checkbox" id="tilt" checked> Tilt the map</label>
+  <label class="switch"><input type="checkbox" id="cols" checked> Columns</label>
+  <div class="row">Column height <select id="metric">
+    <option value="trust">Credibility score</option>
+    <option value="links">Connections</option>
+  </select></div>
+  <label class="switch"><input type="checkbox" id="bldg" checked> 3D buildings (street zoom)</label>
+  <label class="switch"><input type="checkbox" id="arcs" checked> Connection arcs</label>
+
+  <h2>Legend</h2>
+  <div class="legend" id="legend"></div>
+
+  <h2>How sure is the map?</h2>
+  <div class="stat" id="stats"></div>
+
+  <h2>Least certain entries</h2>
+  <div class="weak" id="weak"></div>
+  <p class="note">Scores are computed in your browser from the atlas's own fields. Nothing here edits the data — use “Suggest a fix” on a card to open a GitHub issue a maintainer reviews.</p>
+  </div>
+</aside>
+
+<aside class="card" id="card" aria-live="polite" aria-label="Organization details"></aside>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.js"></script>
+<script src="https://unpkg.com/deck.gl@9.1.14/dist.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4.3.2/dist/js-yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.17.1/ajv7.min.js"></script>
+<script src="atlas-data.js"></script>
+<script>
+/* ============================================================
+   Mass AI Atlas — 3D Lenses
+   ------------------------------------------------------------
+   MapLibre GL renders the basemap (incl. tilt and 3D buildings);
+   deck.gl draws the pins, columns and connection arcs on top.
+   Same data files and loader as index.html (atlas-data.js).
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const GH_REPO = "holzerjm/mass-ai-atlas";
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const VIEWS = {
+  boston: { center:[-71.085, 42.355], zoom:12.3, pitch:55, bearing:-20 },
+  state:  { center:[-71.75, 42.25],   zoom:7.6,  pitch:45, bearing:0 },
+};
+const TIER = { hi:"#4ade80", mid:"#fbbf24", lo:"#f87171" };
+const hex2rgb = h => [1,3,5].map(i => parseInt(h.substr(i,2),16));
+
+/* ---------- data ---------- */
+async function loadData(){
+  const texts = await Promise.all(AtlasData.FILES.map(f =>
+    fetch("data/" + f).then(r => { if(!r.ok) throw new Error(`data/${f}: HTTP ${r.status}`); return r.text(); })));
+  return AtlasData.loadAtlas(Object.fromEntries(AtlasData.FILES.map((f,i) => [f, texts[i]])), jsyaml, ajv7);
+}
+// The weekly events feed is optional: deployed next to this page as events.json.
+async function loadEvents(){
+  for(const u of ["events.json", "https://the-open-accelerator.com/ecosystem/events.json"]){
+    try{ const r = await fetch(u, {cache:"no-cache"}); if(r.ok) return (await r.json()).events || []; }catch(e){}
+  }
+  return [];
+}
+
+/* ---------- credibility ----------
+   Starts at 100 and loses points for each doubt signal the organizers listed
+   (HACKATHON.md), plus stacked coordinates. Every signal carries the evidence
+   and a link so a judge can check it. Recent event mentions add a little back. */
+const monthsSince = ym => {
+  if(!ym) return null;
+  const [y,m] = ym.split("-").map(Number), now = new Date();
+  return (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m);
+};
+const yamlLink = d => `https://github.com/${GH_REPO}/search?q=${encodeURIComponent("id: " + d.id)}&type=code`;
+
+function scoreEntry(d, ctx){
+  const s = [], add = (ok, pts, label, detail, href) => s.push({ok, pts, label, detail, href});
+  const age = monthsSince(d.lastVerified);
+  if(age === null) add(false, -25, "Never verified", "No lastVerified month on this entry.", yamlLink(d));
+  else if(age <= 1) add(true, 0, "Verified recently", `Last checked ${d.lastVerified}.`, yamlLink(d));
+  else if(age <= 3) add(false, -5, "Verified a few months ago", `Last checked ${d.lastVerified} (${age} months).`, yamlLink(d));
+  else add(false, -15, "Stale verification", `Last checked ${d.lastVerified} (${age} months ago).`, yamlLink(d));
+
+  if(d.approx) add(false, -20, "Approximate location", `Pin is neighborhood-level: “${d.loc}”.`, yamlLink(d));
+  else add(true, 0, "Exact location", d.loc, yamlLink(d));
+
+  const twins = ctx.stacked[d.lat + "," + d.lng].filter(x => x !== d);
+  if(twins.length) add(false, -5, "Shares a pin", `Same coordinates as ${twins.map(t => t.name).join(", ")} — one pin hid the other on the original map.`, yamlLink(d));
+
+  if(!(d.stages || []).length) add(false, -10, "No founder stage", "Missing from the Founder Journey view.", yamlLink(d));
+  if(!ctx.neighbors[d.id].size) add(false, -10, "No connections", "Nothing links to or from this entry.", yamlLink(d));
+  if((d.offers || []).includes("funding") && !(d.facts || []).some(f => f[0] === "Check size"))
+    add(false, -10, "Funder without check size", "Offers funding but gives no Check size fact.", yamlLink(d));
+  if(d.applyBy === "rolling") add(false, -5, "Deadline only “rolling”", "No concrete application date.", yamlLink(d));
+
+  const ev = ctx.events[d.id] || [];
+  if(ev.length) add(true, Math.min(10, 5 * ev.length), "Active this month", `${ev.length} upcoming event${ev.length > 1 ? "s" : ""} in the weekly feed mention it.`, ev[0].url);
+
+  const score = Math.max(0, Math.min(100, 100 + s.reduce((a,x) => a + x.pts, 0)));
+  return { score, signals:s, tier: score >= 80 ? "hi" : score >= 60 ? "mid" : "lo", age };
+}
+
+/* ---------- geometry helpers ---------- */
+// fan out entries that sit on identical coordinates so neither hides the other
+function spread(DATA, stacked){
+  for(const group of Object.values(stacked)){
+    group.forEach((d,i) => {
+      if(group.length < 2){ d.pos = [d.lng, d.lat]; return; }
+      const a = 2 * Math.PI * i / group.length, r = 0.0006;
+      d.pos = [d.lng + r * Math.cos(a) / Math.cos(d.lat * Math.PI / 180), d.lat + r * Math.sin(a)];
+    });
+  }
+}
+
+/* ---------- app ---------- */
+Promise.all([loadData(), loadEvents()]).then(([atlas, events]) => start(atlas, events)).catch(err => {
+  console.error(err);
+  document.body.insertAdjacentHTML("afterbegin", `<p role="alert" style="position:fixed;top:0;left:0;right:0;z-index:99;margin:0;padding:12px;background:#7f1d1d">Sorry — the atlas data failed to load.</p>`);
+});
+
+function start({ CATS, STAGES, DATA }, EVENTS){
+  const byId = Object.fromEntries(DATA.map(d => [d.id, d]));
+
+  // links: undirected neighbors + which directions were declared
+  const neighbors = Object.fromEntries(DATA.map(d => [d.id, new Set()]));
+  const declared = new Set();
+  for(const d of DATA) for(const t of d.links || []) if(byId[t]){
+    declared.add(d.id + ">" + t); neighbors[d.id].add(t); neighbors[t].add(d.id);
+  }
+  const pairs = [];
+  for(const d of DATA) for(const t of neighbors[d.id]) if(d.id < t){
+    pairs.push({ a:byId[d.id], b:byId[t], mutual: declared.has(d.id + ">" + t) && declared.has(t + ">" + d.id) });
+  }
+
+  const stacked = {};
+  for(const d of DATA) (stacked[d.lat + "," + d.lng] ||= []).push(d);
+  spread(DATA, stacked);
+
+  // event mentions: org name appears in an upcoming event's title, organizer or venue
+  const evIdx = {};
+  for(const d of DATA){
+    const n = d.name.toLowerCase(); if(n.length < 4) continue;
+    const re = new RegExp("\\b" + n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b");
+    const hits = EVENTS.filter(e => re.test([e.title, e.organizer, e.venue].join(" ").toLowerCase()));
+    if(hits.length) evIdx[d.id] = hits;
+  }
+
+  const ctx = { stacked, neighbors, events: evIdx };
+  for(const d of DATA){ d.cred = scoreEntry(d, ctx); d.deg = neighbors[d.id].size; }
+  const maxDeg = Math.max(...DATA.map(d => d.deg));
+
+  /* ---------- state ---------- */
+  const st = { lens:"trust", metric:"trust", tilt:true, cols:true, arcs:true, bldg:true, sel:null, hover:null, zoom:VIEWS.boston.zoom };
+
+  /* ---------- map ---------- */
+  const map = new maplibregl.Map({
+    container:"map", style:"./map-style-dark.json", ...VIEWS.boston,
+    maxPitch:70, attributionControl:{compact:true}, antialias:true
+  });
+  map.addControl(new maplibregl.NavigationControl({visualizePitch:true}), "bottom-right");
+
+  map.on("load", () => {
+    // 3D buildings — vector tiles only exist for what's on screen, and only from z14,
+    // so this costs nothing at the Commonwealth view.
+    const first = map.getStyle().layers.find(l => l.type === "symbol")?.id;
+    map.addLayer({
+      id:"bldg-3d", type:"fill-extrusion", source:"openmaptiles", "source-layer":"building", minzoom:14,
+      paint:{
+        "fill-extrusion-color":"#1f2a44",
+        "fill-extrusion-height":["interpolate",["linear"],["zoom"],14,0,15,["coalesce",["get","render_height"],10]],
+        "fill-extrusion-base":["coalesce",["get","render_min_height"],0],
+        "fill-extrusion-opacity":0.85
+      }
+    }, first);
+    render();
+  });
+  map.on("zoomend", () => { st.zoom = map.getZoom(); render(); });
+
+  const overlay = new deck.MapboxOverlay({ interleaved:false, layers:[], getCursor:({isHovering}) => isHovering ? "pointer" : "grab" });
+  map.addControl(overlay);
+
+  /* ---------- colors ---------- */
+  const baseColor = d => st.lens === "trust" ? hex2rgb(TIER[d.cred.tier])
+                    : st.lens === "links" ? linkColor(d) : hex2rgb(CATS[d.cat].color);
+  function linkColor(d){
+    const t = maxDeg ? d.deg / maxDeg : 0;   // dim slate → bright cyan by degree
+    return [Math.round(71 + t * (34 - 71)), Math.round(85 + t * (211 - 85)), Math.round(105 + t * (238 - 105))];
+  }
+  const focusSet = () => st.sel ? new Set([st.sel.id, ...neighbors[st.sel.id]]) : null;
+  function alpha(d, focus){
+    if(focus && !focus.has(d.id)) return 40;
+    if(st.lens !== "trust") return 230;
+    // fade with staleness: 0–1 month full, 5+ months 45%
+    const age = d.cred.age ?? 6;
+    return Math.round(255 * Math.max(.45, 1 - Math.max(0, age - 1) * .14));
+  }
+
+  /* ---------- layers ---------- */
+  function render(){
+    const z = st.zoom, focus = focusSet();
+    const k = Math.pow(2, 13 - z);                // meters per "screen unit" relative to z13
+    const colR = Math.max(12, 32 * k);
+    const metric = d => st.metric === "trust" ? d.cred.score / 100 : (maxDeg ? d.deg / maxDeg : 0);
+    const layers = [];
+
+    // uncertainty halos: an approximate pin is drawn as the area it might be in
+    layers.push(new deck.ScatterplotLayer({
+      id:"halo", data:DATA.filter(d => d.approx), getPosition:d => d.pos,
+      radiusUnits:"meters", getRadius:600, radiusMinPixels:10, radiusMaxPixels:80,
+      getFillColor:d => [...baseColor(d), focus && !focus.has(d.id) ? 10 : 45],
+      stroked:false, pickable:false,
+      updateTriggers:{ getFillColor:[st.lens, st.sel?.id] }
+    }));
+
+    if(st.arcs){
+      const vis = st.sel ? pairs.filter(p => p.a === st.sel || p.b === st.sel) : pairs;
+      layers.push(new deck.ArcLayer({
+        id:"arcs", data:vis,
+        getSourcePosition:p => p.a.pos, getTargetPosition:p => p.b.pos,
+        getSourceColor:p => [...(p.mutual ? baseColor(p.a) : [148,163,184]), st.sel ? 230 : (st.lens === "links" ? 150 : 70)],
+        getTargetColor:p => [...(p.mutual ? baseColor(p.b) : [148,163,184]), st.sel ? 230 : (st.lens === "links" ? 150 : 70)],
+        getWidth:st.sel ? 2.5 : 1.2, getHeight:0.5, greatCircle:false,
+        pickable:true,
+        updateTriggers:{ getSourceColor:[st.lens, st.sel?.id], getTargetColor:[st.lens, st.sel?.id] }
+      }));
+    }
+
+    if(st.cols && st.tilt){
+      layers.push(new deck.ColumnLayer({
+        id:"cols", data:DATA, getPosition:d => d.pos, diskResolution:12,
+        radius:colR, extruded:true, elevationScale:1,
+        getElevation:d => (40 + metric(d) * 900) * k,
+        getFillColor:d => [...baseColor(d), alpha(d, focus)],
+        material:{ ambient:.55, diffuse:.6, shininess:16 },
+        pickable:true, autoHighlight:true, highlightColor:[251,191,36,255],
+        updateTriggers:{ getElevation:[st.metric, z], getFillColor:[st.lens, st.sel?.id] }
+      }));
+    }
+
+    layers.push(new deck.ScatterplotLayer({
+      id:"pins", data:DATA, getPosition:d => d.pos,
+      radiusUnits:"pixels", getRadius:d => d === st.sel ? 9 : 5.5,
+      // approximate pins are hollow rings; exact pins are solid dots
+      filled:true, stroked:true, lineWidthUnits:"pixels",
+      getFillColor:d => d.approx ? [0,0,0,0] : [...baseColor(d), alpha(d, focus)],
+      getLineColor:d => d.approx ? [...baseColor(d), alpha(d, focus)] : [7,11,22,alpha(d, focus)],
+      getLineWidth:d => d.approx ? 2 : 1,
+      pickable:true, autoHighlight:true, highlightColor:[251,191,36,255],
+      updateTriggers:{ getFillColor:[st.lens, st.sel?.id], getLineColor:[st.lens, st.sel?.id], getRadius:[st.sel?.id] }
+    }));
+
+    overlay.setProps({ layers, onClick:onPick, onHover });
+    $("bldg") && map.getLayer("bldg-3d") && map.setLayoutProperty("bldg-3d", "visibility", st.bldg ? "visible" : "none");
+    renderLegend();
+  }
+
+  /* ---------- interaction ---------- */
+  const tip = $("tip");
+  function onHover({object, x, y, layer}){
+    if(!object){ tip.style.display = "none"; return; }
+    tip.innerHTML = layer.id === "arcs"
+      ? `${esc(object.a.name)} ↔ ${esc(object.b.name)}${object.mutual ? "" : "<br><span class='note'>listed one way only</span>"}`
+      : `<b>${esc(object.name)}</b><br>${esc(CATS[object.cat].label)} · credibility ${object.cred.score}${object.approx ? " · approx. pin" : ""}`;
+    tip.style.left = (x + 14) + "px"; tip.style.top = (y + 14) + "px"; tip.style.display = "block";
+  }
+  function onPick({object, layer}){
+    if(!object){ select(null); return; }
+    if(layer.id === "arcs") return select(object.a === st.sel ? object.b : object.a, true);
+    select(object, false);
+  }
+  function select(d, fly){
+    st.sel = d; render();
+    if(!d){ $("card").classList.remove("open"); return; }
+    if(fly){
+      const opts = { center:d.pos, zoom:Math.max(map.getZoom(), 13) };
+      REDUCED ? map.jumpTo(opts) : map.flyTo({ ...opts, speed:1.4 });
+    }
+    showCard(d);
+  }
+
+  function showCard(d){
+    const c = d.cred, color = TIER[c.tier];
+    const sig = c.signals.map(s => `<li>
+        <span aria-hidden="true">${s.ok ? "✅" : "⚠️"}</span>
+        <span><b>${esc(s.label)}</b> — ${esc(s.detail)}
+          <a class="src" href="${esc(s.href)}" target="_blank" rel="noopener">source ↗</a></span>
+        <span class="pts" style="color:${s.pts < 0 ? "var(--lo)" : s.pts > 0 ? "var(--hi)" : "var(--muted)"}">${s.pts > 0 ? "+" : ""}${s.pts || "—"}</span>
+      </li>`).join("");
+    const conns = [...neighbors[d.id]].map(id => byId[id]).sort((a,b) => a.name.localeCompare(b.name)).map(o => {
+      const mutual = declared.has(d.id + ">" + o.id) && declared.has(o.id + ">" + d.id);
+      return `<button type="button" data-go="${esc(o.id)}" class="${mutual ? "" : "oneway"}" title="${mutual ? "Both entries list each other" : "Only one entry lists the other"}">${esc(o.name)}</button>`;
+    }).join("");
+    const ev = (evIdx[d.id] || []).map(e => `<div class="ev">📅 <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a> · ${new Date(e.start).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</div>`).join("");
+    const flag = `https://github.com/${GH_REPO}/issues/new?` + new URLSearchParams({
+      template:"flag-entry.yml", title:`[Flag] ${d.name}`, labels:"flag", "entry-id":`${d.name} (id: ${d.id})`
+    });
+    $("card").innerHTML = `
+      <button class="close" aria-label="Close">×</button>
+      <div class="cat" style="color:${CATS[d.cat].color}">${esc(CATS[d.cat].label)}</div>
+      <h3>${esc(d.name)}</h3>
+      <div class="loc">📍 ${esc(d.loc)}${d.approx ? " (approx.)" : ""}</div>
+      <div class="score">
+        <div class="num" style="color:${color}">${c.score}</div>
+        <div style="flex:1"><b>${c.tier === "hi" ? "High" : c.tier === "mid" ? "Medium" : "Low"} credibility</b>
+          <div class="bar-track"><div class="bar-fill" style="width:${c.score}%;background:${color}"></div></div>
+          <div class="note">Last verified ${esc(d.lastVerified || "never")}</div></div>
+      </div>
+      <p style="font-size:14px;line-height:1.5;margin:8px 0">${esc(d.desc)}</p>
+      <h2 style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px">Why this score</h2>
+      <ul class="sig">${sig}</ul>
+      <h2 style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px">Connections (${neighbors[d.id].size})</h2>
+      <div class="conn">${conns || '<span class="note">None yet.</span>'}</div>
+      ${ev ? `<h2 style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px">Upcoming events</h2>${ev}` : ""}
+      <div class="actions">
+        <a href="${esc(d.url)}" target="_blank" rel="noopener">Official site ↗</a>
+        <a href="${esc(yamlLink(d))}" target="_blank" rel="noopener">Entry in data ↗</a>
+        <a href="${esc(flag)}" target="_blank" rel="noopener">Suggest a fix ↗</a>
+      </div>`;
+    $("card").classList.add("open");
+    $("card").querySelector(".close").onclick = () => select(null);
+    $("card").querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(byId[b.dataset.go], true));
+  }
+
+  /* ---------- legend + stats ---------- */
+  function renderLegend(){
+    let h = "";
+    if(st.lens === "trust") h = `<i style="background:${TIER.hi}"></i>High (80–100)<br><i style="background:${TIER.mid}"></i>Medium (60–79)<br><i style="background:${TIER.lo}"></i>Low (under 60)<br><span class="note">Faded = verified longer ago</span><br>`;
+    else if(st.lens === "links") h = `<i style="background:rgb(34,211,238)"></i>Most connected<br><i style="background:rgb(71,85,105)"></i>Few or none<br><span class="note">Grey arcs = listed one way only</span><br>`;
+    else h = Object.values(CATS).map(c => `<i style="background:${c.color}"></i>${esc(c.label)}`).join("<br>") + "<br>";
+    h += `<i style="border:2px solid var(--muted);background:none"></i>Approximate pin (ring)<br><i class="halo"></i>Area it could be in`;
+    $("legend").innerHTML = h;
+  }
+  (function renderStats(){
+    const n = DATA.length, cnt = f => DATA.filter(f).length;
+    const avg = Math.round(DATA.reduce((a,d) => a + d.cred.score, 0) / n);
+    const stackedPins = Object.values(stacked).filter(g => g.length > 1).reduce((a,g) => a + g.length, 0);
+    $("stats").innerHTML = [
+      ["Organizations", n], ["Average credibility", avg],
+      ["High / Medium / Low", `${cnt(d => d.cred.tier === "hi")} / ${cnt(d => d.cred.tier === "mid")} / ${cnt(d => d.cred.tier === "lo")}`],
+      ["Approximate pins", cnt(d => d.approx)], ["Pins sharing coordinates", stackedPins],
+      ["Not verified in 3+ months", cnt(d => (d.cred.age ?? 99) > 3)],
+      ["No connections", cnt(d => !d.deg)], ["Links listed one way", pairs.filter(p => !p.mutual).length],
+      ["Mentioned in this week's events", Object.keys(evIdx).length],
+    ].map(([k,v]) => `<span>${k}</span><b>${v}</b>`).join("");
+    $("weak").innerHTML = [...DATA].sort((a,b) => a.cred.score - b.cred.score).slice(0, 8).map(d =>
+      `<button type="button" data-go="${esc(d.id)}"><span>${esc(d.name)}</span><span class="pill" style="background:${TIER[d.cred.tier]}">${d.cred.score}</span></button>`).join("");
+    $("weak").querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(byId[b.dataset.go], true));
+  })();
+
+  /* ---------- controls ---------- */
+  document.querySelectorAll("[data-lens]").forEach(b => b.onclick = () => {
+    st.lens = b.dataset.lens;
+    document.querySelectorAll("[data-lens]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    if(st.lens !== "category"){ st.metric = st.lens; $("metric").value = st.lens; }
+    render();
+  });
+  document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => {
+    document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    const v = { ...VIEWS[b.dataset.view] }; if(!st.tilt){ v.pitch = 0; v.bearing = 0; }
+    REDUCED ? map.jumpTo(v) : map.flyTo({ ...v, speed:1.2 });
+  });
+  $("tilt").onchange = e => {
+    st.tilt = e.target.checked;
+    const o = { pitch: st.tilt ? 55 : 0, bearing: st.tilt ? map.getBearing() : 0 };
+    REDUCED ? map.jumpTo(o) : map.easeTo({ ...o, duration:800 });
+    render();
+  };
+  $("cols").onchange = e => { st.cols = e.target.checked; render(); };
+  $("arcs").onchange = e => { st.arcs = e.target.checked; render(); };
+  $("bldg").onchange = e => { st.bldg = e.target.checked; render(); };
+  $("metric").onchange = e => { st.metric = e.target.value; render(); };
+  $("togglePanel").onclick = () => {
+    const min = $("panel").classList.toggle("min");
+    $("togglePanel").setAttribute("aria-expanded", !min);
+    $("togglePanel").textContent = (min ? "▸" : "▾") + " Controls";
+  };
+  document.addEventListener("keydown", e => { if(e.key === "Escape") select(null); });
+
+  // search
+  const q = $("q"), res = $("results");
+  q.oninput = () => {
+    const t = q.value.trim().toLowerCase();
+    const hits = t ? DATA.filter(d => d.name.toLowerCase().includes(t)).slice(0, 10) : [];
+    res.innerHTML = hits.map(d => `<button type="button" role="option" data-go="${esc(d.id)}">${esc(d.name)} <span class="note">· ${d.cred.score}</span></button>`).join("");
+    res.style.display = hits.length ? "block" : "none";
+    res.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { res.style.display = "none"; q.value = ""; select(byId[b.dataset.go], true); });
+  };
+  q.onkeydown = e => { if(e.key === "Enter"){ const b = res.querySelector("button"); if(b) b.click(); } if(e.key === "ArrowDown"){ res.querySelector("button")?.focus(); e.preventDefault(); } };
+
+  window.__atlas3d = { DATA, pairs, evIdx, map };   // handy for debugging in the console
+}
+</script>
+</body>
+</html>
