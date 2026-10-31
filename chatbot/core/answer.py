@@ -257,7 +257,9 @@ some any anything something someone anyone who what where which when how why bes
 very really just also like such other others new early stage stages startup startups company companies founder
 founders team org orgs organization organizations organisation organisations list show tell give recommend
 options option places place people work working build building make making support resources thing things
-massachusetts mass boston area atlas ai near local based tech technology now today currently""".split())
+massachusetts mass boston area atlas ai near local based tech technology now today currently
+somewhere anywhere someplace everyone would like want wants write small big front product products tool tools
+idea ideas bounce solo does doing done thinking first time year years month practise practice""".split())
 
 _WORD = r"(?<![a-z0-9]){}(?![a-z0-9])"
 
@@ -613,7 +615,8 @@ def trust(rows):
     bad = only + ([f"last verified {vr}"] if older else [])
     if not bad:
         return None
-    good = [_FIXED[x] for x in only if x in _FIXED]
+    good = [_FIXED[x] for x in only if x in _FIXED] + (["no passed deadline"] if any(
+        x.startswith("deadline passed") for x in only) else [])
     other = "the other has " + _join(good) + (f" and is verified {vs}" if older else "") if good else \
         f"the other is verified {vs}"
     return {"id": risky["id"], "reason": f"{_join(bad)}, while {other}."}
@@ -648,18 +651,27 @@ def _answer(query, mode):
     if intent["contact"] or intent["person"]:
         notes.append("The Atlas lists organizations, not people, so it holds no names or contact details. "
                      "Each organization's page links to its own website.")
-    model_reading = None
-    if not (intent["contact"] or intent["person"]) and not _slots(intent) and not intent["orgs"]:
+    # Words the vocabulary didn't cover go to the model (when a key is set), which maps them onto the
+    # same vocabulary. Once it has, the leftover words stop counting as search terms. Without the
+    # model, leftover words only count when nothing else in the question matched.
+    by_meaning = False
+    uncovered = [w for w in intent["terms"] if not any(_mentions(d, w) for d in atlas()["data"])]
+    if not (intent["contact"] or intent["person"]) and not intent["orgs"] and (intent["terms"] or not _slots(intent)):
         m = _model_slots(query)
         if m and any(m.values()):
+            by_meaning = True
             for k in ("offers", "tags", "stages", "cats"):
                 intent[k] = list(dict.fromkeys(intent[k] + m[k]))
-            if m["place"] in GAP_PLACES:
+            if m["place"] in GAP_PLACES and not intent["place"]:
                 intent["gap"] = m["place"]
-            elif m["place"]:
-                intent["place"] = m["place"]
-            model_reading = ([OFFER_LABEL[o] for o in m["offers"]] + m["tags"]
-                             + [STAGE_NAME[s] + " stage" for s in m["stages"]] + ([m["place"].title()] if m["place"] else []))
+            elif m["place"] and not intent["gap"]:
+                intent["place"] = intent["place"] or m["place"]
+    if by_meaning or _slots(intent):
+        intent["terms"] = []
+    if uncovered and (by_meaning or _slots(intent)):
+        said = [f'"{w}"' for w in uncovered]
+        notes.append(f"Nothing in the Atlas mentions {', '.join(said[:-1]) + ' or ' + said[-1] if len(said) > 1 else said[0]}, "
+                     "so these match the rest of your question.")
 
     if intent["orgs"] and not (intent["offers"] or intent["tags"] or intent["stages"] or intent["cats"]):
         for eid in intent["orgs"][:MAX_RESULTS]:
@@ -669,9 +681,6 @@ def _answer(query, mode):
     elif _slots(intent) or intent["terms"]:
         scored, rank_notes = rank(intent)
         notes += rank_notes
-        if model_reading and scored and not any(s["xm"] for s in scored[:MAX_RESULTS]):
-            notes.append("Nothing in the Atlas uses your exact words, so these match our reading of the question: "
-                         + _join(model_reading) + ".")
         for s in scored[:MAX_RESULTS]:
             rows.append(_result(s["d"], _why(s, intent), mode, link_rows, approved_from))
         if not rows:
