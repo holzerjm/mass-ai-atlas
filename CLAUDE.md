@@ -134,6 +134,9 @@ A JSON array, one object per proposed link:
 - **No Claude trace in the repo:** no "Generated with Claude" or Co-Authored-By lines in commits, and never commit `.claude/` or local session files.
 - Never `git push --force`. Never commit `.env`, caches, or large files.
 - If a rebase conflict appears outside your paths, **stop and tell the team**. Don't resolve someone else's file.
+- **Claude Code adds a Co-Authored-By line by default.** Turn it off (`"includeCoAuthoredBy": false` in your Claude Code settings) or tell your session not to add attribution. Check with `git log -1` before pushing.
+- **CI is on (GitHub Actions).** Browser tests run on every push to `main`, so check they stay green. The validator runs only for `data/`/`scripts/` changes on `main` or on a PR, **not** on pushes to `proposals`. Arsh runs `node scripts/validate.js` locally (or opens a PR from `proposals`) and keeps that output for the submission.
+- Repo health is Bhoomika's job: she checks commits for these rules. Nothing is blocked automatically. These are guidance, so follow them.
 
 ## Timeline
 | Time | Goal |
