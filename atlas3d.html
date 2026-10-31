@@ -12,52 +12,77 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.css">
 <style>
 :root{
-  --bg:#070b16; --panel:rgba(12,18,34,.94); --panel2:#111a30; --line:rgba(148,163,184,.22);
+  --bg:#070b16; --panel:rgba(12,18,34,.94); --panel2:#141e36; --line:rgba(148,163,184,.2);
   --text:#e6ecff; --muted:#9aa7c7; --gold:#fbbf24;
   --hi:#4ade80; --mid:#fbbf24; --lo:#f87171;
+  --shadow:0 10px 30px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:"Red Hat Display",system-ui,sans-serif}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:"Red Hat Display",system-ui,sans-serif;overflow:hidden}
 a{color:var(--gold)}
 button,select,input{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+kbd{font:600 11px/1 "Red Hat Display",sans-serif;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:2px 5px;background:var(--panel2)}
 #map{position:fixed;inset:0}
 
-.bar{position:fixed;top:12px;left:12px;right:12px;z-index:5;display:flex;gap:10px;align-items:center;flex-wrap:wrap;pointer-events:none}
-.bar > *{pointer-events:auto}
+/* ---------- top bar ---------- */
+.bar{position:fixed;top:12px;left:12px;right:12px;z-index:5;display:flex;gap:8px;align-items:center;flex-wrap:wrap;pointer-events:none}
+.bar > *{pointer-events:auto;box-shadow:var(--shadow)}
 .brand{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:800;white-space:nowrap}
 .brand a{color:var(--muted);text-decoration:none;font-weight:600;margin-right:8px}
 .brand span{color:var(--gold)}
 .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:3px}
-.seg button{background:none;border:0;padding:7px 12px;border-radius:9px;cursor:pointer;color:var(--muted);font-weight:600}
+.seg button{background:none;border:0;padding:7px 12px;border-radius:9px;cursor:pointer;color:var(--muted);font-weight:600;transition:background .15s,color .15s}
+.seg button:hover{color:var(--text)}
 .seg button[aria-pressed="true"]{background:var(--panel2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
+.seg button[data-lens="trust"][aria-pressed="true"]{color:var(--hi)}
+.seg button[data-lens="links"][aria-pressed="true"]{color:#22d3ee}
 .search{position:relative;flex:1;min-width:200px;max-width:340px}
-.search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
-.results{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;max-height:260px;overflow:auto;display:none}
-.results button{display:block;width:100%;text-align:left;background:none;border:0;padding:7px 12px;cursor:pointer}
+.search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 12px 9px 34px}
+.search::before{content:"⌕";position:absolute;left:12px;top:50%;transform:translateY(-52%);color:var(--muted);font-size:17px}
+.results{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;max-height:300px;overflow:auto;display:none;box-shadow:var(--shadow)}
+.results button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;padding:8px 12px;cursor:pointer}
 .results button:hover,.results button:focus{background:var(--panel2)}
+.results small{margin-left:auto;color:var(--muted)}
 
-.panel{position:fixed;left:12px;top:120px;z-index:4;width:290px;max-height:calc(100vh - 96px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
-.panel h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
-.panel h2:first-child{margin-top:0}
+/* ---------- side panel ---------- */
+.panel{position:fixed;left:12px;top:70px;z-index:4;width:280px;max-height:calc(100vh - 86px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 14px 12px;box-shadow:var(--shadow)}
+.panel details{border-bottom:1px solid var(--line);padding:4px 0}
+.panel details:last-of-type{border-bottom:0}
+.panel summary{cursor:pointer;list-style:none;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:8px 0;display:flex;justify-content:space-between}
+.panel summary::-webkit-details-marker{display:none}
+.panel summary::after{content:"▸";transition:transform .15s}
+.panel details[open] summary::after{transform:rotate(90deg)}
 .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:14px}
 .row select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 6px}
-.switch{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;margin:6px 0}
-.legend{font-size:13px;line-height:1.7}
-.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px;vertical-align:-1px}
-.legend .halo{background:radial-gradient(circle,rgba(251,191,36,.55),rgba(251,191,36,.05));width:16px;height:16px;vertical-align:-3px}
-.stat{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:13px}
+.switch{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;margin:7px 0}
+.switch input{accent-color:var(--gold);width:15px;height:15px}
+.legend{display:flex;flex-direction:column;gap:2px}
+.legend button,.legend .static{display:flex;align-items:center;gap:8px;background:none;border:0;padding:4px 6px;margin:0 -6px;border-radius:7px;font-size:13px;text-align:left;cursor:pointer}
+.legend .static{cursor:default}
+.legend button:hover{background:var(--panel2)}
+.legend button[aria-pressed="false"]{opacity:.35;text-decoration:line-through}
+.legend .count{margin-left:auto;color:var(--muted);font-size:12px}
+.dot{flex:none;width:11px;height:11px;border-radius:50%}
+.ring{flex:none;width:11px;height:11px;border-radius:50%;border:2px solid var(--muted)}
+.bubble{flex:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--gold);background:rgba(12,18,34,.9);font-size:8px;display:grid;place-items:center;font-weight:800}
+.legend .hint{font-size:12px;color:var(--muted);margin:6px 0 2px}
+.stat{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:13px;padding-bottom:6px}
 .stat b{text-align:right}
-.weak button{display:flex;justify-content:space-between;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:6px 0;cursor:pointer;text-align:left;font-size:13px}
+.meter{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:4px 0 10px}
+.weak button{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:6px 0;cursor:pointer;text-align:left;font-size:13px}
 .weak button:hover{color:var(--gold)}
 .pill{display:inline-block;min-width:34px;text-align:center;border-radius:999px;padding:1px 7px;font-weight:700;font-size:12px;color:#0b1020}
 .note{font-size:12px;color:var(--muted);line-height:1.5}
-.collapse{display:none}
+.toggle-panel{display:none}
 
-.card{position:fixed;right:12px;top:72px;z-index:4;width:360px;max-height:calc(100vh - 96px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:none}
-.card.open{display:block}
+/* ---------- org card ---------- */
+.card{position:fixed;right:12px;top:70px;z-index:4;width:360px;max-height:calc(100vh - 86px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:none;box-shadow:var(--shadow)}
+.card.open{display:block;animation:slide .18s ease-out}
+@keyframes slide{from{opacity:0;transform:translateX(12px)}}
 .card .close{position:absolute;top:10px;right:10px;background:none;border:0;font-size:20px;cursor:pointer;color:var(--muted)}
 .card h3{margin:0 28px 2px 0;font-size:20px}
+.card h4{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
 .card .cat{font-size:13px;font-weight:700}
 .card .loc{font-size:13px;color:var(--muted);margin:4px 0 10px}
 .score{display:flex;align-items:center;gap:12px;margin:10px 0;padding:10px;border-radius:10px;background:var(--panel2)}
@@ -69,73 +94,104 @@ button,select,input{font:inherit;color:inherit}
 .sig .pts{font-weight:700;white-space:nowrap}
 .sig .src{display:block;font-size:12px}
 .conn button{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px 4px 3px 0;cursor:pointer;font-size:12px}
+.conn button:hover{border-color:var(--gold)}
 .conn button.oneway{border-style:dashed;color:var(--muted)}
 .ev{font-size:13px;margin:4px 0}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .actions a{font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;text-decoration:none}
+.actions a:hover{border-color:var(--gold)}
 
-.tip{position:fixed;z-index:6;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:13px;display:none;max-width:260px}
-.toggle-panel{display:none}
+/* ---------- cluster card ---------- */
+.clist button{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:7px 0;cursor:pointer;text-align:left;font-size:13px}
+.clist button:hover{color:var(--gold)}
+.clist .pill{margin-left:auto}
+
+/* ---------- guide ---------- */
+.guide{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:4;width:min(560px,calc(100vw - 24px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 40px 12px 16px;box-shadow:var(--shadow);font-size:13px;line-height:1.55}
+.guide b{color:var(--gold)}
+.guide ul{margin:4px 0 0;padding-left:18px}
+.guide .close{position:absolute;top:8px;right:10px;background:none;border:0;font-size:18px;cursor:pointer;color:var(--muted)}
+.guide[hidden]{display:none}
+.help-btn{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:3;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;box-shadow:var(--shadow)}
+
+.tip{position:fixed;z-index:6;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:13px;display:none;max-width:280px;box-shadow:var(--shadow);line-height:1.45}
+.maplibregl-ctrl-group{background:var(--panel)!important;border:1px solid var(--line)}
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon{filter:invert(1)}
+
 @media (max-width:760px){
-  .panel{top:auto;bottom:12px;left:12px;right:12px;width:auto;max-height:42vh}
-  .panel.min .collapse-body{display:none}
-  .toggle-panel{display:block;background:none;border:0;color:var(--gold);font-weight:700;padding:0;margin-bottom:6px;cursor:pointer}
-  .card{left:12px;right:12px;width:auto;top:auto;bottom:12px;max-height:60vh}
+  .brand{display:none}
+  .panel{top:auto;bottom:12px;left:12px;right:12px;width:auto;max-height:45vh}
+  .panel.min .panel-body{display:none}
+  .toggle-panel{display:block;background:none;border:0;color:var(--gold);font-weight:700;padding:8px 0 2px;cursor:pointer}
+  .card{left:12px;right:12px;width:auto;top:auto;bottom:12px;max-height:62vh;z-index:5}
   .search{max-width:none}
+  .guide,.help-btn{bottom:auto;top:118px}
 }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
 </style>
 </head>
 <body>
-<div id="map" role="application" aria-label="3D map of Massachusetts AI organizations. Use the search box or the 'Least certain entries' list to open any organization's card."></div>
+<div id="map" role="application" aria-label="3D map of Massachusetts AI organizations. Press slash to search, or use the 'Least certain entries' list to open any organization's card."></div>
 
 <div class="bar">
-  <div class="brand"><a href="./">← Atlas</a>Mass <span>AI Atlas</span> · 3D Lenses</div>
+  <div class="brand"><a href="./">← Atlas</a>Mass <span>AI Atlas</span> · 3D</div>
   <div class="seg" role="group" aria-label="Lens">
-    <button type="button" data-lens="category" aria-pressed="false">Category</button>
-    <button type="button" data-lens="trust" aria-pressed="true">Credibility</button>
-    <button type="button" data-lens="links" aria-pressed="false">Connections</button>
+    <button type="button" data-lens="trust" aria-pressed="true" title="How sure is the atlas about each entry?">Credibility</button>
+    <button type="button" data-lens="links" aria-pressed="false" title="Who works with whom">Connections</button>
+    <button type="button" data-lens="category" aria-pressed="false" title="What kind of organization">Category</button>
   </div>
   <div class="seg" role="group" aria-label="Map area">
     <button type="button" data-view="boston" aria-pressed="true">Boston</button>
     <button type="button" data-view="state" aria-pressed="false">Commonwealth</button>
   </div>
   <div class="search">
-    <input id="q" type="search" placeholder="Find an organization…" autocomplete="off" aria-label="Find an organization" aria-controls="results">
+    <input id="q" type="search" placeholder="Find an organization…  ( / )" autocomplete="off" aria-label="Find an organization" aria-controls="results">
     <div class="results" id="results" role="listbox"></div>
   </div>
 </div>
 
 <aside class="panel" id="panel" aria-label="Map controls">
-  <button class="toggle-panel" id="togglePanel" aria-expanded="true">▾ Controls</button>
-  <div class="collapse-body">
-  <h2>3D</h2>
-  <label class="switch"><input type="checkbox" id="tilt" checked> Tilt the map</label>
-  <label class="switch"><input type="checkbox" id="cols" checked> Columns</label>
-  <div class="row">Column height <select id="metric">
-    <option value="trust">Credibility score</option>
-    <option value="links">Connections</option>
-  </select></div>
-  <label class="switch"><input type="checkbox" id="bldg" checked> 3D buildings (street zoom)</label>
-  <label class="switch"><input type="checkbox" id="arcs" checked> Connection arcs</label>
-
-  <h2>Legend</h2>
-  <div class="legend" id="legend"></div>
-
-  <h2>How sure is the map?</h2>
-  <div class="stat" id="stats"></div>
-
-  <h2>Least certain entries</h2>
-  <div class="weak" id="weak"></div>
-  <p class="note">Scores are computed in your browser from the atlas's own fields. Nothing here edits the data — use “Suggest a fix” on a card to open a GitHub issue a maintainer reviews.</p>
+  <button class="toggle-panel" id="togglePanel" aria-expanded="true">▾ Legend &amp; controls</button>
+  <div class="panel-body">
+    <details open>
+      <summary id="legendTitle">Legend · click to filter</summary>
+      <div class="legend" id="legend"></div>
+    </details>
+    <details>
+      <summary>View</summary>
+      <label class="switch"><input type="checkbox" id="tilt" checked> Tilt the map (3D)</label>
+      <label class="switch"><input type="checkbox" id="cols" checked> Columns</label>
+      <div class="row">Column height <select id="metric">
+        <option value="trust">Credibility</option>
+        <option value="links">Connections</option>
+      </select></div>
+      <label class="switch"><input type="checkbox" id="labels" checked> Name labels</label>
+      <label class="switch"><input type="checkbox" id="group" checked> Group crowded areas</label>
+      <label class="switch"><input type="checkbox" id="arcs"> Show every connection</label>
+      <label class="switch"><input type="checkbox" id="bldg" checked> 3D buildings (street zoom)</label>
+    </details>
+    <details>
+      <summary>How sure is the map?</summary>
+      <div class="meter" id="meter" aria-hidden="true"></div>
+      <div class="stat" id="stats"></div>
+    </details>
+    <details>
+      <summary>Least certain entries</summary>
+      <div class="weak" id="weak"></div>
+      <p class="note">Scores are computed in your browser from the atlas's own fields. Nothing here edits the data — “Suggest a fix” on a card opens a GitHub issue for a maintainer to review.</p>
+    </details>
+    <p class="note" style="margin:8px 0 0"><kbd>/</kbd> search · <kbd>←</kbd><kbd>→</kbd> step through connections · <kbd>Esc</kbd> close</p>
   </div>
 </aside>
 
-<aside class="card" id="card" aria-live="polite" aria-label="Organization details"></aside>
+<aside class="card" id="card" aria-live="polite" aria-label="Details"></aside>
+<div class="guide" id="guide" role="note" hidden></div>
+<button class="help-btn" id="helpBtn" hidden>ⓘ How to read this map</button>
 <div class="tip" id="tip" role="tooltip"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.js"></script>
 <script src="https://unpkg.com/deck.gl@9.1.14/dist.min.js"></script>
+<script src="https://unpkg.com/supercluster@8.0.1/dist/supercluster.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.3.2/dist/js-yaml.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.17.1/ajv7.min.js"></script>
 <script src="atlas-data.js"></script>
@@ -144,19 +200,36 @@ button,select,input{font:inherit;color:inherit}
    Mass AI Atlas — 3D Lenses
    ------------------------------------------------------------
    MapLibre GL renders the basemap (incl. tilt and 3D buildings);
-   deck.gl draws the pins, columns and connection arcs on top.
-   Same data files and loader as index.html (atlas-data.js).
+   deck.gl draws the pins, columns, labels and connection arcs on
+   top; Supercluster groups crowded areas into named bubbles that
+   open up as you zoom. Same data files and loader as index.html.
    ============================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+                set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
 const GH_REPO = "holzerjm/mass-ai-atlas";
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const VIEWS = {
-  boston: { center:[-71.085, 42.355], zoom:12.3, pitch:55, bearing:-20 },
-  state:  { center:[-71.75, 42.25],   zoom:7.6,  pitch:45, bearing:0 },
+  boston: { center:[-71.09, 42.358], zoom:12.4, pitch:45, bearing:-15 },
+  state:  { center:[-71.6, 42.2],    zoom:7.7,  pitch:35, bearing:0 },
 };
 const TIER = { hi:"#4ade80", mid:"#fbbf24", lo:"#f87171" };
+const TIER_LABEL = { hi:"High (80–100)", mid:"Medium (60–79)", lo:"Low (under 60)" };
 const hex2rgb = h => [1,3,5].map(i => parseInt(h.substr(i,2),16));
+const GUIDE = {
+  trust: `<b>Credibility lens</b> — how sure is the atlas about each organization?
+    <ul><li><span style="color:var(--hi)">Green</span> = well documented, <span style="color:var(--lo)">red</span> = several doubts. Faded = not checked for months.</li>
+    <li>A <b>hollow ring</b> means the pin is only approximate (neighborhood-level).</li>
+    <li>Numbered bubbles group crowded areas — click one to see who's inside, or zoom in.</li></ul>`,
+  links: `<b>Connections lens</b> — who works with whom.
+    <ul><li>Arcs join connected organizations; thicker arcs = more links between two areas.</li>
+    <li>Click any organization to see only its network. Grey arcs are listed by one side only.</li>
+    <li>Taller, brighter columns = better connected.</li></ul>`,
+  category: `<b>Category lens</b> — what kind of organization each one is.
+    <ul><li>Click a category in the legend to hide or show it.</li>
+    <li>Bubbles take the color of the most common category inside.</li></ul>`
+};
 
 /* ---------- data ---------- */
 async function loadData(){
@@ -209,10 +282,11 @@ function scoreEntry(d, ctx){
   const score = Math.max(0, Math.min(100, 100 + s.reduce((a,x) => a + x.pts, 0)));
   return { score, signals:s, tier: score >= 80 ? "hi" : score >= 60 ? "mid" : "lo", age };
 }
+const tierOf = score => score >= 80 ? "hi" : score >= 60 ? "mid" : "lo";
 
 /* ---------- geometry helpers ---------- */
 // fan out entries that sit on identical coordinates so neither hides the other
-function spread(DATA, stacked){
+function spread(stacked){
   for(const group of Object.values(stacked)){
     group.forEach((d,i) => {
       if(group.length < 2){ d.pos = [d.lng, d.lat]; return; }
@@ -220,6 +294,34 @@ function spread(DATA, stacked){
       d.pos = [d.lng + r * Math.cos(a) / Math.cos(d.lat * Math.PI / 180), d.lat + r * Math.sin(a)];
     });
   }
+}
+// the area part of a loc string: "314 Main St, Kendall Sq" → "Kendall Sq"
+const areaOf = d => { const p = d.loc.split(",").map(s => s.trim()); return p[p.length - 1].replace(/\s*\(.*\)$/, ""); };
+const mode = arr => { const c = {}; let best = null; for(const x of arr){ c[x] = (c[x] || 0) + 1; if(!best || c[x] > c[best]) best = x; } return best; };
+const km = (a, b) => {
+  const r = Math.PI / 180, x = (b[0] - a[0]) * r * Math.cos((a[1] + b[1]) / 2 * r), y = (b[1] - a[1]) * r;
+  return Math.hypot(x, y) * 6371;
+};
+// Most entries' loc ends in just "Boston" or "Cambridge", which makes every bubble
+// look the same. A tight group is named after the nearest neighborhood instead.
+const HOODS = [
+  ["Kendall Sq",42.3629,-71.0861], ["Central Sq",42.3654,-71.1037], ["Harvard Sq",42.3736,-71.1190],
+  ["East Cambridge",42.3700,-71.0790], ["Back Bay",42.3503,-71.0810], ["Seaport",42.3496,-71.0420],
+  ["Downtown",42.3555,-71.0590], ["Fenway–Longwood",42.3420,-71.1010], ["Allston",42.3539,-71.1337],
+  ["South End",42.3410,-71.0720], ["North End",42.3647,-71.0542], ["Charlestown",42.3782,-71.0602],
+  ["Union Sq",42.3796,-71.0935], ["Davis Sq",42.3967,-71.1223], ["Assembly Row",42.3923,-71.0773],
+  ["Porter Sq",42.3884,-71.1191], ["Alewife",42.3955,-71.1425], ["Roxbury",42.3152,-71.0875],
+  ["Dorchester",42.3016,-71.0676], ["Brighton",42.3480,-71.1530], ["Tufts",42.4075,-71.1190]
+].map(([name, lat, lng]) => ({ name, pos:[lng, lat] }));
+function groupName(pos, members){
+  const spreadKm = Math.max(...members.map(d => km(pos, d.pos)));
+  if(spreadKm < 1.6){
+    const near = HOODS.map(h => [h, km(pos, h.pos)]).sort((a,b) => a[1] - b[1])[0];
+    if(near[1] < 1.1) return near[0].name;
+  }
+  const areas = members.map(areaOf), top = mode(areas);
+  if(areas.filter(a => a === top).length / areas.length >= .6) return top;
+  return km(pos, [-71.0589, 42.3601]) < 20 ? "Greater Boston" : top;
 }
 
 /* ---------- app ---------- */
@@ -237,14 +339,14 @@ function start({ CATS, STAGES, DATA }, EVENTS){
   for(const d of DATA) for(const t of d.links || []) if(byId[t]){
     declared.add(d.id + ">" + t); neighbors[d.id].add(t); neighbors[t].add(d.id);
   }
+  const isMutual = (a,b) => declared.has(a + ">" + b) && declared.has(b + ">" + a);
   const pairs = [];
-  for(const d of DATA) for(const t of neighbors[d.id]) if(d.id < t){
-    pairs.push({ a:byId[d.id], b:byId[t], mutual: declared.has(d.id + ">" + t) && declared.has(t + ">" + d.id) });
-  }
+  for(const d of DATA) for(const t of neighbors[d.id]) if(d.id < t)
+    pairs.push({ a:byId[d.id], b:byId[t], mutual:isMutual(d.id, t) });
 
   const stacked = {};
   for(const d of DATA) (stacked[d.lat + "," + d.lng] ||= []).push(d);
-  spread(DATA, stacked);
+  spread(stacked);
 
   // event mentions: org name appears in an upcoming event's title, organizer or venue
   const evIdx = {};
@@ -260,7 +362,41 @@ function start({ CATS, STAGES, DATA }, EVENTS){
   const maxDeg = Math.max(...DATA.map(d => d.deg));
 
   /* ---------- state ---------- */
-  const st = { lens:"trust", metric:"trust", tilt:true, cols:true, arcs:true, bldg:true, sel:null, hover:null, zoom:VIEWS.boston.zoom };
+  const st = {
+    lens:"trust", metric:"trust", tilt:true, cols:true, labels:true, group:true, allArcs:false, bldg:true,
+    sel:null, hover:null, tiers:new Set(["hi","mid","lo"]), cats:new Set(Object.keys(CATS))
+  };
+  const shown = d => st.tiers.has(d.cred.tier) && st.cats.has(d.cat);
+
+  /* ---------- clustering ---------- */
+  const index = new Supercluster({ radius:56, maxZoom:15, minPoints:3 });
+  function rebuildIndex(){
+    index.load(DATA.filter(shown).map(d => ({ type:"Feature", geometry:{ type:"Point", coordinates:d.pos }, properties:{ id:d.id } })));
+  }
+  rebuildIndex();
+
+  // what is drawn right now: org nodes and cluster nodes, plus which node owns each org
+  function computeNodes(){
+    const z = Math.floor(map.getZoom()), nodes = [], owner = {};
+    const focus = focusIds();
+    const orgNode = d => { const n = { kind:"org", id:d.id, d, pos:d.pos }; owner[d.id] = n; nodes.push(n); };
+    if(!st.group){ DATA.filter(shown).forEach(orgNode); return { nodes, owner }; }
+    for(const f of index.getClusters([-180, -85, 180, 85], z)){
+      if(!f.properties.cluster){ orgNode(byId[f.properties.id]); continue; }
+      let members = index.getLeaves(f.properties.cluster_id, Infinity).map(l => byId[l.properties.id]);
+      // the selected org and its network always stand on their own
+      if(focus){ members.filter(d => focus.has(d.id)).forEach(orgNode); members = members.filter(d => !focus.has(d.id)); }
+      if(members.length < 2){ members.forEach(orgNode); continue; }
+      const avg = members.reduce((a,d) => a + d.cred.score, 0) / members.length;
+      const n = { kind:"cluster", id:"c" + f.properties.cluster_id, cid:f.properties.cluster_id, pos:f.geometry.coordinates,
+                  members, avg, area:groupName(f.geometry.coordinates, members), cat:mode(members.map(d => d.cat)),
+                  deg:members.reduce((a,d) => a + d.deg, 0) / members.length };
+      members.forEach(d => owner[d.id] = n);
+      nodes.push(n);
+    }
+    return { nodes, owner };
+  }
+  const focusIds = () => st.sel ? new Set([st.sel.id, ...neighbors[st.sel.id]]) : null;
 
   /* ---------- map ---------- */
   const map = new maplibregl.Map({
@@ -279,113 +415,211 @@ function start({ CATS, STAGES, DATA }, EVENTS){
         "fill-extrusion-color":"#1f2a44",
         "fill-extrusion-height":["interpolate",["linear"],["zoom"],14,0,15,["coalesce",["get","render_height"],10]],
         "fill-extrusion-base":["coalesce",["get","render_min_height"],0],
-        "fill-extrusion-opacity":0.85
+        "fill-extrusion-opacity":0.8
       }
     }, first);
     render();
   });
-  map.on("zoomend", () => { st.zoom = map.getZoom(); render(); });
+  // labels are placed in screen space, so re-place them whenever the camera settles
+  map.on("moveend", () => render());
 
   const overlay = new deck.MapboxOverlay({ interleaved:false, layers:[], getCursor:({isHovering}) => isHovering ? "pointer" : "grab" });
   map.addControl(overlay);
+  // deck's CollisionFilterExtension hides every label in this (non-interleaved)
+  // overlay mode, so labels are de-overlapped here: most important first, and a
+  // label is dropped if its box would overlap one already placed.
+  function placeLabels(lab, elevOf){
+    let vp = null;
+    try{ vp = overlay._deck && overlay._deck.getViewports()[0]; }catch(e){}
+    const project = p => vp ? vp.project(p) : (q => [q.x, q.y])(map.project([p[0], p[1]]));
+    const boxes = [], out = [];
+    for(const l of [...lab].sort((a,b) => b.pri - a.pri)){
+      const [x, y] = project([...l.n.pos, elevOf(l.n)]);
+      const w = l.text.length * (l.n.kind === "cluster" ? 7.6 : 7) + 14, h = 20;
+      const b = [x - w / 2, y + l.off - h, x + w / 2, y + l.off];
+      if(b[2] < 0 || b[0] > innerWidth || b[3] < 0 || b[1] > innerHeight) continue;
+      if(boxes.some(o => b[0] < o[2] + 2 && b[2] > o[0] - 2 && b[1] < o[3] + 2 && b[3] > o[1] - 2)) continue;
+      boxes.push(b); out.push(l);
+    }
+    return out;
+  }
 
   /* ---------- colors ---------- */
-  const baseColor = d => st.lens === "trust" ? hex2rgb(TIER[d.cred.tier])
-                    : st.lens === "links" ? linkColor(d) : hex2rgb(CATS[d.cat].color);
-  function linkColor(d){
-    const t = maxDeg ? d.deg / maxDeg : 0;   // dim slate → bright cyan by degree
+  const degColor = deg => {
+    const t = maxDeg ? Math.min(1, deg / maxDeg) : 0;   // dim slate → bright cyan by degree
     return [Math.round(71 + t * (34 - 71)), Math.round(85 + t * (211 - 85)), Math.round(105 + t * (238 - 105))];
+  };
+  function colorOf(n){
+    if(n.kind === "cluster") return st.lens === "trust" ? hex2rgb(TIER[tierOf(n.avg)])
+                           : st.lens === "links" ? degColor(n.deg) : hex2rgb(CATS[n.cat].color);
+    const d = n.d;
+    return st.lens === "trust" ? hex2rgb(TIER[d.cred.tier]) : st.lens === "links" ? degColor(d.deg) : hex2rgb(CATS[d.cat].color);
   }
-  const focusSet = () => st.sel ? new Set([st.sel.id, ...neighbors[st.sel.id]]) : null;
-  function alpha(d, focus){
-    if(focus && !focus.has(d.id)) return 40;
-    if(st.lens !== "trust") return 230;
-    // fade with staleness: 0–1 month full, 5+ months 45%
-    const age = d.cred.age ?? 6;
+  function alphaOf(n, focus){
+    if(focus && (n.kind === "cluster" || !focus.has(n.id))) return 45;
+    if(n.kind === "cluster" || st.lens !== "trust") return 235;
+    const age = n.d.cred.age ?? 6;      // fade with staleness: 0–1 month full, 5+ months 45%
     return Math.round(255 * Math.max(.45, 1 - Math.max(0, age - 1) * .14));
   }
 
+  /* ---------- arcs ---------- */
+  // Bundled: links between orgs collapse to one arc per pair of drawn nodes, so a
+  // clustered Kendall Square sends one thick arc to the Seaport instead of forty.
+  function arcData(owner){
+    const hot = st.sel || st.hover;
+    const pool = hot ? pairs.filter(p => p.a === hot || p.b === hot)
+               : (st.allArcs || st.lens === "links") ? pairs : [];
+    const out = {};
+    for(const p of pool){
+      const A = owner[p.a.id], B = owner[p.b.id];
+      if(!A || !B || A === B) continue;
+      const key = A.id < B.id ? A.id + "|" + B.id : B.id + "|" + A.id;
+      (out[key] ||= { A, B, n:0, mutual:0, names:[] });
+      out[key].n++; if(p.mutual) out[key].mutual++;
+      if(out[key].names.length < 4) out[key].names.push(`${p.a.name} ↔ ${p.b.name}`);
+    }
+    return { arcs:Object.values(out), hot };
+  }
+
   /* ---------- layers ---------- */
+  let current = { nodes:[], owner:{} };
   function render(){
-    const z = st.zoom, focus = focusSet();
-    const k = Math.pow(2, 13 - z);                // meters per "screen unit" relative to z13
-    const colR = Math.max(12, 32 * k);
+    const z = map.getZoom(), focus = focusIds();
+    current = computeNodes();
+    const { nodes, owner } = current;
+    const orgs = nodes.filter(n => n.kind === "org"), clusters = nodes.filter(n => n.kind === "cluster");
+    const k = Math.pow(2, 13 - z);                    // keeps columns a similar on-screen size at any zoom
+    const colR = Math.max(10, 26 * k);
     const metric = d => st.metric === "trust" ? d.cred.score / 100 : (maxDeg ? d.deg / maxDeg : 0);
+    const elev = n => !(st.cols && st.tilt) ? 0
+                    : n.kind === "cluster" ? (60 + Math.min(n.members.length, 40) * 22) * k
+                    : (30 + metric(n.d) * 700) * k;
+    const sig = [st.lens, st.metric, st.sel?.id, st.hover?.id, st.cols, st.tilt, Math.round(z * 4)];
     const layers = [];
 
     // uncertainty halos: an approximate pin is drawn as the area it might be in
-    layers.push(new deck.ScatterplotLayer({
-      id:"halo", data:DATA.filter(d => d.approx), getPosition:d => d.pos,
-      radiusUnits:"meters", getRadius:600, radiusMinPixels:10, radiusMaxPixels:80,
-      getFillColor:d => [...baseColor(d), focus && !focus.has(d.id) ? 10 : 45],
-      stroked:false, pickable:false,
-      updateTriggers:{ getFillColor:[st.lens, st.sel?.id] }
+    if(z >= 12) layers.push(new deck.ScatterplotLayer({
+      id:"halo", data:orgs.filter(n => n.d.approx), getPosition:n => n.pos,
+      radiusUnits:"meters", getRadius:320, radiusMinPixels:8, radiusMaxPixels:45,
+      getFillColor:n => [...colorOf(n), focus && !focus.has(n.id) ? 6 : 24], stroked:false,
+      updateTriggers:{ getFillColor:sig }
     }));
 
-    if(st.arcs){
-      const vis = st.sel ? pairs.filter(p => p.a === st.sel || p.b === st.sel) : pairs;
-      layers.push(new deck.ArcLayer({
-        id:"arcs", data:vis,
-        getSourcePosition:p => p.a.pos, getTargetPosition:p => p.b.pos,
-        getSourceColor:p => [...(p.mutual ? baseColor(p.a) : [148,163,184]), st.sel ? 230 : (st.lens === "links" ? 150 : 70)],
-        getTargetColor:p => [...(p.mutual ? baseColor(p.b) : [148,163,184]), st.sel ? 230 : (st.lens === "links" ? 150 : 70)],
-        getWidth:st.sel ? 2.5 : 1.2, getHeight:0.5, greatCircle:false,
-        pickable:true,
-        updateTriggers:{ getSourceColor:[st.lens, st.sel?.id], getTargetColor:[st.lens, st.sel?.id] }
-      }));
-    }
+    const { arcs, hot } = arcData(owner);
+    if(arcs.length) layers.push(new deck.ArcLayer({
+      id:"arcs", data:arcs,
+      getSourcePosition:a => a.A.pos, getTargetPosition:a => a.B.pos,
+      getSourceColor:a => a.mutual ? (hot ? [251,191,36,235] : [34,211,238,170]) : [148,163,184,hot ? 200 : 110],
+      getTargetColor:a => a.mutual ? (hot ? [251,191,36,235] : [34,211,238,170]) : [148,163,184,hot ? 200 : 110],
+      getWidth:a => hot ? 2.5 : 1 + Math.sqrt(a.n) * 1.4, widthUnits:"pixels", getHeight:0.45,
+      pickable:true, updateTriggers:{ getSourceColor:sig, getTargetColor:sig, getWidth:sig }
+    }));
 
-    if(st.cols && st.tilt){
-      layers.push(new deck.ColumnLayer({
-        id:"cols", data:DATA, getPosition:d => d.pos, diskResolution:12,
-        radius:colR, extruded:true, elevationScale:1,
-        getElevation:d => (40 + metric(d) * 900) * k,
-        getFillColor:d => [...baseColor(d), alpha(d, focus)],
-        material:{ ambient:.55, diffuse:.6, shininess:16 },
-        pickable:true, autoHighlight:true, highlightColor:[251,191,36,255],
-        updateTriggers:{ getElevation:[st.metric, z], getFillColor:[st.lens, st.sel?.id] }
-      }));
-    }
-
-    layers.push(new deck.ScatterplotLayer({
-      id:"pins", data:DATA, getPosition:d => d.pos,
-      radiusUnits:"pixels", getRadius:d => d === st.sel ? 9 : 5.5,
-      // approximate pins are hollow rings; exact pins are solid dots
-      filled:true, stroked:true, lineWidthUnits:"pixels",
-      getFillColor:d => d.approx ? [0,0,0,0] : [...baseColor(d), alpha(d, focus)],
-      getLineColor:d => d.approx ? [...baseColor(d), alpha(d, focus)] : [7,11,22,alpha(d, focus)],
-      getLineWidth:d => d.approx ? 2 : 1,
+    if(st.cols && st.tilt) layers.push(new deck.ColumnLayer({
+      id:"cols", data:nodes, getPosition:n => n.pos, diskResolution:16,
+      radius:colR, extruded:true, getElevation:elev,
+      getFillColor:n => [...colorOf(n), alphaOf(n, focus)],
+      material:{ ambient:.6, diffuse:.55, shininess:12 },
       pickable:true, autoHighlight:true, highlightColor:[251,191,36,255],
-      updateTriggers:{ getFillColor:[st.lens, st.sel?.id], getLineColor:[st.lens, st.sel?.id], getRadius:[st.sel?.id] }
+      updateTriggers:{ getElevation:sig, getFillColor:sig }
     }));
+
+    // cluster bubbles: dark disc with a colored rim, count drawn on top
+    layers.push(new deck.ScatterplotLayer({
+      id:"bubbles", data:clusters, getPosition:n => [...n.pos, elev(n)],
+      radiusUnits:"pixels", getRadius:n => 13 + Math.sqrt(n.members.length) * 2.6,
+      stroked:true, lineWidthUnits:"pixels", getLineWidth:2.5,
+      getFillColor:n => [12,18,34, focus ? 150 : 235], getLineColor:n => [...colorOf(n), alphaOf(n, focus)],
+      billboard:true, pickable:true, autoHighlight:true, highlightColor:[251,191,36,90],
+      updateTriggers:{ getPosition:sig, getFillColor:sig, getLineColor:sig }
+    }));
+    layers.push(new deck.TextLayer({
+      id:"counts", data:clusters, getPosition:n => [...n.pos, elev(n)], getText:n => String(n.members.length),
+      getSize:13, fontFamily:"Red Hat Display, sans-serif", fontWeight:800, getColor:[230,236,255,focus ? 120 : 255],
+      getTextAnchor:"middle", getAlignmentBaseline:"center", updateTriggers:{ getPosition:sig, getColor:sig }
+    }));
+
+    layers.push(new deck.ScatterplotLayer({
+      id:"pins", data:orgs, getPosition:n => [...n.pos, elev(n)],
+      radiusUnits:"pixels", getRadius:n => n.d === st.sel ? 9 : 6,
+      // approximate pins are hollow rings; exact pins are solid dots
+      filled:true, stroked:true, lineWidthUnits:"pixels", billboard:true,
+      getFillColor:n => n.d.approx ? [12,18,34,alphaOf(n, focus)] : [...colorOf(n), alphaOf(n, focus)],
+      getLineColor:n => n.d === st.sel ? [255,255,255,255] : n.d.approx ? [...colorOf(n), alphaOf(n, focus)] : [7,11,22,alphaOf(n, focus)],
+      getLineWidth:n => n.d === st.sel ? 3 : n.d.approx ? 2.5 : 1.2,
+      pickable:true, autoHighlight:true, highlightColor:[251,191,36,255],
+      updateTriggers:{ getPosition:sig, getFillColor:sig, getLineColor:sig, getLineWidth:sig, getRadius:sig }
+    }));
+
+    // labels: area names on bubbles, org names once zoomed in or when in focus.
+    // The collision filter hides any label that would overlap a more important one.
+    if(st.labels){
+      const lab = [
+        ...clusters.map(n => ({ n, text:`${n.area}`, pri:500 + n.members.length, off:-(17 + Math.sqrt(n.members.length) * 2.6) })),
+        ...orgs.filter(n => z >= 12.5 || (focus && focus.has(n.id)) || n.d === st.hover)
+               .map(n => ({ n, text:n.d.name, pri:(n.d === st.sel ? 1000 : focus && focus.has(n.id) ? 700 : 0) + n.d.deg * 3 + n.d.cred.score / 20, off:-13 }))
+      ];
+      layers.push(new deck.TextLayer({
+        id:"labels", data:placeLabels(lab, elev), getPosition:l => [...l.n.pos, elev(l.n)], getText:l => l.text,
+        getSize:l => l.n.kind === "cluster" ? 13 : 12, getPixelOffset:l => [0, l.off],
+        fontFamily:"Red Hat Display, sans-serif", fontWeight:700, characterSet:"auto",
+        getTextAnchor:"middle", getAlignmentBaseline:"bottom",
+        getColor:l => (focus && !focus.has(l.n.id)) ? [230,236,255,90] : l.n.kind === "cluster" ? [251,191,36,255] : [230,236,255,255],
+        background:true, getBackgroundColor:l => [10,15,30,(focus && !focus.has(l.n.id)) ? 90 : 215], backgroundPadding:[6,3,6,3],
+        updateTriggers:{ getPosition:sig, getColor:sig, getBackgroundColor:sig }
+      }));
+    }
 
     overlay.setProps({ layers, onClick:onPick, onHover });
-    $("bldg") && map.getLayer("bldg-3d") && map.setLayoutProperty("bldg-3d", "visibility", st.bldg ? "visible" : "none");
-    renderLegend();
+    map.getLayer("bldg-3d") && map.setLayoutProperty("bldg-3d", "visibility", st.bldg ? "visible" : "none");
   }
 
   /* ---------- interaction ---------- */
   const tip = $("tip");
   function onHover({object, x, y, layer}){
+    const d = object && (object.d || (object.n && object.n.d)) || null;
+    if((d || null) !== st.hover && !st.sel){ st.hover = d; render(); }
     if(!object){ tip.style.display = "none"; return; }
-    tip.innerHTML = layer.id === "arcs"
-      ? `${esc(object.a.name)} ↔ ${esc(object.b.name)}${object.mutual ? "" : "<br><span class='note'>listed one way only</span>"}`
-      : `<b>${esc(object.name)}</b><br>${esc(CATS[object.cat].label)} · credibility ${object.cred.score}${object.approx ? " · approx. pin" : ""}`;
-    tip.style.left = (x + 14) + "px"; tip.style.top = (y + 14) + "px"; tip.style.display = "block";
+    let h;
+    if(layer.id === "arcs") h = `${object.names.map(esc).join("<br>")}${object.n > 4 ? `<br>+${object.n - 4} more` : ""}`;
+    else if(object.kind === "cluster") h = `<b>${esc(object.area)} · ${object.members.length} organizations</b><br>avg. credibility ${Math.round(object.avg)}<br><span class="note">Click to see who's inside</span>`;
+    else if(d) h = `<b>${esc(d.name)}</b><br>${esc(CATS[d.cat].label)}<br>credibility ${d.cred.score} · ${d.deg} connection${d.deg === 1 ? "" : "s"}${d.approx ? "<br><span class='note'>approximate location</span>" : ""}`;
+    else { tip.style.display = "none"; return; }
+    tip.innerHTML = h;
+    tip.style.left = Math.min(x + 14, innerWidth - 290) + "px"; tip.style.top = (y + 14) + "px"; tip.style.display = "block";
   }
   function onPick({object, layer}){
-    if(!object){ select(null); return; }
-    if(layer.id === "arcs") return select(object.a === st.sel ? object.b : object.a, true);
-    select(object, false);
+    tip.style.display = "none";
+    if(!object){ if(st.sel) select(null); return; }
+    if(layer.id === "arcs") return;
+    st.walk = null;
+    if(object.kind === "cluster") return showCluster(object);
+    select(object.d || object.n.d, false);
   }
+  function flyTo(opts){ REDUCED ? map.jumpTo(opts) : map.flyTo({ ...opts, speed:1.4 }); }
   function select(d, fly){
-    st.sel = d; render();
+    st.sel = d; st.hover = null; render();
     if(!d){ $("card").classList.remove("open"); return; }
-    if(fly){
-      const opts = { center:d.pos, zoom:Math.max(map.getZoom(), 13) };
-      REDUCED ? map.jumpTo(opts) : map.flyTo({ ...opts, speed:1.4 });
-    }
+    if(fly) flyTo({ center:d.pos, zoom:Math.max(map.getZoom(), 13.5) });
     showCard(d);
+  }
+
+  function showCluster(n){
+    st.sel = null; render();
+    const list = [...n.members].sort((a,b) => a.cred.score - b.cred.score);
+    const tiers = ["hi","mid","lo"].map(t => [t, list.filter(d => d.cred.tier === t).length]);
+    $("card").innerHTML = `
+      <button class="close" aria-label="Close">×</button>
+      <div class="cat" style="color:var(--gold)">Group of ${n.members.length}</div>
+      <h3>${esc(n.area)}</h3>
+      <div class="loc">Average credibility ${Math.round(n.avg)} · ${tiers.map(([t,c]) => `<span style="color:${TIER[t]}">${c} ${t === "hi" ? "high" : t === "mid" ? "medium" : "low"}</span>`).join(" · ")}</div>
+      <button type="button" id="zoomIn" style="width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px;cursor:pointer;font-weight:700">🔍 Zoom in to spread them out</button>
+      <h4>Organizations (least certain first)</h4>
+      <div class="clist">${list.map(d => `<button type="button" data-go="${esc(d.id)}"><span class="dot" style="background:${CATS[d.cat].color}"></span>${esc(d.name)}<span class="pill" style="background:${TIER[d.cred.tier]}">${d.cred.score}</span></button>`).join("")}</div>`;
+    $("card").classList.add("open");
+    $("card").querySelector(".close").onclick = () => $("card").classList.remove("open");
+    $("zoomIn").onclick = () => flyTo({ center:n.pos, zoom:Math.min(16, index.getClusterExpansionZoom(n.cid) + 0.3) });
+    wireGo($("card"));
   }
 
   function showCard(d){
@@ -397,7 +631,7 @@ function start({ CATS, STAGES, DATA }, EVENTS){
         <span class="pts" style="color:${s.pts < 0 ? "var(--lo)" : s.pts > 0 ? "var(--hi)" : "var(--muted)"}">${s.pts > 0 ? "+" : ""}${s.pts || "—"}</span>
       </li>`).join("");
     const conns = [...neighbors[d.id]].map(id => byId[id]).sort((a,b) => a.name.localeCompare(b.name)).map(o => {
-      const mutual = declared.has(d.id + ">" + o.id) && declared.has(o.id + ">" + d.id);
+      const mutual = isMutual(d.id, o.id);
       return `<button type="button" data-go="${esc(o.id)}" class="${mutual ? "" : "oneway"}" title="${mutual ? "Both entries list each other" : "Only one entry lists the other"}">${esc(o.name)}</button>`;
     }).join("");
     const ev = (evIdx[d.id] || []).map(e => `<div class="ev">📅 <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a> · ${new Date(e.start).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</div>`).join("");
@@ -416,11 +650,11 @@ function start({ CATS, STAGES, DATA }, EVENTS){
           <div class="note">Last verified ${esc(d.lastVerified || "never")}</div></div>
       </div>
       <p style="font-size:14px;line-height:1.5;margin:8px 0">${esc(d.desc)}</p>
-      <h2 style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px">Why this score</h2>
+      <h4>Why this score</h4>
       <ul class="sig">${sig}</ul>
-      <h2 style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px">Connections (${neighbors[d.id].size})</h2>
+      <h4>Connections (${neighbors[d.id].size})</h4>
       <div class="conn">${conns || '<span class="note">None yet.</span>'}</div>
-      ${ev ? `<h2 style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px">Upcoming events</h2>${ev}` : ""}
+      ${ev ? `<h4>Upcoming events</h4>${ev}` : ""}
       <div class="actions">
         <a href="${esc(d.url)}" target="_blank" rel="noopener">Official site ↗</a>
         <a href="${esc(yamlLink(d))}" target="_blank" rel="noopener">Entry in data ↗</a>
@@ -428,25 +662,60 @@ function start({ CATS, STAGES, DATA }, EVENTS){
       </div>`;
     $("card").classList.add("open");
     $("card").querySelector(".close").onclick = () => select(null);
-    $("card").querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(byId[b.dataset.go], true));
+    wireGo($("card"));
+  }
+  const wireGo = root => root.querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(byId[b.dataset.go], true));
+
+  /* ---------- legend (doubles as filters) ---------- */
+  function renderLegend(){
+    const L = $("legend"); let h = "";
+    const cnt = f => DATA.filter(f).length;
+    if(st.lens === "trust"){
+      $("legendTitle").textContent = "Credibility · click to filter";
+      h = ["hi","mid","lo"].map(t => `<button type="button" data-tier="${t}" aria-pressed="${st.tiers.has(t)}"><span class="dot" style="background:${TIER[t]}"></span>${TIER_LABEL[t]}<span class="count">${cnt(d => d.cred.tier === t)}</span></button>`).join("")
+        + `<div class="hint">Faded = not verified for months</div>`;
+    } else if(st.lens === "links"){
+      $("legendTitle").textContent = "Connections";
+      h = `<div class="static"><span class="dot" style="background:rgb(34,211,238)"></span>Most connected</div>
+           <div class="static"><span class="dot" style="background:rgb(71,85,105)"></span>Few or none</div>
+           <div class="static"><span style="flex:none;width:16px;height:3px;background:#22d3ee;border-radius:2px"></span>Both sides list the link</div>
+           <div class="static"><span style="flex:none;width:16px;height:3px;background:#94a3b8;border-radius:2px"></span>Only one side lists it</div>`;
+    } else {
+      $("legendTitle").textContent = "Categories · click to filter";
+      h = Object.entries(CATS).map(([k,c]) => `<button type="button" data-cat="${k}" aria-pressed="${st.cats.has(k)}"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}<span class="count">${cnt(d => d.cat === k)}</span></button>`).join("");
+    }
+    h += `<div class="hint" style="margin-top:8px">Symbols</div>
+      <div class="static"><span class="bubble">12</span>Group of nearby organizations</div>
+      <div class="static"><span class="dot" style="background:var(--text)"></span>Exact location</div>
+      <div class="static"><span class="ring"></span>Approximate location</div>`;
+    L.innerHTML = h;
+    L.querySelectorAll("[data-tier]").forEach(b => b.onclick = () => toggle(st.tiers, b.dataset.tier));
+    L.querySelectorAll("[data-cat]").forEach(b => b.onclick = () => toggle(st.cats, b.dataset.cat));
+  }
+  function toggle(set, key){
+    set.has(key) ? set.delete(key) : set.add(key);
+    if(!set.size) set.add(key);           // never filter everything away
+    if(st.sel && !shown(st.sel)) select(null);
+    rebuildIndex(); renderLegend(); render();
   }
 
-  /* ---------- legend + stats ---------- */
-  function renderLegend(){
-    let h = "";
-    if(st.lens === "trust") h = `<i style="background:${TIER.hi}"></i>High (80–100)<br><i style="background:${TIER.mid}"></i>Medium (60–79)<br><i style="background:${TIER.lo}"></i>Low (under 60)<br><span class="note">Faded = verified longer ago</span><br>`;
-    else if(st.lens === "links") h = `<i style="background:rgb(34,211,238)"></i>Most connected<br><i style="background:rgb(71,85,105)"></i>Few or none<br><span class="note">Grey arcs = listed one way only</span><br>`;
-    else h = Object.values(CATS).map(c => `<i style="background:${c.color}"></i>${esc(c.label)}`).join("<br>") + "<br>";
-    h += `<i style="border:2px solid var(--muted);background:none"></i>Approximate pin (ring)<br><i class="halo"></i>Area it could be in`;
-    $("legend").innerHTML = h;
+  function renderGuide(){
+    $("guide").innerHTML = `<button class="close" aria-label="Hide guide">×</button>${GUIDE[st.lens]}`;
+    $("guide").querySelector(".close").onclick = () => { $("guide").hidden = true; $("helpBtn").hidden = false; store.set("atlas3d-guide", "off"); };
   }
+  $("helpBtn").onclick = () => { $("guide").hidden = false; $("helpBtn").hidden = true; store.set("atlas3d-guide", "on"); };
+  if(store.get("atlas3d-guide") === "off") $("helpBtn").hidden = false; else $("guide").hidden = false;
+
+  /* ---------- stats ---------- */
   (function renderStats(){
     const n = DATA.length, cnt = f => DATA.filter(f).length;
     const avg = Math.round(DATA.reduce((a,d) => a + d.cred.score, 0) / n);
+    const t = { hi:cnt(d => d.cred.tier === "hi"), mid:cnt(d => d.cred.tier === "mid"), lo:cnt(d => d.cred.tier === "lo") };
     const stackedPins = Object.values(stacked).filter(g => g.length > 1).reduce((a,g) => a + g.length, 0);
+    $("meter").innerHTML = ["hi","mid","lo"].map(k => `<span style="width:${t[k] / n * 100}%;background:${TIER[k]}"></span>`).join("");
     $("stats").innerHTML = [
       ["Organizations", n], ["Average credibility", avg],
-      ["High / Medium / Low", `${cnt(d => d.cred.tier === "hi")} / ${cnt(d => d.cred.tier === "mid")} / ${cnt(d => d.cred.tier === "lo")}`],
+      ["High / Medium / Low", `${t.hi} / ${t.mid} / ${t.lo}`],
       ["Approximate pins", cnt(d => d.approx)], ["Pins sharing coordinates", stackedPins],
       ["Not verified in 3+ months", cnt(d => (d.cred.age ?? 99) > 3)],
       ["No connections", cnt(d => !d.deg)], ["Links listed one way", pairs.filter(p => !p.mutual).length],
@@ -454,16 +723,17 @@ function start({ CATS, STAGES, DATA }, EVENTS){
     ].map(([k,v]) => `<span>${k}</span><b>${v}</b>`).join("");
     $("weak").innerHTML = [...DATA].sort((a,b) => a.cred.score - b.cred.score).slice(0, 8).map(d =>
       `<button type="button" data-go="${esc(d.id)}"><span>${esc(d.name)}</span><span class="pill" style="background:${TIER[d.cred.tier]}">${d.cred.score}</span></button>`).join("");
-    $("weak").querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(byId[b.dataset.go], true));
+    wireGo($("weak"));
   })();
 
   /* ---------- controls ---------- */
-  document.querySelectorAll("[data-lens]").forEach(b => b.onclick = () => {
-    st.lens = b.dataset.lens;
-    document.querySelectorAll("[data-lens]").forEach(x => x.setAttribute("aria-pressed", x === b));
-    if(st.lens !== "category"){ st.metric = st.lens; $("metric").value = st.lens; }
-    render();
-  });
+  function setLens(lens){
+    st.lens = lens;
+    document.querySelectorAll("[data-lens]").forEach(x => x.setAttribute("aria-pressed", x.dataset.lens === lens));
+    if(lens !== "category"){ st.metric = lens; $("metric").value = lens; }
+    renderLegend(); renderGuide(); render();
+  }
+  document.querySelectorAll("[data-lens]").forEach(b => b.onclick = () => setLens(b.dataset.lens));
   document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => {
     document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", x === b));
     const v = { ...VIEWS[b.dataset.view] }; if(!st.tilt){ v.pitch = 0; v.bearing = 0; }
@@ -471,33 +741,57 @@ function start({ CATS, STAGES, DATA }, EVENTS){
   });
   $("tilt").onchange = e => {
     st.tilt = e.target.checked;
-    const o = { pitch: st.tilt ? 55 : 0, bearing: st.tilt ? map.getBearing() : 0 };
+    const o = { pitch: st.tilt ? 45 : 0, bearing: st.tilt ? map.getBearing() : 0 };
     REDUCED ? map.jumpTo(o) : map.easeTo({ ...o, duration:800 });
     render();
   };
-  $("cols").onchange = e => { st.cols = e.target.checked; render(); };
-  $("arcs").onchange = e => { st.arcs = e.target.checked; render(); };
-  $("bldg").onchange = e => { st.bldg = e.target.checked; render(); };
+  const bind = (id, key) => $(id).onchange = e => { st[key] = e.target.checked; render(); };
+  bind("cols", "cols"); bind("labels", "labels"); bind("group", "group"); bind("arcs", "allArcs"); bind("bldg", "bldg");
   $("metric").onchange = e => { st.metric = e.target.value; render(); };
   $("togglePanel").onclick = () => {
     const min = $("panel").classList.toggle("min");
     $("togglePanel").setAttribute("aria-expanded", !min);
-    $("togglePanel").textContent = (min ? "▸" : "▾") + " Controls";
+    $("togglePanel").textContent = (min ? "▸" : "▾") + " Legend & controls";
   };
-  document.addEventListener("keydown", e => { if(e.key === "Escape") select(null); });
+  if(innerWidth <= 760) $("togglePanel").click();
+
+  // keyboard (issue #47 asks for this on the Galaxy; same idea here)
+  document.addEventListener("keydown", e => {
+    const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+    if(e.key === "Escape"){ select(null); $("results").style.display = "none"; }
+    else if(e.key === "/" && !typing){ e.preventDefault(); $("q").focus(); }
+    else if((e.key === "ArrowRight" || e.key === "ArrowLeft") && st.sel && !typing){
+      const list = [...neighbors[st.sel.id]].map(id => byId[id]).sort((a,b) => a.name.localeCompare(b.name));
+      if(!list.length) return;
+      // walk the selected org's network: remember where we came from
+      st.walk ||= { from:st.sel, i:-1 };
+      const base = st.walk.from, ring = [...neighbors[base.id]].map(id => byId[id]).sort((a,b) => a.name.localeCompare(b.name));
+      st.walk.i = (st.walk.i + (e.key === "ArrowRight" ? 1 : -1) + ring.length) % ring.length;
+      const w = st.walk; select(ring[w.i], true); st.walk = w;
+    }
+  });
+  map.on("click", () => { if(!st.sel) st.walk = null; });
 
   // search
   const q = $("q"), res = $("results");
   q.oninput = () => {
     const t = q.value.trim().toLowerCase();
-    const hits = t ? DATA.filter(d => d.name.toLowerCase().includes(t)).slice(0, 10) : [];
-    res.innerHTML = hits.map(d => `<button type="button" role="option" data-go="${esc(d.id)}">${esc(d.name)} <span class="note">· ${d.cred.score}</span></button>`).join("");
+    const hits = t ? DATA.filter(d => d.name.toLowerCase().includes(t) || areaOf(d).toLowerCase().includes(t)).slice(0, 10) : [];
+    res.innerHTML = hits.map(d => `<button type="button" role="option" data-go="${esc(d.id)}"><span class="dot" style="background:${CATS[d.cat].color}"></span>${esc(d.name)}<small>${esc(areaOf(d))} · ${d.cred.score}</small></button>`).join("");
     res.style.display = hits.length ? "block" : "none";
-    res.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { res.style.display = "none"; q.value = ""; select(byId[b.dataset.go], true); });
+    res.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { res.style.display = "none"; q.value = ""; st.walk = null; select(byId[b.dataset.go], true); });
   };
-  q.onkeydown = e => { if(e.key === "Enter"){ const b = res.querySelector("button"); if(b) b.click(); } if(e.key === "ArrowDown"){ res.querySelector("button")?.focus(); e.preventDefault(); } };
+  q.onkeydown = e => {
+    if(e.key === "Enter"){ const b = res.querySelector("button"); if(b) b.click(); }
+    if(e.key === "ArrowDown"){ res.querySelector("button")?.focus(); e.preventDefault(); }
+  };
+  res.onkeydown = e => {
+    if(e.key === "ArrowDown"){ document.activeElement.nextElementSibling?.focus(); e.preventDefault(); }
+    if(e.key === "ArrowUp"){ (document.activeElement.previousElementSibling || q).focus(); e.preventDefault(); }
+  };
 
-  window.__atlas3d = { DATA, pairs, evIdx, map };   // handy for debugging in the console
+  renderLegend(); renderGuide();
+  window.__atlas3d = { DATA, pairs, evIdx, map, st, render };   // handy for debugging in the console
 }
 </script>
 </body>
