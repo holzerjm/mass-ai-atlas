@@ -546,6 +546,79 @@ def _why(s, intent):
     return (lead + " " + _first_sentence(d.get("why") or d.get("desc"))).strip()
 
 
+CAT_NOUN = {"vc": "venture firms", "angel": "angel groups", "accel": "accelerators", "university": "university labs",
+            "corporate": "corporate labs", "startup": "startups", "community": "communities", "event": "events",
+            "gov": "government programs", "space": "spaces and hubs", "student": "student groups"}
+
+
+def understood(intent, lookup):
+    """How the question was read, in plain words. It is our reading, never a fact, and it
+    never names an organization."""
+    if intent["out_of_state"]:
+        return f"a place outside Massachusetts ({intent['out_of_state'].title()})"
+    parts = []
+    if intent["contact"] or intent["person"]:
+        parts.append("people or contact details")
+    if lookup:
+        parts.append("an organization you named")
+    parts += [OFFER_LABEL[o] for o in intent["offers"]]
+    parts += [_join(intent["tags"])] if intent["tags"] else []
+    parts += [_join(STAGE_NAME[s] for s in intent["stages"]) + " stage"] if intent["stages"] else []
+    parts += [_join(CAT_NOUN[c] for c in intent["cats"])] if intent["cats"] else []
+    if intent["place"]:
+        parts.append("in " + intent["place"].title())
+    elif intent["gap"]:
+        parts.append("near " + intent["gap"].title())
+    elif intent["region"]:
+        parts.append("west of Worcester" if intent["region"] == "west" else "outside Boston")
+    elif intent["offers"] or intent["tags"] or intent["stages"] or intent["cats"] or intent["terms"]:
+        parts.append("any MA location")
+    if intent["open_only"]:
+        parts.append("open to apply now")
+    if intent["terms"]:
+        parts.append("mentions " + _join(f'"{w}"' for w in intent["terms"]))
+    return " · ".join(parts) or None
+
+
+_CONCERNS = ("approximate pin", "no stage listed", "no connections", "no check size listed")
+_FIXED = {"approximate pin": "an exact address", "no stage listed": "stages listed",
+          "no connections": "listed connections", "no check size listed": "a stated check size"}
+
+
+def trust(rows):
+    """Which of the top two results to trust less, from their doubts and Atlas fields only.
+    None when there are fewer than two results or nothing separates them."""
+    if len(rows) < 2:
+        return None
+    a, b = rows[0], rows[1]
+
+    def concerns(r):
+        out = [x for x in r["doubts"] if x in _CONCERNS or x.startswith("deadline passed")]
+        return out
+
+    def verified(r):
+        return next((x.split()[-1] for x in r["doubts"] if x.startswith("last verified ")), "")
+
+    ca, cb = concerns(a), concerns(b)
+    if len(ca) != len(cb):
+        risky, safe = (a, b) if len(ca) > len(cb) else (b, a)
+    elif verified(a) != verified(b):
+        risky, safe = (a, b) if verified(a) < verified(b) else (b, a)
+    else:
+        return None
+    # only what differs between the two: a doubt both share separates nothing
+    vr, vs = verified(risky), verified(safe)
+    only = [x for x in concerns(risky) if x not in concerns(safe)]
+    older = bool(vr and vs and vr < vs)
+    bad = only + ([f"last verified {vr}"] if older else [])
+    if not bad:
+        return None
+    good = [_FIXED[x] for x in only if x in _FIXED]
+    other = "the other has " + _join(good) + (f" and is verified {vs}" if older else "") if good else \
+        f"the other is verified {vs}"
+    return {"id": risky["id"], "reason": f"{_join(bad)}, while {other}."}
+
+
 def _result(d, why, mode, link_rows, approved_from):
     return {"id": d["id"], "name": d["name"], "why": why, "atlas_url": ATLAS_URL.format(d["id"]),
             "connections": connections(d, mode, link_rows), "doubts": doubts(d, mode, approved_from)}
@@ -570,7 +643,8 @@ def _answer(query, mode):
     if intent["out_of_state"]:
         return {"query": query, "mode": mode, "results": [],
                 "not_found": f"The Atlas covers Massachusetts only, so it has nothing in {intent['out_of_state'].title()}. "
-                             "Try a Massachusetts city, or leave the place out."}
+                             "Try a Massachusetts city, or leave the place out.",
+                "understood": understood(intent, False), "trust": None}
     if intent["contact"] or intent["person"]:
         notes.append("The Atlas lists organizations, not people, so it holds no names or contact details. "
                      "Each organization's page links to its own website.")
@@ -613,7 +687,9 @@ def _answer(query, mode):
     not_found = " ".join(dict.fromkeys(notes)) or None
     if not rows and not not_found:
         not_found = "Nothing in the Atlas matches that."
-    return {"query": query, "mode": mode, "results": rows, "not_found": not_found}
+    lookup = bool(intent["orgs"]) and not (intent["offers"] or intent["tags"] or intent["stages"] or intent["cats"])
+    return {"query": query, "mode": mode, "results": rows, "not_found": not_found,
+            "understood": understood(intent, lookup), "trust": None if lookup else trust(rows)}
 
 
 if __name__ == "__main__":
