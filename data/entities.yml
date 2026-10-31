@@ -2189,8 +2189,6 @@
   stages: [1, 2, 3, 4, 5]
   links: [aihub, sundai, techweek]
   offers: [space, mentorship, compute, community]
-  applyBy: '2026-10-25'
-  applyNote: Spring 2027 cohort
   added: 2026-06
   lastVerified: 2026-10
 - id: ssc
@@ -3046,8 +3044,6 @@
   tags: [climate]
   stages: [2, 4]
   offers: [grants, customers, funding]
-  applyBy: '2026-10-20'
-  applyNote: InnovateMass
   added: 2026-08
   lastVerified: 2026-10
 - id: mlsc
