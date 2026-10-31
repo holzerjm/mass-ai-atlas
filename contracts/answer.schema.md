@@ -19,6 +19,8 @@ answer(query: str, mode: str = "after") -> dict   # mode is "before" or "after"
 - It **never raises** to the app. On any error it returns `results: []` and a short plain
   `not_found` message (e.g. `"Something went wrong: needs review."`).
 - It reads `ATLAS_PATH` (default `chatbot/data/atlas.json`) and `LINKS_PATH`. Nothing else.
+- Import note: `streamlit run chatbot/app/main.py` doesn't put the repo root on the import path, so
+  `main.py` runs `sys.path.insert(0, str(Path(__file__).resolve().parents[2]))` before the import.
 
 ## Output
 
@@ -42,6 +44,22 @@ answer(query: str, mode: str = "after") -> dict   # mode is "before" or "after"
 | `mode` | string | `"before"` or `"after"`, echoed |
 | `results` | array | Ranked, best first. **May be empty.** At most 8 items |
 | `not_found` | string or `null` | What the query asked for that the Atlas doesn't cover, in plain words, plus an alternative when there is one (e.g. `"No wet-lab space is listed in the Atlas. The closest listed spaces are below."`). `null` when everything was covered. **Never null when `results` is empty** |
+| `understood` | string or `null` | *Optional.* How we read the question, in plain words (e.g. `"pre-seed funding · for MIT alumni · any MA location"`). This is **our reading, not a fact**, and the app labels it that way. It never names an org. Absent or `null` means don't show it |
+| `trust` | object or `null` | *Optional.* Which of the top two results to trust less, and why. See below. Absent or `null` means don't show it |
+
+### `trust` (optional)
+
+```json
+{"id":"sbxi","reason":"last verified 2025-11 and no connections, while the other is verified 2026-06 with 3 connections"}
+```
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | string | Must be `results[0].id` or `results[1].id`. The app ignores `trust` otherwise |
+| `reason` | string | One sentence built **only** from the two entries' `doubts` and Atlas fields, never from the model's judgement |
+
+`null` when there are fewer than two results or nothing separates them. Readers that don't
+know these two fields can ignore them, so adding them doesn't break anything.
 
 ### Result
 
@@ -49,7 +67,7 @@ answer(query: str, mode: str = "after") -> dict   # mode is "before" or "after"
 |---|---|---|
 | `id` | string | **Must exist in `atlas.json`.** core checks this in code and drops anything else |
 | `name` | string | Copied from `atlas.json`, never from the model |
-| `why` | string | One or two sentences, built only from that org's Atlas fields (`desc`, `why`, `tags`, `stages`, `offers`, `facts`) |
+| `why` | string | One or two sentences, built only from that org's Atlas fields (`desc`, `why`, `tags`, `stages`, `offers`, `facts`, `loc`). `loc` gives place answers their "located in …" wording |
 | `atlas_url` | string | `https://the-open-accelerator.com/ecosystem/?entry=<id>`. This is the source for everything in `why` |
 | `connections` | array | See below. May be empty |
 | `doubts` | array of strings | See below. May be empty |

@@ -84,8 +84,12 @@ A JSON array, one object per proposed link:
              "atlas_url":"...",
              "connections":[{"to_id":"...","relation":"...","source_url":"...","quote":"...","new":true}],
              "doubts":["approximate pin","last verified 2026-06","no stage listed"]}],
- "not_found":"what we couldn't find in the Atlas, or null"}
+ "not_found":"what we couldn't find in the Atlas, or null",
+ "understood":"optional: how we read the question, labelled as our reading, or null",
+ "trust":{"id":"one of the top two result ids","reason":"optional: why to trust it less, from doubts/Atlas fields only"}}
 ```
+- `why` may use `loc` (for "located in …"). `understood` and `trust` are optional, so readers can ignore them. Full spec: `contracts/answer.schema.md`.
+
 **The six doubt signals** (Track B is scored on showing all of them):
 1. approximate pin (`approx: true`)
 2. the month the entry was last verified (`lastVerified`)
