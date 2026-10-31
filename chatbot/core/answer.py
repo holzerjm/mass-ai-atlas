@@ -145,6 +145,14 @@ OFFERS = {
     "talent": r"talent|hir(?:e|ing)|recruit(?:ing|ment)?|engineers?|interns?|internships?|co-?founders?|teammates?|developers?",
     "customers": r"customers?|pilots?|buyers?|design partners?|first users|sales|distribution|clients?",
 }
+# Kinds of organization that usually provide each need. A small nudge in ranking only: it
+# orders equally good matches, it never decides whether an entry matches.
+NEED_CATS = {
+    "funding": {"vc", "angel", "accel", "gov"}, "grants": {"gov", "accel", "university"},
+    "space": {"space", "accel"}, "compute": {"gov", "university", "corporate"},
+    "mentorship": {"accel", "community", "student"}, "community": {"community", "event", "student", "space"},
+    "talent": {"student", "event", "community", "university"}, "customers": {"corporate", "accel"},
+}
 OFFER_LABEL = {"funding": "funding", "grants": "equity-free money", "space": "space", "compute": "compute",
                "mentorship": "mentorship", "community": "community", "talent": "talent",
                "customers": "customers and pilots"}
@@ -357,6 +365,69 @@ def parse(query):
     return intent
 
 
+_model_cache = {}
+
+
+def _model_slots(query):
+    """Ask the model to map an unusual question onto the Atlas vocabulary. Returns a dict of
+    slots, or None when no key is set or anything fails, so the keyword reading stands. The
+    answer is cached per question, so both toggle modes rank the same way."""
+    key = re.sub(r"\s+", " ", query.lower()).strip()
+    if key in _model_cache:
+        return _model_cache[key]
+    _model_cache[key] = None
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return None
+    try:
+        import anthropic
+    except ImportError:
+        return None
+    places = sorted(PLACES) + sorted(GAP_PLACES)
+    schema = {
+        "type": "object",
+        "properties": {
+            "offers": {"type": "array", "items": {"type": "string", "enum": list(OFFERS)}},
+            "tags": {"type": "array", "items": {"type": "string", "enum": list(TAGS) + ["seed"]}},
+            "stages": {"type": "array", "items": {"type": "integer", "enum": list(STAGE_NAME)}},
+            "cats": {"type": "array", "items": {"type": "string", "enum": list(CATS)}},
+            "place": {"type": "string", "enum": places + [""]},
+        },
+        "required": ["offers", "tags", "stages", "cats", "place"],
+        "additionalProperties": False,
+    }
+    system = ("You map a founder's question onto the vocabulary of the Mass AI Atlas, a directory of "
+              "Massachusetts AI organizations. Use only the allowed values. offers = what the founder "
+              "needs from an organization; tags = sectors or traits; stages: 1 Spark (exploring), "
+              "2 Validate, 3 Build, 4 Fund (pre-seed and seed), 5 Scale; cats = the kinds of "
+              "organization they ask for, only if they name one; place = a Massachusetts place they "
+              "name, else empty. Leave a field empty rather than guess. Never name organizations.")
+    request = dict(model=os.environ.get("CLAUDE_MODEL") or "claude-sonnet-5-5", max_tokens=1024, system=system,
+                   messages=[{"role": "user", "content": query}],
+                   output_config={"effort": "low", "format": {"type": "json_schema", "schema": schema}})
+    try:
+        client = anthropic.Anthropic(timeout=8.0, max_retries=0)
+        try:
+            # a policy decline on the first model is re-run on a fallback model inside the same call
+            resp = client.beta.messages.create(betas=["server-side-fallback-2026-07-01"], fallbacks="default", **request)
+        except anthropic.BadRequestError:
+            resp = client.messages.create(**request)
+        if resp.stop_reason == "refusal":
+            return None
+        text = next((b.text for b in resp.content if b.type == "text"), "")
+        raw = json.loads(text)
+    except Exception:
+        return None
+    slots = {
+        "offers": [o for o in raw.get("offers", []) if o in OFFERS],
+        "tags": [t for t in raw.get("tags", []) if t in TAGS or t == "seed"],
+        "stages": [s for s in raw.get("stages", []) if s in STAGE_NAME],
+        "cats": [c for c in raw.get("cats", []) if c in CATS],
+        "place": raw.get("place") if raw.get("place") in places else None,
+    }
+    _model_cache[key] = slots
+    return slots
+
+
 def _slots(intent):
     return bool(intent["offers"] or intent["tags"] or intent["stages"] or intent["cats"] or intent["place"]
                 or intent["gap"] or intent["region"] or intent["open_only"])
@@ -438,8 +509,17 @@ def rank(intent):
         soft = intent["offers"] or intent["tags"] or intent["stages"] or intent["terms"]
         if soft and score == 0:
             continue
+        score += 1 if any(d["cat"] in NEED_CATS[o] for o in om) else 0
         km = _haversine(GAP_PLACES[intent["gap"]], (d["lat"], d["lng"])) if intent["gap"] else 0
         scored.append({"d": d, "score": score, "om": om, "tm": tm, "sm": sm, "xm": xm, "km": km})
+    where = intent["place"] or ("west of Worcester" if intent["region"] == "west" else None) or \
+        ("outside Boston" if intent["region"] == "outside" else None)
+    if not scored and where:
+        wider = dict(intent, place=None, region=None)
+        scored, wider_notes = rank(wider)
+        if scored:
+            return scored, [f"Nothing {('in ' + where.title()) if intent['place'] else where} matches that, "
+                            f"so these are from across the state."] + wider_notes
     want_tags = [x for x in intent["tags"] if not any(x in (s["d"].get("tags") or []) for s in scored)]
     if want_tags and scored:
         notes.append(f"Nothing here is tagged {_join(want_tags)}, so these match the rest of your question.")
@@ -494,6 +574,18 @@ def _answer(query, mode):
     if intent["contact"] or intent["person"]:
         notes.append("The Atlas lists organizations, not people, so it holds no names or contact details. "
                      "Each organization's page links to its own website.")
+    model_reading = None
+    if not (intent["contact"] or intent["person"]) and not _slots(intent) and not intent["orgs"]:
+        m = _model_slots(query)
+        if m and any(m.values()):
+            for k in ("offers", "tags", "stages", "cats"):
+                intent[k] = list(dict.fromkeys(intent[k] + m[k]))
+            if m["place"] in GAP_PLACES:
+                intent["gap"] = m["place"]
+            elif m["place"]:
+                intent["place"] = m["place"]
+            model_reading = ([OFFER_LABEL[o] for o in m["offers"]] + m["tags"]
+                             + [STAGE_NAME[s] + " stage" for s in m["stages"]] + ([m["place"].title()] if m["place"] else []))
 
     if intent["orgs"] and not (intent["offers"] or intent["tags"] or intent["stages"] or intent["cats"]):
         for eid in intent["orgs"][:MAX_RESULTS]:
@@ -503,6 +595,9 @@ def _answer(query, mode):
     elif _slots(intent) or intent["terms"]:
         scored, rank_notes = rank(intent)
         notes += rank_notes
+        if model_reading and scored and not any(s["xm"] for s in scored[:MAX_RESULTS]):
+            notes.append("Nothing in the Atlas uses your exact words, so these match our reading of the question: "
+                         + _join(model_reading) + ".")
         for s in scored[:MAX_RESULTS]:
             rows.append(_result(s["d"], _why(s, intent), mode, link_rows, approved_from))
         if not rows:
