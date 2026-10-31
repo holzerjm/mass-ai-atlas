@@ -17,3 +17,10 @@ node_modules/
 # Playwright output (run: npm run test:e2e)
 test-results/
 playwright-report/
+
+# Team TBTT
+.env
+survey/cache/
+__pycache__/
+# frozen Atlas copy the chatbot reads (the bare atlas.json rule above would hide it)
+!chatbot/data/atlas.json

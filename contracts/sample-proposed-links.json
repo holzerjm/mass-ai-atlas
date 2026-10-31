@@ -1,0 +1,22 @@
+[
+ {"from_id":"sbxi","to_id":"mit-sandbox","relation":"program_of",
+  "source_url":"https://github.com/holzerjm/mass-ai-atlas/blob/7d06de183f227d8a957bff9572b0545f11a01904/data/entities.yml#L1893",
+  "quote":"grew out of the MIT Sandbox program.",
+  "confidence":"high","status":"approved"},
+ {"from_id":"startup-worcester","to_id":"worclab","relation":"partner",
+  "source_url":"https://github.com/holzerjm/mass-ai-atlas/blob/7d06de183f227d8a957bff9572b0545f11a01904/data/entities.yml#L2315",
+  "quote":"Pre-accelerator run by the Worcester Regional Chamber of Commerce with the WorcLab incubator",
+  "confidence":"high","status":"approved"},
+ {"from_id":"nvidia-bos","to_id":"redhat-bos","relation":"partner",
+  "source_url":"https://github.com/holzerjm/mass-ai-atlas/blob/7d06de183f227d8a957bff9572b0545f11a01904/data/entities.yml#L439",
+  "quote":"the AI Factory collaboration with Red Hat.",
+  "confidence":"medium","status":"pending"},
+ {"from_id":"amazon-sea","to_id":"amazon-robotics","relation":"related",
+  "source_url":"https://github.com/holzerjm/mass-ai-atlas/blob/7d06de183f227d8a957bff9572b0545f11a01904/data/entities.yml#L393",
+  "quote":"Amazon Robotics operates separately in North Reading and Westborough.",
+  "confidence":"medium","status":"pending"},
+ {"from_id":"founder-institute","to_id":"masschallenge","relation":"related",
+  "source_url":"https://github.com/holzerjm/mass-ai-atlas/blob/7d06de183f227d8a957bff9572b0545f11a01904/data/entities.yml#L2254",
+  "quote":"A structured first step for founders not yet ready for Techstars or MassChallenge",
+  "confidence":"low","status":"rejected"}
+]

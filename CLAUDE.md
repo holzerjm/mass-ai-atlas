@@ -2,129 +2,154 @@
 
 Read this file fully before doing anything. It applies to every Claude Code session on this team.
 
-## What we're building (2-hour build)
-We're 3 students. The repo is the **Mass AI Atlas** (197 Massachusetts AI organizations in `data/entities.yml`, published as `atlas.json` / `atlas.csv`). We are building two connected parts:
+## The setup: two projects, one repo
+The repo is the **Mass AI Atlas**: 197 Massachusetts AI organizations in `data/entities.yml`, published as `atlas.json` / `atlas.csv`. We submit **two projects**:
 
-1. **Heartbeat** (owner: Seat A): a deterministic verification pipeline. For each org, it collects dated, permanent records from independent witnesses (SEC EDGAR Form D filings and the Internet Archive Wayback CDX; the IRS via ProPublica if time allows). It matches each record to an Atlas org with a confidence level, refuses bad matches, and writes one case file per org with a status: `ALIVE_CORROBORATED`, `ALIVE_SINGLE`, `QUIET`, `FLATLINE`, or `CONFLICT`. A human reviews the results before anything touches the data.
-2. **Ask the Atlas** (owners: Seats B and C): a chatbot for founders. A query like "pre-seed healthtech, need lab space" returns a ranked list of Atlas orgs. **Every result shows its heartbeat status and clickable sources.** It says "not in the Atlas" when nothing fits.
+| Track | Project | People |
+|---|---|---|
+| **A: The Survey** (backend data) | **Missing connections:** propose sourced `links` for isolated entries, which moves probe 2 | **Arsh** |
+| **B: The Passage** (founder experience) | **Ask the Atlas:** a chatbot that gives founders a ranked, sourced shortlist and shows every doubt signal | **Karthik** (engine) + **Bhoomika** (panel) |
 
-**Pitch:** "The Atlas says verified. We made it *truly tested*, and showed founders that trust."
+**How they connect:** the chatbot shows doubt signals such as "no connections" and "approximate pin". Arsh's proposed links feed into the chatbot through a **before/after toggle**, so in the demo, "no connections" disappears from an entry live, with the source sentence shown.
 
 ## Seats and ownership (the no-conflict rule)
-**Edit only your own folder.** You can read anything.
+**Edit only your own paths.** You can read anything.
 
-| Seat | Person | Role | Owns (edit only these) |
-|---|---|---|---|
-| A | **Arshmehar** | Heartbeat pipeline (SEC, Archive, matcher, cases, live command) | `heartbeat/**` |
-| B | **Karthik** | Chatbot core: retrieval, ranking, Claude calls, the no-invented-orgs check | `chatbot/core/**` |
-| C | **Bhoomika** | Chatbot app: UI, status badges, sources, doubt signals, demo flow. Also repo setup and shared files | `chatbot/app/**` |
-| Shared | Bhoomika approves changes | Contracts, rules, config | `contracts/**`, `CLAUDE.md`, `.gitignore` |
+| Person | Role | Owns (edit only these) |
+|---|---|---|
+| **Arsh** | Track A: link extraction, matching, confidence, review queue, probe numbers | `survey/**`, and the `proposals` branch |
+| **Karthik** | Track B engine: data loading, retrieval, ranking, Claude calls, the no-invented-orgs check | `chatbot/core/**`, `chatbot/requirements.txt` |
+| **Bhoomika** | Track B panel: UI, doubt badges, sources, before/after toggle, demo flow. Also repo setup and shared files | `chatbot/app/**`, `contracts/**`, `CLAUDE.md`, `.gitignore` |
 
-Each part keeps its own dependency file: `chatbot/requirements.txt` (Karthik owns it; Bhoomika asks before adding to it). Heartbeat adds no new dependencies.
-
-- **Never edit** `data/`, `scripts/`, `index.html` or any other original repo file. The only exception is Heartbeat's apply step, which runs only on items a human approved.
-- To change a shared file, tell the team first. One person makes the change and the others pull.
-- If you need something from another seat, ask. Don't edit their folder.
+- **Never edit `data/`, `scripts/`, `index.html` or any other original repo file on `main`.**
+- Arsh's `data/entities.yml` changes go **only** on the `proposals` branch, and only after a human approves each one.
+- To change a shared file or a contract, tell the team first. Bhoomika makes the change and the others pull.
+- If you need something from another person's folder, ask. Don't edit it.
 
 ## How we work in parallel (each person runs their own Claude Code)
-**Rule: two Claude Code sessions never edit the same file.** We split by folder and connect through the contracts below.
+**Rule: two Claude Code sessions never edit the same file.**
 
-1. **Skeleton first (Karthik, first 10 minutes).** Create `chatbot/core/answer.py` with a stub `answer(query)` that returns a hard-coded result in the Contract 2 format. Create `chatbot/app/main.py` as a Streamlit page that calls it and displays the result. Push. Now the chatbot runs end to end.
-2. **Then split.** Karthik replaces the stub with the real logic. Bhoomika builds the UI against the stub's output. Neither waits on the other.
-3. **Heartbeat runs on its own.** The chatbot reads `contracts/sample-cases.jsonl` until Arshmehar's real `heartbeat/out/cases.jsonl` is ready, then `CASES_PATH` switches over.
-4. **Integrate every 15–20 minutes:** pull, run the full app, push.
-5. **If you run a second Claude Code session yourself,** give it a different subfolder and use a git worktree (`git worktree add ../tbtt-2`).
+1. **Skeleton first (Karthik, first 10 minutes).** Create `chatbot/core/answer.py` with a stub `answer(query, mode)` that returns a hard-coded result in the Contract 2 format, and `chatbot/app/main.py` as a Streamlit page that calls it. Push. The chatbot now runs end to end.
+2. **Then split.** Karthik replaces the stub with real logic. Bhoomika builds the panel against the stub's output. Arsh works independently in `survey/`.
+3. **Sample first.** Bhoomika commits `contracts/sample-proposed-links.json` (3–5 rows using real Atlas ids), so the toggle can be built before Arsh's real output exists.
+4. **Integrate every 15–20 minutes:** pull, run, push.
+5. **A second session of your own** must use a different subfolder and a git worktree (`git worktree add ../tbtt-2`).
 
 **Open every Claude Code session with your line:**
-- Arshmehar: *"I'm Seat A (Arshmehar). Read CLAUDE.md. Only edit `heartbeat/`. Never change the `cases.jsonl` format without telling the team."*
-- Karthik: *"I'm Seat B (Karthik). Read CLAUDE.md. Only edit `chatbot/core/` and `chatbot/requirements.txt`. Never change the signature or output format of `answer()`."*
-- Bhoomika: *"I'm Seat C (Bhoomika). Read CLAUDE.md. Only edit `chatbot/app/` and the shared files. Read `answer()` output exactly as Contract 2 defines it."*
+- Arsh: *"I'm Arsh (Track A). Read CLAUDE.md. Only edit `survey/`. Data edits only on the `proposals` branch, only for approved items. Never change the proposed-links format without telling the team."*
+- Karthik: *"I'm Karthik (Track B engine). Read CLAUDE.md. Only edit `chatbot/core/` and `chatbot/requirements.txt`. Never change the signature or output format of `answer()`."*
+- Bhoomika: *"I'm Bhoomika (Track B panel). Read CLAUDE.md. Only edit `chatbot/app/` and the shared files. Read `answer()` output exactly as Contract 2 defines it."*
 
 ## Repo layout
 ```
 contracts/
-  cases.schema.md        # the contract between Heartbeat and the chatbot (frozen)
-  sample-cases.jsonl     # hand-written sample: the chatbot builds against this first
-  answer.schema.md       # the contract between chatbot/core and chatbot/app (frozen)
-heartbeat/               # Seat A · Node 20, repo's js-yaml, no new deps
-  lib/ witnesses/ match/ case/ review/ probes/ bin/
-  out/                   # generated, gitignored except cases.jsonl
-  cache/                 # gitignored
+  proposed-links.schema.md        # Contract 1 (frozen)
+  sample-proposed-links.json      # sample so the toggle works before Arsh's output exists
+  answer.schema.md                # Contract 2 (frozen)
+survey/                           # Arsh · Track A
+  out/proposed-links.json         # Arsh's output: the only survey file the chatbot reads
+  out/probes.json                 # before/after numbers
+  cache/                          # gitignored
 chatbot/
-  core/                  # Seat B · Python
-  app/                   # Seat C · Python (Streamlit)
-.env                     # gitignored: ANTHROPIC_API_KEY, CLAUDE_MODEL, CASES_PATH
+  data/atlas.json                 # frozen local copy, downloaded once at the start
+  core/                           # Karthik · Python
+  app/                            # Bhoomika · Python (Streamlit)
+  requirements.txt
+.env                              # gitignored: ANTHROPIC_API_KEY, CLAUDE_MODEL, ATLAS_PATH, LINKS_PATH
 ```
 
-## Contract 1: `cases.jsonl` (Heartbeat → chatbot)
-One JSON object per line, one per Atlas org. UTF-8, dates `YYYY-MM-DD`.
+## Contract 1: `proposed-links.json` (Arsh → chatbot)
+A JSON array, one object per proposed link:
 ```json
-{"id":"nextview","name":"NextView Ventures","cat":"vc",
- "status":"ALIVE_CORROBORATED",
- "witnesses":[{"source":"sec","event":"form_d","date":"2026-02-12","record_name":"NextView Ventures VI, L.P.","city":"Boston","state":"MA","url":"https://www.sec.gov/...","confidence":"high"},
-              {"source":"archive","event":"homepage_capture","date":"2026-10-13","url":"https://web.archive.org/...","confidence":"high"}],
- "refusals":[],
- "checked_at":"2026-10-31"}
+[{"from_id":"example-startup","to_id":"example-accel","relation":"hosted_at",
+  "source_url":"https://example.org/about",
+  "quote":"the exact sentence from the page that supports this link",
+  "confidence":"high",
+  "status":"approved"}]
 ```
-- `status` is one of `ALIVE_CORROBORATED | ALIVE_SINGLE | QUIET | FLATLINE | CONFLICT | NOT_CHECKED`
-- The chatbot reads the path from `CASES_PATH`. Until Heartbeat's real file exists, it uses `contracts/sample-cases.jsonl`.
-- **Orgs missing from cases.jsonl → show `NOT_CHECKED`.** Never crash.
+- Both `from_id` and `to_id` must exist in `atlas.json`.
+- `relation` must match what `data/entities.schema.yml` allows for `links`. Arsh confirms this from the schema and updates this contract at the start.
+- `confidence` is `high | medium | low`. `status` is `approved | pending | rejected`.
+- **The chatbot shows `approved` links as connections, `pending` ones only as "proposed, needs review", and never shows `rejected` ones.**
+- The chatbot reads the path from `LINKS_PATH`. Until Arsh's real file exists, it uses `contracts/sample-proposed-links.json`.
+- **Arsh gives a heads-up before any change to ids, fields, or this format.** The chatbot reads `links`, `facts`, `approx` and `lastVerified`.
 
 ## Contract 2: `answer()` (chatbot/core → chatbot/app)
-`chatbot/core` exposes one function: `answer(query: str) -> dict`
+`answer(query: str, mode: "before" | "after") -> dict`
+- `before`: original `atlas.json` only.
+- `after`: `atlas.json` plus Arsh's approved links.
 ```json
-{"query":"...",
- "results":[{"id":"masschallenge","name":"MassChallenge","why":"short reason it fits, from Atlas fields only",
-             "status":"ALIVE_CORROBORATED","atlas_url":"...","sources":[{"label":"SEC Form D 2026-02","url":"..."}],
-             "doubts":["approximate pin","last verified 2026-06"]}],
+{"query":"...","mode":"after",
+ "results":[{"id":"...","name":"...","why":"short reason it fits, from Atlas fields only",
+             "atlas_url":"...",
+             "connections":[{"to_id":"...","relation":"...","source_url":"...","quote":"...","new":true}],
+             "doubts":["approximate pin","last verified 2026-06","no stage listed"]}],
  "not_found":"what we couldn't find in the Atlas, or null"}
 ```
-`doubts` covers the six signals: approximate pin (`approx`), `lastVerified` month, startup with no `stages`, no `links`, funder with no check size, and `applyBy` (rolling, dated or past).
+**The six doubt signals** (Track B is scored on showing all of them):
+1. approximate pin (`approx: true`)
+2. the month the entry was last verified (`lastVerified`)
+3. a startup with no `stages`
+4. an entry with no `links`
+5. a funder with no check size
+6. a deadline (`applyBy`) that is rolling, dated, or past
 
-## Truth rules (these affect our score, so never break them)
-- **Never invent an organization.** The chatbot answers **only** from `atlas.json` plus `cases.jsonl`. Claude may rank and explain, but every result `id` must exist in `atlas.json`. Validate this in code and drop anything that doesn't match.
-- **Every claim has a source URL.** No URL means it isn't shown.
-- **Never present an inference as a verification.** "Alive" is shown as dated evidence. Only a human stamps `lastVerified`.
-- **Organizations, not people.** Never read or store SEC "related persons", IRS officers, or any personal names or contacts.
-- **Massachusetts only.** An out-of-state record is a `CONFLICT`, never evidence.
-- **Heartbeat has no AI in the verification path.** It's deterministic, so a rerun gives the same answer.
+## Truth rules (both tracks, never break them)
+- **Never invent an organization.** The chatbot answers **only** from `atlas.json` plus approved links. Every result id must exist in `atlas.json`. Check this in code and drop anything that doesn't match.
+- **Every claim has a source URL.** No URL means it isn't shown or proposed.
+- **Never present an inference as a verification.** Proposed links are labeled as proposed until a human approves them.
+- **Organizations, not people.** Never store or output data about individuals or any personal contact details.
+- **Massachusetts only.** An out-of-state org is a false positive.
+- **Public pages and documented APIs only.** Never use platforms whose terms forbid automated collection (no LinkedIn, Crunchbase, PitchBook or scraping search engines).
 - Say "needs review" or "not in the Atlas" instead of guessing.
 
+## Track A specifics (Arsh)
+- Output must pass `node scripts/validate.js` on the `proposals` branch. **A validator failure caps Track Excellence at 2.**
+- Every proposed link carries `source_url` plus the exact `quote`.
+- Track Excellence needs a **before/after on screen** plus **at least two of:** a review queue a maintainer could use, dedup against existing links, multi-source corroboration, calibrated confidence, a new probe.
+- Confirm the official probe 2 number at the probe reveal (our count was 74 isolated entries; the organizers' page says 104 with zero edges).
+- Keep a list of every domain fetched, for the declared sources list.
+
+## Track B specifics (Karthik + Bhoomika)
+- A founder who has never seen it reaches a defensible shortlist unaided and knows what to do next.
+- All six doubt signals show **before** the action they should change. A confident entry still looks confident.
+- A dead end says so and offers an alternative.
+- It works on a phone-width screen and with the keyboard alone.
+- Judges will type their own query, so test off-script queries all session.
+
 ## Tech conventions
-- **Heartbeat:** Node 20+, built-ins plus `js-yaml`. All HTTP goes through `heartbeat/lib/http.js`: an honest user agent with a team email (the SEC requires one), roughly 1 request per second per host (under 10 for the SEC), back off on 429/503, cache every response, and support `--live`.
-- **Chatbot:** Python 3.11, Streamlit for the UI, the `anthropic` SDK. The model comes from the `CLAUDE_MODEL` env var. The key comes **only** from `.env`, never hard-coded and never committed.
-- Load Atlas data from a local copy of `atlas.json` that you download once at the start. A mid-day merge must not change our demo.
+- **Survey:** Arsh's choice (Node 20 with the repo's `js-yaml`, or Python). Honest user agent, about 1 request per second per host, cache responses in `survey/cache/`.
+- **Chatbot:** Python 3.11, Streamlit, the `anthropic` SDK. The model comes from the `CLAUDE_MODEL` env var. The key comes **only** from `.env`, never hard-coded or committed.
+- The chatbot reads the frozen `chatbot/data/atlas.json`, so a mid-day merge can't move our demo.
 - Keep it simple: no new frameworks, no databases, no Docker.
 
 ## Git workflow
-- Everyone works on `main` in their own folder only.
+- Everyone works on `main`, in their own paths only. Arsh's data edits go only on `proposals`.
 - **Before every push:** `git pull --rebase`, then push. Commit small and often (every 15–20 minutes).
-- Commit message format: `[arshmehar] sec witness`, `[karthik] retrieval`, `[bhoomika] badges`.
-- Never `git push --force`. Never commit `.env`, `heartbeat/cache/`, or large files.
-- If a rebase conflict appears outside your folder, **stop and tell the team**. Don't resolve someone else's file.
-- Bhoomika tags the demo commit at freeze: `git tag demo`.
+- Commit message format: `[arsh] link extractor`, `[karthik] retrieval`, `[bhoomika] doubt badges`.
+- **No Claude trace in the repo:** no "Generated with Claude" or Co-Authored-By lines in commits, and never commit `.claude/` or local session files.
+- Never `git push --force`. Never commit `.env`, caches, or large files.
+- If a rebase conflict appears outside your paths, **stop and tell the team**. Don't resolve someone else's file.
 
-## Timeline (2 hours from start = T)
+## Timeline
 | Time | Goal |
 |---|---|
-| T+0:15 | Setup done. **Bhoomika:** contracts and sample committed. **Karthik:** chatbot skeleton pushed. **Everyone:** repo runs and `.env` works |
-| T+0:45 | **Checkpoint 1.** Arshmehar: a real case for NextView. Karthik: real retrieval on the sample file. Bhoomika: badges and sources showing |
-| T+1:20 | **Checkpoint 2.** The real `cases.jsonl` (at least the 52 stale entries) is wired into the chatbot end to end |
-| T+1:45 | **Feature freeze.** Only bug fixes. Bhoomika records the backup video, Karthik writes the brief, Arshmehar saves validator output, Bhoomika tags `demo` |
-| T+2:00 | Code freeze. Rehearse the 4-minute demo twice |
+| Start + 0:15 | **Bhoomika:** contracts and sample committed. **Karthik:** skeleton pushed. **Arsh:** link format confirmed from the schema, "before" probe number recorded |
+| Midpoint | **Checkpoint.** Arsh: first real proposed links with sources. Karthik: real retrieval and all six doubts. Bhoomika: panel and toggle working on the sample |
+| 2:00 | Arsh's real `proposed-links.json` is wired in, and the toggle shows real before/after |
+| **2:30** | **Feature freeze.** Only bug fixes |
+| 2:45 | Arsh: before/after probe numbers final. Backup videos recorded (Bhoomika for Track B, Arsh for Track A) |
+| **3:15** | **Both tracks submitted:** public repo, 2-min YouTube video, 1-page brief, declared track, declared sources. Arsh adds validator output |
+| 3:45 | Demos. Rehearse twice before. If rooms are parallel, Arsh presents Track A alone |
 
-**Cut order if behind:** IRS witness → review queue polish → chatbot extras. **Never cut:** the matcher's refusals, sources on screen, the no-invented-orgs check, live runs.
+**Cut order if behind:** chatbot polish → pending-link display → extra probes. **Never cut:** sources on screen, the no-invented-orgs check, the human approval gate, a passing validator, live runs.
 
 ## Demo must-haves (judges will test these)
-- `heartbeat <any org> --live` runs on an org the judges pick.
-- The chatbot answers a query the judges type themselves.
-- Every source is clickable and actually supports the claim.
-- Show one refusal (e.g. Pillar VC: the name appears in someone else's filing) and one conflict (e.g. Flybridge: filing address in New York).
-- Before → after numbers on screen.
+- **Track A:** before/after on probe 2 on screen. One refused link (a source that didn't support it). Click any `source_url`, and the quote is on that page.
+- **Track B:** the chatbot answers a query the judges type. All six doubts are visible. Every source is clickable. Flip the before/after toggle: "no connections" disappears, with the source sentence shown.
 
 ## How Claude Code should behave here
-- Start each session by restating your seat and folder.
+- Start each session by restating who you are and your paths.
 - Make small changes and run them immediately. Don't build big untested chunks.
-- Don't use web search or fetch tools to collect pipeline data. Only the pipeline's own code fetches data.
 - Ask before adding a dependency or touching a shared file.
 - When unsure about a rule, choose the more honest option ("needs review").
