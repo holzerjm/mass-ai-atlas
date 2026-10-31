@@ -13,31 +13,49 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<!-- Tailwind (same config as the rest of the TOA site) — preflight off so it doesn't reset this page's custom app CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  corePlugins: { preflight: false },
-  theme: {
-    fontFamily: { sans: ['"Red Hat Display"', 'sans-serif'] },
-    extend: {
-      colors: {
-        gold: { DEFAULT: '#FFC600', light: '#FFD54F', dark: '#C79100' },
-        redhat: '#EE0000',
-        ibm: '#0F62FE',
-        dark: { bg: '#0A0A0F', card: '#12121A', accent: '#1E1E2A' }
-      }
-    }
-  }
-}
-</script>
 <!-- Apply saved theme before render to avoid a flash. Page defaults to dark (its native design); light only if the user chose it. -->
 <script>(function(){try{if(localStorage.getItem('toa-atlas-theme')==='light'){document.documentElement.classList.remove('dark');}}catch(e){}})();</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
 <style>
+  /* Custom utility classes replacing Tailwind */
+.font-medium { font-weight: 500; }
+.text-gray-600 { color: #4b5563; }
+.dark\:text-gray-300 { color: #d1d5db; }
+.hover\:text-black:hover { color: #000000; }
+.dark\:hover\:text-white:hover { color: #ffffff; }
+.relative { position: relative; }
+.group { position: relative; }
+.transition-colors { transition: color 0.2s ease; }
+.absolute { position: absolute; }
+.bottom-0 { bottom: 0; }
+.left-0 { left: 0; }
+.w-0 { width: 0; }
+.group-hover\:w-full:hover { width: 100%; }
+.h-0\.5 { height: 2px; }
+.bg-gold { background-color: #FFC600; }
+.transition-all { transition: all 0.3s ease; }
+.duration-300 { transition-duration: 300ms; }
+.hidden { display: none; }
+.lg\:flex { display: flex; }
+.items-center { align-items: center; }
+.gap-5 { gap: 1.25rem; }
+.gap-4 { gap: 1rem; }
+.p-2 { padding: 0.5rem; }
+.rounded-full { border-radius: 9999px; }
+.border { border-width: 1px; }
+.border-gray-200 { border-color: #e5e7eb; }
+.dark\:border-gray-800 { border-color: #1f2937; }
+.bg-gray-100 { background-color: #f3f4f6; }
+.dark\:bg-dark-card { background-color: #12121A; }
+.hover\:border-gold:hover { border-color: #FFC600; }
+.lg\:hidden { display: none; }
+.text-2xl { font-size: 1.5rem; }
+.text-gray-800 { color: #1f2937; }
+.dark\:text-white { color: #ffffff; }
+.focus\:outline-none:focus { outline: none; }
+
 :root{
   --bg:#0a0a0f; --bg2:#101018; --panel:#12121a; --panel2:#1e1e2a;
   --line:rgba(255,255,255,.10); --text:#ececf1; --muted:#9aa0b4;
