@@ -62,7 +62,11 @@ jobs:
           [ -z "$SLACK_WEBHOOK_URL" ] && { echo "SLACK_WEBHOOK_URL not set — skipping"; exit 0; }
           # `|| true` so a missing report file cannot abort this step under bash -e
           SUMMARY=$(head -1 linkcheck.txt 2>/dev/null || true)
-          LINKS=$(tail -n +2 linkcheck.txt 2>/dev/null | grep -E '^(BROKEN|MOVED|  )' | head -25 || true)
+          # BLOCKED must be in this pattern too. Its entries are indented like the rest,
+          # so the grep kept them and dropped only their heading, filing every blocked
+          # host under whichever heading came before it: in November 2026 the whole
+          # blocked list appeared under "MOVED — update the url field".
+          LINKS=$(tail -n +2 linkcheck.txt 2>/dev/null | grep -E '^(BROKEN|MOVED|BLOCKED|  )' | head -25 || true)
           # head -40 is a safety rail, not the rota size — --cycle sets that. At 15
           # it silently cut the list short the moment the rota outgrew it.
           ROTA=$(tail -n +2 rota.txt 2>/dev/null | grep '^  ' | head -40 || true)
