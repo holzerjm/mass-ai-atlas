@@ -234,7 +234,9 @@ that step copies the files with several `rsync` commands, one after another, and
 whatever it copied before the failure is already live. The 🚨 message says which of the
 two happened. Fix the cause, then deploy again
 from the **Actions tab → Deploy to TOA site → Run workflow**, which copies all the files
-again from the current `main`. The same button triggers a deploy by hand at any time.
+again from the current `main`. Don't use **Re-run jobs** on the failed run instead: a re-run
+deploys that run's own commit, so if a newer deploy has finished since, it puts older files
+back on the live site. **Run workflow** also triggers a deploy by hand at any time.
 
 Manual fallback (only if GitHub Actions is unavailable), from a computer with the
 repo checked out and SSH access to the server:
