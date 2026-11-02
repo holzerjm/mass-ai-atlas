@@ -58,10 +58,17 @@ if (withoutCurated === withoutCount) throw new Error("footer: the #footCurated c
 const SUGGEST_LINK = '<a href="#" onclick="suggestEntry();return false">';
 const withSuggestForm = withoutCurated.replace(SUGGEST_LINK, `<a href="${issueUrl("suggest-entry.yml")}" target="_blank" rel="noopener">`);
 if (withSuggestForm === withoutCurated) throw new Error("footer: the Suggest an entry link was not found in index.html, so the events page could ship a link to suggestEntry(), which it does not define");
+// The footer's link to the repository is written into index.html, and the atlas page points it
+// at GH_REPO when its script runs. This page does not run that script, so point it here from the
+// same GH_REPO, or a copy's events page links to the repository it was copied from.
+// tests/events.spec.js checks this with a different GH_REPO.
+const REPO_LINK = /<a id="footGhLink" href="[^"]*"/;
+if (!REPO_LINK.test(withSuggestForm)) throw new Error("footer: the GitHub link (#footGhLink) was not found in index.html, so a copy's events page could link to the repository it was copied from");
+const withRepoLink = withSuggestForm.replace(REPO_LINK, `<a id="footGhLink" href="https://github.com/${GH_REPO}"`);
 // The footer's link to the credits page is relative to the atlas page. This page sits
 // one folder down, at events/, so the same href would point at events/credits/. Point
 // it up a level. tests/credits.spec.js checks that both footers reach the credits page.
-const footer = withSuggestForm.replace('href="credits/"', 'href="../credits/"');
+const footer = withRepoLink.replace('href="credits/"', 'href="../credits/"');
 const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color:var(--gold);text-decoration:none}");
 // The footer band has to stay dark in both themes: its partner marks are white artwork (the
 // reverse Red Hat wordmark, and IBM's logo inverted by `.partners img.ibm`). index.html keeps it

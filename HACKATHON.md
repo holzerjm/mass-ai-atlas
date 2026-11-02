@@ -42,7 +42,8 @@ and the suggestion bot never sees them.
 **The repository your page points at.** It rewrites `GH_REPO` in `index.html` and
 regenerates `events/index.html` to match. Skip this and the ➕ Suggest an entry button,
 every entry's 🚩 flag, and the events page's ➕ Add your event link all open issues on
-**this** repository rather than yours — silently, because the page works either way.
+**this** repository rather than yours, and the GitHub links in the nav and footer lead here
+too — silently, because the page works either way.
 Commit both files. (`--keep-repo` opts out, and says what it is leaving behind.)
 
 It is idempotent; running it twice is harmless. The rest of what to change in your own copy
@@ -125,7 +126,8 @@ Accelerator. Change these before you go far:
   suggestion bot (which only runs on `bot:draft`) would never fire. The script is
   idempotent; run it once after creating your repo.
 - **Branding** — the header, footer and logo are TOA's. The `GH_REPO` constant in the app
-  script builds the "Suggest an entry" link; point it at your repo.
+  script builds the "Suggest an entry" link and the GitHub links in the nav and footer; point
+  it at your repo.
 
 ## The licence matters here
 

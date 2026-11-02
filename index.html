@@ -639,7 +639,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     </div>
     <b>Mass AI Atlas</b> · A project of <a href="https://the-open-accelerator.com" target="_blank" rel="noopener">The Open Accelerator</a> · Curated <span id="footCurated" data-computed>—</span> · <span id="footCount" data-computed>—</span> organizations across Massachusetts.<br>
     Some pin locations are approximate (nearest neighborhood) and community groups move between venues — always check the official site before visiting.<br>
-    Know something we missed? <a href="#" onclick="suggestEntry();return false">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a href="https://github.com/holzerjm/mass-ai-atlas" target="_blank" rel="noopener">GitHub</a>.<br>
+    Know something we missed? <a href="#" onclick="suggestEntry();return false">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a id="footGhLink" href="https://github.com/holzerjm/mass-ai-atlas" target="_blank" rel="noopener">GitHub</a>.<br>
     Meet the <a href="credits/">mapmakers</a> whose work is in the atlas.
   </div>
 </footer>
@@ -747,6 +747,11 @@ window.flagEntry = flagEntry;
   if(sb) sb.addEventListener("click", suggestEntry);
   const gl = document.getElementById("ghLink");
   if(gl) gl.href = "https://github.com/"+GH_REPO;
+  // The footer's link to the repository is written into the HTML, so point it at GH_REPO too,
+  // or a copy's footer links to the repository it was copied from. The events page has no
+  // such script; scripts/build-events-page.js sets its copy of the link at build time.
+  const fg = document.getElementById("footGhLink");
+  if(fg) fg.href = "https://github.com/"+GH_REPO;
 })();
 
 /* ---------- category ink ----------

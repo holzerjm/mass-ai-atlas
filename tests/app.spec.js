@@ -268,6 +268,28 @@ test.describe("on the first screen", () => {
   }
 });
 
+// A copy of this repository sets `const GH_REPO`, and the page's links to the repository must
+// follow it. The footer's "reviewed openly on GitHub" link was written into the HTML and ignored
+// GH_REPO until 2026-11, so a copy's footer linked to the original. This serves index.html with
+// another GH_REPO, so it guards the wiring, not the value.
+test("the nav's and the footer's GitHub links follow GH_REPO", async ({ page, baseURL }) => {
+  const doc = new URL("./", baseURL).href;   // the page itself, not a CDN script also served at "/"
+  let replaced = false;
+  await page.route(url => url.href === doc, async route => {
+    const res = await route.fetch();
+    const html = await res.text();
+    const copy = html.replace(/^const GH_REPO = "[^"]+"/m, 'const GH_REPO = "example-org/atlas-copy"');
+    replaced = copy !== html;
+    await route.fulfill({ response: res, body: copy });
+  });
+  await page.goto("./");
+  await waitForApp(page);
+  expect(replaced, "index.html must define `const GH_REPO`").toBe(true);
+  for(const id of ["#ghLink", "#footGhLink"]){
+    await expect(page.locator(id)).toHaveAttribute("href", "https://github.com/example-org/atlas-copy");
+  }
+});
+
 // A category button hides that category's pins and shows them again, and says which
 // state it is in.
 test("a category button hides and shows that category's pins", async ({ page }) => {

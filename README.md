@@ -64,7 +64,8 @@ relative `data/` fetches resolve.
 
 **If the repo ever moves (or you host your own copy):** set `GH_REPO` in
 `index.html` (search for `const GH_REPO`) to your `org/repo` so the in-app
-**Suggest** and **Flag** buttons point at the right issue forms.
+**Suggest** and **Flag** buttons point at the right issue forms, and the GitHub links in the
+nav and footer point at your repository.
 
 ## Contribute
 
