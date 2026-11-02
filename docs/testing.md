@@ -5,8 +5,7 @@ Two safety nets, both added in v2.0 Part A (2026-09-30):
 1. **A Playwright + axe smoke suite** (`tests/`) that loads the real page in
    Chromium and checks the things founders rely on: shared links land where they
    point, every view shows, the counts are real, nothing throws, and there are
-   no critical accessibility failures. It runs in CI on every PR that touches
-   the page, the data, the scripts or the tests.
+   no critical accessibility failures. It runs in CI on every pull request.
 2. **A post-deploy check** (`tests/deploy/verify-live.js`) that runs at the end
    of every deploy and confirms the live site is serving exactly the files that
    were deployed.
@@ -155,8 +154,8 @@ If a test fails because you changed that behaviour on purpose, change the test
 in the same PR and say why in the commit message — the tests are the written
 record of what shared links and counts promise.
 
-Tests read the page's own globals by name (`DATA`, `markers`, `map`,
-`openDrawer`) through `page.evaluate` — top-level `let`/`const` in `index.html`
+Tests read the page's own globals by name (`DATA`, `markers`, `openDrawer`)
+through `page.evaluate` — top-level `let`/`const` in `index.html`
 are reachable that way. The Node side reads `data/*.yml` through the same shared
 loader the page uses (`atlas-data.js`), exactly as
 `validate.js` does.
@@ -186,15 +185,16 @@ the elements it is tolerated in (`within`: CSS selectors — a flagged node must
 be, or sit inside, one of them), the date, and why. There are no rule-wide
 entries (a test fails if one is added): the same rule anywhere else on that page
 still fails, so a new colour-only link can't hide behind a known one. Region
-selectors (`#add p`, `.footer-inner`) rather than axe's own `nth-child`
-selectors keep an unrelated footer edit from breaking the gate. As of
-2026-09-30:
+selectors rather than axe's own `nth-child` selectors keep an unrelated edit
+from breaking the gate. As of 2026-11-01:
 
 | Scan | Rule | Within | Why it's tolerated for now |
 |---|---|---|---|
-| events page | `color-contrast` | `#genLine`, `#add + p` | the grey "refreshed …" line and the sources/credits paragraph with its links (`--faint`) are below 4.5:1 — fix in `scripts/build-events-page.js` |
-| events page | `link-in-text-block` | `#add p`, `.footer-inner`, `#list .atlas` | colour-only links in three places: the "Get your event on this list" paragraph, the footer ("The Open Accelerator", "Suggest an entry", "GitHub"), and each event's "→ on the atlas" link — same file |
 | first-visit tour | `color-contrast` | `#tourStep` | the "1 / 5" counter is below 4.5:1 |
+
+The baseline also had two events-page entries, for its faint meta text
+(`color-contrast`) and its colour-only links (`link-in-text-block`). Both were
+fixed in October 2026 and their entries removed.
 
 To **fix one**: fix the page, run `npx playwright test tests/a11y.spec.js`, and
 the report shows "allowlist entry unused" naming each selector that no longer
