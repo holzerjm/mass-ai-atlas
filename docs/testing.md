@@ -39,9 +39,11 @@ is deployed, and nobody editing `data/entities.yml` needs to install anything.
 > said "Sorry — the atlas data failed to load", and the test timed out in `waitForApp`.
 > On 2026-11-01, 4 of 10 local runs at `--workers=2` failed that way before the change,
 > and none of 10 after it; GitHub's Linux runners had not shown it in their last 10
-> runs. Keep the backlog if you change `webServer.command`. Serving the atlas by hand is
-> unaffected: one browser opens at most six connections to a host, and 300 requests six
-> at a time drew no resets from the stock server.
+> runs. Keep the backlog if you change `webServer.command`. Serving the atlas by hand
+> with the stock server is rarely affected: one browser opens at most six connections to
+> a host, and 300 requests six at a time drew no resets. Rarely is not never, though: the
+> same day, a `--workers=1` run, which is a single browser, still lost `axe: map view` to a
+> reset. If a page you serve by hand says its data failed to load, reload it.
 
 ## Running the suite locally
 
