@@ -52,6 +52,13 @@ jobs:
           node scripts/export-csv.js
       - name: Build entry share pages + sitemap
         run: node scripts/build-pages.js
+      # events/index.html is generated from index.html's chrome. validate.yml
+      # fails a pull request whose committed copy has drifted; rebuilding it here
+      # also covers two merges that are each fine alone but stale together, so the
+      # deployed events page always matches the deployed index.html. If the
+      # generator throws, the deploy stops here, before anything is uploaded.
+      - name: Build the events page from index.html
+        run: node scripts/build-events-page.js
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
