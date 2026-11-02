@@ -186,6 +186,8 @@ html:not(.dark) .gx-search .map-results{background:rgba(10,15,30,.97);color:#e6e
 .pop-name{font-weight:700;font-size:14.5px;margin-bottom:3px}
 .pop-cat{font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
 .pop-desc{font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:8px}
+.pop-colocated{font-size:12px;color:var(--muted);line-height:1.45;margin:-2px 0 8px}
+.pop-colocated a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
 .pop-btn{display:inline-block;font-size:12px;font-weight:700;color:#000;background:linear-gradient(90deg,#ffd54f,#ffc600);
   padding:6px 12px;border-radius:8px;cursor:pointer;text-decoration:none}
 .pulse-dot{border-radius:50%;box-shadow:0 0 10px 2px currentColor;border:2px solid rgba(255,255,255,.75)}
@@ -1180,6 +1182,15 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   };
   clusterCtl.addTo(map);
 
+  // Pins at the same spot draw on top of each other at street zoom (clustering
+  // stops at z15 and spiderfy is off), so only the top one can be clicked. Each
+  // popup lists the others within COLOCATED_M instead, and every pin keeps its
+  // exact coordinates. tests/helpers/atlas.js's metersBetween is the same
+  // haversine, so the page and the tests agree on which pairs count.
+  const COLOCATED_M = 25;
+  const colocated = Object.fromEntries(DATA.map(d => [d.id,
+    DATA.filter(o => o !== d && metresBetween(d.lat, d.lng, o.lat, o.lng) <= COLOCATED_M)]));
+
   DATA.forEach(d=>{
     const col = cColor(d.cat);
     const icon = L.divIcon({className:"", html:
@@ -1190,6 +1201,8 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
       `<div class="pop-name">${esc(d.name)}</div>`+
       `<div class="pop-cat" style="color:${cInk(d.cat)}">${cLabel(d.cat)}</div>`+
       `<div class="pop-desc">${esc(d.desc.length>140 ? d.desc.slice(0,140)+"…" : d.desc)}</div>`+
+      (colocated[d.id].length ? `<div class="pop-colocated">Also here: ${colocated[d.id].map(o =>
+        `<a href="?entry=${o.id}" onclick="openDrawer('${o.id}');return false">${esc(o.name)}</a>`).join(", ")}</div>` : "")+
       `<span class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</span>`,
       {maxWidth:260});
     pinGroup().addLayer(m);

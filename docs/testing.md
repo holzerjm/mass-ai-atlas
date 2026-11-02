@@ -118,6 +118,7 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | tab clicks write the hash; unknown hash → map | the URL staying shareable as people move around |
 | | footer `#footCount` | the footer count being hand-typed again (it said "101 organizations" while the atlas listed 171) |
 | | every entry opens a drawer | one malformed entry (unknown category, stage with no row) throwing only when someone opens it |
+| | co-located pins | a pin that shares its spot losing the others: every pin within 25 m of another (exact or near, by the map's own haversine) must list them in its popup's `.pop-colocated`, each name there must open that entry's drawer, and markers must stay at their exact coordinates. Without it, 16 entries could not be reached from the map at street zoom (2026-11-01) |
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
 | | `?list=` of unknown ids | a stale list link breaking the page |
 | | co-located pins | every pin sharing exact coordinates with another lists the others in its popup's `.pop-colocated`, and each name there opens that entry's drawer. Every pair within the contract's 25 m is checked too (9 as of 2026-09-30), with the same distance formula as the map's `COLOCATED_M` grouping; the nearest pair outside it is 27.7 m apart |
