@@ -181,9 +181,18 @@ in it.
 node scripts/validate.js && node scripts/lint-copy.js && npm run test:e2e
 ```
 
-If a browser test fails, re-run it with `--workers=1` before believing it. Every spec renders a
-WebGL basemap, and under parallel workers a test can fail for lack of frames rather than a real
-defect. Retries are off on purpose so flakes stay visible.
+If a browser test fails, read the failure before you re-run it:
+
+- **The page says "Sorry — the atlas data failed to load".** The test lists any request for a
+  file in this repository that failed, and the trace in `npx playwright show-report` has the
+  page's console. Start from those rather than a re-run: a missing or broken data file fails the
+  same way every time. [`docs/testing.md`](docs/testing.md#telling-a-flake-from-a-failure) lists
+  the causes.
+- **Anything else**: re-run it with `--workers=1` before believing it. Every spec renders a WebGL
+  basemap, and under parallel workers a test can fail for lack of frames rather than a real
+  defect.
+
+Retries are off on purpose so flakes stay visible.
 
 Green checks only prove your change works against the commit you branched from. If `main` has
 moved on, merge it into your branch and run the suite again before you trust them. One fix here

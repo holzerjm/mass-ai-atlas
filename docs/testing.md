@@ -27,12 +27,27 @@ is deployed, and nobody editing `data/entities.yml` needs to install anything.
 > and 2 in CI. On a machine with less GPU headroom those still contend and a spec can
 > fail for lack of frames rather than a real defect — `axe: galaxy view` is the usual
 > casualty. If a run fails where a serial run passes, re-run with `--workers=1` before
-> believing it. Retries are deliberately off locally so flakes stay visible.
+> believing it. Retries are deliberately off locally so flakes stay visible. A serial
+> re-run only settles frames: when the page says "the atlas data failed to load", read
+> the failure first (see [Telling a flake from a failure](#telling-a-flake-from-a-failure)).
+
+> **A note on the test server.** The suite serves the repo with the server
+> `python3 -m http.server` runs, but from a one-line script in `playwright.config.js`
+> that raises its listen backlog from Python's default of 5 to 128. The page requests
+> every `data/*.yml` file at once, and on a Mac, parallel browsers overflowed a queue of
+> 5: Chrome got `net::ERR_CONNECTION_RESET` or `net::ERR_SOCKET_NOT_CONNECTED`, the page
+> said "Sorry — the atlas data failed to load", and the test timed out in `waitForApp`.
+> On 2026-11-01, 4 of 10 local runs at `--workers=2` failed that way before the change,
+> and none of 10 after it; GitHub's Linux runners had not shown it in their last 10
+> runs. Keep the backlog if you change `webServer.command`. Serving the atlas by hand is
+> unaffected: one browser opens at most six connections to a host, and 300 requests six
+> at a time drew no resets from the stock server.
 
 ## Running the suite locally
 
-You need Node 20+ and Python 3 (the tests serve the repo with
-`python3 -m http.server`, the same way you would by hand).
+You need Node 20+ and Python 3 (the tests serve the repo with Python's
+`http.server`, the same way you would by hand, with a longer connection queue: see
+the note on the test server above).
 
 ```sh
 npm ci                              # once: installs Playwright + axe (dev only)
@@ -67,6 +82,24 @@ Retries are off locally (a flaky test should be seen) and 2 in CI (shared runner
 network, CDN-hosted scripts). Workers are capped at 4 locally and 2 in CI: every
 page renders a WebGL basemap, and at 8 parallel browsers a busy laptop stalled
 pages for 10–20 s at a time.
+
+### Telling a flake from a failure
+
+Read a failure before you re-run it. The terminal shows each test's errors, and
+`npx playwright show-report` keeps a screenshot and a trace of every failed test.
+
+A page showing **"Sorry — the atlas data failed to load"** never got its data, so
+`waitForApp` times out on `#stats .stat`. What else the test reports says why:
+
+| The test also reports | Which means |
+|---|---|
+| "failed requests for files this repo ships" with `net::ERR_CONNECTION_RESET` or `net::ERR_SOCKET_NOT_CONNECTED` on `data/` | the test server dropped the connection: the backlog in the note on the test server. Check that `webServer.command` still raises it |
+| the same list with a `404` | a file the page asks for is missing from the tree being served |
+| no failed request, and a YAML or schema error in the trace's console | the data is wrong; `node scripts/validate.js` reports the same error |
+| no failed request, and "third-party request failed (tolerated)" for js-yaml or Ajv | the page could not load the library that reads its data. That is the network: re-run |
+
+Anything else that fails under parallel workers but passes at `--workers=1` — most
+often `axe: galaxy view` — is GPU contention, as in the note on workers.
 
 ---
 

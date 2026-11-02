@@ -38,7 +38,17 @@ module.exports = defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: `python3 -m http.server ${PORT} --bind 127.0.0.1 --directory "${ROOT}"`,
+    // What `python3 -m http.server` runs, with a longer accept queue. The default
+    // backlog of 5 overflowed on macOS when parallel browsers each fetched every
+    // data/*.yml at once: Chrome got ERR_CONNECTION_RESET and the page said "the
+    // atlas data failed to load" (2026-11-01). 128 is macOS's default ceiling.
+    // ROOT goes in as an argument, so no path can break the Python source.
+    command:
+      `python3 -c "import functools, http.server, sys; ` +
+      `http.server.ThreadingHTTPServer.request_queue_size = 128; ` +
+      `http.server.test(ServerClass=http.server.ThreadingHTTPServer, port=${PORT}, bind='127.0.0.1', ` +
+      `HandlerClass=functools.partial(http.server.SimpleHTTPRequestHandler, directory=sys.argv[1]))" ` +
+      `"${ROOT}"`,
     url: `http://127.0.0.1:${PORT}/`,
     // Never silently reuse: a leftover server on this port could be serving a
     // different tree (another checkout, or the baseline export).
