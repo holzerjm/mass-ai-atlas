@@ -2630,6 +2630,22 @@
   applyBy: rolling
   added: 2026-10
   lastVerified: 2026-10
+- id: cbai
+  name: Cambridge Boston Alignment Initiative (CBAI)
+  cat: community
+  loc: Cambridge
+  approx: true
+  lat: 42.3715
+  lng: -71.1125
+  url: https://www.cbai.ai
+  desc: Cambridge-based nonprofit, founded in 2022, working to reduce risks from advanced AI. Runs fully funded AI safety research fellowships and CAMBRIA, a free three-week technical bootcamp, and is the fiscal sponsor of the Harvard and MIT student AI safety teams.
+  why: Trains AI safety researchers in Cambridge, which makes it a talent pool and community for founders working on evaluations, interpretability or alignment.
+  tags: [AI safety, research]
+  stages: [1]
+  links: [hcsai, maia]
+  offers: [community, talent]
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- STUDENT GROUPS ----------
 - id: aimit
