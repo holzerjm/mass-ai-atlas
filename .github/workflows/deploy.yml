@@ -46,6 +46,7 @@ jobs:
     # job stops running here too. It is the only place the slug is hardcoded.
     if: github.repository == 'holzerjm/mass-ai-atlas'
     runs-on: ubuntu-latest
+    timeout-minutes: 15          # a hung ssh/rsync must not hold the deploy-atlas group for hours
     steps:
       - uses: actions/checkout@v5
         with:

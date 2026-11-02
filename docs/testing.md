@@ -320,7 +320,9 @@ for it instead of uploading alongside it, and a newer run never cancels one
 that is running. GitHub keeps one waiting run per group, so a newer run
 replaces a waiting one. That loses no change, since the newer run deploys a
 later `main`, but the replaced push's commits are missing from the Slack
-summary.
+summary. A deploy run normally takes about 20 seconds, and `timeout-minutes: 15`
+stops one whose upload hangs, so it cannot hold the group, and every deploy
+behind it, for GitHub's default limit of six hours.
 
 **What it doesn't cover:**
 
