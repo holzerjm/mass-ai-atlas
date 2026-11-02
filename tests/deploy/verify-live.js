@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-/* Post-deploy check: is the LIVE site serving exactly the files this checkout
-   just deployed? Run by deploy.yml after the rsync steps; safe to run locally
-   (read-only GETs):
+/* Post-deploy check: is the LIVE site serving exactly the files in this
+   checkout? Run it by hand after a deploy (npm run verify:live); no workflow
+   runs it, deploy.yml included. Read-only GETs:
 
      node tests/deploy/verify-live.js                     # default files, ~3 min of retries
      node tests/deploy/verify-live.js --timeout 20 data/entities.yml
@@ -34,8 +34,8 @@
                  visitors get, so it is reported as "could not check".
    Exit 0 = every file matched. Exit 1 = anything else within the budget. In
    GitHub Actions the per-file report and the two lists are written to
-   $GITHUB_OUTPUT (`report`, `mismatched`, `unverified`; deploy.yml words its
-   Slack alert from them) and to $GITHUB_STEP_SUMMARY. */
+   $GITHUB_OUTPUT (`report`, `mismatched`, `unverified`, for a step that words
+   an alert from them) and to $GITHUB_STEP_SUMMARY. */
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
