@@ -8,8 +8,11 @@
  *
  * Classifications:
  *   moved    2xx but the final URL is on a different domain — update the url
- *   blocked  403/429/503 — likely bot-blocking, needs a HUMAN look, not a bot
- *   broken   404/410/other 4xx-5xx, network error, or timeout (after 1 retry)
+ *   blocked  403/429/503 — likely bot-blocking, needs a HUMAN look, not a bot.
+ *            Not the same as fine: in November 2026 one of these hosts had
+ *            become a gambling site, and its bot wall was all a bot could see.
+ *   broken   404/410/other 4xx-5xx, network error, or timeout (after 1 retry),
+ *            or a parked domain: a for-sale or expired page served with a 200
  * Healthy URLs are counted but not listed.
  */
 
@@ -29,26 +32,60 @@ const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } 
 const BOT_WALLED = new Set(["metacareers.com", "meta.com",
   "mitre.org", "analog.com", "evolv.com"]);
 
+// A domain that no longer belongs to the organization still answers 200 on its own
+// host, so status and redirects alone call it healthy. These are the page shapes that
+// give one away, matched against the raw page before any script runs. The first is
+// why this exists: www.aimlconference.com became GoDaddy's for-sale lander, a one-line
+// script redirect to /lander, and was reported healthy every month from the day its
+// entry was added until a sweep in a real browser found it for sale.
+const PARKED = [
+  [/window\.location\.href\s*=\s*["']\/lander["']/, "redirects to a for-sale lander"],
+  [/<title>[^<]*\b(?:is for sale|domain (?:name )?(?:is )?for sale|buy this domain)\b/i, "for-sale page"],
+  [/<title>[^<]*\b(?:website expired|domain (?:has )?expired|this site has expired)\b/i, "expired site"],
+];
+
+// The start of a page is enough to recognize a parked one (that lander is 114 bytes),
+// and downloading every homepage in full each month would be a waste.
+async function pageStart(res, limit = 65536) {
+  if (!res.body) return "";
+  const reader = res.body.getReader(), dec = new TextDecoder();
+  let text = "";
+  try {
+    while (text.length < limit) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      text += dec.decode(value, { stream: true });
+    }
+  } finally {
+    reader.cancel().catch(() => {});
+  }
+  return text;
+}
+
 async function probe(url) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), 15000);
   try {
     const res = await fetch(url, { redirect: "follow", signal: ctl.signal,
       headers: { "User-Agent": UA, "Accept": "text/html,*/*" } });
-    clearTimeout(timer);
     if ([403, 429, 503].includes(res.status)) return { cls: "blocked", note: `HTTP ${res.status}` };
     if (!res.ok && BOT_WALLED.has(host(url)))
       return { cls: "blocked", note: `HTTP ${res.status} — host refuses all bots` };
     if (!res.ok) return { cls: "broken", note: `HTTP ${res.status}` };
     if (host(res.url) && host(res.url) !== host(url)) return { cls: "moved", note: `now at ${res.url}` };
+    // A body we could not read says nothing either way, so it stays ok rather than broken.
+    const page = await pageStart(res).catch(() => "");
+    const parked = PARKED.find(([re]) => re.test(page));
+    if (parked) return { cls: "broken", note: `parked domain — ${parked[1]}` };
     return { cls: "ok" };
   } catch (e) {
-    clearTimeout(timer);
     // Some bot walls drop the connection instead of answering 403, so the
     // allowance has to apply here too or the host still reports as broken.
     if (BOT_WALLED.has(host(url)))
       return { cls: "blocked", note: "connection refused — host refuses all bots" };
     return { cls: "error", note: e.name === "AbortError" ? "timeout" : (e.cause?.code || e.message) };
+  } finally {
+    clearTimeout(timer);   // only now: the 15s budget covers reading the page as well
   }
 }
 

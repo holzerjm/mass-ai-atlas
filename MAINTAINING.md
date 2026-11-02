@@ -252,6 +252,12 @@ org is real, active, and the entry's facts are right.
 > and the entries longest without a check — your queue for the month. The same
 > report is in the action's job summary, or run it yourself:
 > `node scripts/linkcheck.js` and `node scripts/stale.js --cycle 12`.
+>
+> The link list also names hosts that **refuse bots**. Open each one in a real browser
+> before assuming it is fine: in November 2026 one of them had become a gambling site,
+> and a bot only ever saw its wall. A **parked domain** (for sale, or an expired site)
+> answers like a healthy one, so the checker reads the start of each page and reports
+> those as broken.
 
 To keep those honest, do a small sweep about once a month:
 
