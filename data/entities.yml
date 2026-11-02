@@ -731,7 +731,7 @@
   links: [suno, gv, fprime, gc, xfund]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: tamr
   name: Tamr
   cat: startup
@@ -747,7 +747,7 @@
   links: [csail, gv]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: pathai
   name: PathAI
   cat: startup
@@ -763,7 +763,7 @@
   links: [gc]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: generate
   name: Generate:Biomedicines
   cat: startup
@@ -779,7 +779,7 @@
   links: [flagship, nvidia-bos]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: lila
   name: Lila Sciences
   cat: startup
@@ -795,7 +795,7 @@
   links: [flagship, nvidia-bos]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: realtime
   name: Realtime Robotics
   cat: startup
@@ -825,7 +825,7 @@
   links: [matrix, gv, fprime]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: pickle
   name: Pickle Robot
   cat: startup
@@ -840,7 +840,7 @@
   links: [hyperplane]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: concertai
   name: ConcertAI
   cat: startup
@@ -855,7 +855,7 @@
   stages: []
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: code-metal
   name: Code Metal
   cat: startup
@@ -1189,7 +1189,7 @@
   links: []
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: epipelagic
   name: Epipelagic Ventures
   cat: vc
@@ -1204,7 +1204,7 @@
   links: []
   offers: [funding, mentorship]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: nextview
   name: NextView Ventures
   cat: vc
@@ -1219,7 +1219,7 @@
   stages: [3, 4]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: rough-draft
   name: GC Venture Fellowship (fka Rough Draft Ventures)
   cat: vc
@@ -1266,7 +1266,7 @@
   links: [toa]
   offers: [funding, customers]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: gc
   name: General Catalyst
   cat: vc
@@ -1282,7 +1282,7 @@
   links: [lila]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: glasswing
   name: Glasswing Ventures
   cat: vc
@@ -1314,7 +1314,7 @@
   stages: [2, 4]
   offers: [funding, mentorship]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: hyperplane
   name: Hyperplane
   cat: vc
@@ -1329,7 +1329,7 @@
   stages: [4]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: flybridge
   name: Flybridge
   cat: vc
@@ -1345,7 +1345,7 @@
   stages: [4]
   offers: [funding, community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: underscore
   name: Underscore VC
   cat: vc
@@ -1359,7 +1359,7 @@
   stages: [2, 4]
   offers: [funding, mentorship, community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: fc
   name: Founder Collective
   cat: vc
