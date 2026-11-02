@@ -241,7 +241,7 @@ there either.
 
 | Workflow | Job | What it does |
 |---|---|---|
-| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
+| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit `index.html`); then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
 | Browser tests | `e2e` | `npm ci`, Chromium restored from a cache keyed on the lockfile, `npm run test:e2e`; on failure uploads `playwright-report/` as the **playwright-report** artifact, kept 7 days |
 
 **Only `validate` is a required status check** on `main`. Browser tests runs and reports
@@ -340,6 +340,15 @@ behind it, for GitHub's default limit of six hours.
   copy would go unnoticed here; purge the cache after deploys in that case.
   `atlas-data.js` is cached already: on 2026-11-02 Cloudflare served it from its
   edge (`cf-cache-status: HIT`, `Cache-Control: max-age=14400`), while every
-  other file the check compares was `DYNAMIC`. After a deploy that changes it,
-  visitors can keep getting the old copy for a while (up to four hours from a
-  browser that cached it), and this check still reports `OK`.
+  other file the check compares was `DYNAMIC`. Those are Cloudflare's zone
+  defaults, about 2 hours at the edge and 4 in browsers, and the check, which
+  bypasses the cache, would not see a stale copy. So `index.html` loads the
+  loader as `atlas-data.js?v=<version>`, a short hash of the file that
+  `scripts/loader-version.js` keeps current and CI checks. Cloudflare keys its
+  cache on the query string, so a changed loader is a new address that neither
+  Cloudflare nor a browser has cached. The plain `atlas-data.js` address can
+  still be stale at the edge, but the page no longer requests it. This relies
+  on the upload order: `deploy.yml` copies `atlas-data.js` and `index.html` in
+  one `rsync` command, which sorts its file list, so the loader lands first.
+  Uploading `index.html` first, in a command of its own, would let a visitor in
+  the gap make Cloudflare cache the old loader under the new address.

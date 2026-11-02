@@ -650,7 +650,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 <!-- Ajv 8.17.1 is the newest browser build on a CDN (npm uses 8.20.0); its advisory
      GHSA-2g4f-4pwh-qvx6 needs the $data option, which atlas-data.js doesn't enable -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.17.1/ajv7.min.js"></script>
-<script src="atlas-data.js"></script>
+<script src="atlas-data.js?v=c62436b9fc"></script>
 <script>
 /* Data loader: fetch data/*.yml + schemas, validate (atlas-data.js), expose
    CATS / STAGES / DATA as globals, then start the app script below. The app is

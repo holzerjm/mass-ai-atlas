@@ -113,6 +113,10 @@ Use this path for a change outside `data/`, such as an issue labelled
      run `node scripts/build-events-page.js` and commit any change it makes. Never edit
      `events/index.html` by hand. If the script stops with `start not found`, your change
      removed a marker it copies from, so update the script to match.
+   - **The loader's version.** `index.html` loads `atlas-data.js` at an address that
+     carries a short hash of the file, so browsers and Cloudflare fetch a changed loader
+     at once instead of serving a cached copy. If you changed `atlas-data.js`, run
+     `node scripts/loader-version.js --write` and commit `index.html` with it.
    - **The tests.** If a test fails because you changed on purpose what it checks, update
      the test in the same pull request and say why. If you fixed an issue on the
      accessibility allowlist, `KNOWN_SERIOUS` in `tests/a11y.spec.js`, delete its entry. The
@@ -126,7 +130,8 @@ Use this path for a change outside `data/`, such as an issue labelled
    node scripts/validate.js && node scripts/lint-copy.js && npm run test:e2e
    ```
 
-   CI also rebuilds the events page and fails if your copy differs. If a browser test
+   CI also rebuilds the events page and checks the loader's version, and fails if
+   either is out of date. If a browser test
    fails, read the failure before you re-run it:
    [`docs/testing.md`](docs/testing.md#telling-a-flake-from-a-failure) explains how to tell
    a flake from a real failure.

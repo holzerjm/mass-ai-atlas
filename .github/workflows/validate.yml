@@ -38,6 +38,12 @@ jobs:
             echo "::error file=events/index.html::events/index.html is out of date with index.html. Run node scripts/build-events-page.js and commit the result."
             exit 1
           }
+      # index.html loads atlas-data.js?v=<a short hash of the file>. Cloudflare and
+      # browsers cache .js files for hours, so a loader changed at an unchanged
+      # address could reach visitors as the old cached copy, next to a new
+      # index.html. Fail if the version in index.html no longer matches the file.
+      - name: Loader version matches atlas-data.js
+        run: node scripts/loader-version.js
       - name: Freshness report (informational, never fails the build)
         continue-on-error: true
         run: node scripts/stale.js >> "$GITHUB_STEP_SUMMARY"
