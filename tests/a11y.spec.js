@@ -5,25 +5,25 @@
    - a SERIOUS violation fails unless it is listed in KNOWN_SERIOUS below, with
      the scan and the elements it is tolerated in, and the reason;
    - moderate and minor findings are attached to the report, not failed on.
-   Atlas views use the default dark theme; the events page is scanned in
-   both dark and light themes. See docs/testing.md. */
+   Atlas views use the default dark theme; the first-visit tour card and the
+   events page are scanned in both dark and light themes. See docs/testing.md. */
 const AxeBuilder = require("@axe-core/playwright").default;
 const { test, expect, DATA, waitForApp } = require("./helpers/atlas");
 
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
-// Known serious issues, measured on the baseline. Each entry is tolerated only
+// Known serious issues the gate tolerates. Each entry is tolerated only
 // in the scan it names AND only inside the elements `within` names (CSS
 // selectors: a flagged node must be, or sit inside, one of them). There are no
 // whole-rule entries: the same rule anywhere else on that page still fails, so a
 // new colour-only link can't hide behind an old one. Fix an issue, then delete
 // its selector (or the whole entry); the report says "allowlist entry unused"
 // for each selector that no longer matches a flagged node.
-const KNOWN_SERIOUS = [
-  { scan: "first-visit tour", rule: "color-contrast", since: "2026-09-30",
-    within: ["#tourStep"],
-    why: "The tour card's '1 / 5' step counter (.tour-step) is below 4.5:1. Only this node is tolerated." },
-];
+// Empty since 2026-11-02, when the last of the three baseline entries was fixed.
+// An entry looks like this:
+//   { scan: "map view", rule: "color-contrast", since: "YYYY-MM-DD",
+//     within: ["#someRegion"], why: "what fails, and why it ships anyway" },
+const KNOWN_SERIOUS = [];
 
 test("every KNOWN_SERIOUS entry is scoped to named elements", () => {
   // a rule-wide entry would tolerate every future node of that rule on the page
@@ -41,6 +41,8 @@ const SCANS = [
   { name: "entry drawer", url: `./?entry=${entry.id}`, include: "#drawer" },
   { name: "shared shortlist", url: `./?list=${DATA[0].id},${DATA[1].id}`, include: "#shortlistModal" },
   { name: "first-visit tour", url: "./", firstVisit: true, include: "#tourCard" },
+  { name: "first-visit tour (light theme)", url: "./", firstVisit: true, include: "#tourCard",
+    theme: "light" },
   { name: "events page", url: "./events/", events: true },
   { name: "events page (light theme)", url: "./events/", events: true,
     theme: "light" },

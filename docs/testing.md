@@ -167,8 +167,8 @@ loader the page uses (`atlas-data.js`), exactly as
 
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
-an open entry drawer, a shared shortlist, the first-visit tour card, and the
-events page in both dark and light themes.
+an open entry drawer and a shared shortlist, in the dark theme; and the
+first-visit tour card and the events page, in both dark and light themes.
 
 The gate was set from what the pristine baseline (main @ 76cf38e) actually
 produced:
@@ -187,15 +187,12 @@ be, or sit inside, one of them), the date, and why. There are no rule-wide
 entries (a test fails if one is added): the same rule anywhere else on that page
 still fails, so a new colour-only link can't hide behind a known one. Region
 selectors rather than axe's own `nth-child` selectors keep an unrelated edit
-from breaking the gate. As of 2026-11-01:
+from breaking the gate.
 
-| Scan | Rule | Within | Why it's tolerated for now |
-|---|---|---|---|
-| first-visit tour | `color-contrast` | `#tourStep` | the "1 / 5" counter is below 4.5:1 |
-
-The baseline also had two events-page entries, for its faint meta text
-(`color-contrast`) and its colour-only links (`link-in-text-block`). Both were
-fixed in October 2026 and their entries removed.
+**The allowlist has been empty since 2026-11-02.** The baseline had three entries,
+all since fixed and removed: the events page's faint meta text (`color-contrast`)
+and its colour-only links (`link-in-text-block`), both in October 2026, and the
+first-visit tour's "1 / 5" step counter (`color-contrast`), in November 2026.
 
 To **fix one**: fix the page, run `npx playwright test tests/a11y.spec.js`, and
 the report shows "allowlist entry unused" naming each selector that no longer
@@ -221,13 +218,15 @@ The first run against main @ 76cf38e failed on two real bugs, both fixed in
 Not gated yet:
 
 - **Light theme on atlas views.** The map, galaxy, journey and directory views,
-  entry drawer, shared shortlist, and first-visit tour are scanned in the default
-  dark theme only. On the baseline, the light theme had 19 serious
-  `color-contrast` nodes on the map and 207 in the Directory (category chips,
-  card text), plus 3 `link-in-text-block`; gating those views still needs a
-  contrast pass on the light palette. The events page is a separate and much
-  smaller surface, so it is already gated in both themes (above) and does not
-  wait on that pass.
+  entry drawer and shared shortlist are scanned in the default dark theme only.
+  On the baseline, the light theme had 19 serious `color-contrast` nodes on the
+  map and 207 in the Directory (category chips, card text), plus 3
+  `link-in-text-block`; gating those views still needs a contrast pass on the
+  light palette. The events page and the tour card are separate and much smaller
+  surfaces, so they are already gated in both themes (above) and do not wait on
+  that pass. The tour card's light scan came with its step-counter fix: the
+  colour first proposed for the counter passed in the dark theme and failed, at
+  2.61:1, in the light one.
 
 ---
 
