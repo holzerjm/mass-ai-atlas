@@ -735,12 +735,11 @@
 - id: tamr
   name: Tamr
   cat: startup
-  loc: Cambridge
-  approx: true
-  lat: 42.365
-  lng: -71.08
+  loc: 66 Church St, Cambridge
+  lat: 42.374
+  lng: -71.121
   url: https://www.tamr.com
-  desc: AI-native data mastering, co-founded by database legend Michael Stonebraker out of MIT CSAIL.
+  desc: AI-native master data management, co-founded by database legend Michael Stonebraker out of MIT CSAIL. Raised $21M in growth equity led by Boston's Volition Capital in October 2026.
   why: Classic CSAIL-to-company playbook.
   tags: [ML, MIT spinout]
   stages: []
@@ -2903,7 +2902,7 @@
   lat: 42.3612
   lng: -71.0833
   url: https://sloangroups.mit.edu/aiml/home/
-  desc: Student-run conference connecting AI research, business and policy each spring.
+  desc: Student-run conference connecting AI research, business and policy, organized by the MIT Sloan AI & ML Club. Its last confirmed edition was "The Age of Implementation" on February 7, 2025.
   why: Dense one-day download of where AI-meets-business is heading.
   tags: [events, MIT]
   stages: [1, 5]
@@ -2944,12 +2943,12 @@
 - id: techweek
   name: Boston Tech Week (a16z)
   cat: event
-  loc: Citywide · May
+  loc: Citywide · late April–early May
   approx: true
   lat: 42.354
   lng: -71.055
   url: https://www.tech-week.com
-  desc: The a16z-organized decentralized tech week hit Boston in 2026 — hundreds of community-hosted events.
+  desc: The a16z-organized decentralized tech week hit Boston in 2026 — hundreds of community-hosted events. The 2027 edition runs April 26–May 2.
   why: A second 'whole ecosystem in one week' moment each spring.
   tags: [events]
   stages: [1, 4]
