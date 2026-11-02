@@ -51,10 +51,17 @@ if (withoutCount === footerRaw) throw new Error("footer: the #footCount clause w
 const CURATED_CLAUSE = /\s*·\s*Curated\s*<span id="footCurated"[^>]*>[^<]*<\/span>/;
 const withoutCurated = withoutCount.replace(CURATED_CLAUSE, "");
 if (withoutCurated === withoutCount) throw new Error("footer: the #footCurated clause was not found in index.html — the events page would ship a curation date it cannot keep current");
+// The footer's "Suggest an entry" link calls suggestEntry(), which the atlas page defines and
+// this page does not, so here a click did nothing but throw a ReferenceError. Point it at the
+// suggestion form instead. issueUrl() reads GH_REPO, so a copy's link opens its own repository's
+// form. tests/events.spec.js checks the link.
+const SUGGEST_LINK = '<a href="#" onclick="suggestEntry();return false">';
+const withSuggestForm = withoutCurated.replace(SUGGEST_LINK, `<a href="${issueUrl("suggest-entry.yml")}" target="_blank" rel="noopener">`);
+if (withSuggestForm === withoutCurated) throw new Error("footer: the Suggest an entry link was not found in index.html, so the events page could ship a link to suggestEntry(), which it does not define");
 // The footer's link to the credits page is relative to the atlas page. This page sits
 // one folder down, at events/, so the same href would point at events/credits/. Point
 // it up a level. tests/credits.spec.js checks that both footers reach the credits page.
-const footer = withoutCurated.replace('href="credits/"', 'href="../credits/"');
+const footer = withSuggestForm.replace('href="credits/"', 'href="../credits/"');
 const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color:var(--gold);text-decoration:none}");
 // The footer band has to stay dark in both themes: its partner marks are white artwork (the
 // reverse Red Hat wordmark, and IBM's logo inverted by `.partners img.ibm`). index.html keeps it

@@ -84,6 +84,21 @@ test("the events page footer stays dark in light theme", async ({ page }) => {
     .toEqual({ footer: dark.footer, text: dark.text, link: dark.link });
 });
 
+// The footer comes from index.html, where its "Suggest an entry" link calls suggestEntry().
+// This page never defines that function, so the link did nothing but throw a ReferenceError,
+// and the error guard never saw it because no test clicked it. scripts/build-events-page.js
+// now points the link at the suggestion form, on the repository GH_REPO names.
+test("the events page footer's Suggest an entry link opens the suggestion form", async ({ page }) => {
+  const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  const repo = (html.match(/^const GH_REPO = "([^"]+)"/m) || [])[1];
+  expect(repo, "index.html must define `const GH_REPO`").toBeTruthy();
+
+  await page.goto("./events/");
+  const link = page.locator("footer.footer a", { hasText: "Suggest an entry" });
+  await expect(link).toHaveAttribute("href", `https://github.com/${repo}/issues/new?template=suggest-entry.yml`);
+  await expect(link).not.toHaveAttribute("onclick");
+});
+
 // Contract: a copy of this repository must not file issues on the repository it
 // was copied FROM. index.html's `const GH_REPO` is the single place that decides,
 // and scripts/build-events-page.js reads it. Until 2026-10-23 this page hardcoded
