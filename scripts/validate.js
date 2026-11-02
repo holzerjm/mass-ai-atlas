@@ -78,6 +78,33 @@ for (const d of DATA)
   for (const l of d.links || [])
     if (!ids.has(l)) err(d.id, `links to unknown entry "${l}"`);
 
+// data/credits.yml feeds the credits page (credits/index.html), not the atlas, so
+// atlas-data.js never loads it. Check it here: its schema, then one entry per
+// person and no date in the future. CORE_SCHEMA keeps dates as strings, as the
+// atlas loader does.
+{
+  const fs = require("fs"), path = require("path"), yaml = require("js-yaml"), Ajv = require("ajv");
+  const { DATA_DIR } = require("./load-data");
+  const cerr = msg => errors.push(`  ✗ [credits.yml] ${msg}`);
+  try {
+    const read = f => yaml.load(fs.readFileSync(path.join(DATA_DIR, f), "utf8"), { schema: yaml.CORE_SCHEMA, filename: f });
+    const schema = read("credits.schema.yml"), credits = read("credits.yml");
+    const ajv = new Ajv({ allErrors: true });
+    if (!ajv.validate(schema, credits)) {
+      for (const e of ajv.errors) cerr(`${e.instancePath || "/"} ${e.message}`);
+    } else {
+      const seen = new Set();
+      for (const m of credits.mapmakers) {
+        if (seen.has(m.github.toLowerCase())) cerr(`${m.github} is listed more than once`);
+        seen.add(m.github.toLowerCase());
+        if (m.since > TODAY) cerr(`${m.github}: since ${m.since} is in the future`);
+      }
+      for (const ms of credits.milestones)
+        if (ms.date > TODAY) cerr(`milestone "${ms.title}" is dated ${ms.date}, in the future`);
+    }
+  } catch (e) { cerr(e.message); }   // a YAML syntax error names the line and column
+}
+
 if (warn.length) console.log("Warnings:\n" + warn.join("\n") + "\n");
 if (errors.length) {
   console.log("Errors:\n" + errors.join("\n"));

@@ -23,7 +23,7 @@ name: Deploy to TOA site
 on:
   push:
     branches: [main]
-    paths: ["index.html", "atlas-data.js", "data/**", "map-style-dark.json", "events/**"]
+    paths: ["index.html", "atlas-data.js", "data/**", "map-style-dark.json", "events/**", "credits/**"]
   workflow_dispatch:
 
 # One deploy at a time. Without this, two quick merges start two runs that upload
@@ -90,6 +90,10 @@ jobs:
           # entries' share pages clean up without touching anything else
           rsync -avz --delete -e "ssh -i ~/.ssh/id_deploy" site-pages/e/ \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/e/"
+          # the credits page. Its data, data/credits.yml, went up with data/ above. Last,
+          # so a failure here leaves every other file in place.
+          rsync -avz -e "ssh -i ~/.ssh/id_deploy" credits/ \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/credits/"
 
       - name: Notify Slack (deployed)
         if: success()

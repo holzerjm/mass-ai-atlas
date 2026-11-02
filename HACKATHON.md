@@ -117,6 +117,8 @@ Accelerator. Change these before you go far:
   enable private vulnerability reporting under **Settings → Code security**, or the
   primary route has nothing behind it.
 - **`CODE_OF_CONDUCT.md`** names `conduct@the-open-accelerator.com`. Change it.
+- **`data/credits.yml`** credits the people who built the atlas upstream, and its links point
+  at the upstream repository. Keep them credited, and add your own contributors below them.
 - **Run `scripts/setup-labels.sh <owner/repo>` first.** Labels do **not** come with a
   template copy, and GitHub *silently* drops a label an issue form asks for when it does
   not exist — so the suggest and flag forms would quietly arrive unlabelled, and the

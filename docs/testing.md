@@ -128,6 +128,11 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | events footer, no curation date | the same for the curation month, which said "Curated June 2026" into October |
 | | events footer, light theme | the footer band turning light with the page, which puts the white partner marks on a near-white ground (it did until 2026-11). The footer's ground, text and link colours must match the dark theme's |
 | | contribution links follow `GH_REPO` | a copy of this repository filing its issues on the one it was copied from. `scripts/build-events-page.js` takes the repository from `const GH_REPO` in `index.html`; until 2026-10-23 the page hardcoded `holzerjm/mass-ai-atlas` in three links. The test checks the wiring, not the value |
+| `credits.spec.js` | one card per mapmaker | the credits page drifting from `data/credits.yml`: a missing card, a wrong handle link, a story that doesn't match, or a hand-typed count |
+| | the timeline, oldest first | a milestone going missing or out of order |
+| | a kind filter, and All | the filter hiding the wrong people, or All failing to bring everyone back |
+| | no photo or real name without consent | a card showing a GitHub photo or a real name that `data/credits.yml` doesn't opt in to with `photo: true` or `name` |
+| | both footers link to the credits page | the events page's copy of the footer pointing one folder too deep. `scripts/build-events-page.js` rewrites that link |
 | `a11y.spec.js` | axe on each view | see below |
 | | every allowlist entry is scoped | a `KNOWN_SERIOUS` entry with no `within`, which would tolerate its rule on every element of that page, including ones added later |
 
@@ -168,7 +173,8 @@ loader the page uses (`atlas-data.js`), exactly as
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
 an open entry drawer and a shared shortlist, in the dark theme; and the
-first-visit tour card and the events page, in both dark and light themes.
+first-visit tour card, the events page and the credits page, in both dark and light
+themes.
 
 The gate was set from what the pristine baseline (main @ 76cf38e) actually
 produced:
@@ -222,9 +228,9 @@ Not gated yet:
   On the baseline, the light theme had 19 serious `color-contrast` nodes on the
   map and 207 in the Directory (category chips, card text), plus 3
   `link-in-text-block`; gating those views still needs a contrast pass on the
-  light palette. The events page and the tour card are separate and much smaller
-  surfaces, so they are already gated in both themes (above) and do not wait on
-  that pass. The tour card's light scan came with its step-counter fix: the
+  light palette. The events page, the credits page and the tour card are separate
+  and much smaller surfaces, so they are already gated in both themes (above) and
+  do not wait on that pass. The tour card's light scan came with its step-counter fix: the
   colour first proposed for the counter passed in the dark theme and failed, at
   2.61:1, in the light one.
 
@@ -286,7 +292,8 @@ A checkout of `main` should report `OK`; a branch with unmerged changes to the
 files it compares will (correctly) report a mismatch. The script:
 
 1. hashes (sha256) this checkout's `index.html`, `atlas-data.js`, the data and
-   schema files in `data/`, `events/index.html` and `map-style-dark.json`
+   schema files in `data/`, `events/index.html`, `credits/index.html` and
+   `map-style-dark.json`
    (`DEFAULT_FILES` at the top of the script), or only the files you name;
 2. fetches each from `https://the-open-accelerator.com/ecosystem/` through
    Cloudflare's proxy, with a cache-busting query

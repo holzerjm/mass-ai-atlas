@@ -49,8 +49,12 @@ if (withoutCount === footerRaw) throw new Error("footer: the #footCount clause w
 // it could only rot — it said "Curated June 2026" into October. Drop the clause
 // rather than bake in a date the page cannot keep current.
 const CURATED_CLAUSE = /\s*·\s*Curated\s*<span id="footCurated"[^>]*>[^<]*<\/span>/;
-const footer = withoutCount.replace(CURATED_CLAUSE, "");
-if (footer === withoutCount) throw new Error("footer: the #footCurated clause was not found in index.html — the events page would ship a curation date it cannot keep current");
+const withoutCurated = withoutCount.replace(CURATED_CLAUSE, "");
+if (withoutCurated === withoutCount) throw new Error("footer: the #footCurated clause was not found in index.html — the events page would ship a curation date it cannot keep current");
+// The footer's link to the credits page is relative to the atlas page. This page sits
+// one folder down, at events/, so the same href would point at events/credits/. Point
+// it up a level. tests/credits.spec.js checks that both footers reach the credits page.
+const footer = withoutCurated.replace('href="credits/"', 'href="../credits/"');
 const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color:var(--gold);text-decoration:none}");
 // The footer band has to stay dark in both themes: its partner marks are white artwork (the
 // reverse Red Hat wordmark, and IBM's logo inverted by `.partners img.ibm`). index.html keeps it

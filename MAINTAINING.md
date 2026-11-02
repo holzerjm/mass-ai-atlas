@@ -210,6 +210,10 @@ Once it's green and approved, click **Merge pull request** → **Confirm merge**
 Prefer **"Squash and merge"** if offered (it keeps history tidy — one clean entry per
 contribution).
 
+If the work came from someone outside the core team, credit them in `data/credits.yml`, in
+the same pull request or the next one: a new entry, or a new link on theirs. Use their GitHub
+handle. Add a real name or photo only once they have said yes.
+
 ➡️ Now publish it → [Part 3](#part-3--publish-to-the-live-site).
 
 ---
@@ -217,7 +221,7 @@ contribution).
 ## Part 3 — Publish to the live site
 
 **Publishing is automatic.** When a change to `index.html`, `atlas-data.js`, `data/`,
-`map-style-dark.json` or `events/` lands on `main` (i.e. when you merge a PR), a GitHub Action
+`map-style-dark.json`, `events/` or `credits/` lands on `main` (i.e. when you merge a PR), a GitHub Action
 re-checks the data and copies the files to the web server. Within about a minute
 the public atlas at **the-open-accelerator.com/ecosystem** shows the change, and a
 summary lands in the TOA Slack channel (what deployed, which entries are new or

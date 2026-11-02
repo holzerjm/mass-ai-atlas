@@ -49,7 +49,7 @@ The maintenance scripts (`scripts/`) need Node 20+ and the two npm dependencies
 ## Deploy
 
 **Merging is publishing.** A GitHub Action deploys `index.html`, `atlas-data.js`,
-`data/`, the map style and the events page to [the live site](https://the-open-accelerator.com/ecosystem/) on every
+`data/`, the map style, the events page and the credits page to [the live site](https://the-open-accelerator.com/ecosystem/) on every
 merge to `main` that touches them — it re-validates the data first, then rsyncs to
 the server and posts a summary to the TOA Slack. (Not GitHub Pages.)
 
@@ -92,7 +92,9 @@ index.html                        the app — one file of HTML/CSS/vanilla JS (L
                                   MapLibre GL, Tailwind & web fonts via CDN; TOA-branded)
 data/entities.yml                 the dataset — this is what you edit
 data/categories.yml, stages.yml   the categories and founder stages
-data/*.schema.yml                 JSON Schemas for the three data files
+data/credits.yml                  who has contributed, and the milestones (consent rules inside)
+data/*.schema.yml                 JSON Schemas for the data files
+credits/index.html                the credits page, which reads data/credits.yml
 atlas-data.js                     shared loader: parses data/*.yml + validates against
                                   the schemas (used by index.html and scripts/)
 package.json                      npm deps for the scripts (js-yaml, Ajv) — `npm ci`

@@ -5,8 +5,9 @@
    - a SERIOUS violation fails unless it is listed in KNOWN_SERIOUS below, with
      the scan and the elements it is tolerated in, and the reason;
    - moderate and minor findings are attached to the report, not failed on.
-   Atlas views use the default dark theme; the first-visit tour card and the
-   events page are scanned in both dark and light themes. See docs/testing.md. */
+   Atlas views use the default dark theme; the first-visit tour card, the
+   events page and the credits page are scanned in both dark and light themes.
+   See docs/testing.md. */
 const AxeBuilder = require("@axe-core/playwright").default;
 const { test, expect, DATA, waitForApp } = require("./helpers/atlas");
 
@@ -46,6 +47,9 @@ const SCANS = [
   { name: "events page", url: "./events/", events: true },
   { name: "events page (light theme)", url: "./events/", events: true,
     theme: "light" },
+  { name: "credits page", url: "./credits/", credits: true },
+  { name: "credits page (light theme)", url: "./credits/", credits: true,
+    theme: "light" },
 ];
 
 // For each flagged node, the `within` selector it falls under, or null. axe's
@@ -77,6 +81,10 @@ for(const scan of SCANS){
       await page.goto(scan.url);
       if(scan.events){
         await expect(page.locator("#list .ev").first()).toBeVisible();
+      } else if(scan.credits){
+        // wait for the cards and the timeline, which render from data/credits.yml
+        await expect(page.locator("#cards .card").first()).toBeVisible();
+        await expect(page.locator("#timeline li").first()).toBeVisible();
       } else {
         await waitForApp(page);
         if(scan.include) await expect(page.locator(scan.include)).toBeVisible({ timeout: 8000 });

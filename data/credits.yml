@@ -1,0 +1,141 @@
+# Credits: the people outside the core team whose work is in the atlas, and the
+# milestones of how it got here. Rendered by credits/index.html, checked by
+# scripts/validate.js against credits.schema.yml.
+#
+# Consent. A GitHub handle and that person's public pull requests and issues are
+# public already, so every entry starts with just those. Add `name`, or
+# `photo: true` to show their GitHub avatar, only after the person has said yes.
+# Anyone can ask to change or remove their credit through `corrections`.
+#
+# When an outside contribution merges, credit it in the same pull request: add
+# the person below, or add a link and any new kind to their entry. People only:
+# no bots, and no AI co-authors. Sponsors are thanked on the atlas page itself,
+# and credit here can't be bought.
+#
+# A copy of this template inherits this file. Keep crediting the people who
+# built the atlas upstream, and add your own below them.
+
+contributing: https://github.com/holzerjm/mass-ai-atlas/blob/main/CONTRIBUTING.md
+corrections: https://github.com/holzerjm/mass-ai-atlas/issues/new?title=Credits%3A%20
+
+mapmakers:
+  - github: lalexandrh
+    since: 2026-06-15
+    kinds: [data]
+    story: "Suggested Ven^X and Epipelagic Ventures through the entry form, the first suggestions to come from outside the core team. Both are on the map."
+    links:
+      - { label: "Issue #8", url: "https://github.com/holzerjm/mass-ai-atlas/issues/8" }
+      - { label: "Issue #9", url: "https://github.com/holzerjm/mass-ai-atlas/issues/9" }
+
+  - github: graiz
+    since: 2026-06-23
+    kinds: [data]
+    story: "Suggested FoundersEdge, which joined the map in August."
+    links:
+      - { label: "Issue #12", url: "https://github.com/holzerjm/mass-ai-atlas/issues/12" }
+
+  - github: jojoh9924
+    since: 2026-07-07
+    kinds: [data]
+    story: "Suggested Milemark Capital, which joined the map in August."
+    links:
+      - { label: "Issue #13", url: "https://github.com/holzerjm/mass-ai-atlas/issues/13" }
+
+  - github: straz
+    since: 2026-10-09
+    kinds: [code, data]
+    story: "Moved the atlas's data out of one JavaScript file into YAML, with a JSON Schema for each file. Every entry still has that shape. Also suggested Longreach."
+    links:
+      - { label: "PR #18", url: "https://github.com/holzerjm/mass-ai-atlas/pull/18" }
+      - { label: "Issue #16", url: "https://github.com/holzerjm/mass-ai-atlas/issues/16" }
+
+  - github: msnorrason
+    since: 2026-10-16
+    kinds: [events]
+    story: "Suggested a Boston AIR talk for the events page, which led to subscribing to the whole Boston Computer Vision AIR calendar."
+    links:
+      - { label: "Issue #34", url: "https://github.com/holzerjm/mass-ai-atlas/issues/34" }
+      - { label: "PR #35", url: "https://github.com/holzerjm/mass-ai-atlas/pull/35" }
+
+  - github: Tanmay-Ubhare
+    since: 2026-10-24
+    kinds: [code, accessibility]
+    story: "Underlined the events page's inline links, so they no longer rely on color alone, and retired that page's link exception in the accessibility tests."
+    links:
+      - { label: "PR #62", url: "https://github.com/holzerjm/mass-ai-atlas/pull/62" }
+      - { label: "Issue #56", url: "https://github.com/holzerjm/mass-ai-atlas/issues/56" }
+
+  - github: CodeWithDisha896
+    since: 2026-10-30
+    kinds: [code, accessibility]
+    story: "Raised the contrast of the events page's meta text in both themes. The issue only asked about dark mode, and checking light mode found it was worse."
+    links:
+      - { label: "PR #65", url: "https://github.com/holzerjm/mass-ai-atlas/pull/65" }
+
+  - github: bfs2021
+    since: 2026-10-30
+    kinds: [code, accessibility]
+    story: "Put the events page's faint text back below its muted text in dark mode, so the quietest tier reads quietest again."
+    links:
+      - { label: "PR #69", url: "https://github.com/holzerjm/mass-ai-atlas/pull/69" }
+      - { label: "Issue #66", url: "https://github.com/holzerjm/mass-ai-atlas/issues/66" }
+
+  - github: Vamsi-2581
+    since: 2026-10-30
+    kinds: [tests, accessibility]
+    story: "Added a light-theme accessibility scan for the events page, so a contrast regression there now fails the build."
+    links:
+      - { label: "PR #71", url: "https://github.com/holzerjm/mass-ai-atlas/pull/71" }
+
+  - github: egornikot
+    team: CommonSpace
+    since: 2026-10-31
+    kinds: [research]
+    story: "Found that entries sharing a spot hid each other at street zoom. That finding became the “Also here” list in every map popup."
+    links:
+      - { label: "PR #79", url: "https://github.com/holzerjm/mass-ai-atlas/pull/79" }
+      - { label: "Issue #87", url: "https://github.com/holzerjm/mass-ai-atlas/issues/87" }
+
+milestones:
+  - date: 2026-06-15
+    title: "The first outside suggestions"
+    text: "Ven^X and Epipelagic Ventures arrive through the entry form, from @lalexandrh."
+    link: { label: "Issue #8", url: "https://github.com/holzerjm/mass-ai-atlas/issues/8" }
+
+  - date: 2026-08-29
+    title: "Merging becomes publishing"
+    text: "Deploys go automatic. A merged change is live on the site in about a minute."
+
+  - date: 2026-10-11
+    title: "The data moves to YAML"
+    text: "@straz's refactor gives every data file a schema, and every entry the shape it has today."
+    link: { label: "PR #18", url: "https://github.com/holzerjm/mass-ai-atlas/pull/18" }
+
+  - date: 2026-10-16
+    title: "One suggestion becomes a whole feed"
+    text: "A single suggested talk turns into a subscription to the Boston Computer Vision AIR calendar."
+    link: { label: "PR #35", url: "https://github.com/holzerjm/mass-ai-atlas/pull/35" }
+
+  - date: 2026-10-19
+    title: "A template anyone can copy"
+    text: "The atlas becomes the Mass AI Atlas, and a GitHub template, so anyone can start their own from it."
+
+  - date: 2026-10-24
+    title: "Outside fixes begin"
+    text: "@Tanmay-Ubhare underlines the events page's links, the first of 4 accessibility fixes from outside the team in a week."
+    link: { label: "PR #62", url: "https://github.com/holzerjm/mass-ai-atlas/pull/62" }
+
+  - date: 2026-10-30
+    title: "The events page passes in both themes"
+    text: "With fixes from @CodeWithDisha896 and @bfs2021, and a light-theme scan from @Vamsi-2581, the events page meets AA contrast in dark and light."
+    link: { label: "PR #71", url: "https://github.com/holzerjm/mass-ai-atlas/pull/71" }
+
+  - date: 2026-10-31
+    title: "Chart the Common Wealth"
+    text: "A hackathon on the atlas at Red Hat in Fort Point, Boston. Teams build on their own copies of the template."
+    link: { label: "Handbook", url: "https://github.com/holzerjm/mass-ai-atlas/blob/main/HACKATHON.md" }
+
+  - date: 2026-11-02
+    title: "A hackathon finding ships"
+    text: "Team CommonSpace's stacked-pins finding becomes the “Also here” list in every map popup."
+    link: { label: "PR #89", url: "https://github.com/holzerjm/mass-ai-atlas/pull/89" }

@@ -45,7 +45,8 @@ const ROOT = path.join(__dirname, "..", "..");
 // leaves the page showing its "data failed to load" banner.
 const DEFAULT_FILES = ["index.html", "atlas-data.js", "data/entities.yml",
   "data/entities.schema.yml", "data/categories.yml", "data/categories.schema.yml",
-  "data/stages.yml", "data/stages.schema.yml", "events/index.html", "map-style-dark.json"];
+  "data/stages.yml", "data/stages.schema.yml", "data/credits.yml", "data/credits.schema.yml",
+  "events/index.html", "credits/index.html", "map-style-dark.json"];
 
 const args = process.argv.slice(2);
 let base = "https://the-open-accelerator.com/ecosystem/";
