@@ -130,8 +130,9 @@ Copy this template into a notes app and replace the blanks:
      See the troubleshooting table in [`MAINTAINING.md`](../MAINTAINING.md).
 2. When it's green, click **Merge pull request → Confirm merge** (or leave the final merge
    to a maintainer). The suggestion closes itself. 🎉
-3. **Publishing to the live site** is a separate deploy step a maintainer runs — see
-   [`MAINTAINING.md`](../MAINTAINING.md) → *Publish to the live site*.
+3. **Publishing to the live site** needs no separate step: the merge itself starts the
+   deploy. See [`MAINTAINING.md`](../MAINTAINING.md#part-3--publish-to-the-live-site) →
+   *Publish to the live site* for what it does and what to do if it fails.
 
 ---
 

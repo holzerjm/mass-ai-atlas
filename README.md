@@ -49,7 +49,7 @@ The maintenance scripts (`scripts/`) need Node 20+ and the two npm dependencies
 ## Deploy
 
 **Merging is publishing.** A GitHub Action deploys `index.html`, `atlas-data.js`,
-`data/` and the map style to [the live site](https://the-open-accelerator.com/ecosystem/) on every
+`data/`, the map style and the events page to [the live site](https://the-open-accelerator.com/ecosystem/) on every
 merge to `main` that touches them — it re-validates the data first, then rsyncs to
 the server and posts a summary to the TOA Slack. (Not GitHub Pages.)
 

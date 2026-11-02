@@ -216,20 +216,25 @@ contribution).
 
 ## Part 3 — Publish to the live site
 
-**Publishing is automatic.** When a change to `index.html` or `data/` lands on
-`main` (i.e. when you merge a PR), a GitHub Action
+**Publishing is automatic.** When a change to `index.html`, `atlas-data.js`, `data/`,
+`map-style-dark.json` or `events/` lands on `main` (i.e. when you merge a PR), a GitHub Action
 re-checks the data and copies the files to the web server. Within about a minute
 the public atlas at **the-open-accelerator.com/ecosystem** shows the change, and a
 summary lands in the TOA Slack channel (what deployed, which entries are new or
-updated — or a 🚨 alert if the deploy failed, in which case the live site is simply
-unchanged).
+updated). If the deploy fails, a 🚨 alert lands there instead; see below for what a
+failed deploy leaves live.
 
 So: **merging IS publishing.** There is no step 3 anymore.
 
 If the deploy ever fails (red ✗ on the "Deploy to TOA site" action, or the 🚨 Slack
-message): open the failed run from the Actions tab to see why, and know the live site
-still serves the previous version — nothing half-deploys. A deploy can also be
-triggered by hand from the **Actions tab → Deploy to TOA site → Run workflow**.
+message), open the failed run from the Actions tab and see which step failed. A run that
+stopped before its **Rsync atlas** step uploaded nothing, so the live site still serves
+the previous version. A failure inside **Rsync atlas** can leave the site half updated:
+that step copies the files with several `rsync` commands, one after another, and
+whatever it copied before the failure is already live. The 🚨 message says the site is
+unchanged either way, so go by the step that failed. Fix the cause, then deploy again
+from the **Actions tab → Deploy to TOA site → Run workflow**, which copies all the files
+again from the current `main`. The same button triggers a deploy by hand at any time.
 
 Manual fallback (only if GitHub Actions is unavailable), from a computer with the
 repo checked out and SSH access to the server:
