@@ -132,7 +132,7 @@ milestones:
 
   - date: 2026-10-31
     title: "Chart the Common Wealth"
-    text: "A hackathon on the atlas at Red Hat in Fort Point, Boston. Teams build on their own copies of the template."
+    text: "A hackathon on the atlas at Red Hat in Fort Point, Boston. Teams built on their own copies of the template."
     link: { label: "Handbook", url: "https://github.com/holzerjm/mass-ai-atlas/blob/main/HACKATHON.md" }
 
   - date: 2026-11-02
