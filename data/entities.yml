@@ -2674,7 +2674,7 @@
   approx: true
   lat: 42.3598
   lng: -71.0902
-  url: https://www.mitalignment.org
+  url: https://mitaialignment.org/
   desc: Student group focused on AI safety research and field-building.
   why: Boston's hub for safety-minded AI talent.
   tags: [AI safety, research]
@@ -2683,13 +2683,13 @@
   added: 2026-06
   lastVerified: 2026-06
 - id: hcsai
-  name: Harvard AI Safety Student Team (AISST)
+  name: Harvard AI Safety Team (AIST)
   cat: student
   loc: Harvard, Cambridge
   approx: true
   lat: 42.377
   lng: -71.1167
-  url: https://aisst.ai/
+  url: https://aisafetyteam.org/
   desc: Harvard's AI safety student research community.
   why: Rigorous student researchers thinking about AI's hardest problems.
   tags: [AI safety, Harvard]
@@ -2906,7 +2906,7 @@
   approx: true
   lat: 42.3612
   lng: -71.0833
-  url: https://www.aimlconference.com
+  url: https://sloangroups.mit.edu/aiml/home/
   desc: Student-run conference connecting AI research, business and policy each spring.
   why: Dense one-day download of where AI-meets-business is heading.
   tags: [events, MIT]
