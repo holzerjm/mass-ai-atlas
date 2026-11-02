@@ -124,6 +124,7 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | "→ on the atlas" link | the events page → atlas drawer hand-off |
 | | without `events.json` | a missing feed leaving the page stuck on "Loading events…" |
 | | events footer `#footCount` | same as the atlas footer |
+| | events footer, light theme | the footer band turning light with the page, which puts the white partner marks on a near-white ground (it did until 2026-11). The footer's ground, text and link colours must match the dark theme's |
 | `a11y.spec.js` | axe on each view | see below |
 
 ### Rules every test gets for free

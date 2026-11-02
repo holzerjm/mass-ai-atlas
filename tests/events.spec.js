@@ -52,6 +52,38 @@ test("the events page footer claims no curation date", async ({ page }) => {
   await expect(page.locator("footer")).not.toHaveText(/Curated/i);
 });
 
+// The footer band carries white partner artwork, so it has to stay dark in light mode as well.
+// The atlas does that with rules outside the footer block this page's generator copies, so this
+// page once showed both marks on its near-white ground. Compared across themes rather than with
+// a colour value: a palette change can't break it, a light footer can.
+test("the events page footer stays dark in light theme", async ({ page }) => {
+  const look = () => page.evaluate(() => {
+    const ground = (el) => {
+      for (; el; el = el.parentElement) {
+        const bg = getComputedStyle(el).backgroundColor;
+        if (bg !== "rgba(0, 0, 0, 0)") return bg;
+      }
+      return null;
+    };
+    const footer = document.querySelector("footer.footer");
+    return {
+      page: ground(document.body),
+      footer: ground(footer),
+      text: getComputedStyle(footer).color,
+      link: getComputedStyle(footer.querySelector("a")).color,
+    };
+  });
+  await page.goto("./events/");
+  const dark = await look();
+  await page.evaluate(() => localStorage.setItem("toa-atlas-theme", "light"));
+  await page.reload();
+  await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
+  const light = await look();
+  expect(light.page, "the light theme should change the page's own ground").not.toBe(dark.page);
+  expect({ footer: light.footer, text: light.text, link: light.link })
+    .toEqual({ footer: dark.footer, text: dark.text, link: dark.link });
+});
+
 // Contract: a copy of this repository must not file issues on the repository it
 // was copied FROM. index.html's `const GH_REPO` is the single place that decides,
 // and scripts/build-events-page.js reads it. Until 2026-10-23 this page hardcoded

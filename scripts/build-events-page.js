@@ -50,6 +50,14 @@ const CURATED_CLAUSE = /\s*·\s*Curated\s*<span id="footCurated"[^>]*>[^<]*<\/sp
 const footer = withoutCount.replace(CURATED_CLAUSE, "");
 if (footer === withoutCount) throw new Error("footer: the #footCurated clause was not found in index.html — the events page would ship a curation date it cannot keep current");
 const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color:var(--gold);text-decoration:none}");
+// The footer band has to stay dark in both themes: its partner marks are white artwork (the
+// reverse Red Hat wordmark, and IBM's logo inverted by `.partners img.ibm`). index.html keeps it
+// dark in light mode with rules up in its theme block, outside the slice above, so they never came
+// across and the marks sat on this page's near-white ground. Nor could they come across as they
+// are: they re-assert the atlas's dark palette, and this page's light --gold (#b45309) reads 3.93:1
+// on a dark ground. So the page writes its own dark palette once, for :root and for that footer.
+const DARK = `--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
+    --muted:#9aa1ab;--faint:#848c97;--gold:#ffc600;--red:#ff5c45;--ok:#4ade80`;
 // chrome script: from toggleMobileMenu's containing <script> to the updateLogos sync call
 const scriptStart = src.lastIndexOf("<script>", src.indexOf("function toggleMobileMenu"));
 const scriptEnd = src.indexOf("</script>", src.indexOf("updateLogos(document.documentElement.classList.contains"));
@@ -76,8 +84,7 @@ ${tailwind}<script>
 ${twConfig}
 ${bootstrap}
 <style>
-  :root{--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
-    --muted:#9aa1ab;--faint:#848c97;--gold:#ffc600;--red:#ff5c45;--ok:#4ade80}
+  :root{${DARK}}
   html:not(.dark){--bg:#faf9f7;--panel:#ffffff;--panel2:#f3f1ee;--line:#e2ddd6;--text:#1c1a17;
     --muted:#5d574e;--faint:#6b6255;--gold:#b45309;--red:#cc0000;--ok:#15803d}
   /* light --red is darkened from brand #ee0000, which reads 4.31:1 on this ground */
@@ -125,6 +132,8 @@ ${bootstrap}
   .contrib a:hover{text-decoration:underline}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 ${footerCss}
+  /* the footer band stays dark in light mode too: its partner marks are white artwork */
+  html:not(.dark) .footer{${DARK};background:var(--bg)}
     /* Make inline links distinguishable without relying on colour alone. */
   #add p a,
   .footer-inner a,
