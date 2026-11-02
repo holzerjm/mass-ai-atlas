@@ -314,12 +314,13 @@ any other difference still fails. If Cloudflare's features change and the
 check starts failing on every run, look at a `diff` between the live file and
 the local one before suspecting the deploy.
 
-**Two deploys can overlap.** `deploy.yml` has no `concurrency` group, so two
-merges in quick succession that both match its `paths` filter start two deploy
-runs, and nothing stops them uploading at the same time. For each file, the
-run that uploads last decides what is live, even when it carries the older
-commit. When two changes that deploy are ready together, merge one, let its
-deploy run finish, then merge the other.
+**One deploy at a time.** `deploy.yml` has a `concurrency` group,
+`deploy-atlas`, so a deploy run that starts while another is in progress waits
+for it instead of uploading alongside it, and a newer run never cancels one
+that is running. GitHub keeps one waiting run per group, so a newer run
+replaces a waiting one. That loses no change, since the newer run deploys a
+later `main`, but the replaced push's commits are missing from the Slack
+summary.
 
 **What it doesn't cover:**
 

@@ -26,6 +26,16 @@ on:
     paths: ["index.html", "atlas-data.js", "data/**", "map-style-dark.json", "events/**"]
   workflow_dispatch:
 
+# One deploy at a time. Without this, two quick merges start two runs that upload
+# side by side, and whichever copies a file last decides what is live, even with
+# the older commit. cancel-in-progress stays false so no upload stops halfway.
+# GitHub keeps one waiting run per group: a newer run replaces a waiting one,
+# which loses no change (it deploys a later main) but leaves the replaced push's
+# commits out of the Slack summary.
+concurrency:
+  group: deploy-atlas
+  cancel-in-progress: false
+
 jobs:
   deploy:
     # This repository is also a GitHub template. A copy made from it is a new repo
