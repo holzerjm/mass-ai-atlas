@@ -719,13 +719,12 @@
 - id: kensho
   name: Kensho
   cat: startup
-  loc: Harvard Sq, Cambridge
-  approx: true
-  lat: 42.3736
-  lng: -71.119
+  loc: 44 Brattle St, Cambridge
+  lat: 42.3738
+  lng: -71.1224
   url: https://kensho.com
   badge: $550M exit
-  desc: AI for financial intelligence; acquired by S&P Global for ~$550M — then its founders went on to start Suno.
+  desc: AI for financial intelligence; acquired by S&P Global for ~$550M in 2018 — and Kensho alumni went on to found Suno.
   why: A case study in Boston's founder-recycling flywheel.
   tags: [fintech]
   stages: []
@@ -768,12 +767,12 @@
 - id: generate
   name: Generate:Biomedicines
   cat: startup
-  loc: Somerville
-  approx: true
-  lat: 42.39
-  lng: -71.083
+  loc: 101 South St, Somerville
+  lat: 42.3748
+  lng: -71.0911
   url: https://generatebiomedicines.com
-  desc: Generative AI for protein therapeutics, created by Flagship Pioneering.
+  badge: 'NASDAQ: GENB'
+  desc: Generative AI for protein therapeutics, created by Flagship Pioneering. Went public on Nasdaq (GENB) in February 2026 with a $400M IPO; its lead candidate, GB-0895, is in Phase 3 trials.
   why: Where generative AI and Boston biotech collide at scale.
   tags: [biotech, generative AI]
   stages: []
@@ -815,10 +814,9 @@
 - id: righthand
   name: RightHand Robotics
   cat: startup
-  loc: Somerville
-  approx: true
-  lat: 42.387
-  lng: -71.099
+  loc: 237 Washington St, Somerville
+  lat: 42.3799
+  lng: -71.0936
   url: https://www.righthandrobotics.com
   desc: AI-driven robotic picking for e-commerce fulfillment, with Harvard/MIT research roots.
   why: Warehouse AI born from Boston lab benches.
@@ -831,10 +829,9 @@
 - id: pickle
   name: Pickle Robot
   cat: startup
-  loc: Charlestown, Boston
-  approx: true
-  lat: 42.378
-  lng: -71.065
+  loc: 465 Medford St, Charlestown
+  lat: 42.3848
+  lng: -71.068
   url: https://www.picklerobot.com
   desc: Robots that unload trucks — physical AI for the supply chain.
   why: Embodied-AI startup thriving outside the Kendall bubble.
@@ -1211,14 +1208,13 @@
 - id: nextview
   name: NextView Ventures
   cat: vc
-  loc: Boston, Seaport
-  approx: true
-  lat: 42.3519
-  lng: -71.0444
+  loc: 22 Boston Wharf Rd, Seaport
+  lat: 42.3504
+  lng: -71.047
   url: https://nextview.vc
-  desc: Seed-stage fund focused on 'redesigning the everyday economy' — backing founders using software and AI to solve mass-market problems.
-  why: 'Boston-native since 2010. Writes $500K–$2M checks at seed. Notable exit: Hatch acquired by Yelp for $300M (2026).'
-  facts: [[Stage, Seed], [Check size, $500K–$2M], [Focus, Everyday economy — software and AI]]
+  desc: Pre-seed and seed fund that leads rounds for pre-traction companies using AI and software to tackle mass-market human problems.
+  why: 'Boston-native since 2010; leads most of its rounds and usually takes a board or observer seat. Notable exit: Hatch acquired by Yelp for $300M (2026).'
+  facts: [[Stage, Pre-seed and seed], [Check size, $250K–$4M initial investment], [Focus, AI and software for mass-market human problems]]
   tags: [seed, consumer]
   stages: [3, 4]
   offers: [funding]
@@ -1263,7 +1259,7 @@
   lat: 42.3625
   lng: -71.0843
   url: https://www.ibm.com/ventures
-  desc: IBM's strategic investment arm — invests in AI, hybrid cloud, quantum, and enterprise tech startups.
+  desc: IBM's strategic investment arm — backs early-stage AI and quantum startups solving enterprise problems, from infrastructure to applications.
   why: Co-sponsor of The Open Accelerator. Strategic investor that brings enterprise distribution, not just capital. Particularly valuable for startups selling to regulated industries.
   tags: [strategic, enterprise, infrastructure]
   stages: [4, 5]
@@ -1306,14 +1302,14 @@
 - id: pillar
   name: Pillar VC
   cat: vc
-  loc: Fort Point, Boston
+  loc: Back Bay, Boston
   approx: true
-  lat: 42.349
-  lng: -71.048
+  lat: 42.3515
+  lng: -71.079
   url: https://www.pillar.vc
   desc: Founder-friendly seed firm; runs free programs for PhD founders (Pillar Frequency) across AI and bio.
   why: Among the most accessible institutional seed money for first-time technical founders.
-  facts: [[Stage, Seed], [Focus, AI and bio], [Terms, Free PhD-founder program (Frequency)]]
+  facts: [[Stage, Pre-seed and seed], [Focus, AI and bio], [Terms, Free PhD-founder program (Frequency)]]
   tags: [seed, founders]
   stages: [2, 4]
   offers: [funding, mentorship]
@@ -1344,6 +1340,7 @@
   url: https://www.flybridge.com
   desc: Seed firm with an explicit AI-first thesis and long Boston history.
   why: Publishes practical AI-startup playbooks; strong community programs.
+  facts: [[Stage, Pre-seed and seed], [Check size, 'Up to $250K pre-seed (Next Wave); $1M–$3M seed']]
   tags: [seed, AI-native]
   stages: [4]
   offers: [funding, community]
@@ -1352,10 +1349,9 @@
 - id: underscore
   name: Underscore VC
   cat: vc
-  loc: Downtown Boston
-  approx: true
-  lat: 42.358
-  lng: -71.057
+  loc: 131 Oliver St, Boston
+  lat: 42.3552
+  lng: -71.0525
   url: https://underscore.vc
   desc: Boston seed firm with a community-driven model (Core) connecting founders to operators.
   why: Their operator network doubles as a free advisory bench.
