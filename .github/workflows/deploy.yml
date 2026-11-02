@@ -174,6 +174,7 @@ jobs:
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && { echo "SLACK_WEBHOOK_URL not set — skipping"; exit 0; }
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/workflows/deploy.yml"
           SUBJECT=$(git log -1 --pretty=%s 2>/dev/null || echo "unknown commit")
           # What is live depends on how far Rsync atlas got. Its rsync commands run
           # one after another, so "failure" (or "cancelled") means it stopped partway
@@ -183,7 +184,10 @@ jobs:
           case "$RSYNC_OUTCOME" in
             failure|cancelled)
               STATE="The upload stopped partway, so the live site may be *half updated*."
-              NEXT=", then re-run it to upload every file" ;;
+              # Not "re-run": a re-run deploys the failed run's own commit, which puts
+              # older files back if a newer deploy has landed since. Run workflow
+              # deploys the current main.
+              NEXT=", then use *Run workflow* on <${WORKFLOW_URL}|Deploy to TOA site> to upload every file from the current \`main\`" ;;
             success)
               STATE="Every file was uploaded before the run stopped."
               NEXT="" ;;
