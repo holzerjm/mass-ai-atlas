@@ -50,7 +50,7 @@ behavior:
 
 - **There is no backend and no accounts.** No server-side code, no database, no login, no
   user data collected, no analytics. Everything a visitor does stays in their browser, in
-  five `localStorage` keys.
+  6 `localStorage` keys, all starting with `toa-atlas-`.
 - **No secret reaches the browser.** The deploy credentials and Slack webhooks are GitHub
   Actions secrets, used only inside CI.
 - **Untrusted input is gated by a human.** The suggestion bot runs only on the `bot:draft`
@@ -63,8 +63,10 @@ behavior:
   value cannot escape its field.
 - **Text fields reject angle brackets** at the schema level, and the generated share pages
   escape their output again.
-- **The data is validated twice**: in CI before it ships, and again in the visitor's
-  browser before anything is drawn.
+- **The atlas data is validated twice**: in CI before it ships, and again in the visitor's
+  browser before anything is drawn. The credits page's data, `data/credits.yml`, is checked
+  in CI only. The page inserts every value as text, never as HTML, and accepts only
+  `https:` links.
 
 ## What is not a security issue
 
