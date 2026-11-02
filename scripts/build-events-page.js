@@ -35,9 +35,11 @@ const mobileNav = between("<!-- Mobile Nav Overlay -->", "</div>");
 // The atlas page fills #footCount from the dataset at runtime. This page ships no
 // such script, so any number lifted into it can only go stale — it read "101
 // organizations" for months. Baking the real count in at build time (as this did)
-// only moved the problem: nothing in CI re-runs this generator, so the number was
-// correct once and then frozen. Drop the clause instead; the atlas page still
-// shows a live count, and scripts/lint-copy.js keeps a literal from creeping back.
+// only moved the problem: the number froze at whatever the last run saw, and now
+// that validate.yml re-runs this generator on every pull request, a baked count
+// would fail that check on every data change. Drop the clause instead; the atlas
+// page still shows a live count, and scripts/lint-copy.js keeps a literal from
+// creeping back.
 const footerRaw = between('<footer class="footer">', "</footer>");
 const COUNT_CLAUSE = /\s*·\s*<span id="footCount"[^>]*>[^<]*<\/span>\s*organizations across Massachusetts\./;
 const withoutCount = footerRaw.replace(COUNT_CLAUSE, ".");
@@ -45,7 +47,7 @@ if (withoutCount === footerRaw) throw new Error("footer: the #footCount clause w
 // Same reasoning for the curation month. The atlas page fills #footCurated from the
 // newest lastVerified in the data; this page has no script, so a month lifted into
 // it could only rot — it said "Curated June 2026" into October. Drop the clause
-// rather than bake in a date nothing regenerates.
+// rather than bake in a date the page cannot keep current.
 const CURATED_CLAUSE = /\s*·\s*Curated\s*<span id="footCurated"[^>]*>[^<]*<\/span>/;
 const footer = withoutCount.replace(CURATED_CLAUSE, "");
 if (footer === withoutCount) throw new Error("footer: the #footCurated clause was not found in index.html — the events page would ship a curation date it cannot keep current");

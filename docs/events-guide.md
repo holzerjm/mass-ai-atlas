@@ -139,10 +139,12 @@ node scripts/fetch-events.js          # writes events.json locally, prints a per
   a manual dispatch — two different cadences by design.
 - **`events/index.html` is generated — don't hand-edit it.** It's assembled by
   `node scripts/build-events-page.js`, which copies the real TOA header,
-  mobile nav, footer, and theme toggle out of the atlas's `index.html` so the
-  two pages can never drift apart. To change the events page, edit that
-  script and re-run it; to change the shared chrome, edit `index.html` and
-  re-run it.
+  mobile nav, footer, and theme toggle out of the atlas's `index.html`. To
+  change the events page, edit that script and re-run it; to change the shared
+  chrome, edit `index.html` and re-run it. The `validate` check rebuilds the
+  page on every pull request and fails if the committed copy differs, so a
+  forgotten re-run, or an `index.html` change the script can no longer read,
+  stops at review instead of reaching the site.
 - The server trigger authenticates with a **fine-grained GitHub token** that can
   do exactly one thing — start Actions workflows in this repo — stored at
   `~/.config/mass-ai-atlas/github-token` on `toa-forge` (mode 600). Optionally

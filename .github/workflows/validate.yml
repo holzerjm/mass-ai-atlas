@@ -7,7 +7,7 @@ on:
   pull_request:
   push:
     branches: [main]
-    paths: ["data/**", "scripts/**", "atlas-data.js", "package.json", "package-lock.json"]
+    paths: ["data/**", "scripts/**", "atlas-data.js", "package.json", "package-lock.json", "index.html", "events/**"]
 
 jobs:
   validate:
@@ -25,6 +25,19 @@ jobs:
       # while the atlas listed 171.
       - name: Copy lint (no hand-typed organization counts)
         run: node scripts/lint-copy.js
+      # events/index.html is generated from index.html by
+      # scripts/build-events-page.js, and nothing else rebuilds it, so a change to
+      # index.html's chrome used to leave the committed page silently stale (its
+      # footer claimed 101 organizations for months). Rebuild it here and fail if
+      # that changes the file. A generator that can no longer run, because an
+      # index.html change removed a piece it lifts, fails here too.
+      - name: Events page matches its generator
+        run: |
+          node scripts/build-events-page.js
+          git diff --exit-code -- events/index.html || {
+            echo "::error file=events/index.html::events/index.html is out of date with index.html. Run node scripts/build-events-page.js and commit the result."
+            exit 1
+          }
       - name: Freshness report (informational, never fails the build)
         continue-on-error: true
         run: node scripts/stale.js >> "$GITHUB_STEP_SUMMARY"
