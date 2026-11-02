@@ -223,3 +223,108 @@ test.describe("co-located pins", () => {
     await expect(page.locator("#drName")).toHaveText(other.name);
   });
 });
+
+// What a first screen holds. The map and the galaxy each fill a screen below a tall header,
+// so until 2026-11 their category legend sat at the canvas's bottom-left corner and always
+// landed just below the first screen (43 px below it at every desktop size), and the
+// credits page was linked only from the footer, below the whole map. 1366 × 650 is a
+// small laptop's browser window, the shortest of the sizes measured then.
+test.describe("on the first screen", () => {
+  test.use({ viewport: { width: 1366, height: 650 } });
+
+  test("the map's and the galaxy's category rows, and the credits link", async ({ page }) => {
+    const cats = Object.keys(ATLAS.CATS).length;
+    await page.goto("./");
+    await waitForApp(page);
+    const onFirstScreen = async (sel) => {
+      const box = await page.locator(sel).boundingBox();
+      expect(box, `${sel} is not rendered`).not.toBeNull();
+      expect(box.y + box.height, `${sel} ends below the first screen`).toBeLessThanOrEqual(650);
+    };
+    await expect(page.locator("#mapCatBar .cat-btn")).toHaveCount(cats);
+    await onFirstScreen("#mapCatBar");
+    const credits = page.locator(".tagline a", { hasText: "mapmakers" });
+    await onFirstScreen(".tagline a");
+    expect(await credits.evaluate(a => new URL(a.href).pathname)).toMatch(/\/credits\/$/);
+
+    await page.locator('.tab[data-view="galaxy"]').click();
+    await expect(page.locator("#gxCatBar .cat-btn")).toHaveCount(cats);
+    await onFirstScreen("#gxCatBar");
+  });
+
+  // #map and #galaxy are also the ids of the map and the galaxy canvas, so the browser
+  // scrolls a #map or #galaxy link down to the canvas, past its category row. The canvases'
+  // scroll-margin-top keeps such a link at the top of the page, where a tab click lands.
+  for(const view of ["map", "galaxy"]){
+    test(`a #${view} link opens at the top, with the category row in view`, async ({ page }) => {
+      await page.goto(`./#${view}`);
+      await waitForApp(page);
+      await page.waitForLoadState("load");
+      await page.waitForTimeout(300);   // the browser's scroll to the #fragment comes after load
+      expect(await page.evaluate(() => scrollY)).toBe(0);
+      const bar = await page.locator(view === "map" ? "#mapCatBar" : "#gxCatBar").boundingBox();
+      expect(bar.y + bar.height).toBeLessThanOrEqual(650);
+    });
+  }
+});
+
+// A category button hides that category's pins and shows them again, and says which
+// state it is in.
+test("a category button hides and shows that category's pins", async ({ page }) => {
+  const cat = "vc", inCat = DATA.filter(d => d.cat === cat).length;
+  await page.goto("./");
+  await waitForApp(page);
+  const shown = () => page.evaluate(() => (clustered ? clusterGroup : flatGroup).getLayers().length);
+  const btn = page.locator(`#mapCatBar .cat-btn[data-cat="${cat}"]`);
+  await expect(btn).toHaveAttribute("aria-pressed", "true");
+  expect(await shown()).toBe(DATA.length);
+  await btn.click();
+  await expect(btn).toHaveAttribute("aria-pressed", "false");
+  expect(await shown()).toBe(DATA.length - inCat);
+  await btn.click();
+  await expect(btn).toHaveAttribute("aria-pressed", "true");
+  expect(await shown()).toBe(DATA.length);
+});
+
+// Both canvases fill a screen, so until 2026-11 a wheel turn over either one zoomed it,
+// and the page below — the footer, the credits link — could not be scrolled to. Now the
+// wheel scrolls the page (with a hint), and Ctrl + wheel, or a trackpad pinch, zooms.
+test.describe("the wheel over the map and the galaxy", () => {
+  test.use({ viewport: { width: 1366, height: 650 } });
+
+  test("over the map it scrolls the page; Ctrl + wheel zooms the map", async ({ page }) => {
+    await page.goto("./");
+    await waitForApp(page);
+    const zoom = () => page.evaluate(() => map.getZoom());
+    const z0 = await zoom();
+    await page.mouse.move(600, 600);   // the map starts below the header, at about y = 530
+    await page.mouse.wheel(0, 300);
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+    await expect(page.locator(".map-wrap .zoom-hint")).toHaveClass(/\bshow\b/);
+    expect(await zoom()).toBe(z0);
+
+    await page.mouse.move(600, 400);   // still over the map, now that the page has moved
+    await page.keyboard.down("Control");
+    await page.mouse.wheel(0, -300);
+    await page.keyboard.up("Control");
+    await expect.poll(zoom).toBeGreaterThan(z0);
+  });
+
+  test("over the galaxy it scrolls the page; Ctrl + wheel zooms the galaxy", async ({ page }) => {
+    await page.goto("./#galaxy");
+    await waitForApp(page);
+    const scale = () => page.evaluate(() => gxScale);
+    const s0 = await scale();
+    await page.mouse.move(600, 600);
+    await page.mouse.wheel(0, 300);
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+    await expect(page.locator(".galaxy-wrap .zoom-hint")).toHaveClass(/\bshow\b/);
+    expect(await scale()).toBe(s0);
+
+    await page.mouse.move(600, 400);
+    await page.keyboard.down("Control");
+    await page.mouse.wheel(0, -100);
+    await page.keyboard.up("Control");
+    await expect.poll(scale).toBeGreaterThan(s0);
+  });
+});

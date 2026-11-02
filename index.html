@@ -91,10 +91,8 @@ html:not(.dark) .galaxy-wrap,html:not(.dark) .footer,html:not(.dark) footer.py-1
 }
 html:not(.dark) .galaxy-wrap{color:#e6ecff}
 html:not(.dark) .footer,html:not(.dark) footer.py-16{background:#0a0a0f}
-/* Light map: tiles swap to OpenFreeMap positron (JS), the container backdrop and floating controls follow so the popups/legend/search read as light. */
+/* Light map: tiles swap to OpenFreeMap positron (JS), the container backdrop and floating controls follow so the popups/search read as light. */
 html:not(.dark) #map{background:#e8eaed}
-html:not(.dark) .map-legend{background:rgba(255,255,255,.92)}
-html:not(.dark) #gxLegend{background:rgba(10,15,30,.92)} /* the galaxy stays dark in light mode */
 html:not(.dark) .map-search input{background:rgba(255,255,255,.94)}
 html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 ::-webkit-scrollbar{width:10px;height:10px}
@@ -117,6 +115,7 @@ html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 .brand h1 span{background:linear-gradient(90deg,#ffd54f,#ffc600);-webkit-background-clip:text;background-clip:text;color:transparent}
 .eyebrow{margin-top:12px;font-size:12px;text-transform:uppercase;letter-spacing:1.6px;color:var(--gold-ink);font-weight:700}
 .tagline{margin-top:8px;color:var(--muted);font-size:14.5px;max-width:900px;line-height:1.55}
+.tagline a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
 .hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .stats{display:flex;gap:26px;margin-top:18px;flex-wrap:wrap}
 .stat b{font-size:22px;font-weight:800;display:block;background:linear-gradient(90deg,#cfe0ff,#9fb4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -145,18 +144,34 @@ html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 .view-full{max-width:none;padding:0}
 
 /* ---------- MAP ---------- */
-#view-map.active{display:block}
-.map-wrap{position:relative;height:calc(100vh - 64px);min-height:540px}
+/* The map and the galaxy each fill one screen below the sticky nav: a row of category
+   buttons on top, the canvas below it. Until 2026-11 the categories floated at the
+   canvas's bottom-left corner, which always landed just below the first screen. */
+#view-map.active,#view-galaxy.active{display:flex;flex-direction:column;height:calc(100vh - 64px);min-height:600px}
+.map-wrap{position:relative;flex:1;min-height:0}
 #map{position:absolute;inset:0;background:#0a0f1e}
+/* A #map or #galaxy link makes the browser scroll the element with that id (the map, or the
+   galaxy canvas) to the top of the window, which hides its category row behind the nav. A
+   margin this large leaves the page at the top instead, where a tab click leaves it. */
+#map,#galaxy{scroll-margin-top:200vh}
 .leaflet-container{font:inherit}
-.map-legend{position:absolute;z-index:1000;left:14px;bottom:14px;background:rgba(10,15,30,.92);
-  border:1px solid var(--line);border-radius:14px;padding:12px 14px;max-width:230px;backdrop-filter:blur(8px)}
-.map-legend h4{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:8px}
-.lg-item{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 4px;border-radius:7px;cursor:pointer;user-select:none;
-  background:none;border:0;color:inherit;font-family:inherit;text-align:left;width:100%}
-.lg-item:hover{background:rgba(148,163,255,.1)}
-.lg-item.off{opacity:.32}
+.cat-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.cat-bar-label{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-right:4px}
+.cat-btn{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--text);font-family:inherit;font-size:12.5px;
+  font-weight:600;line-height:1.2;white-space:nowrap;transition:.15s}
+.cat-btn:hover{border-color:rgba(148,163,255,.45)}
+/* a hidden category: muted text and a hollow dot, so the state is not carried by colour alone */
+.cat-btn[aria-pressed="false"]{background:transparent;color:var(--muted)}
+.cat-btn[aria-pressed="false"] .lg-dot{background:transparent!important;box-shadow:none;border:1.5px solid currentColor}
 .lg-dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 8px currentColor}
+.cat-btn .lg-dot{width:9px;height:9px}
+/* shown when the wheel scrolls the page over the map or the galaxy instead of zooming */
+.zoom-hint{position:absolute;z-index:1001;top:50%;left:50%;transform:translate(-50%,-50%);padding:10px 18px;
+  border-radius:99px;background:rgba(10,15,30,.92);border:1px solid rgba(148,163,255,.25);color:#e6ecff;
+  font-size:13.5px;font-weight:600;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden;
+  transition:opacity .2s,visibility .2s}
+.zoom-hint.show{opacity:1;visibility:visible}
 .map-search{position:absolute;z-index:1000;top:14px;left:54px;right:auto;width:300px}
 /* map area presets — sits under .map-search's z-index so the search results overlay it */
 .map-view-switch{position:absolute;z-index:999;top:14px;right:14px;display:flex;gap:3px;padding:3px;
@@ -198,7 +213,7 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
   border-color:#ee0000;box-shadow:0 0 10px rgba(238,0,0,.25)}
 
 /* ---------- GALAXY ---------- */
-.galaxy-wrap{position:relative;height:calc(100vh - 64px);min-height:540px;background:radial-gradient(ellipse at 50% 40%,#0d1530 0%,#070b16 70%)}
+.galaxy-wrap{position:relative;flex:1;min-height:0;background:radial-gradient(ellipse at 50% 40%,#0d1530 0%,#070b16 70%)}
 #galaxy{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
 #galaxy:active{cursor:grabbing}
 .gx-tip{position:absolute;pointer-events:none;background:rgba(10,15,30,.95);border:1px solid var(--line);
@@ -405,6 +420,16 @@ html:not(.dark) .dr-verified.stale,html:not(.dark) .stale-tag{color:#b45309;bord
   /* the search takes the whole top row on a phone, so the presets drop below it */
   .map-view-switch{top:60px}
   .mv-btn{padding:7px 11px;font-size:12px}
+  /* one row of categories that scrolls sideways, rather than five rows above the map,
+     and it sits right under the nav, so it still makes the first screen */
+  .view-full{padding-top:0}
+  .cat-bar{flex-wrap:nowrap;overflow-x:auto;padding:8px 12px}
+}
+/* On a touch screen one finger pans the map, so a map as tall as the screen left no page
+   to swipe. Keep the map and the galaxy to two-thirds of the screen there. */
+@media (max-width:720px), (pointer:coarse){
+  #view-map.active,#view-galaxy.active{height:auto;min-height:0}
+  .map-wrap,.galaxy-wrap{flex:none;height:65vh;min-height:320px}
 }
 </style>
 </head>
@@ -506,7 +531,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
       <h1>Mass <span>AI Atlas</span></h1>
     </div>
     <p class="eyebrow">Presented by The Open Accelerator · an initiative between the MA AI Hub, Red Hat &amp; IBM</p>
-    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br>Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br>Your contributions make this a valuable resource</p>
+    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br>Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br>Your contributions make this a valuable resource. Meet the <a href="credits/">mapmakers</a>.</p>
     <div class="hero-cta">
       <a class="btn btn-pri" href="https://the-open-accelerator.com/residency/" target="_blank" rel="noopener">Apply for the TOA Residency</a>
       <a class="btn btn-sec" href="https://the-open-accelerator.com/community/" target="_blank" rel="noopener">Join the Community</a>
@@ -530,13 +555,16 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 </nav>
 
 <section id="view-map" class="view view-full active">
+  <div class="cat-bar" id="mapCatBar" role="group" aria-labelledby="mapCatLabel">
+    <span class="cat-bar-label" id="mapCatLabel">Categories</span>
+  </div>
   <div class="map-wrap">
     <div id="map"></div>
     <div class="map-search">
       <input id="mapSearch" type="text" placeholder="Search the ecosystem…" autocomplete="off">
       <div class="map-results" id="mapResults"></div>
     </div>
-    <div class="map-legend" id="mapLegend"><h4>Categories · click to toggle</h4></div>
+    <div class="zoom-hint" aria-hidden="true">Hold <span class="zoom-key">Ctrl</span> and scroll to zoom the map</div>
     <div class="map-view-switch" role="group" aria-label="Map area">
       <button type="button" class="mv-btn" data-view="boston" aria-pressed="true">Boston area</button>
       <button type="button" class="mv-btn" data-view="state" aria-pressed="false">Whole Commonwealth</button>
@@ -545,6 +573,9 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 </section>
 
 <section id="view-galaxy" class="view view-full">
+  <div class="cat-bar" id="gxCatBar" role="group" aria-labelledby="gxCatLabel">
+    <span class="cat-bar-label" id="gxCatLabel">Categories</span>
+  </div>
   <div class="galaxy-wrap">
     <canvas id="galaxy" role="img" aria-label="Network diagram of how Massachusetts' AI organizations connect. The same information is available as text in the Directory; use the search box below to find and focus any organization."></canvas>
     <div class="map-search gx-search">
@@ -553,9 +584,9 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     </div>
     <button class="gx-home" onclick="gxHome()" title="Re-center the galaxy"
       aria-label="Re-center the galaxy view">⌖</button>
-    <div class="gx-hint">Drag to pan · scroll to zoom · hover to trace connections · click a node for details</div>
+    <div class="gx-hint">Drag to pan · hold <span class="zoom-key">Ctrl</span> and scroll to zoom · hover to trace connections · click a node for details</div>
     <div class="gx-tip" id="gxTip"></div>
-    <div class="map-legend" id="gxLegend"><h4>Categories · click to toggle</h4></div>
+    <div class="zoom-hint" aria-hidden="true">Hold <span class="zoom-key">Ctrl</span> and scroll to zoom the galaxy</div>
   </div>
 </section>
 
@@ -1067,6 +1098,23 @@ window.goToMap = goToMap;
 let map, markers = {}, mapTiles, clusterGroup, flatGroup, clustered = true;
 try{ clustered = localStorage.getItem("toa-atlas-cluster") !== "off"; }catch(e){}
 const activeCats = new Set(Object.keys(CATS));
+// The row of category buttons above the map and the galaxy: one real button per category,
+// so it is operable by keyboard and announces its state. `shown` is the view's set of
+// visible categories; onToggle(k) redraws after category k is shown or hidden.
+function buildCatBar(bar, shown, onToggle){
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "cat-btn"; b.dataset.cat = k;
+    b.setAttribute("aria-pressed", String(shown.has(k)));
+    b.innerHTML = `<span class="lg-dot" style="color:${v.color};background:${v.color}"></span>${esc(v.label)}`;
+    b.addEventListener("click", ()=>{
+      if(shown.has(k)) shown.delete(k); else shown.add(k);
+      b.setAttribute("aria-pressed", String(shown.has(k)));
+      onToggle(k);
+    });
+    bar.appendChild(b);
+  });
+}
 // OpenFreeMap vector basemap via maplibre-gl-leaflet — keyless, unlimited,
 // commercial use permitted. Leaflet stays the map engine; only the base layer
 // renders through MapLibre GL. Fallback style host if OpenFreeMap ever
@@ -1214,25 +1262,16 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   // apply the remembered preset now the pins are on the map (no animation on load)
   applyMapView(mapView, false);
 
-  // legend
-  const lg = $("mapLegend");
-  Object.entries(CATS).forEach(([k,v])=>{
-    // a real button, so the legend is operable by keyboard and announces its state
-    const div = document.createElement("button");
-    div.type = "button"; div.className = "lg-item"; div.dataset.cat = k;
-    div.setAttribute("aria-pressed", "true");
-    div.innerHTML = `<span class="lg-dot" style="color:${v.color};background:${v.color}"></span>${v.label}`;
-    div.addEventListener("click", ()=>{
-      if(activeCats.has(k)) activeCats.delete(k); else activeCats.add(k);
-      div.classList.toggle("off", !activeCats.has(k));
-      div.setAttribute("aria-pressed", String(activeCats.has(k)));
-      DATA.forEach(d=>{
-        if(d.cat!==k) return;
-        if(activeCats.has(k)) pinGroup().addLayer(markers[d.id]); else pinGroup().removeLayer(markers[d.id]);
-      });
+  // categories
+  buildCatBar($("mapCatBar"), activeCats, k=>{
+    DATA.forEach(d=>{
+      if(d.cat!==k) return;
+      if(activeCats.has(k)) pinGroup().addLayer(markers[d.id]); else pinGroup().removeLayer(markers[d.id]);
     });
-    lg.appendChild(div);
   });
+  // The category row is filled in after Leaflet has measured the map, and it wraps to a
+  // second line on narrower screens, so tell Leaflet whenever the map's box changes size.
+  new ResizeObserver(()=>{ if(currentView==="map") map.invalidateSize(); }).observe(map.getContainer());
 
   // search
   const inp = $("mapSearch"), res = $("mapResults");
@@ -1296,20 +1335,8 @@ let gxEnergy = 1;
     gxNodes[e.a].deg=(gxNodes[e.a].deg||0)+1; gxNodes[e.b].deg=(gxNodes[e.b].deg||0)+1;
   }});
   gxNodes.forEach(n=>{ if(!n.hub) n.r = 5.5 + Math.min(n.deg||0, 8)*0.8; });
-  // category legend (same behavior as the map legend)
-  const lg = $("gxLegend");
-  Object.entries(CATS).forEach(([k,v])=>{
-    const div = document.createElement("button");
-    div.type = "button"; div.className = "lg-item"; div.dataset.cat = k;
-    div.setAttribute("aria-pressed", "true");
-    div.innerHTML = `<span class="lg-dot" style="color:${v.color};background:${v.color}"></span>${v.label}`;
-    div.addEventListener("click", ()=>{
-      if(gxCats.has(k)) gxCats.delete(k); else gxCats.add(k);
-      div.classList.toggle("off", !gxCats.has(k));
-      div.setAttribute("aria-pressed", String(gxCats.has(k)));
-    });
-    lg.appendChild(div);
-  });
+  // categories (the draw loop reads gxCats every frame, so a toggle needs no redraw call)
+  buildCatBar($("gxCatBar"), gxCats, ()=>{});
   // starfield
   for(let i=0;i<160;i++) gxStars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.3+0.3, p:Math.random()*Math.PI*2});
 })();
@@ -1530,6 +1557,31 @@ gxCanvas.addEventListener("wheel", e=>{
   const f = e.deltaY<0 ? 1.12 : 0.89;
   gxScale = Math.min(4, Math.max(0.45, gxScale*f));
 }, {passive:false});
+// Over the map and the galaxy the wheel scrolls the page; ⌘ or Ctrl + wheel zooms. A trackpad
+// pinch arrives as Ctrl + wheel, so it zooms too, and on the map so do +/−, double-click and
+// a two-finger pinch. Both views fill a screen, so until 2026-11 every wheel turn over them
+// zoomed, and nothing below them (the footer, the credits link) could be scrolled to.
+const ZOOM_KEY = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl";
+document.querySelectorAll(".zoom-key").forEach(s => s.textContent = ZOOM_KEY);
+function wheelScrollsPage(wrap, canvas){
+  const hint = wrap.querySelector(".zoom-hint");
+  let hide;
+  // Capture phase, so this runs before the map's or the galaxy's own wheel handler. Stopping
+  // the event here means that handler never sees it, and the browser scrolls the page.
+  wrap.addEventListener("wheel", e=>{
+    if(e.ctrlKey || e.metaKey || !canvas.contains(e.target)) return;
+    e.stopPropagation();
+    // centre the hint in the part of the canvas that is on screen, below the sticky nav,
+    // or it sits below the window while the page is still scrolled near the top
+    const box = wrap.getBoundingClientRect();
+    const top = Math.max(box.top, document.querySelector(".nav").getBoundingClientRect().bottom);
+    hint.style.top = ((top + Math.min(box.bottom, innerHeight)) / 2 - box.top) + "px";
+    hint.classList.add("show");
+    clearTimeout(hide); hide = setTimeout(()=>hint.classList.remove("show"), 1400);
+  }, {capture:true, passive:true});
+}
+wheelScrollsPage(document.querySelector(".map-wrap"), $("map"));
+wheelScrollsPage(gxCanvas.parentElement, gxCanvas);
 // touch
 let touchDist=0;
 gxCanvas.addEventListener("touchstart", e=>{
@@ -1821,7 +1873,7 @@ const TOUR = [
     text:`${DATA.length} verified organizations — VCs, labs, accelerators, spaces and communities — in four views: the Map, the Galaxy of connections, a stage-by-stage Founder Journey, and a searchable Directory.` },
   { view:"map", sel:"#mapSearch",
     title:"The Map",
-    text:"Search anything, toggle categories in the legend, and click any colored pin for details. Top right switches between the Boston area and the whole Commonwealth; ⌖ re-frames the view you picked and ∴ groups or un-groups nearby pins." },
+    text:"Search anything, toggle categories in the row above the map, and click any colored pin for details. Top right switches between the Boston area and the whole Commonwealth; ⌖ re-frames the view you picked and ∴ groups or un-groups nearby pins." },
   { view:"directory", sel:"#catChips",
     title:"The Directory",
     text:"Full-text search plus category and founder-stage filters — the fastest way to answer “who can help me right now?”" },

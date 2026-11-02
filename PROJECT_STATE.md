@@ -28,8 +28,8 @@ detail. The design brief was: *same domain, far more engaging and useful.*
 
 | View | What it does |
 |------|--------------|
-| 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; legend doubles as category toggles |
-| ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (170 cited edges across 114 entries as of 2026-10-11). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, legend toggles, and a search box that centers + locks any org's neighborhood. Drag/zoom/click |
+| 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; a row of category toggles above it. The wheel scrolls the page; ⌘ or Ctrl + wheel zooms |
+| ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (170 cited edges across 114 entries as of 2026-10-11). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, a row of category toggles above it, and a search box that centers + locks any org's neighborhood. Drag/zoom/click |
 | 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows curated tips plus every entry whose `stages` includes that number |
 | 📇 **Directory** | Card grid, full-text search, category chips, stage filter, sort |
 
