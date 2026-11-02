@@ -75,7 +75,8 @@ The atlas is community-maintained:
 - **🚩 Flag an entry** — [report something outdated or miscategorized](../../issues/new?template=flag-entry.yml)
   (or use the Flag button on any entry inside the atlas)
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the entry schema and review process.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the entry schema, how to fix something in the
+code, and the review process.
 Every PR is automatically validated by CI, and a maintainer can
 hand your suggestion to the **atlas bot**, which drafts it as a pull request
 (geocoded and validated) for human review — nothing publishes without a maintainer
