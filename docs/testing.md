@@ -1,14 +1,14 @@
 # Testing — the smoke suite and the post-deploy check
 
-Two safety nets, both added in v2.0 Part A (2026-09-30):
+Two checks, both added in v2.0 Part A (2026-09-30):
 
 1. **A Playwright + axe smoke suite** (`tests/`) that loads the real page in
    Chromium and checks the things founders rely on: shared links land where they
    point, every view shows, the counts are real, nothing throws, and there are
    no critical accessibility failures. It runs in CI on every pull request.
-2. **A post-deploy check** (`tests/deploy/verify-live.js`) that runs at the end
-   of every deploy and confirms the live site is serving exactly the files that
-   were deployed.
+2. **A post-deploy check** (`tests/deploy/verify-live.js`) that confirms the
+   live site is serving exactly the files in your checkout. You run it by hand,
+   with `npm run verify:live`: no workflow runs it, `deploy.yml` included.
 
 The atlas itself is still buildless: `index.html` + `data/*.yml` open in a browser
 with no npm step. `package.json` exists only for this tooling — nothing in it
@@ -236,12 +236,13 @@ Not gated yet:
 Two workflows run on every pull request, and **neither is path-filtered**. That is
 deliberate: a path-filtered required status check never reports on a PR outside its
 paths, and would block that PR forever. On pushes to `main`, **Validate atlas data** is
-limited to `data/**`, `scripts/**`, `atlas-data.js`, `package.json` and
-`package-lock.json`; **Browser tests** has no path filter there either.
+limited to `data/**`, `scripts/**`, `atlas-data.js`, `package.json`,
+`package-lock.json`, `index.html` and `events/**`; **Browser tests** has no path filter
+there either.
 
 | Workflow | Job | What it does |
 |---|---|---|
-| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count; then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
+| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
 | Browser tests | `e2e` | `npm ci`, Chromium restored from a cache keyed on the lockfile, `npm run test:e2e`; on failure uploads `playwright-report/` as the **playwright-report** artifact, kept 7 days |
 
 **Only `validate` is a required status check** on `main`. Browser tests runs and reports
@@ -263,23 +264,38 @@ step by step.
 
 ---
 
-## The post-deploy check (`deploy.yml`)
+## The post-deploy check (`npm run verify:live`)
 
 `rsync` exiting 0 only proves the origin server accepted the files. It doesn't
 prove visitors get them: the files could land in the wrong directory, or a TOA
 site deploy could be racing this one (the 2026-08-31 overwrite in
 `PROJECT_STATE.md`).
 
-So after the rsync steps, `deploy.yml` runs
-`node tests/deploy/verify-live.js`, which:
+`tests/deploy/verify-live.js` checks the live site, but only when you run it:
+no workflow calls it. `deploy.yml` validates `data/` and builds the generated
+files before it uploads anything, and never looks at the live site afterwards,
+so a green deploy run, and the Slack message it sends, prove only that the
+upload succeeded, not that visitors get the new files. Once a deploy run has
+finished, run the check by hand (read-only GETs):
 
-1. hashes (sha256) the local `index.html`, `data/*.yml`, `events/index.html` and
-   `map-style-dark.json` — the files the run just copied;
+```sh
+npm run verify:live                               # compares against this checkout
+node tests/deploy/verify-live.js --timeout 20 data/entities.yml
+```
+
+A checkout of `main` should report `OK`; a branch with unmerged changes to the
+files it compares will (correctly) report a mismatch. The script:
+
+1. hashes (sha256) this checkout's `index.html`, `atlas-data.js`, the data and
+   schema files in `data/`, `events/index.html` and `map-style-dark.json`
+   (`DEFAULT_FILES` at the top of the script), or only the files you name;
 2. fetches each from `https://the-open-accelerator.com/ecosystem/` through
    Cloudflare's proxy, with a cache-busting query
-   (`?deploy-check=<sha>-<attempt>-<time>`) and `no-cache` headers. The unique
+   (`?deploy-check=local-<attempt>-<time>`) and `no-cache` headers. The unique
    query means Cloudflare always asks the origin, so this checks what the
-   origin serves, never an edge-cached copy (see "What it doesn't cover");
+   origin serves, never an edge-cached copy (see "What it doesn't cover").
+   `--base <url>` checks a different deployment instead, such as a copy's
+   own site;
 3. compares hashes, retrying the files that don't match yet with backoff
    (waits of 5, 10, 15, 20, 30, 40, 60 s — 3 minutes in all, within a 210 s
    budget that also counts the fetches);
@@ -293,50 +309,25 @@ So after the rsync steps, `deploy.yml` runs
 replaces every `mailto:` link in the pages it serves with an encoded
 `/cdn-cgi/l/email-protection#…` link and injects a decoder script. On
 2026-09-30 the live `index.html` differed from `main` by exactly that and
-nothing else, so a plain hash comparison would fail on every deploy. The script
+nothing else, so a plain hash comparison would fail every time. The script
 reverses that exact rewrite before hashing (the encoding is a one-byte XOR key);
 any other difference still fails. If Cloudflare's features change and the
-check starts failing on every deploy, look at a `diff` between the live file and
+check starts failing on every run, look at a `diff` between the live file and
 the local one before suspecting the deploy.
 
-**What happens on a mismatch:**
-
-- the verify step is `continue-on-error`, so it does **not** trip the existing
-  "🚨 Atlas deploy failed — the live site is *unchanged*" alert, which would be
-  false here (the files were copied);
-- a separate Slack message, "⚠️ Atlas live check failed", lists each file with
-  the live and deployed hashes, Cloudflare's cache status and the file's
-  `Last-Modified` (same header / section / context layout as the others;
-  `continue-on-error`; skipped silently when `SLACK_WEBHOOK_URL` is unset). It
-  says "still not serving them" only when a file is proven **mismatched**; when
-  files merely **could not be checked** it says so and asks for a check by
-  hand;
-- a proven mismatch also holds back the usual "🗺️ Atlas updated — N
-  organizations live" message, which would be false. When the check only
-  couldn't fetch the site, that message still goes out, followed by the "could
-  not check" alert;
-- the last step of the job then fails the run, so it shows red in Actions.
-
-The workflow also has `concurrency: deploy-atlas`, so two merges in quick
-succession deploy one after the other instead of overwriting each other's
-files mid-check.
-
-Run the same check by hand at any time (read-only GETs):
-
-```sh
-npm run verify:live                               # compares against this checkout
-node tests/deploy/verify-live.js --timeout 20 data/entities.yml
-```
-
-A checkout of `main` should report `OK`; a branch with unmerged changes to those
-files will (correctly) report a mismatch.
+**Two deploys can overlap.** `deploy.yml` has no `concurrency` group, so two
+merges in quick succession that both match its `paths` filter start two deploy
+runs, and nothing stops them uploading at the same time. For each file, the
+run that uploads last decides what is live, even when it carries the older
+commit. When two changes that deploy are ready together, merge one, let its
+deploy run finish, then merge the other.
 
 **What it doesn't cover:**
 
-- It checks once, at deploy time. A later overwrite (a TOA site deploy an hour
-  afterwards) isn't caught until the next atlas deploy. Running
-  `npm run verify:live` from a scheduled workflow against `main` would close
-  that gap.
+- It checks only when someone runs it. A deploy that did not land, or a later
+  overwrite (a TOA site deploy an hour afterwards), goes unnoticed until someone
+  does. A step at the end of `deploy.yml` would catch the first, and a scheduled
+  run of `npm run verify:live` against `main` would catch the second.
 - `atlas.json`, `atlas.csv`, `sitemap.xml` and the `/e/<id>/` share stubs are
   deployed but not compared.
 - Edge-cached copies. The cache-busting query bypasses Cloudflare's cache on
@@ -345,3 +336,8 @@ files will (correctly) report a mismatch.
   was edge-cached (`cf-cache-status: DYNAMIC`), so visitors get the origin's
   copy too. If a Cloudflare cache rule ever starts caching them, a stale edge
   copy would go unnoticed here; purge the cache after deploys in that case.
+  `atlas-data.js` is cached already: on 2026-11-02 Cloudflare served it from its
+  edge (`cf-cache-status: HIT`, `Cache-Control: max-age=14400`), while every
+  other file the check compares was `DYNAMIC`. After a deploy that changes it,
+  visitors can keep getting the old copy for a while (up to four hours from a
+  browser that cached it), and this check still reports `OK`.
