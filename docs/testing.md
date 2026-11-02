@@ -117,17 +117,19 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | `#map`, `#galaxy`, `#journey`, `#directory` | each view link showing that view, with real content (pins, canvas, 5 stages, one card per entry) |
 | | tab clicks write the hash; unknown hash → map | the URL staying shareable as people move around |
 | | footer `#footCount` | the footer count being hand-typed again (it said "101 organizations" while the atlas listed 171) |
+| | footer `#footCurated` | the curation month being hand-typed again (it still said "Curated June 2026" in October). The test takes the newest `lastVerified` in the data, the way the page does, so it never needs updating by hand |
 | | every entry opens a drawer | one malformed entry (unknown category, stage with no row) throwing only when someone opens it |
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
 | | `?list=` of unknown ids | a stale list link breaking the page |
-| | co-located pins | every pin sharing exact coordinates with another lists the others in its popup's `.pop-colocated`, and each name there opens that entry's drawer. Every pair within the contract's 25 m is checked too (9 as of 2026-09-30), with the same distance formula as the map's `COLOCATED_M` grouping; the nearest pair outside it is 27.7 m apart |
-| | affiliation labels | an entry with `affiliation` shows "Atlas publisher" / "Atlas sponsor" / "Sponsor-affiliated" in its drawer, and an entry without one shows none of them. Also fails if no entry has the field at all (it was lost, not empty) |
 | `events.spec.js` | `/events/` loads and lists events | the events page breaking |
 | | "→ on the atlas" link | the events page → atlas drawer hand-off |
 | | without `events.json` | a missing feed leaving the page stuck on "Loading events…" |
-| | events footer `#footCount` | same as the atlas footer |
+| | events footer, no count | an organisation count coming back into the events footer. That page never loads the atlas data, so a count there could only go stale (it said "101 organizations" for months); `scripts/build-events-page.js` drops the clause, and the test fails if `#footCount` or an "N organizations" phrase reappears |
+| | events footer, no curation date | the same for the curation month, which said "Curated June 2026" into October |
 | | events footer, light theme | the footer band turning light with the page, which puts the white partner marks on a near-white ground (it did until 2026-11). The footer's ground, text and link colours must match the dark theme's |
+| | contribution links follow `GH_REPO` | a copy of this repository filing its issues on the one it was copied from. `scripts/build-events-page.js` takes the repository from `const GH_REPO` in `index.html`; until 2026-10-23 the page hardcoded `holzerjm/mass-ai-atlas` in three links. The test checks the wiring, not the value |
 | `a11y.spec.js` | axe on each view | see below |
+| | every allowlist entry is scoped | a `KNOWN_SERIOUS` entry with no `within`, which would tolerate its rule on every element of that page, including ones added later |
 
 ### Rules every test gets for free
 

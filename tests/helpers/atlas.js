@@ -26,13 +26,6 @@ const ATLAS = loadAtlas();
 const { DATA } = ATLAS;
 const byId = Object.fromEntries(DATA.map(d => [d.id, d]));
 
-// Contract 1 (Part A brief): affiliation value → the label the drawer shows.
-const AFFILIATION_LABELS = {
-  "publisher": "Atlas publisher",
-  "sponsor": "Atlas sponsor",
-  "sponsor-affiliated": "Sponsor-affiliated",
-};
-
 function metersBetween(a, b){
   const R = 6371000, rad = x => x * Math.PI / 180;
   const dLat = rad(b.lat - a.lat), dLng = rad(b.lng - a.lng);
@@ -123,4 +116,4 @@ async function waitForApp(page){
   await page.waitForFunction(n => typeof markers === "object" && Object.keys(markers).length === n, DATA.length);
 }
 
-module.exports = { test, expect: base.expect, ROOT, ATLAS, DATA, byId, AFFILIATION_LABELS, metersBetween, eventsFixture, waitForApp };
+module.exports = { test, expect: base.expect, ROOT, ATLAS, DATA, byId, metersBetween, eventsFixture, waitForApp };
