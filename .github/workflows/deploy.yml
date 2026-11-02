@@ -160,12 +160,17 @@ jobs:
             }' \
           | curl -sS -X POST -H 'Content-type: application/json' -d @- "$SLACK_WEBHOOK_URL"
 
+      # cancelled() as well as failure(): GitHub cancels a job that hits
+      # timeout-minutes, and one stopped by hand, so failure() alone would post
+      # nothing for either. A waiting run that a newer one replaces never starts,
+      # so it posts nothing.
       - name: Notify Slack (deploy failed)
-        if: failure()
+        if: failure() || cancelled()
         continue-on-error: true
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           RSYNC_OUTCOME: ${{ steps.rsync.outcome }}
+          JOB_STATUS: ${{ job.status }}
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && { echo "SLACK_WEBHOOK_URL not set — skipping"; exit 0; }
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -173,24 +178,26 @@ jobs:
           # What is live depends on how far Rsync atlas got. Its rsync commands run
           # one after another, so "failure" (or "cancelled") means it stopped partway
           # and whatever it had copied is already live; "success" means every file
-          # went up before a later step failed; anything else ("skipped") means
+          # went up before the run stopped; anything else ("skipped") means
           # nothing was uploaded.
           case "$RSYNC_OUTCOME" in
             failure|cancelled)
               STATE="The upload stopped partway, so the live site may be *half updated*."
               NEXT=", then re-run it to upload every file" ;;
             success)
-              STATE="Every file was uploaded, then a later step failed."
+              STATE="Every file was uploaded before the run stopped."
               NEXT="" ;;
             *)
               STATE="The live site is *unchanged*."
               NEXT="" ;;
           esac
-          jq -n --arg subject "$SUBJECT" --arg run "$RUN_URL" --arg state "$STATE" --arg next "$NEXT" '
+          WHY=""
+          if [ "$JOB_STATUS" = "cancelled" ]; then WHY="The run was cancelled or hit its time limit. "; fi
+          jq -n --arg subject "$SUBJECT" --arg run "$RUN_URL" --arg why "$WHY" --arg state "$STATE" --arg next "$NEXT" '
             {text: "🚨 Mass AI Atlas deploy FAILED",
              blocks: [
                {type:"header", text:{type:"plain_text", text:"🚨 Atlas deploy failed", emoji:true}},
                {type:"section", text:{type:"mrkdwn",
-                 text:("`" + $subject + "`\n" + $state + " <" + $run + "|View the failed run> to see what broke" + $next + ".")}}
+                 text:("`" + $subject + "`\n" + $why + $state + " <" + $run + "|View the failed run> to see what broke" + $next + ".")}}
              ]}' \
           | curl -sS -X POST -H 'Content-type: application/json' -d @- "$SLACK_WEBHOOK_URL"

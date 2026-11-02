@@ -221,8 +221,8 @@ contribution).
 re-checks the data and copies the files to the web server. Within about a minute
 the public atlas at **the-open-accelerator.com/ecosystem** shows the change, and a
 summary lands in the TOA Slack channel (what deployed, which entries are new or
-updated). If the deploy fails, a 🚨 alert lands there instead; see below for what a
-failed deploy leaves live.
+updated). If the deploy fails, is cancelled or hits its time limit, a 🚨 alert lands
+there instead; see below for what a failed deploy leaves live.
 
 So: **merging IS publishing.** There is no step 3 anymore.
 
