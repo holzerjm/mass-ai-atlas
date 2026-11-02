@@ -1307,9 +1307,9 @@
   lat: 42.3515
   lng: -71.079
   url: https://www.pillar.vc
-  desc: Founder-friendly seed firm; runs free programs for PhD founders (Pillar Frequency) across AI and bio.
+  desc: Founder-friendly pre-seed and seed firm that partners at inception with technical founders across AI and bio.
   why: Among the most accessible institutional seed money for first-time technical founders.
-  facts: [[Stage, Pre-seed and seed], [Focus, AI and bio], [Terms, Free PhD-founder program (Frequency)]]
+  facts: [[Stage, Pre-seed and seed], [Focus, AI and bio]]
   tags: [seed, founders]
   stages: [2, 4]
   offers: [funding, mentorship]
@@ -1318,10 +1318,10 @@
 - id: hyperplane
   name: Hyperplane
   cat: vc
-  loc: Fort Point, Boston
+  loc: Back Bay, Boston
   approx: true
-  lat: 42.35
-  lng: -71.047
+  lat: 42.3513
+  lng: -71.0772
   url: https://www.hyperplane.vc
   desc: Seed fund backing machine-intelligence companies since before it was cool.
   why: Technical partners who actually read your model card.
