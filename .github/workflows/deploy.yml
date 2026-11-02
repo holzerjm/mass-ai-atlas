@@ -1,6 +1,6 @@
-# Hands-off deploys — rsync the atlas to the web server on every merge to
-# main that touches index.html or data/, so accepted community PRs go
-# live automatically. Can also be run manually from the Actions tab
+# Hands-off deploys: rsync the atlas to the web server on every merge to main
+# that matches the paths filter below, so accepted community PRs go live
+# automatically. Can also be run manually from the Actions tab
 # (workflow_dispatch), e.g. to test the pipeline.
 #
 # Repository secrets (Settings → Secrets and variables → Actions):
@@ -77,6 +77,7 @@ jobs:
           chmod 600 ~/.ssh/id_deploy
           ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
       - name: Rsync atlas
+        id: rsync
         run: |
           rsync -avz -e "ssh -i ~/.ssh/id_deploy" index.html atlas-data.js map-style-dark.json atlas.json atlas.csv site-pages/sitemap.xml \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/"
@@ -164,15 +165,32 @@ jobs:
         continue-on-error: true
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RSYNC_OUTCOME: ${{ steps.rsync.outcome }}
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && { echo "SLACK_WEBHOOK_URL not set — skipping"; exit 0; }
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           SUBJECT=$(git log -1 --pretty=%s 2>/dev/null || echo "unknown commit")
-          jq -n --arg subject "$SUBJECT" --arg run "$RUN_URL" '
+          # What is live depends on how far Rsync atlas got. Its rsync commands run
+          # one after another, so "failure" (or "cancelled") means it stopped partway
+          # and whatever it had copied is already live; "success" means every file
+          # went up before a later step failed; anything else ("skipped") means
+          # nothing was uploaded.
+          case "$RSYNC_OUTCOME" in
+            failure|cancelled)
+              STATE="The upload stopped partway, so the live site may be *half updated*."
+              NEXT=", then re-run it to upload every file" ;;
+            success)
+              STATE="Every file was uploaded, then a later step failed."
+              NEXT="" ;;
+            *)
+              STATE="The live site is *unchanged*."
+              NEXT="" ;;
+          esac
+          jq -n --arg subject "$SUBJECT" --arg run "$RUN_URL" --arg state "$STATE" --arg next "$NEXT" '
             {text: "🚨 Mass AI Atlas deploy FAILED",
              blocks: [
                {type:"header", text:{type:"plain_text", text:"🚨 Atlas deploy failed", emoji:true}},
                {type:"section", text:{type:"mrkdwn",
-                 text:("`" + $subject + "`\nThe live site is *unchanged*. <" + $run + "|View the failed run> to see what broke.")}}
+                 text:("`" + $subject + "`\n" + $state + " <" + $run + "|View the failed run> to see what broke" + $next + ".")}}
              ]}' \
           | curl -sS -X POST -H 'Content-type: application/json' -d @- "$SLACK_WEBHOOK_URL"
