@@ -5,8 +5,8 @@
    - a SERIOUS violation fails unless it is listed in KNOWN_SERIOUS below, with
      the scan and the elements it is tolerated in, and the reason;
    - moderate and minor findings are attached to the report, not failed on.
-   Atlas views use the default dark theme; the first-visit tour card, the
-   events page and the credits page are scanned in both dark and light themes.
+   Every page is scanned in both the dark and the light theme (the atlas views since
+   2026-11), and the galaxy's keyboard list and search in the dark theme.
    See docs/testing.md. */
 const AxeBuilder = require("@axe-core/playwright").default;
 const { test, expect, DATA, waitForApp } = require("./helpers/atlas");
@@ -50,6 +50,16 @@ const SCANS = [
   { name: "directory view", url: "./#directory" },
   { name: "entry drawer", url: `./?entry=${entry.id}`, include: "#drawer" },
   { name: "shared shortlist", url: `./?list=${DATA[0].id},${DATA[1].id}`, include: "#shortlistModal" },
+  // The atlas in the light theme, scanned since 2026-11. Until then it failed 21 to 34 times per
+  // view: category colours as text on white, the site footer's grey on its dark band, and footer
+  // links told apart by colour alone.
+  { name: "map view (light theme)", url: "./", theme: "light" },
+  { name: "galaxy view (light theme)", url: "./#galaxy", theme: "light" },
+  { name: "journey view (light theme)", url: "./#journey", theme: "light" },
+  { name: "directory view (light theme)", url: "./#directory", theme: "light" },
+  { name: "entry drawer (light theme)", url: `./?entry=${entry.id}`, include: "#drawer", theme: "light" },
+  { name: "shared shortlist (light theme)", url: `./?list=${DATA[0].id},${DATA[1].id}`, include: "#shortlistModal",
+    theme: "light" },
   { name: "first-visit tour", url: "./", firstVisit: true, include: "#tourCard" },
   { name: "first-visit tour (light theme)", url: "./", firstVisit: true, include: "#tourCard",
     theme: "light" },

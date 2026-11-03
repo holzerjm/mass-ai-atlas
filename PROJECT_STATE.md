@@ -285,7 +285,8 @@ live at `/ecosystem/`.
 **Open items / ideas, roughly by value:**
 
 1. **Accessibility pass** — focus states, `prefers-reduced-motion` for the animated
-   views, contrast audit. (The Galaxy's keyboard navigation shipped in 2026-11, #47.)
+   views. (Shipped in 2026-11: the Galaxy's keyboard navigation, #47, and the light theme's
+   contrast, which the axe gate now checks on every page in both themes.)
 2. **Self-hosted assets** — vendoring Leaflet/Tailwind/fonts/logo would remove CDN
    dependence and fix the `file://` experience. (Beyond the TOA logo, the favicon and
    `og:image` are also hot-linked — from the-open-accelerator.com and people.redhat.com.)

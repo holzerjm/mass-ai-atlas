@@ -192,10 +192,9 @@ loader the page uses (`atlas-data.js`), exactly as
 
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
-an open entry drawer, a shared shortlist, and the galaxy's keyboard list and search
-with a category open and results showing, in the dark theme; and the
-first-visit tour card, the events page and the credits page, in both dark and light
-themes.
+an open entry drawer, a shared shortlist, the first-visit tour card, the events page and
+the credits page, each in both the dark and the light theme; and the galaxy's keyboard
+list and search with a category open and results showing, in the dark theme.
 
 The gate was set from what the pristine baseline (main @ 76cf38e) actually
 produced:
@@ -242,18 +241,23 @@ The first run against main @ 76cf38e failed on two real bugs, both fixed in
   in a non-map view, so any link copied from the address bar there was broken.
   Fixed by reading `?entry=` first.
 
-Not gated yet:
+**Light theme on atlas views: gated since 2026-11.** Until then the map, galaxy,
+journey and directory views, the entry drawer and the shared shortlist were scanned in
+the dark theme only. In the light theme each view failed 21 to 34 times:
 
-- **Light theme on atlas views.** The map, galaxy, journey and directory views,
-  entry drawer and shared shortlist are scanned in the default dark theme only.
-  On the baseline, the light theme had 19 serious `color-contrast` nodes on the
-  map and 207 in the Directory (category chips, card text), plus 3
-  `link-in-text-block`; gating those views still needs a contrast pass on the
-  light palette. The events page, the credits page and the tour card are separate
-  and much smaller surfaces, so they are already gated in both themes (above) and
-  do not wait on that pass. The tour card's light scan came with its step-counter fix: the
-  colour first proposed for the counter passed in the dark theme and failed, at
-  2.61:1, in the light one.
+- category colours used as text on white: the Directory's category chips and the
+  Journey's group headings now use the category's ink, which darkens in light mode;
+- the site footer's grey (Tailwind's gray-500, 4.08:1) on its dark band;
+- the atlas footer's links, told apart from its text by colour alone, now underlined;
+- the Directory's "Apply by" tags (4.43:1) and the shortlist's URLs (3.8:1).
+
+The two footer faults were there in the dark theme as well. There the footer band has no
+background of its own, so axe could not measure its contrast and reported nothing.
+On the 2026-09-30 baseline the light theme had 19 serious `color-contrast` nodes on the
+map and 207 in the Directory, before the category ink and other fixes in between.
+
+The tour card's light scan came with its step-counter fix: the colour first proposed for
+the counter passed in the dark theme and failed, at 2.61:1, in the light one.
 
 ---
 
