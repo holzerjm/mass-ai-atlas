@@ -332,21 +332,25 @@ test.describe("the wheel over the map and the galaxy", () => {
     await expect.poll(zoom).toBeGreaterThan(z0);
   });
 
+  // The galaxy's camera fits it to the canvas and follows the layout as it settles, so its
+  // scale moves by itself. Zooming is what hands the camera to the visitor (gxAuto false).
   test("over the galaxy it scrolls the page; Ctrl + wheel zooms the galaxy", async ({ page }) => {
     await page.goto("./#galaxy");
     await waitForApp(page);
     const scale = () => page.evaluate(() => gxScale);
-    const s0 = await scale();
+    const auto = () => page.evaluate(() => gxAuto);
     await page.mouse.move(600, 600);
     await page.mouse.wheel(0, 300);
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
     await expect(page.locator(".galaxy-wrap .zoom-hint")).toHaveClass(/\bshow\b/);
-    expect(await scale()).toBe(s0);
+    expect(await auto()).toBe(true);
 
     await page.mouse.move(600, 400);
+    const s0 = await scale();
     await page.keyboard.down("Control");
     await page.mouse.wheel(0, -100);
     await page.keyboard.up("Control");
-    await expect.poll(scale).toBeGreaterThan(s0);
+    await expect.poll(auto).toBe(false);
+    expect(await scale()).toBeGreaterThan(s0);
   });
 });

@@ -37,6 +37,15 @@ const entry = DATA.find(d => d.id === "csail") || DATA[0];
 const SCANS = [
   { name: "map view", url: "./" },
   { name: "galaxy view", url: "./#galaxy" },
+  // the galaxy's keyboard list with a category open, and its search with results showing:
+  // the ARIA tree and combobox only exist in full once someone uses them
+  { name: "galaxy keyboard list and search", url: "./#galaxy", include: "#view-galaxy",
+    prepare: async page => {
+      await page.locator("#gxTree [aria-expanded]").first().focus();
+      await page.keyboard.press("ArrowRight");
+      await page.locator("#gxSearch").fill("ventures");
+      await expect(page.locator("#gxResults")).toBeVisible();
+    } },
   { name: "journey view", url: "./#journey" },
   { name: "directory view", url: "./#directory" },
   { name: "entry drawer", url: `./?entry=${entry.id}`, include: "#drawer" },
@@ -88,6 +97,7 @@ for(const scan of SCANS){
       } else {
         await waitForApp(page);
         if(scan.include) await expect(page.locator(scan.include)).toBeVisible({ timeout: 8000 });
+        if(scan.prepare) await scan.prepare(page);
       }
       await page.waitForTimeout(300);   // let open/close transitions settle
 

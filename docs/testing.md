@@ -123,7 +123,13 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | a `#map` or `#galaxy` link opens at the top | the browser scrolling such a link down to the element with that id (the map or the galaxy canvas), past its category row. The canvases' `scroll-margin-top` keeps the page at the top, where a tab click leaves it |
 | | the nav's and the footer's GitHub links follow `GH_REPO` | a copy of this repository linking to the one it was copied from. The test serves `index.html` with a different `GH_REPO` and checks both links. The footer's link was written into the HTML and ignored `GH_REPO` until 2026-11 |
 | | a category button hides and shows its pins | a category toggle that stops removing that category's pins, or doesn't put them back, or doesn't report its state in `aria-pressed` |
-| | the wheel over the map and the galaxy | a full-screen canvas swallowing the wheel again. A plain wheel turn must scroll the page and show the zoom hint without zooming, and Ctrl + wheel must zoom. Until 2026-11 any wheel turn zoomed, and the footer could not be scrolled to |
+| | the wheel over the map and the galaxy | a full-screen canvas swallowing the wheel again. A plain wheel turn must scroll the page and show the zoom hint without zooming, and Ctrl + wheel must zoom. Until 2026-11 any wheel turn zoomed, and the footer could not be scrolled to. The galaxy's scale moves by itself while its layout settles, so there the test checks that only Ctrl + wheel takes the camera off its fitted view (`gxAuto`) |
+| `galaxy.spec.js` | the galaxy fits its canvas, on a phone and on a small laptop | the galaxy opening cropped again. Every node must be on the canvas, and every label inside it, with no two overlapping. Until 2026-11 the galaxy opened at its layout's own size, which a phone showed only the middle third of, with category labels cut off at both edges; a 1366 × 650 window lost its top and bottom |
+| | a tap traces, a second tap opens, a tap on empty space clears | a phone losing the hover that explains the galaxy. The first tap must trace a node's connections and pin its tooltip without opening the drawer, the second must open it, and a tap on empty space must clear the choice. Until 2026-11 a tap opened the drawer at once |
+| | the keyboard reaches every organization | the galaxy being mouse-only again. Its tree of organizations must hold one entry per category and one per entry in the data, Tab must reach it after ⌖, the arrow keys must open a category and move through it while the canvas shows the focus (`gxKbd`), and Enter must open the drawer, with focus back on the entry when it closes |
+| | the search's results take the arrow keys and Enter | the galaxy search taking only a click again. The arrow keys must move through the results (`aria-activedescendant`, `aria-selected`) and Enter must pick one and lock its constellation |
+| | the drawer's connections can be followed by keyboard | the drawer's "Connected to" entries going back to spans that take only a click, and focus going nowhere when a drawer reopened from inside itself is closed. Until 2026-11 it took the return point after the redraw had removed the button pressed, so focus fell to `<body>` |
+| | a hidden category leaves the keyboard list | a category hidden with its button still taking Tab in the galaxy's tree, or Tab's place staying in it |
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
 | | `?list=` of unknown ids | a stale list link breaking the page |
 | `events.spec.js` | `/events/` loads and lists events | the events page breaking |
@@ -179,7 +185,8 @@ loader the page uses (`atlas-data.js`), exactly as
 
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
-an open entry drawer and a shared shortlist, in the dark theme; and the
+an open entry drawer, a shared shortlist, and the galaxy's keyboard list and search
+with a category open and results showing, in the dark theme; and the
 first-visit tour card, the events page and the credits page, in both dark and light
 themes.
 

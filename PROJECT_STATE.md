@@ -29,7 +29,7 @@ detail. The design brief was: *same domain, far more engaging and useful.*
 | View | What it does |
 |------|--------------|
 | 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; a row of category toggles above it. The wheel scrolls the page; ⌘ or Ctrl + wheel zooms |
-| ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (170 cited edges across 114 entries as of 2026-10-11). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, a row of category toggles above it, and a search box that centers + locks any org's neighborhood. Drag/zoom/click |
+| ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (170 cited edges across 114 entries as of 2026-10-11). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, a row of category toggles above it, and a search box that centers + locks any org's neighborhood. Drag/zoom/click. It opens fitted to its canvas, phones included; on a touch screen the first tap traces a node and the second opens it; the keyboard reaches every node through a tree of organizations by category, and the search's results take the arrow keys |
 | 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows curated tips plus every entry whose `stages` includes that number |
 | 📇 **Directory** | Card grid, full-text search, category chips, stage filter, sort |
 
@@ -275,6 +275,7 @@ auto-deploy on merge + Slack notifications · suggestion bot
 (issue → draft PR) · maintainer docs · CSV export · `lastVerified` freshness field + stale
 report · shareable deep links (`?entry=` / `#view`) · HTML-escaped rendering · MIT licence ·
 OpenFreeMap vector basemap (repo-owned dark style) · guided tour · Galaxy search + focus ·
+Galaxy on phones (fitted to the screen, tap to trace) and by keyboard (#45, #47) ·
 monthly health rails (link-check + verification rota → Slack) · events page (`/events/`,
 weekly Luma/AI-Tinkerers fetch) · founder stickiness: ★ shortlist (localStorage +
 `?list=` share links + print), ⚖ compare (up to 3 funders side-by-side), ✨ new-this-month
@@ -283,13 +284,12 @@ live at `/ecosystem/`.
 
 **Open items / ideas, roughly by value:**
 
-1. **Accessibility pass** — keyboard navigation for the Galaxy canvas, focus states,
-   `prefers-reduced-motion` for the animated views, contrast audit.
-2. **Mobile polish** — the Galaxy view is cramped on small screens.
-3. **Self-hosted assets** — vendoring Leaflet/Tailwind/fonts/logo would remove CDN
+1. **Accessibility pass** — focus states, `prefers-reduced-motion` for the animated
+   views, contrast audit. (The Galaxy's keyboard navigation shipped in 2026-11, #47.)
+2. **Self-hosted assets** — vendoring Leaflet/Tailwind/fonts/logo would remove CDN
    dependence and fix the `file://` experience. (Beyond the TOA logo, the favicon and
    `og:image` are also hot-linked — from the-open-accelerator.com and people.redhat.com.)
-4. **Tailwind Play CDN** prints a console warning about production use; if it ever
+3. **Tailwind Play CDN** prints a console warning about production use; if it ever
    matters, precompile or drop it (most styling is hand-written CSS anyway).
 
 *(Resolved 2026-08-28: README/CONTRIBUTING described a GitHub Pages deploy path that was
