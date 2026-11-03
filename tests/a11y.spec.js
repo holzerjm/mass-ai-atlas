@@ -134,16 +134,21 @@ for(const scan of SCANS){
   });
 }
 
-// #58: the atlas page had two footers outside any sectioning element and no <main>, so screen
-// readers listed two contentinfo landmarks with nothing to tell them apart, and no main one. The
-// views and the atlas's own footer are now inside <main>, which leaves the TOA site footer as the
-// page's one contentinfo. axe rates both rules moderate, and the gate above reports moderate
-// findings without failing on them, so this test checks the two rules on their own.
-test("the atlas page has one footer landmark and a main landmark", async ({ page }) => {
+// The atlas page's landmarks, which screen readers list for jumping around a page. Until 2026-11
+// it had two footers and two headers outside any sectioning element and no <main>, so it listed
+// two contentinfo and two banner landmarks with nothing to tell them apart, and no main one; its
+// two <nav>s had no names either (#58).
+// - The views and the atlas's own footer are inside <main>, so the TOA site footer is the one
+//   contentinfo.
+// - The hero is a section named by the page's title, so the TOA site header is the one banner.
+// - Each <nav> has a name.
+// axe rates all four rules moderate, and the gate above reports moderate findings without
+// failing on them, so this test checks the four on their own.
+test("the atlas page has one banner, one main and one footer landmark, each told apart", async ({ page }) => {
   await page.goto("./");
   await waitForApp(page);
   const { violations } = await new AxeBuilder({ page })
-    .withRules(["landmark-no-duplicate-contentinfo", "landmark-one-main"])
+    .withRules(["landmark-no-duplicate-contentinfo", "landmark-one-main", "landmark-no-duplicate-banner", "landmark-unique"])
     .analyze();
   expect(violations.map(v => `${v.id}: ${v.nodes.length} node(s)`)).toEqual([]);
 });

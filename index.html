@@ -501,7 +501,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     <a href="https://the-open-accelerator.com/" class="flex items-center gap-3 z-50">
       <img id="header-logo" src="https://the-open-accelerator.com/images/toa-white.png" alt="The Open Accelerator" class="h-10 w-auto">
     </a>
-    <nav class="hidden lg:flex items-center gap-5">
+    <nav class="hidden lg:flex items-center gap-5" aria-label="The Open Accelerator">
       <a href="https://the-open-accelerator.com/about-why.html" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">About<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
       <a href="https://the-open-accelerator.com/residency/" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">Residency<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
       <a href="https://the-open-accelerator.com/community/" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">Community<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
@@ -543,10 +543,15 @@ browse the <a href="e/">full organization index</a> or use the open dataset
   <a href="https://the-open-accelerator.com/TOAhack/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Help us</a>
 </div>
 
-<header class="hero">
+<!-- A <section> named by the page's title, not a <header>: as a <header> outside <main> it was a
+     second banner landmark beside the TOA site header (until 2026-11). It can't move into <main>,
+     because the sticky view tabs come between it and the views, and on a short phone the tabs
+     would stop sticking at the foot of <main>. As a named section it is a region landmark, so its
+     content still sits in a landmark. -->
+<section class="hero" aria-labelledby="atlasTitle">
   <div class="hero-inner">
     <div class="brand">
-      <h1>Mass <span>AI Atlas</span></h1>
+      <h1 id="atlasTitle">Mass <span>AI Atlas</span></h1>
     </div>
     <p class="eyebrow">Presented by The Open Accelerator · an initiative between the MA AI Hub, Red Hat &amp; IBM</p>
     <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br>Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br>Your contributions make this a valuable resource. Meet the <a href="credits/">mapmakers</a>.</p>
@@ -556,9 +561,9 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     </div>
     <div class="stats" id="stats"></div>
   </div>
-</header>
+</section>
 
-<nav class="nav">
+<nav class="nav" aria-label="Atlas views">
   <div class="nav-inner">
     <button class="tab active" data-view="map"><span class="ico">🗺️</span>Map</button>
     <button class="tab" data-view="galaxy"><span class="ico">✨</span>Galaxy</button>
