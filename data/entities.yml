@@ -2852,13 +2852,13 @@
 - id: aiweek
   name: Boston AI Week
   cat: event
-  loc: Statewide · Sept 16–Oct 28, 2026
+  loc: Statewide · Sept 16–Oct 28, 2027
   lat: 42.3554
   lng: -71.0603
   url: https://aiweek.boston
-  badge: 232+ events
+  badge: 252 events in 2026
   approx: true
-  desc: Statewide AI festival built from independently hosted events — talks, workshops, demo nights and hackathons — with Boston's Seaport as the hub neighborhood. The 2026 run was Sept 16 to Oct 28, with a core week Sept 24 to Oct 2. Free to attend, and most individual events are free. The 2025 edition drew 15,000+ participants to 125+ events.
+  desc: Statewide AI festival built from independently hosted events — talks, workshops, demo nights and hackathons — with Boston's Seaport as the hub neighborhood. The 2027 run is Sept 16 to Oct 28, with a core week Sept 24 to Oct 1. Free to attend, and most individual events are free. In 2026, 193 organizations ran 252 events, and 23 countries took part.
   why: The week the whole Massachusetts AI ecosystem is in one place — plan launches, hiring and investor meetings around it. Any Massachusetts host can list an event on the official calendar for free, approved on a rolling basis, so you can run your own demo night inside the program.
   tags: [events, hackathons, founders]
   stages: [1, 2, 4, 5]
