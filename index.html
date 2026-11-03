@@ -572,6 +572,14 @@ browse the <a href="e/">full organization index</a> or use the open dataset
   </div>
 </nav>
 
+<!-- The views, the drawer and the atlas's own footer are the page's main content. Inside <main>
+     that footer is not a page landmark, so the TOA site footer below is the page's one footer
+     (contentinfo); until 2026-11 screen readers listed two, with nothing to tell them apart
+     (#58). Keep that footer's opening tag exactly as it is, and never quote it in a comment:
+     scripts/build-events-page.js finds the footer by that exact text and copies it to the events
+     page, where it is the footer. <main> starts after the view tabs, because their sticky bar
+     would stop sticking where <main> ends. -->
+<main>
 <section id="view-map" class="view view-full active">
   <div class="cat-bar" id="mapCatBar" role="group" aria-labelledby="mapCatLabel">
     <span class="cat-bar-label" id="mapCatLabel">Categories</span>
@@ -668,6 +676,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     Meet the <a href="credits/">mapmakers</a> whose work is in the atlas.
   </div>
 </footer>
+</main>
 
 <!-- ============ STANDARD TOA SITE FOOTER ============ -->
 <footer class="py-16 text-center text-gray-500 text-sm relative z-10 border-t border-white/10">

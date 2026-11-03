@@ -153,6 +153,7 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | both footers link to the credits page | the events page's copy of the footer pointing one folder too deep. `scripts/build-events-page.js` rewrites that link |
 | `a11y.spec.js` | axe on each view | see below |
 | | every allowlist entry is scoped | a `KNOWN_SERIOUS` entry with no `within`, which would tolerate its rule on every element of that page, including ones added later |
+| | one footer landmark and a main landmark | the atlas page listing two footers again, or losing its main landmark (#58). Screen readers listed two contentinfo landmarks with nothing to tell them apart, and no main one, until 2026-11. The views and the atlas's own footer now sit in `<main>`, so the TOA site footer is the page's one footer. axe rates both rules moderate, which the gate reports without failing, so this test runs `landmark-no-duplicate-contentinfo` and `landmark-one-main` on their own |
 
 ### Rules every test gets for free
 
