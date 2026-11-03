@@ -84,6 +84,9 @@ const scriptEnd = src.indexOf("</script>", src.indexOf("updateLogos(document.doc
 const chromeJs = src.slice(scriptStart, scriptEnd + "</script>".length)
   .replace("if(typeof setMapTiles==='function')setMapTiles();", "");
 
+// The page's own content is its <main> (class "wrap"), between the site header (banner) and the
+// atlas's footer (contentinfo). Until 2026-11 it was a <div>, so the page had no main landmark
+// and its content sat outside every landmark.
 const page = `<!doctype html>
 <!-- GENERATED FILE — do not edit by hand. Rebuild with: node scripts/build-events-page.js (see docs/events-guide.md) -->
 <html lang="en" class="dark">
@@ -168,7 +171,7 @@ ${footerCss}
 <body>
 ${header}</header>
 ${mobileNav}
-<div class="wrap">
+<main class="wrap">
   <p class="eyebrow">The Open Accelerator · Mass AI Atlas</p>
   <h1>Boston AI Events</h1>
   <p class="stand">Every AI community event we can find across Greater Boston for the next
@@ -197,7 +200,7 @@ ${mobileNav}
     Luma's Boston AI feed, and <a style="color:var(--faint)" href="https://boston.aitinkerers.org/">AI Tinkerers Boston</a> ·
     aggregation approach builds on <a style="color:var(--faint)" href="https://github.com/nkpng2k/startup-event-scraper">nkpng2k's startup-event-scraper</a> (Apache-2.0)
   </p>
-</div>
+</main>
 ${footer}</footer>
 <script>
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")

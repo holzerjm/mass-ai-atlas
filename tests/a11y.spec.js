@@ -152,3 +152,16 @@ test("the atlas page has one banner, one main and one footer landmark, each told
     .analyze();
   expect(violations.map(v => `${v.id}: ${v.nodes.length} node(s)`)).toEqual([]);
 });
+
+// The events page had no <main>, so its content sat outside every landmark (until 2026-11). Its
+// content is now its <main>, between the site header and the atlas's footer. The page is built
+// by scripts/build-events-page.js, so that is where the <main> lives. The test runs on the
+// events feed fixture, so the list is there to be scanned.
+test("the events page has one banner, one main and one footer landmark, and nothing outside them", async ({ page }) => {
+  await page.goto("./events/");
+  await expect(page.locator("#list .ev").first()).toBeVisible();
+  const { violations } = await new AxeBuilder({ page })
+    .withRules(["landmark-one-main", "region", "landmark-no-duplicate-banner", "landmark-no-duplicate-contentinfo", "landmark-unique"])
+    .analyze();
+  expect(violations.map(v => `${v.id}: ${v.nodes.length} node(s)`)).toEqual([]);
+});

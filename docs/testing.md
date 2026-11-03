@@ -154,6 +154,7 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | `a11y.spec.js` | axe on each view | see below |
 | | every allowlist entry is scoped | a `KNOWN_SERIOUS` entry with no `within`, which would tolerate its rule on every element of that page, including ones added later |
 | | one banner, one main and one footer landmark, each told apart | the atlas page's landmarks going wrong again (#58). Until 2026-11 screen readers listed two contentinfo and two banner landmarks with nothing to tell them apart, and no main one, and its two `<nav>`s had no names. The views and the atlas's own footer now sit in `<main>`, so the TOA site footer is the page's one footer. The hero is a section named by the page's title, so the TOA site header is the one banner. Each `<nav>` has a name. axe rates the four rules moderate, which the gate reports without failing, so this test runs `landmark-no-duplicate-contentinfo`, `landmark-one-main`, `landmark-no-duplicate-banner` and `landmark-unique` on their own |
+| | the events page's landmarks | the events page losing its main landmark again. Until 2026-11 its content was a `<div>`, so the page had no main landmark and its content sat outside every landmark. `scripts/build-events-page.js` now writes it as the page's `<main>`. The test runs `landmark-one-main`, `region`, `landmark-no-duplicate-banner`, `landmark-no-duplicate-contentinfo` and `landmark-unique` on the page with the events fixture |
 
 ### Rules every test gets for free
 
