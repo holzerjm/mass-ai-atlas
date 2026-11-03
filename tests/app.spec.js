@@ -354,3 +354,46 @@ test.describe("the wheel over the map and the galaxy", () => {
     expect(await scale()).toBeGreaterThan(s0);
   });
 });
+
+// The map search's results took only a click until 2026-11, as the galaxy's did; both boxes
+// are now the same combobox. A pick still flies the map to the pin and opens its popup.
+test("the map search's results can be chosen with the arrow keys and Enter", async ({ page }) => {
+  const q = "ventures";
+  expect(DATA.filter(d => d.name.toLowerCase().includes(q)).length, `entries named "${q}"`).toBeGreaterThan(1);
+  await page.goto("./");
+  await waitForApp(page);
+  const input = page.locator("#mapSearch"), options = page.locator('#mapResults [role="option"][data-id]');
+  await input.fill(q);
+  await expect(page.locator("#mapResults")).toBeVisible();
+  await expect(input).toHaveAttribute("aria-expanded", "true");
+  await input.press("ArrowDown");
+  await input.press("ArrowDown");
+  const second = options.nth(1), id = await second.getAttribute("data-id");
+  await expect(second).toHaveAttribute("aria-selected", "true");
+  await expect(input).toHaveAttribute("aria-activedescendant", await second.getAttribute("id"));
+  await input.press("Enter");
+  await expect(page.locator("#mapResults")).toBeHidden();
+  await expect(input).toHaveAttribute("aria-expanded", "false");
+  await expect(input).toHaveValue(DATA.find(d => d.id === id).name);
+  await expect.poll(() => page.evaluate(id => markers[id].isPopupOpen(), id), "the pin's popup").toBe(true);
+  expect(await page.evaluate(() => map.getZoom())).toBe(15);
+});
+
+// The Founder Journey's organizations were spans that took only a click until 2026-11. As
+// buttons, Tab reaches them from the Journey's tab, Enter opens one, and closing its drawer
+// puts focus back on it.
+test("the Founder Journey's organizations can be reached with Tab and opened with Enter", async ({ page }) => {
+  await page.goto("./#journey");
+  await waitForApp(page);
+  const chip = page.locator("#jrPanel .chip").first(), name = (await chip.textContent()).trim();
+  await page.locator('.tab[data-view="journey"]').focus();
+  const onChip = () => page.evaluate(() => document.activeElement.matches("#jrPanel .chip"));
+  for(let i = 0; i < 30 && !(await onChip()); i++) await page.keyboard.press("Tab");
+  await expect(chip).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#drawer")).toHaveClass(/\bopen\b/);
+  await expect(page.locator("#drName")).toHaveText(name);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#drawer")).not.toHaveClass(/\bopen\b/);
+  await expect(chip).toBeFocused();
+});

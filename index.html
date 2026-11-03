@@ -262,7 +262,7 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
   padding:7px 13px;border-radius:99px;font-size:13px;cursor:pointer;transition:.15s}
 .chip:hover{transform:translateY(-1px);border-color:rgba(148,163,255,.45);box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .chip .lg-dot{width:8px;height:8px}
-button.chip{font-family:inherit;color:inherit;line-height:inherit}
+button.chip{font-family:inherit;color:inherit;line-height:inherit;text-align:inherit}
 
 /* ---------- DIRECTORY ---------- */
 .dir-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
@@ -577,8 +577,10 @@ browse the <a href="e/">full organization index</a> or use the open dataset
   <div class="map-wrap">
     <div id="map"></div>
     <div class="map-search">
-      <input id="mapSearch" type="text" placeholder="Search the ecosystem…" autocomplete="off">
-      <div class="map-results" id="mapResults"></div>
+      <input id="mapSearch" type="text" placeholder="Search the ecosystem…" autocomplete="off"
+        role="combobox" aria-label="Search the ecosystem" aria-autocomplete="list"
+        aria-expanded="false" aria-controls="mapResults">
+      <div class="map-results" id="mapResults" role="listbox" aria-label="Matching organizations"></div>
     </div>
     <div class="zoom-hint" aria-hidden="true">Hold <span class="zoom-key">Ctrl</span> and scroll to zoom the map</div>
     <div class="map-view-switch" role="group" aria-label="Map area">
@@ -1147,6 +1149,45 @@ function buildCatBar(bar, shown, onToggle){
     bar.appendChild(b);
   });
 }
+// The search boxes over the map and the galaxy, each a WAI-ARIA combobox: the results are a
+// listbox that the arrow keys move through and Enter picks from, as a click does, and Escape
+// closes it. Until 2026-11 only a mouse could pick a result. find(q) returns the entries that
+// match the lowercased query (the first eight are listed), pick(id) acts on the one picked,
+// and cleared(), if given, runs when the box is emptied. Returns close(), to shut the list.
+function searchBox(inp, res, prefix, find, pick, cleared){
+  let active = -1;
+  const opts = () => [...res.querySelectorAll('[role="option"][data-id]')];
+  function setActive(i){
+    const o = opts(); active = i;
+    o.forEach((el,k)=>el.setAttribute("aria-selected", String(k===i)));
+    if(o[i]){ inp.setAttribute("aria-activedescendant", o[i].id); o[i].scrollIntoView({block:"nearest"}); }
+    else inp.removeAttribute("aria-activedescendant");
+  }
+  function close(){ res.classList.remove("open"); inp.setAttribute("aria-expanded", "false"); setActive(-1); }
+  function choose(id){ close(); inp.value = byId[id].name; pick(id); }
+  inp.addEventListener("input", ()=>{
+    const q = inp.value.trim().toLowerCase();
+    if(!q){ close(); res.innerHTML=""; if(cleared) cleared(); return; }
+    res.innerHTML = find(q).slice(0,8).map(d=>
+      `<div role="option" id="${prefix}-${d.id}" data-id="${d.id}" aria-selected="false"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</div>`).join("")
+      || `<div role="option" aria-disabled="true" style="color:var(--muted)">No matches</div>`;
+    res.classList.add("open"); inp.setAttribute("aria-expanded", "true"); setActive(-1);
+    res.querySelectorAll("div[data-id]").forEach(el=>{
+      el.addEventListener("click", ()=>choose(el.dataset.id));
+    });
+  });
+  inp.addEventListener("keydown", e=>{
+    const o = opts(), open = res.classList.contains("open");
+    if((e.key==="ArrowDown" || e.key==="ArrowUp") && open && o.length){
+      e.preventDefault();
+      setActive(e.key==="ArrowDown" ? Math.min(active+1, o.length-1) : Math.max(active-1, 0));
+    } else if(e.key==="Enter" && open && o.length){
+      e.preventDefault();
+      choose(o[Math.max(active, 0)].dataset.id);   // Enter with no result chosen takes the first
+    } else if(e.key==="Escape") close();
+  });
+  return { close };
+}
 // OpenFreeMap vector basemap via maplibre-gl-leaflet — keyless, unlimited,
 // commercial use permitted. Leaflet stays the map engine; only the base layer
 // renders through MapLibre GL. Fallback style host if OpenFreeMap ever
@@ -1305,30 +1346,21 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   // second line on narrower screens, so tell Leaflet whenever the map's box changes size.
   new ResizeObserver(()=>{ if(currentView==="map") map.invalidateSize(); }).observe(map.getContainer());
 
-  // search
-  const inp = $("mapSearch"), res = $("mapResults");
-  inp.addEventListener("input", ()=>{
-    const q = inp.value.trim().toLowerCase();
-    if(!q){ res.classList.remove("open"); res.innerHTML=""; return; }
-    const hits = DATA.filter(d =>
+  // search: a pick flies the map to the pin and opens its popup
+  const search = searchBox($("mapSearch"), $("mapResults"), "mapr",
+    q => DATA.filter(d =>
       d.name.toLowerCase().includes(q) ||
       (d.tags||[]).some(t=>t.toLowerCase().includes(q)) ||
       d.desc.toLowerCase().includes(q) ||
-      cLabel(d.cat).toLowerCase().includes(q)
-    ).slice(0,8);
-    res.innerHTML = hits.map(d=>
-      `<div data-id="${d.id}"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</div>`).join("")
-      || `<div style="color:var(--muted)">No matches</div>`;
-    res.classList.add("open");
-    res.querySelectorAll("div[data-id]").forEach(el=>{
-      el.addEventListener("click", ()=>{
-        res.classList.remove("open"); inp.value = byId[el.dataset.id].name;
-        mapGoTo([byId[el.dataset.id].lat, byId[el.dataset.id].lng], 15);
-        setTimeout(()=>markers[el.dataset.id].openPopup(), 950);
-      });
+      cLabel(d.cat).toLowerCase().includes(q)),
+    id => {
+      // The popup opens when the flight ends. Until 2026-11 a 950 ms timer opened it, and when
+      // a busy machine finished the 900 ms flight late, the pin was still inside a cluster,
+      // where openPopup() does nothing, so no popup appeared.
+      map.once("moveend", ()=>markers[id].openPopup());
+      mapGoTo([byId[id].lat, byId[id].lng], 15);
     });
-  });
-  document.addEventListener("click", e=>{ if(!e.target.closest(".map-search")) res.classList.remove("open"); });
+  document.addEventListener("click", e=>{ if(!e.target.closest(".map-search")) search.close(); });
 })();
 
 /* ---------- galaxy ---------- */
@@ -1708,46 +1740,14 @@ function gxFocusOn(id){
   gxEnergy = Math.max(gxEnergy, 0.3);
   gxTreeCurrent(id);   // so the keyboard list carries on from the organization the search found
 }
-// The results are a listbox that the arrow keys move through and Enter picks from, as a click
-// does (the WAI-ARIA combobox). Until 2026-11 only a mouse could pick a result.
 (function initGxSearch(){
-  const inp = $("gxSearch"), res = $("gxResults");
-  let active = -1;
-  const opts = () => [...res.querySelectorAll('[role="option"][data-id]')];
-  function setActive(i){
-    const o = opts(); active = i;
-    o.forEach((el,k)=>el.setAttribute("aria-selected", String(k===i)));
-    if(o[i]){ inp.setAttribute("aria-activedescendant", o[i].id); o[i].scrollIntoView({block:"nearest"}); }
-    else inp.removeAttribute("aria-activedescendant");
-  }
-  function close(){ res.classList.remove("open"); inp.setAttribute("aria-expanded", "false"); setActive(-1); }
-  function pick(id){ close(); inp.value = byId[id].name; gxFocusOn(id); }
-  inp.addEventListener("input", ()=>{
-    const q = inp.value.trim().toLowerCase();
-    if(!q){ close(); res.innerHTML=""; gxLocked = null; return; }
-    const hits = DATA.filter(d =>
-      d.name.toLowerCase().includes(q) || (d.tags||[]).some(t=>t.toLowerCase().includes(q))
-    ).slice(0,8);
-    res.innerHTML = hits.map(d=>
-      `<div role="option" id="gxr-${d.id}" data-id="${d.id}" aria-selected="false"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</div>`).join("")
-      || `<div role="option" aria-disabled="true" style="color:var(--muted)">No matches</div>`;
-    res.classList.add("open"); inp.setAttribute("aria-expanded", "true"); setActive(-1);
-    res.querySelectorAll("div[data-id]").forEach(el=>{
-      el.addEventListener("click", ()=>pick(el.dataset.id));
-    });
-  });
-  inp.addEventListener("keydown", e=>{
-    const o = opts(), open = res.classList.contains("open");
-    if((e.key==="ArrowDown" || e.key==="ArrowUp") && open && o.length){
-      e.preventDefault();
-      setActive(e.key==="ArrowDown" ? Math.min(active+1, o.length-1) : Math.max(active-1, 0));
-    } else if(e.key==="Enter" && open && o.length){
-      e.preventDefault();
-      pick(o[Math.max(active, 0)].dataset.id);   // Enter with no result chosen takes the first
-    } else if(e.key==="Escape") close();
-  });
+  const inp = $("gxSearch");
+  const search = searchBox(inp, $("gxResults"), "gxr",
+    q => DATA.filter(d =>
+      d.name.toLowerCase().includes(q) || (d.tags||[]).some(t=>t.toLowerCase().includes(q))),
+    gxFocusOn, ()=>{ gxLocked = null; });
   document.addEventListener("keydown", e=>{
-    if(e.key==="Escape" && gxLocked){ gxLocked = null; inp.value = ""; close(); if(gxTipHow==="touch") gxHideTip(); }
+    if(e.key==="Escape" && gxLocked){ gxLocked = null; inp.value = ""; search.close(); if(gxTipHow==="touch") gxHideTip(); }
   });
 })();
 gxCanvas.addEventListener("wheel", e=>{
@@ -1914,10 +1914,11 @@ function renderJourney(){
   let html = `<h3>${s.icon} ${s.t} — ${s.s}</h3><div class="jr-desc">${s.desc}</div>`;
   html += `<div class="jr-tips">` + s.tips.map(([b,t])=>`<div class="jr-tip"><b>${b}</b>${t}</div>`).join("") + `</div>`;
   const order = ["community","space","accel","university","student","event","angel","vc","gov","corporate","startup"];
+  // buttons, so the keyboard can open them too: until 2026-11 they were spans that took only a click
   order.filter(c=>groups[c]).forEach(c=>{
     html += `<div class="jr-group"><h4 style="color:${cColor(c)}">${cLabel(c)}</h4><div class="chips">` +
       groups[c].sort((a,b)=>a.name.localeCompare(b.name)).map(d=>
-        `<span class="chip" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(c)};background:${cColor(c)}"></span>${esc(d.name)}</span>`).join("") +
+        `<button type="button" class="chip" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(c)};background:${cColor(c)}"></span>${esc(d.name)}</button>`).join("") +
       `</div></div>`;
   });
   $("jrPanel").innerHTML = html;
