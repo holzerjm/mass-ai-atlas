@@ -208,7 +208,7 @@ html:not(.dark) .gx-search .map-results{background:rgba(10,15,30,.97);color:#e6e
 .pop-colocated{font-size:12px;color:var(--muted);line-height:1.45;margin:-2px 0 8px}
 .pop-colocated a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
 .pop-btn{display:inline-block;font-size:12px;font-weight:700;color:#000;background:linear-gradient(90deg,#ffd54f,#ffc600);
-  padding:6px 12px;border-radius:8px;cursor:pointer;text-decoration:none}
+  padding:6px 12px;border-radius:8px;cursor:pointer;text-decoration:none;border:0;font-family:inherit;line-height:inherit;text-align:inherit}
 .pulse-dot{border-radius:50%;box-shadow:0 0 10px 2px currentColor;border:2px solid rgba(255,255,255,.75)}
 .cluster-chip{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
   font:700 13px/1 'Red Hat Display',sans-serif;background:rgba(20,23,28,.92);color:#fff;
@@ -239,14 +239,15 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
 .jr-head{margin:8px 0 4px;font-size:24px;font-weight:800}
 .jr-sub{color:var(--muted);font-size:14px;margin-bottom:24px;max-width:720px;line-height:1.55}
 .stepper{display:flex;gap:0;margin-bottom:28px;overflow-x:auto;padding-bottom:6px}
-.step{flex:1;min-width:150px;position:relative;cursor:pointer;padding:14px 12px 12px;border-radius:14px;border:1px solid transparent;transition:.18s;text-align:center}
+.step{flex:1;min-width:150px;position:relative;cursor:pointer;padding:14px 12px 12px;border-radius:14px;border:1px solid transparent;transition:.18s;text-align:center;
+  font-family:inherit;font-size:inherit;color:inherit;line-height:inherit;background:transparent}
 .step:hover{background:rgba(148,163,255,.06)}
 .step.active{background:var(--panel);border-color:var(--line)}
 .step-num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;margin:0 auto 8px;
   font-weight:800;font-size:14px;background:var(--panel2);color:var(--muted);border:2px solid var(--line);transition:.18s}
 .step.active .step-num{background:linear-gradient(135deg,#ffd54f,#ffc600);color:#000;border-color:transparent;box-shadow:0 0 18px rgba(255,198,0,.5)}
-.step-title{font-size:13.5px;font-weight:700}
-.step-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.step-title{display:block;font-size:13.5px;font-weight:700}
+.step-sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
 .step::after{content:"";position:absolute;top:30px;right:-2px;width:4px;height:4px;border-radius:50%;background:var(--line)}
 .step:last-child::after{display:none}
 .jr-panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px}
@@ -272,7 +273,8 @@ button.chip{font-family:inherit;color:inherit;line-height:inherit;text-align:inh
 .dir-select{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px 14px;font-size:13.5px;outline:none}
 .cat-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
 .cat-chip{display:inline-flex;gap:7px;align-items:center;border:1px solid var(--line);background:var(--panel);
-  color:var(--muted);padding:7px 14px;border-radius:99px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;user-select:none}
+  color:var(--muted);padding:7px 14px;border-radius:99px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;user-select:none;
+  font-family:inherit;line-height:inherit;text-align:inherit}
 .cat-chip:hover{color:var(--text)}
 .cat-chip.on{color:var(--text);border-color:currentColor;background:rgba(148,163,255,.07)}
 .dir-count{font-size:13px;color:var(--muted);margin-bottom:14px}
@@ -616,7 +618,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 <section id="view-journey" class="view">
   <h2 class="jr-head">The Founder Journey</h2>
   <p class="jr-sub">Massachusetts' ecosystem mapped to where <em>you</em> are. Pick your stage — every resource below is curated for that moment, with a reason why it matters.</p>
-  <div class="stepper" id="stepper"></div>
+  <div class="stepper" id="stepper" role="group" aria-label="Your founder stage"></div>
   <div class="jr-panel" id="jrPanel"></div>
 </section>
 
@@ -1130,6 +1132,7 @@ window.goToMap = goToMap;
 
 /* ---------- map ---------- */
 let map, markers = {}, mapTiles, clusterGroup, flatGroup, clustered = true;
+const pinOf = new WeakMap();   // a pin's popup → the pin, to give the focus back on close
 try{ clustered = localStorage.getItem("toa-atlas-cluster") !== "off"; }catch(e){}
 const activeCats = new Set(Object.keys(CATS));
 // The row of category buttons above the map and the galaxy: one real button per category,
@@ -1325,12 +1328,36 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
       `<div class="pop-desc">${esc(d.desc.length>140 ? d.desc.slice(0,140)+"…" : d.desc)}</div>`+
       (colocated[d.id].length ? `<div class="pop-colocated">Also here: ${colocated[d.id].map(o =>
         `<a href="?entry=${o.id}" onclick="openDrawer('${o.id}');return false">${esc(o.name)}</a>`).join(", ")}</div>` : "")+
-      `<span class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</span>`,
+      `<button type="button" class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</button>`,
       {maxWidth:260});
+    pinOf.set(m.getPopup(), m);
     pinGroup().addLayer(m);
     markers[d.id] = m;
   });
   map.addLayer(pinGroup());
+
+  // A pin's popup takes the focus when it opens, so the keyboard reaches "Full details →".
+  // Leaflet puts popups after every pin in the tab order, and a search pick leaves the focus in
+  // the search box, so until 2026-11 the button was out of a keyboard's reach. Closing the
+  // popup, or Escape inside it, gives the focus back: to where it was, or to the pin when that
+  // place has been hidden (Show on map comes from a drawer over another view).
+  let popupFrom = null;
+  map.on("popupopen", e=>{
+    const btn = e.popup.getElement().querySelector(".pop-btn");
+    if(!btn) return;
+    popupFrom = document.activeElement;
+    btn.focus({preventScroll:true});
+  });
+  map.on("popupclose", e=>{
+    const from = popupFrom, el = e.popup.getElement(), now = document.activeElement;
+    popupFrom = null;
+    if(now !== document.body && !(el && el.contains(now))) return;   // the focus has moved on
+    const pin = pinOf.get(e.popup), back = from && from !== document.body && from.offsetParent ? from : pin && pin.getElement();
+    if(back) back.focus({preventScroll:true});
+  });
+  map.getContainer().addEventListener("keydown", e=>{
+    if(e.key === "Escape" && e.target.closest(".leaflet-popup")) map.closePopup();
+  });
 
   // apply the remembered preset now the pins are on the map (no animation on load)
   applyMapView(mapView, false);
@@ -1896,15 +1923,20 @@ function gxKeepInView(n){
 
 /* ---------- journey ---------- */
 let jrStage = 1;
+// The stages are buttons that say which one is chosen (aria-pressed), so the keyboard can pick
+// one too: until 2026-11 they were divs that took only a click, and the keyboard could see
+// only stage 1. Redrawing them removes the button just pressed, so its focus moves to the new one.
 function renderStepper(){
-  $("stepper").innerHTML = STAGES.map(s=>
-    `<div class="step ${s.n===jrStage?'active':''}" data-n="${s.n}">
-      <div class="step-num">${s.n===jrStage?s.icon:s.n}</div>
-      <div class="step-title">${s.t}</div>
-      <div class="step-sub">${s.s}</div>
-    </div>`).join("");
-  $("stepper").querySelectorAll(".step").forEach(el=>
+  const st = $("stepper"), hadFocus = st.contains(document.activeElement);
+  st.innerHTML = STAGES.map(s=>
+    `<button type="button" class="step ${s.n===jrStage?'active':''}" data-n="${s.n}" aria-pressed="${s.n===jrStage}">
+      <span class="step-num">${s.n===jrStage?s.icon:s.n}</span>
+      <span class="step-title">${s.t}</span>
+      <span class="step-sub">${s.s}</span>
+    </button>`).join("");
+  st.querySelectorAll(".step").forEach(el=>
     el.addEventListener("click", ()=>{ jrStage=+el.dataset.n; renderStepper(); renderJourney(); }));
+  if(hadFocus) st.querySelector(`.step[data-n="${jrStage}"]`).focus();
 }
 function renderJourney(){
   const s = STAGES.find(x=>x.n===jrStage);
@@ -1956,18 +1988,23 @@ let dirOpenOnly = false;      // ⏳ hard constraint: is this org accepting appl
     const o=document.createElement("option"); o.value=s.n; o.textContent=`${s.icon} Stage ${s.n}: ${s.t}`;
     $("dirStage").appendChild(o);
   });
-  // category chips
+  // category chips: buttons that say whether their category is shown (aria-pressed), as the
+  // "I need…" chips do. Until 2026-11 they were spans that took only a click.
   const cc=$("catChips");
   Object.entries(CATS).forEach(([k,v])=>{
-    const el=document.createElement("span");
-    el.className="cat-chip on"; el.style.color=v.color; el.dataset.cat=k;
+    const el=document.createElement("button");
+    el.type="button"; el.className="cat-chip on"; el.style.color=v.color; el.dataset.cat=k;
+    el.setAttribute("aria-pressed","true");
     el.innerHTML=`<span class="lg-dot" style="background:${v.color};color:${v.color}"></span>${v.label}`;
     el.addEventListener("click",()=>{
       // if all on, clicking isolates; else toggle
       if(dirCats.size===Object.keys(CATS).length){ dirCats.clear(); dirCats.add(k); }
       else if(dirCats.has(k)){ dirCats.delete(k); if(!dirCats.size) Object.keys(CATS).forEach(x=>dirCats.add(x)); }
       else dirCats.add(k);
-      cc.querySelectorAll(".cat-chip").forEach(c=>c.classList.toggle("on", dirCats.has(c.dataset.cat)));
+      cc.querySelectorAll(".cat-chip").forEach(c=>{
+        const on = dirCats.has(c.dataset.cat);
+        c.classList.toggle("on", on); c.setAttribute("aria-pressed", String(on));
+      });
       renderCards();
     });
     cc.appendChild(el);

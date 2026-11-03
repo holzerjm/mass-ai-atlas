@@ -397,3 +397,72 @@ test("the Founder Journey's organizations can be reached with Tab and opened wit
   await expect(page.locator("#drawer")).not.toHaveClass(/\bopen\b/);
   await expect(chip).toBeFocused();
 });
+
+// The Founder Journey's stages were divs that took only a click until 2026-11, so the keyboard
+// saw stage 1 and nothing else. As buttons they say which stage is chosen (aria-pressed), and
+// the focus stays on the chosen one when the stepper redraws.
+test("the Founder Journey's stages can be chosen by keyboard", async ({ page }) => {
+  await page.goto("./#journey");
+  await waitForApp(page);
+  const step = n => page.locator(`#stepper .step[data-n="${n}"]`);
+  await expect(step(1)).toHaveAttribute("aria-pressed", "true");
+  await step(1).focus();
+  await page.keyboard.press("Tab");
+  await expect(step(2)).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(step(2)).toHaveAttribute("aria-pressed", "true");
+  await expect(step(1)).toHaveAttribute("aria-pressed", "false");
+  await expect(step(2)).toBeFocused();
+  await expect(page.locator("#jrPanel h3")).toContainText(ATLAS.STAGES.find(s => s.n === 2).t);
+});
+
+// "Full details →" in a pin's popup was a span until 2026-11, and Leaflet puts popups after
+// every pin in the tab order, so the keyboard could not reach it. The popup now takes the
+// focus when it opens, and gives it back when it closes or Escape is pressed inside it.
+test("a pin's popup takes the focus, so the keyboard can open its details", async ({ page }) => {
+  await page.goto("./");
+  await waitForApp(page);
+  const input = page.locator("#mapSearch"), details = page.locator(".leaflet-popup .pop-btn");
+  await input.fill(entry.name);   // a pick flies to street zoom, where no pin is clustered
+  const ids = await page.locator('#mapResults [role="option"][data-id]').evaluateAll(els => els.map(el => el.dataset.id));
+  expect(ids, `${entry.name} among the results`).toContain(entry.id);
+  for(let i = 0; i <= ids.indexOf(entry.id); i++) await input.press("ArrowDown");
+  await input.press("Enter");
+  await expect(details).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#drName")).toHaveText(entry.name);
+  await page.keyboard.press("Escape");   // closes the drawer
+  await expect(details).toBeFocused();
+  await page.keyboard.press("Escape");   // then the popup
+  await expect(page.locator(".leaflet-popup")).toHaveCount(0);
+  await expect(input).toBeFocused();
+
+  // a pin opens its popup with Enter, and gets the focus back when the popup's × closes it
+  const pinFocused = () => page.evaluate(id => document.activeElement === markers[id].getElement(), entry.id);
+  await page.evaluate(id => markers[id].getElement().focus(), entry.id);
+  await page.keyboard.press("Enter");
+  await expect(details).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.locator(".leaflet-popup-close-button")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".leaflet-popup")).toHaveCount(0);
+  expect(await pinFocused(), "the focus back on the pin").toBe(true);
+});
+
+// The Directory's category chips were spans that took only a click until 2026-11. As buttons
+// they say which categories show (aria-pressed), as the "I need…" chips beside them do.
+test("the Directory's category chips work by keyboard and say which categories show", async ({ page }) => {
+  await page.goto("./#directory");
+  await waitForApp(page);
+  const cats = Object.keys(ATLAS.CATS).length, pressed = page.locator('#catChips .cat-chip[aria-pressed="true"]');
+  const first = page.locator("#catChips .cat-chip").first(), cat = await first.getAttribute("data-cat");
+  await expect(pressed).toHaveCount(cats);
+  await first.focus();
+  await page.keyboard.press("Enter");   // with every category showing, a chip shows its own alone
+  await expect(pressed).toHaveCount(1);
+  await expect(first).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#cards .card")).toHaveCount(DATA.filter(d => d.cat === cat).length);
+  await page.keyboard.press("Space");   // and turning that one off shows them all again
+  await expect(pressed).toHaveCount(cats);
+  await expect(page.locator("#cards .card")).toHaveCount(DATA.length);
+});
