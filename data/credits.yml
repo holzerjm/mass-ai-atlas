@@ -96,6 +96,33 @@ mapmakers:
       - { label: "PR #79", url: "https://github.com/holzerjm/mass-ai-atlas/pull/79" }
       - { label: "Issue #87", url: "https://github.com/holzerjm/mass-ai-atlas/issues/87" }
 
+  - github: arshmehar
+    team: TBTT
+    since: 2026-10-31
+    kinds: [data, research]
+    story: "Surveyed organizations' own pages with the team for connections the atlas was missing. That survey added 7 links, each backed by a sentence on the organization's page."
+    links:
+      - { label: "PR #120", url: "https://github.com/holzerjm/mass-ai-atlas/pull/120" }
+      - { label: "PR #80", url: "https://github.com/holzerjm/mass-ai-atlas/pull/80" }
+
+  - github: kartsen03
+    team: TBTT
+    since: 2026-10-31
+    kinds: [data, research]
+    story: "Surveyed organizations' own pages with the team for connections the atlas was missing. That survey added 7 links, each backed by a sentence on the organization's page."
+    links:
+      - { label: "PR #120", url: "https://github.com/holzerjm/mass-ai-atlas/pull/120" }
+      - { label: "PR #80", url: "https://github.com/holzerjm/mass-ai-atlas/pull/80" }
+
+  - github: bhoomig11
+    team: TBTT
+    since: 2026-10-31
+    kinds: [data, research]
+    story: "Surveyed organizations' own pages with the team for connections the atlas was missing. That survey added 7 links, each backed by a sentence on the organization's page."
+    links:
+      - { label: "PR #120", url: "https://github.com/holzerjm/mass-ai-atlas/pull/120" }
+      - { label: "PR #80", url: "https://github.com/holzerjm/mass-ai-atlas/pull/80" }
+
 milestones:
   - date: 2026-06-15
     title: "The first outside suggestions"
