@@ -113,7 +113,7 @@ the tables in Appendix A do this for you:
   GitHub file view, press **`/`** or `Ctrl/Cmd-F` and search the id).
 
 `offers` is **required** and needs at least one value — an entry without it is invisible to
-the Directory's "I need…" filter, so validation rejects it. Add a `badge:` line only if
+the "I need…" filter, so validation rejects it. Add a `badge:` line only if
 there's something to flag (an empty value is an error). `links` is optional — see
 Appendix A. For `added` **and** `lastVerified`, put **today's month** as
 `YYYY-MM` (e.g. `2026-08`) — the entry joins the atlas now, and you just verified
@@ -281,7 +281,7 @@ To keep those honest, do a small sweep about once a month:
    in **one PR**.
 
 `--cycle 12` sizes that list from the dataset, so it keeps pace as the atlas grows:
-every entry comes round within a year without anyone re-tuning a number. At 197
+every entry comes round within a year without anyone re-tuning a number. At 198
 entries that is **17 re-checks a month, about half an hour**. A fixed `--queue`
 quietly stops covering everything as soon as entries outrun it — at 13 a month it
 would now take **15 months** to come round, against a 12-month threshold.

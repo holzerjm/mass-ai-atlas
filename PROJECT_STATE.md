@@ -29,7 +29,7 @@ detail. The design brief was: *same domain, far more engaging and useful.*
 | View | What it does |
 |------|--------------|
 | 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; rows of category toggles and "I need…" and stage filters above it. The wheel scrolls the page; ⌘ or Ctrl + wheel zooms |
-| ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (170 cited edges across 114 entries as of 2026-10-11). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, a row of category toggles above it, and a search box that centers + locks any org's neighborhood. Drag/zoom/click. It opens fitted to its canvas, phones included; on a touch screen the first tap traces a node and the second opens it; the keyboard reaches every node through a tree of organizations by category, and the search's results take the arrow keys |
+| ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (179 cited edges across 129 entries as of 2026-11-04). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, a row of category toggles above it, and a search box that centers + locks any org's neighborhood. Drag/zoom/click. It opens fitted to its canvas, phones included; on a touch screen the first tap traces a node and the second opens it; the keyboard reaches every node through a tree of organizations by category, and the search's results take the arrow keys |
 | 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows curated tips plus every entry whose `stages` includes that number |
 | 📇 **Directory** | Card grid, word-by-word search, category chips, need and stage filters, sort. The map and the Directory share one set of filters, kept in the address (`?need=`, `?stage=`, `?open=`, `?cat=`, `?sort=`) |
 
@@ -128,8 +128,8 @@ stamps it automatically). Powers the "✨ New" chips, the once-a-month new-orgs 
 and the Directory's "Recently added" sort. Validator warns if missing, errors if
 malformed or future. Full reference: `CONTRIBUTING.md`; enforced by `data/entities.schema.yml` + `scripts/validate.js`.
 
-**Current composition (197 entries, 2026-10-11):** vc 48 · startup 35 · accel 20 ·
-university 19 · corporate 19 · student 13 · space 10 · gov 9 · community 9 · event 8 ·
+**Current composition (198 entries, 2026-11-04):** vc 48 · startup 35 · accel 20 ·
+university 19 · corporate 19 · student 13 · space 10 · community 10 · gov 9 · event 8 ·
 angel 7.
 (Startup bar raised 15 → 28 on 2026-09-01: a 20-candidate research list was independently
 verified by a 4-agent workflow — 13 passed, 4 held, 1 skipped for NYC HQ, 2 were dupes.)
@@ -269,7 +269,7 @@ GitHub Pages copy exists.
 
 ## 6. Status & known gaps
 
-**Done:** four views · 197 verified entries · TOA branding · GitHub contribution loop ·
+**Done:** four views · nearly 200 verified entries · TOA branding · GitHub contribution loop ·
 CI validation + live count shield · `validate` as a required status check on `main` ·
 auto-deploy on merge + Slack notifications · suggestion bot
 (issue → draft PR) · maintainer docs · CSV export · `lastVerified` freshness field + stale
