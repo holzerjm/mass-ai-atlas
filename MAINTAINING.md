@@ -465,14 +465,19 @@ the reasoning is open rather than a silent judgment.
 | **Lux Capital** | Listed until October 2026, then removed: its own contact page says New York and Silicon Valley, and no Massachusetts office could be found. It backs Massachusetts companies, but so do dozens of out-of-state funds; a pin implies a presence. |
 | **Y Combinator (Boston alumni)** | Listed until October 2026, then removed. Not an organisation with a Massachusetts presence but a category of founders: its `loc` read "Remote / SF (Boston-based founders)" and its `url` was a filtered list of YC companies rather than a front door. YC alumni belong in the atlas as their own entries — several already are. |
 | **Fennec Design Studio** | Self-submitted via the entry form, October 2026 (#48). Real, Grafton MA, and candid about its own method — but a paid consultancy, with packages priced from $17,000 for a two-to-three-week engagement. Out under the vendor rule, same as NineTwoThree. It also does not claim to be an AI organisation: it describes AI as speeding up synthesis rather than replacing judgment, and bills itself as workflow and systems consulting. Its founder perk for Open Accelerator companies belongs in the perks marketplace, not the atlas — see #51. |
+| **Crunchr** | Submitted through the entry form by someone at the company, November 2026 (#124). Real, with a US office in Boston since 2023, now at 1 Lincoln St, and not a vendor to founders: it sells to companies with 1,000+ employees. But it is headquartered in Amsterdam, the public evidence puts sales and customer success in Boston, and it calls itself a people analytics company, with AI as a product feature. The form's "Mentorship" was an informal offer to share lessons, with no program behind it. Revisit if it builds an AI engineering team here or starts a founder program. |
 
 The rules those add up to:
 
 - **A pin implies a presence.** An investor or company with no Massachusetts office
   does not get one, however active it is here.
+- **A sales office is a presence, not a home.** Companies are listed for what they
+  add here: they are based in Massachusetts, or they have research or engineering
+  teams here. A US sales or customer office of a company built elsewhere does not
+  qualify.
 - **AI has to be the org's own claim**, not an inference from one programme listing.
 - **The atlas lists what a founder can get, not who sells to them.** Agencies,
-  consultancies and vendors are out as a class.
+  consultancies and other vendors that sell to founders are out as a class.
 - **Being real and useful is not enough** — it also has to be AI-relevant and
   Massachusetts-based. Say so plainly when declining; a contributor who gets a
   reason can argue with it.
