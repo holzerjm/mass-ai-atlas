@@ -135,6 +135,25 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | the search's results take the arrow keys and Enter | the galaxy search taking only a click again. The arrow keys must move through the results (`aria-activedescendant`, `aria-selected`) and Enter must pick one and lock its constellation |
 | | the drawer's connections can be followed by keyboard | the drawer's "Connected to" entries going back to spans that take only a click, and focus going nowhere when a drawer reopened from inside itself is closed. Until 2026-11 it took the return point after the redraw had removed the button pressed, so focus fell to `<body>` |
 | | a hidden category leaves the keyboard list | a category hidden with its button still taking Tab in the galaxy's tree, or Tab's place staying in it |
+| `search.spec.js` | hyphens, plurals, and founders' words | the atlas's own spelling deciding what a founder finds again. "wet lab" must find LabCentral's "wet-lab", "women" must find January Ventures' "Woman-led", and a plural must match |
+| | a need finds every entry that offers it | a search that doesn't read `offers`. "grant" missed 8 of the 17 entries offering grants until 2026-11. "gpu", "pilot", and "mentor" must each find every entry with that offer |
+| | several words must all match | a short query turning into "any of these words". Each word may match anywhere in the entry |
+| | word starts, and short words whole | matching inside words. "robot" must find robotics, and "bu" must not match "built" |
+| | a sentence finds the closest entries | a founder's sentence finding nothing, as every sentence did until 2026-11, or a list that doesn't say it is only the closest. The count must say so, the sort must read "Best match", and each card must show what it matched on |
+| | no match, then Clear filters | a dead end. Clear filters must empty the search and bring every entry back |
+| | the three boxes share the search | the map's or the galaxy's box going back to its own matching |
+| | typed text stays out of the address | a founder's own sentence reaching a link, a server log, or an analytics beacon |
+| `filters.spec.js` | a filter goes into the address, and a reload keeps it | filters that vanish on reload and can't be shared, as they did until 2026-11 |
+| | a shared link sets every filter | a link losing a filter, or `?entry=` taking the filters with it when the drawer closes |
+| | unknown values are ignored | a mistyped link breaking the page or setting a filter that doesn't exist |
+| | the map shows what the Directory shows | the two views drifting apart. A need or a stage set in either must show in the other's controls, pins, and cards |
+| | a hidden category hides in both | the same for categories, which share one set too |
+| | a need frames the pins it leaves | a filter leaving the Boston view looking empty when most of what it left is elsewhere. Clear filters must return to the chosen view and move the focus to the first filter |
+| | a pin the filters hide can still be reached | a search or Show on map doing nothing because the pin is filtered out |
+| | the headline figures open the Directory | a figure and its link disagreeing. Each link's set must be the count it shows |
+| | on a phone, the map and the first card are on the first screen | the header filling a phone's first screen again (the map started 792 px down and the first card 1,428 px down, until 2026-11), or the sticky tabs going back to three rows |
+| | the menu button has no gray box | the browser's default button background returning behind the white menu icon (1.15:1), on the atlas and on the events page, which lifts the header from it |
+| | the hero's button | the hero promising an open application again. It said "Apply" while the residency page said applications had closed |
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
 | | `?list=` of unknown ids | a stale list link breaking the page |
 | `events.spec.js` | `/events/` loads and lists events | the events page breaking |

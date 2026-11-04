@@ -17,13 +17,14 @@ MA AI Hub, Red Hat & IBM).
 - 🗺️ **Map** — every VC, lab, accelerator and community pinned across Massachusetts
 - ✨ **Galaxy** — an animated network of how the ecosystem connects (spinouts, funds, hosts)
 - 🧭 **Founder Journey** — resources curated by stage, from first spark to scale
-- 📇 **Directory** — full-text search with category and stage filters
+- 📇 **Directory** — search in your own words, with category, need, and stage filters
 
 Each entry's drawer says what the organization offers founders, shows when a maintainer
 last verified it, and under **places to meet** lists the cafés, quick bites and quieter
 spots within a five-minute walk.
 Every entry and view is linkable — `?entry=csail` opens straight to an organization,
-`#galaxy` to a view (there's a 🔗 Copy link button in each entry's drawer).
+`#galaxy` to a view (there's a 🔗 Copy link button in each entry's drawer). Filters are
+linkable too: `?need=compute&stage=3` opens the map and the Directory with them set.
 
 > **Building on this as a template?** Start with [HACKATHON.md](HACKATHON.md): setup, the
 > architecture on one page, where to extend it, and what to change because it is still

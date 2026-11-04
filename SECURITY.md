@@ -51,6 +51,9 @@ behavior:
 - **There is no backend and no accounts.** No server-side code, no database, no login, no
   user data collected, no analytics. Everything a visitor does stays in their browser, in
   6 `localStorage` keys, all starting with `toa-atlas-`.
+- **The URL carries filters and ids, never what someone typed.** Filter values are checked
+  against the atlas's fixed lists and anything else is ignored. Text typed into a search box
+  stays out of the URL, so links and logs don't carry a founder's own words.
 - **No secret reaches the browser.** The deploy credentials and Slack webhooks are GitHub
   Actions secrets, used only inside CI.
 - **Untrusted input is gated by a human.** The suggestion bot runs only on the `bot:draft`

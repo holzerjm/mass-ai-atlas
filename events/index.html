@@ -136,13 +136,13 @@ tailwind.config = {
         <svg class="w-5 h-5 hidden dark:block text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         <svg class="w-5 h-5 block dark:hidden text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-gray-800 dark:text-white focus:outline-none" aria-label="Open Menu" aria-expanded="false" id="mobile-menu-btn">&#9776;</button>
+      <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-gray-800 dark:text-white bg-transparent border-0 focus:outline-none" aria-label="Open Menu" aria-expanded="false" id="mobile-menu-btn">&#9776;</button>
     </div>
   </div>
 </header></header>
 <!-- Mobile Nav Overlay -->
 <div id="mobile-nav" class="fixed inset-0 bg-white/95 dark:bg-dark-bg/95 z-[3000] flex flex-col items-center justify-center gap-6 transform translate-x-full transition-transform duration-300 lg:hidden backdrop-blur-sm">
-  <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-4xl text-gray-800 dark:text-white" aria-label="Close Menu">&times;</button>
+  <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-4xl text-gray-800 dark:text-white bg-transparent border-0" aria-label="Close Menu">&times;</button>
   <a href="https://the-open-accelerator.com/about-why.html" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">About</a>
   <a href="https://the-open-accelerator.com/residency/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Residency</a>
   <a href="https://the-open-accelerator.com/community/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Community</a>

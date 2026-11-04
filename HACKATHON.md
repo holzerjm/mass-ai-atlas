@@ -56,7 +56,7 @@ is deliberate, and it is why you can read the whole thing in an afternoon.
 
 When someone opens the page:
 
-1. The browser loads `index.html` — one hand-written file, HTML + CSS + vanilla JS, ~160 KB.
+1. The browser loads `index.html` — one hand-written file, HTML + CSS + vanilla JS, ~205 KB.
 2. It fetches six files from `data/`: three data files and their three JSON Schemas.
 3. `atlas-data.js` parses the YAML and validates every file **in the browser**.
 4. On failure the page shows a banner. On success the data becomes globals and the app runs.
@@ -67,12 +67,12 @@ build artifact in between.
 
 | Piece | What it is |
 |---|---|
-| `index.html` | the entire application, about 2,350 lines |
+| `index.html` | the entire application, about 2,600 lines |
 | `data/entities.yml` | the organizations, plus `categories.yml` (11) and `stages.yml` (5) |
 | `data/*.schema.yml` | JSON Schema for each — these are a safety control, not just a type check |
 | `atlas-data.js` | the shared loader, used by the page and by every script |
 | `scripts/` | validate, exports, link check, freshness rota, the events pipeline |
-| `tests/` | about 75 Playwright tests over the four views, deep links, the Galaxy on phones, keyboard use, the shortlist, events, credits, and accessibility in both themes |
+| `tests/` | about 95 Playwright tests over the four views, deep links, search, filters, the Galaxy on phones, keyboard use, the shortlist, events, credits, and accessibility in both themes |
 
 Map stack: Leaflet 1.9.4 with a MapLibre GL 5.24.0 vector basemap from OpenFreeMap (keyless),
 markercluster 1.5.3. All from CDNs — there is nothing to bundle.
@@ -90,7 +90,9 @@ a fifth means a section, a tab, and adding its name to the list in the on-load d
 
 **Filter differently.** `offers` is the interesting field: every entry declares 1–6 of
 `funding, grants, space, compute, mentorship, community, talent, customers`. That is what powers
-"I need…" — filtering by what an organization *gives* rather than what it is called.
+"I need…" — filtering by what an organization *gives* rather than what it is called. The map
+and the Directory share one set of filters, and `readFilters()` and `writeFilters()` keep them in
+the address. To teach the search a founder's word, add it to `SEARCH_SAME`.
 
 **Add a data source.** The events pipeline is the worked example: `events-sources.json` lists
 calendars, `scripts/fetch-events.js` pulls and screens them, `scripts/build-events-page.js`

@@ -28,10 +28,10 @@ detail. The design brief was: *same domain, far more engaging and useful.*
 
 | View | What it does |
 |------|--------------|
-| 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; a row of category toggles above it. The wheel scrolls the page; ⌘ or Ctrl + wheel zooms |
+| 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; rows of category toggles and "I need…" and stage filters above it. The wheel scrolls the page; ⌘ or Ctrl + wheel zooms |
 | ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (170 cited edges across 114 entries as of 2026-10-11). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, a row of category toggles above it, and a search box that centers + locks any org's neighborhood. Drag/zoom/click. It opens fitted to its canvas, phones included; on a touch screen the first tap traces a node and the second opens it; the keyboard reaches every node through a tree of organizations by category, and the search's results take the arrow keys |
 | 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows curated tips plus every entry whose `stages` includes that number |
-| 📇 **Directory** | Card grid, full-text search, category chips, stage filter, sort |
+| 📇 **Directory** | Card grid, word-by-word search, category chips, need and stage filters, sort. The map and the Directory share one set of filters, kept in the address (`?need=`, `?stage=`, `?open=`, `?cat=`, `?sort=`) |
 
 A detail **drawer** is shared by all views: description, "why it matters for founders",
 tags, stages, connected entries, website link, "show on map", **places to meet** (cafés,
@@ -117,7 +117,7 @@ neighbourhood-level · `lastVerified` is the month a maintainer last **actually 
 the org (validator warns if missing, errors if malformed; drawer shows "✓ Verified …",
 entries >12 months old get a stale marker). **Since 2026-08-30 ("decision tool" fields):**
 `offers` — 1-6 of a controlled 8-value vocabulary (funding · grants · space · compute ·
-mentorship · community · talent · customers) powering the Directory's "I need…" filter;
+mentorship · community · talent · customers) powering the "I need…" filter;
 `applyBy` — `"rolling"` or a `"YYYY-MM-DD"` deadline (past dates auto-hide in the app,
 validator warns until cleared/rolled); `applyNote` — short cohort label; `facts` — an
 optional 1-6-row [label, value] "at a glance" table (whitelisted labels). Tags are a
@@ -280,7 +280,8 @@ monthly health rails (link-check + verification rota → Slack) · events page (
 weekly Luma/AI-Tinkerers fetch) · founder stickiness: ★ shortlist (localStorage +
 `?list=` share links + print), ⚖ compare (up to 3 funders side-by-side), ✨ new-this-month
 (banner, chips, "Recently added" sort), 🎟 event ribbons on cards/drawer via `events.json` ·
-live at `/ecosystem/`.
+word-by-word search that takes a founder's sentence, and filters shared by the map and the
+Directory · live at `/ecosystem/`.
 
 **Open items / ideas, roughly by value:**
 

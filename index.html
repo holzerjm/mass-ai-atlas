@@ -125,6 +125,9 @@ html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 .tagline a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
 .hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .stats{display:flex;gap:26px;margin-top:18px;flex-wrap:wrap}
+a.stat{display:block;color:inherit;text-decoration:none}
+a.stat span{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
+a.stat:hover span{color:var(--text);text-decoration-color:currentColor}
 .stat b{font-size:22px;font-weight:800;display:block;background:linear-gradient(90deg,#cfe0ff,#9fb4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .stat span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px}
 
@@ -173,6 +176,17 @@ html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 .cat-btn[aria-pressed="false"] .lg-dot{background:transparent!important;box-shadow:none;border:1.5px solid currentColor}
 .lg-dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 8px currentColor}
 .cat-btn .lg-dot{width:9px;height:9px}
+/* What a founder needs and their stage: the Directory's filters, over the map as well */
+.map-filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.map-filters .need-chips{margin-top:0;gap:6px}
+.map-filters .need-chip{padding:5px 9px;font-size:12px}
+.map-filters .dir-select{padding:4px 8px;font-size:12px;border-radius:99px}
+/* how many pins the filters leave, under the search box so it shows without scrolling */
+.map-note{position:absolute;z-index:999;top:62px;left:54px;max-width:calc(100% - 66px);display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:var(--text)}
+.map-note.on{padding:6px 7px 6px 14px;border-radius:18px;background:rgba(10,15,30,.92);border:1px solid var(--line)}
+html:not(.dark) .map-note.on{background:rgba(255,255,255,.94)}
+.filter-clear{appearance:none;flex:none;border:1px solid var(--line);background:var(--panel);color:var(--text);font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;padding:5px 11px;border-radius:99px;cursor:pointer}
+.filter-clear:hover{border-color:rgba(255,198,0,.45)}
 /* shown when the wheel scrolls the page over the map or the galaxy instead of zooming */
 .zoom-hint{position:absolute;z-index:1001;top:50%;left:50%;transform:translate(-50%,-50%);padding:10px 18px;
   border-radius:99px;background:rgba(10,15,30,.92);border:1px solid rgba(148,163,255,.25);color:#e6ecff;
@@ -281,7 +295,9 @@ button.chip{font-family:inherit;color:inherit;line-height:inherit;text-align:inh
   font-family:inherit;line-height:inherit;text-align:inherit}
 .cat-chip:hover{color:var(--text)}
 .cat-chip.on{color:var(--text);border-color:currentColor;background:rgba(148,163,255,.07)}
-.dir-count{font-size:13px;color:var(--muted);margin-bottom:14px}
+.dir-count-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:14px}
+.dir-count{font-size:13px;color:var(--muted)}
+#view-directory{scroll-margin-top:64px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;
   cursor:pointer;transition:.18s;overflow:hidden}
@@ -406,6 +422,7 @@ html:not(.dark) .apply-tag{color:#166534;border-color:rgba(21,128,61,.35)}   /* 
 .dr-facts td{padding:5px 12px 5px 0;border-bottom:1px solid rgba(128,128,128,.15);vertical-align:top}
 .dr-facts td:first-child{color:var(--muted);white-space:nowrap;width:1%}
 .offer-tag{font-size:12.5px}
+.match-tag{color:var(--text)}
 .dr-verified{font-size:12px;color:var(--muted);margin-top:16px}
 .dr-verified.stale{color:#fbbf24}
 .stale-tag{color:#fbbf24;border-color:rgba(251,191,36,.4)}
@@ -439,14 +456,42 @@ html:not(.dark) .dr-verified.stale,html:not(.dark) .stale-tag{color:#b45309;bord
 .footer-inner a{text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--muted)}
 
 @media(max-width:720px){
-  .hero{padding:24px 18px 16px}
-  .view{padding:18px 16px 70px}
-  .nav-inner{padding:8px 12px}
-  .tab{padding:8px 13px;font-size:13px}
+  /* The header filled a phone's first screen, so the map started 792 px down and the Directory's
+     first card 1,428 px down, on an 844 px screen (until 2026-11). */
+  .hero{padding:14px 16px 12px}
+  .eyebrow{margin-top:6px;font-size:10px;letter-spacing:.8px}
+  .tagline{margin-top:6px;font-size:13.5px;line-height:1.45}
+  .tagline .tag-more{display:none}
+  .hero-cta{margin-top:10px;gap:8px}
+  .hero-cta .btn{padding:9px 11px;font-size:12px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .stat b{font-size:17px}
+  .stat span{display:block;font-size:9.5px;letter-spacing:.3px;line-height:1.25}
+  .view{padding:12px 16px 70px}
+  /* one row of tabs that scrolls sideways: this bar sticks, and its three rows took a fifth of the screen */
+  .nav-inner{flex-wrap:nowrap;overflow-x:auto;padding:6px 10px;scrollbar-width:none}
+  .nav-inner::-webkit-scrollbar{display:none}
+  .tab{flex:none;padding:7px 11px;font-size:13px}
+  .tab .ico{display:none}
+  .nav-gh{flex:none}
   .nav-hint{display:none}
+  /* the Directory's chips scroll sideways too, like the category row above the map */
+  .dir-controls{gap:8px;margin-bottom:10px}
+  .dir-search{flex-basis:100%;min-width:0;padding-top:10px;padding-bottom:10px}
+  .dir-select{flex:1;min-width:0;padding:9px 10px;font-size:13px}
+  .cat-chips,.need-chips,.map-filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .cat-chips::-webkit-scrollbar,.need-chips::-webkit-scrollbar,.map-filters::-webkit-scrollbar{display:none}
+  .cat-chips{margin-bottom:8px}
+  .need-chips{margin-top:0;margin-bottom:10px}
+  .cat-chip,.need-chip,.need-label{flex:none}
+  .need-label{white-space:nowrap}
+  .map-filters{padding:6px 12px}
+  .map-filters .need-chips{flex:none;margin-bottom:0;overflow:visible}
+  .map-filters .dir-select{flex:none}
   .map-search{width:calc(100% - 70px)}
   /* the search takes the whole top row on a phone, so the presets drop below it */
   .map-view-switch{top:60px}
+  .map-note{top:106px}
   .mv-btn{padding:7px 11px;font-size:12px}
   /* one row of categories that scrolls sideways, rather than five rows above the map,
      and it sits right under the nav, so it still makes the first screen */
@@ -471,7 +516,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 
 <div id="newBanner" class="new-banner" style="display:none">
   <span id="newBannerText"></span>
-  <a href="#" onclick="switchView('directory');document.getElementById('dirSort').value='new';renderCards();return false">see what's new</a>
+  <a href="#" onclick="switchView('directory');document.getElementById('dirSort').value='new';filtersChanged();return false">see what's new</a>
   <button class="nb-x" aria-label="Dismiss" onclick="dismissNewBanner()">✕</button>
 </div>
 
@@ -535,14 +580,14 @@ browse the <a href="e/">full organization index</a> or use the open dataset
         <svg class="w-5 h-5 hidden dark:block text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         <svg class="w-5 h-5 block dark:hidden text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-gray-800 dark:text-white focus:outline-none" aria-label="Open Menu" aria-expanded="false" id="mobile-menu-btn">&#9776;</button>
+      <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-gray-800 dark:text-white bg-transparent border-0 focus:outline-none" aria-label="Open Menu" aria-expanded="false" id="mobile-menu-btn">&#9776;</button>
     </div>
   </div>
 </header>
 
 <!-- Mobile Nav Overlay -->
 <div id="mobile-nav" class="fixed inset-0 bg-white/95 dark:bg-dark-bg/95 z-[3000] flex flex-col items-center justify-center gap-6 transform translate-x-full transition-transform duration-300 lg:hidden backdrop-blur-sm">
-  <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-4xl text-gray-800 dark:text-white" aria-label="Close Menu">&times;</button>
+  <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-4xl text-gray-800 dark:text-white bg-transparent border-0" aria-label="Close Menu">&times;</button>
   <a href="https://the-open-accelerator.com/about-why.html" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">About</a>
   <a href="https://the-open-accelerator.com/residency/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Residency</a>
   <a href="https://the-open-accelerator.com/community/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Community</a>
@@ -567,9 +612,9 @@ browse the <a href="e/">full organization index</a> or use the open dataset
       <h1 id="atlasTitle">Mass <span>AI Atlas</span></h1>
     </div>
     <p class="eyebrow">Presented by The Open Accelerator · an initiative between the MA AI Hub, Red Hat &amp; IBM</p>
-    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br>Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br>Your contributions make this a valuable resource. Meet the <a href="credits/">mapmakers</a>.</p>
+    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br><span class="tag-more">Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br></span>Your contributions make this a valuable resource. Meet the <a href="credits/">mapmakers</a>.</p>
     <div class="hero-cta">
-      <a class="btn btn-pri" href="https://the-open-accelerator.com/residency/" target="_blank" rel="noopener">Apply for the TOA Residency</a>
+      <a class="btn btn-pri" href="https://the-open-accelerator.com/residency/" target="_blank" rel="noopener">Learn about the TOA Residency</a>
       <a class="btn btn-sec" href="https://the-open-accelerator.com/community/" target="_blank" rel="noopener">Join the Community</a>
     </div>
     <div class="stats" id="stats"></div>
@@ -602,8 +647,18 @@ browse the <a href="e/">full organization index</a> or use the open dataset
   <div class="cat-bar" id="mapCatBar" role="group" aria-labelledby="mapCatLabel">
     <span class="cat-bar-label" id="mapCatLabel">Categories</span>
   </div>
+  <div class="map-filters" role="group" aria-label="Filter the map">
+    <div class="need-chips" id="mapNeeds"></div>
+    <select class="dir-select stage-select" id="mapStage" aria-label="Filter the map by founder stage">
+      <option value="">Any founder stage</option>
+    </select>
+  </div>
   <div class="map-wrap">
     <div id="map"></div>
+    <div class="map-note" id="mapNote">
+      <span id="mapCount" role="status" aria-live="polite"></span>
+      <button type="button" class="filter-clear" hidden onclick="clearFilters()">Clear filters</button>
+    </div>
     <div class="map-search">
       <input id="mapSearch" type="text" placeholder="Search the ecosystem…" autocomplete="off"
         role="combobox" aria-label="Search the ecosystem" aria-autocomplete="list"
@@ -650,8 +705,8 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 
 <section id="view-directory" class="view">
   <div class="dir-controls">
-    <input class="dir-search" id="dirSearch" type="text" placeholder="Search by name, tag, or keyword…">
-    <select class="dir-select" id="dirStage" aria-label="Filter by founder stage">
+    <input class="dir-search" id="dirSearch" type="text" placeholder="Search by name, need, topic, or place…">
+    <select class="dir-select stage-select" id="dirStage" aria-label="Filter by founder stage">
       <option value="">Any founder stage</option>
     </select>
     <select class="dir-select" id="dirSort" aria-label="Sort organizations">
@@ -665,7 +720,10 @@ browse the <a href="e/">full organization index</a> or use the open dataset
   <!-- announced on change, so a screen-reader user hears the consequence of a
        filter, not just the chip's own pressed state. Search is debounced so this
        does not fire once per keystroke. -->
-  <div class="dir-count" id="dirCount" role="status" aria-live="polite"></div>
+  <div class="dir-count-row">
+    <div class="dir-count" id="dirCount" role="status" aria-live="polite"></div>
+    <button type="button" class="filter-clear" hidden onclick="clearFilters()">Clear filters</button>
+  </div>
   <div class="cards" id="cards"></div>
 </section>
 
@@ -848,9 +906,12 @@ const cInk = c => `var(--cat-${c}, ${cColor(c)})`;
   const nCats = Object.keys(CATS).length;
   const vcs = DATA.filter(d=>d.cat==="vc"||d.cat==="angel").length;
   const free = DATA.filter(d=>(d.offers||[]).includes("grants")).length;
+  // Three of these open the Directory with that set showing, as links (see initDirectory).
   $("stats").innerHTML = [
-    [total,"organizations"], [nCats,"categories"], [vcs,"capital sources"], [free,"equity-free resources"]
-  ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+    [total,"organizations","./#directory"], [nCats,"categories"],
+    [vcs,"capital sources","?cat=vc,angel#directory"], [free,"equity-free resources","?need=grants#directory"]
+  ].map(([b,s,href])=> href ? `<a class="stat" href="${href}"><b>${b}</b><span>${s}</span></a>`
+                            : `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
   // the footer used to carry a hand-typed count; it drifted to 101 while the atlas grew
   const fc = $("footCount"); if(fc) fc.textContent = total;
   // "Curated <month>" was hand-typed too, and said June 2026 well into October.
@@ -877,7 +938,7 @@ document.querySelectorAll(".tab[data-view]").forEach(t=>{
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
     currentView = t.dataset.view;
     $("view-"+currentView).classList.add("active");
-    if(currentView==="map" && map) setTimeout(()=>map.invalidateSize(),60);
+    if(currentView==="map" && map) setTimeout(()=>{ map.invalidateSize(); if(frameOnShow) framePins(); },60);
     if(currentView==="galaxy") { gxResize(); gxKick(); }
     window.scrollTo({top:0});
     updateURL();
@@ -943,6 +1004,194 @@ const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matche
 // CSS handles animations and transitions; these are the motions JS drives.
 const mapGoTo = (ll, z) => reduceMotion() ? map.setView(ll, z) : map.flyTo(ll, z, {duration:.9});
 const fmtDeadline = v => { const [y,m,dd] = v.split("-"); return `${MONTH_NAMES[+m-1]} ${+dd}, ${y}`; };
+
+/* ---------- filters ---------- */
+// One set of filters for the map and the Directory: the categories that show, what a founder
+// needs, their stage, and whether applications are open. Until 2026-11 only the Directory had
+// needs and stages, and a reload cleared them. They live in the address now, so a reload keeps
+// them and a link shares them (`?need=compute&stage=3`). What someone types in a search box
+// stays out of it on purpose: a link, a server log or an analytics beacon should never carry
+// a founder's own sentence.
+const activeCats = new Set();
+const dirNeeds = new Set();   // soft needs — values from the `offers` vocabulary
+let dirStage = "";            // a stage's number as a string, or "" for every stage
+let dirOpenOnly = false;      // ⏳ hard constraint: is this org accepting applications?
+// Unknown values are ignored, as they are for ?entry= and ?list=.
+function readFilters(params){
+  const listed = name => (params.get(name) || "").split(",");
+  const cats = listed("cat").filter(k => CATS[k]);
+  activeCats.clear();
+  (cats.length ? cats : Object.keys(CATS)).forEach(k => activeCats.add(k));
+  dirNeeds.clear();
+  listed("need").filter(k => OFFERS_META[k]).forEach(k => dirNeeds.add(k));
+  dirStage = STAGES.some(s => String(s.n) === params.get("stage")) ? params.get("stage") : "";
+  dirOpenOnly = params.get("open") === "1";
+}
+readFilters(new URLSearchParams(location.search));
+function writeFilters(params){
+  const put = (name, value) => { if(value) params.set(name, value); else params.delete(name); };
+  const cats = Object.keys(CATS).filter(k => activeCats.has(k));
+  put("cat", cats.length < Object.keys(CATS).length ? cats.join(",") : "");
+  put("need", Object.keys(OFFERS_META).filter(k => dirNeeds.has(k)).join(","));
+  put("stage", dirStage);
+  put("open", dirOpenOnly ? "1" : "");
+  put("sort", $("dirSort").value === "name" ? "" : $("dirSort").value);
+}
+const filtersOn = () => activeCats.size < Object.keys(CATS).length || dirNeeds.size > 0 || dirStage !== "" || dirOpenOnly;
+// Category and stage gate the list, and so does ⏳: it is a fact about the org, not a need it
+// satisfies, so it must never become a term in need matching (or, later, in need scoring).
+const passesFilters = d => activeCats.has(d.cat) && (!dirStage || (d.stages||[]).includes(+dirStage))
+  && (!dirOpenOnly || applyOpen(d));
+// Needs run last, against whatever the hard filters left, and they relax instead
+// of dead-ending: show the entries meeting the most selected needs that anything
+// here meets. 97 of 171 orgs offer exactly one thing, so demanding all of three
+// returned nothing in 40 of 56 combinations — an empty page while a good answer
+// sat one band below. The band is constant across the result set, so the sort the
+// reader chose still means what it says.
+function meetNeeds(list){
+  if(!dirNeeds.size) return { list, band: 0 };
+  const needs = [...dirNeeds];
+  const met = d => needs.reduce((n,x)=>n + ((d.offers||[]).includes(x) ? 1 : 0), 0);
+  let band = list.reduce((hi,d)=>Math.max(hi, met(d)), 0);
+  // Relax, but never all the way down to "meets any one of these" — with two or
+  // more chips that band is not an answer, it is the whole directory wearing a
+  // filter (funding+talent would return 130 of 171). Measured: this floor leaves
+  // 3- and 4-chip results untouched and cuts the 2-chip worst case from 130 to 22.
+  // Below the floor we show nothing, which is the honest report that no org here
+  // does both — the very thing the founder was asking.
+  if(needs.length > 1 && band < 2) band = 0;
+  return { list: band ? list.filter(d=>met(d) === band) : [], band };
+}
+const needsRelaxed = band => dirNeeds.size > 1 && band > 0 && band < dirNeeds.size;
+const needsNote = band => needsRelaxed(band) ? ` · none offer all ${dirNeeds.size} — these meet ${band}` : "";
+// Every control for a filter shows the same state, on the map and in the Directory.
+function syncFilters(){
+  document.querySelectorAll(".need-chip").forEach(chip=>{
+    const on = chip.dataset.need === "open" ? dirOpenOnly : dirNeeds.has(chip.dataset.need);
+    chip.classList.toggle("on", on);
+    chip.setAttribute("aria-pressed", String(on));
+  });
+  document.querySelectorAll(".stage-select").forEach(sel=>{ sel.value = dirStage; });
+  document.querySelectorAll("#catChips .cat-chip, #mapCatBar .cat-btn").forEach(el=>{
+    const on = activeCats.has(el.dataset.cat);
+    el.classList.toggle("on", on);
+    el.setAttribute("aria-pressed", String(on));
+  });
+}
+function filtersChanged(){ syncFilters(); drawPins(); renderCards(); updateURL(); }
+function clearFilters(){
+  readFilters(new URLSearchParams());
+  $("dirSearch").value = "";
+  filtersChanged();
+  framePins();
+  // the button just pressed has gone, so the focus moves to the first filter in this view
+  document.querySelector(currentView === "map" ? "#mapNeeds .need-chip" : "#needChips .need-chip").focus({preventScroll:true});
+}
+window.clearFilters = clearFilters;
+window.filtersChanged = filtersChanged;
+
+/* ---------- search ---------- */
+// Word by word, in the founder's words rather than the atlas's. Until 2026-11 each search box
+// looked for the whole query as one exact string, so any sentence found nothing, "wet lab"
+// missed LabCentral's "wet-lab", "women" missed January Ventures' "Woman-led", and "grant"
+// missed 8 of the 17 entries that offer grants. The three boxes share this now.
+const foldText = s => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .replace(/['’]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const SEARCH_SKIP = new Set(("a about after again all also am an and any are around as at be been being but by can could " +
+  "did do does doing dont for from get getting go going got had has have having help here how i id if im in into is it its " +
+  "ive just know let like looking lot make me more most much my need needs no not now of on one only or our out over please " +
+  "really right so some still than that the their them then there these they thing things this those to too two three four " +
+  "five six seven eight nine ten up us very want wants was we were what when where which who why will with would yet you your").split(" "));
+// In a sentence these say nothing: most of the atlas is AI, for startups, in Massachusetts.
+const SEARCH_VAGUE = new Set(["ai", "startup", "founder", "company", "massachusett"]);
+// Words that mean the same thing here. A founder's word finds the atlas's, and the other way round.
+const SEARCH_SAME = [
+  ["grant", "non dilutive", "nondilutive", "equity free", "no equity", "prize", "win money", "free money"],
+  ["pre seed", "preseed"],
+  ["community", "network", "networking", "meet people", "peer"],
+  ["accelerator", "incubator"],
+  ["lab space", "lab bench"],
+  ["government", "state", "public sector"],
+  ["woman", "women", "female"],
+  ["cofounder", "co founder"],
+  ["gpu", "compute", "cloud credit"],
+  ["pilot", "customer", "design partner"],
+  ["invest", "investor", "investment", "fund", "funder", "funding"],
+  ["vc", "venture capital"],
+  ["hire", "hiring", "recruit", "recruiting", "talent"],
+  ["desk", "coworking", "co working", "office space"],
+  ["mentor", "mentorship", "advisor", "coach"],
+  ["health", "healthcare", "medical", "medtech", "clinical"],
+  ["biotech", "life science", "pharma"],
+  ["climate", "cleantech", "clean tech"],
+  ["defense", "defence", "dual use", "military"],
+  ["security", "cybersecurity", "cyber"],
+  ["meetup", "meet up"],
+];
+const searchSame = new Map(SEARCH_SAME.flatMap(group => group.map(w => [w, group])));
+const singular = w => w.length > 4 && w.endsWith("ies") ? w.slice(0, -3) + "y"
+  : w.length > 3 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w;
+// A query becomes terms: each a word or phrase, with the other ways to say it. A term's first
+// form identifies it, so "grant" and "non-dilutive" in one query count once.
+function searchTerms(query){
+  const words = foldText(query).split(" ").filter(Boolean), terms = [], seen = new Set();
+  const add = (label, forms) => { if(!seen.has(forms[0])){ seen.add(forms[0]); terms.push({label, forms}); } };
+  for(let i = 0; i < words.length; ){
+    const n = [3, 2, 1].find(n => { const p = words.slice(i, i + n).join(" "); return i + n <= words.length && (searchSame.has(p) || searchSame.has(singular(p))); });
+    if(n){
+      const phrase = words.slice(i, i + n).join(" ");
+      add(phrase, searchSame.get(phrase) || searchSame.get(singular(phrase)));
+      i += n;
+      continue;
+    }
+    const w = words[i++], one = singular(w);
+    if(!SEARCH_SKIP.has(w)) add(w, one === w ? [w] : [one, w]);
+  }
+  if(!terms.length) words.forEach(w => add(w, [w]));   // nothing but small words: look for them after all
+  const specific = terms.filter(t => !SEARCH_VAGUE.has(t.forms[0]));
+  return terms.length > 3 && specific.length ? Object.assign(specific, {sentence:true}) : terms;
+}
+// Each field is folded once, with a space at each end so a word's start can be found. A name, a
+// tag or an offer says more about an entry than a passing word in its description does.
+const SEARCH_FIELDS = [["name", 4], ["vocab", 4], ["place", 3], ["cat", 2], ["text", .25]];
+let searchDocs = null;
+function searchDoc(d){
+  const pad = s => " " + foldText(s) + " ";
+  searchDocs = searchDocs || Object.fromEntries(DATA.map(e => [e.id, {
+    name: pad(e.name), place: pad(e.loc), cat: pad(cLabel(e.cat)), text: pad(e.desc + " " + (e.why||"")),
+    vocab: pad([...(e.tags||[]), ...(e.offers||[]).map(o => OFFERS_META[o].label)].join(" ")),
+  }]));
+  return searchDocs[d.id];
+}
+// A form matches at the start of a word, so "robot" finds "robotics" and "mit" doesn't find
+// "summit". One or two letters must be the whole word: "ai" is not "air", nor "vc" a word's start.
+const hasForm = (text, form) => text.includes(" " + form + (form.length < 3 ? " " : ""));
+const termWeight = (d, term) => {
+  const doc = searchDoc(d);
+  const field = SEARCH_FIELDS.find(([f]) => term.forms.some(form => hasForm(doc[f], form)));
+  return field ? field[1] : 0;
+};
+// Returns the entries of `list`, best first. `exact` says they match every term. A sentence
+// never will, and a pair of words may not, so then the closest entries come back instead:
+// a rare word counts for more than a common one, and those well behind the best are dropped.
+// `words` says which of the founder's words each entry matched on.
+function searchEntries(query, list = DATA){
+  const terms = searchTerms(query);
+  if(!terms.length) return { list, exact: true, words: {} };
+  const rarity = terms.map(t => { const n = DATA.filter(d => termWeight(d, t)).length; return n ? Math.log(1 + DATA.length / n) : 0; });
+  const scored = list.map(d => {
+    let score = 0, met = 0;
+    const words = [];
+    terms.forEach((t, i) => {
+      const w = termWeight(d, t);
+      if(w){ score += w * rarity[i]; met++; if(w > 1) words.push(t.label); }
+    });
+    return { d, score, met, words };
+  }).filter(x => x.met).sort((a, b) => b.score - a.score || a.d.name.localeCompare(b.d.name));
+  const all = terms.sentence ? [] : scored.filter(x => x.met === terms.length);
+  const found = all.length ? all : scored.filter(x => x.score >= scored[0].score / 2).slice(0, 24);
+  return { list: found.map(x => x.d), exact: all.length > 0, words: Object.fromEntries(found.map(x => [x.d.id, x.words])) };
+}
 
 /* ---------- html escaping (entry text is data, never markup) ---------- */
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -1142,8 +1391,10 @@ document.addEventListener("keydown", e=>{
 
 function goToMap(id){
   closeDrawer();
-  switchView("map");
   const d = byId[id];
+  // asked to see this one on the map, so filters that hide its pin give way
+  if(!mapEntries().list.includes(d)){ readFilters(new URLSearchParams()); filtersChanged(); }
+  switchView("map");
   setTimeout(()=>{
     mapGoTo([d.lat,d.lng], 15);
     const m = markers[id];
@@ -1161,7 +1412,37 @@ window.goToMap = goToMap;
 let map, markers = {}, mapTiles, clusterGroup, flatGroup, clustered = true;
 const pinOf = new WeakMap();   // a pin's popup → the pin, to give the focus back on close
 try{ clustered = localStorage.getItem("toa-atlas-cluster") !== "off"; }catch(e){}
-const activeCats = new Set(Object.keys(CATS));
+// The pins are the Directory's list before any search, so the two views agree.
+const mapEntries = () => meetNeeds(DATA.filter(passesFilters));
+function drawPins(){
+  if(!map) return;
+  const group = clustered ? clusterGroup : flatGroup, { list, band } = mapEntries();
+  group.clearLayers();
+  const pins = list.map(d => markers[d.id]);
+  if(clustered) group.addLayers(pins); else pins.forEach(m => group.addLayer(m));
+  const on = filtersOn();
+  $("mapCount").textContent = on ? `${list.length} of ${DATA.length} organizations on the map${needsNote(band)}` : "";
+  $("mapNote").classList.toggle("on", on);
+  $("mapNote").querySelector(".filter-clear").hidden = !on;
+}
+// Leaflet's fly animation stalls while the map is scrolled off-screen and leaves the camera
+// part-way, so only animate when the map is actually in front of someone.
+function mapCanAnimate(){
+  const box = map.getContainer().getBoundingClientRect();
+  return box.bottom > 0 && box.top < innerHeight && !reduceMotion();
+}
+// A need or a stage can leave a handful of pins across the state, most of them outside the
+// Boston view, so frame what is left. Categories don't move the map: hiding one takes pins
+// away from a view someone chose. Filters set in the Directory frame on the way back to the map.
+let frameOnShow = false;
+function framePins(){
+  if(!map) return;
+  if(currentView !== "map"){ frameOnShow = true; return; }
+  frameOnShow = false;
+  if(!dirNeeds.size && !dirStage && !dirOpenOnly) return homeMap();
+  const { list } = mapEntries();
+  if(list.length) map.fitBounds(list.map(d => [d.lat, d.lng]), {padding:[50,50], maxZoom:14, animate:mapCanAnimate()});
+}
 // The row of category buttons above the map and the galaxy: one real button per category,
 // so it is operable by keyboard and announces its state. `shown` is the view's set of
 // visible categories; onToggle(k) redraws after category k is shown or hidden.
@@ -1259,11 +1540,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   function applyMapView(key, animate){
     const v = MAP_VIEWS[key]; if(!v) return;
     mapView = key;
-    // Leaflet's fly animation stalls while the map is scrolled off-screen and leaves the
-    // camera part-way, so only animate when the map is actually in front of someone.
-    const box = map.getContainer().getBoundingClientRect();
-    const onScreen = box.bottom > 0 && box.top < innerHeight;
-    const move = animate && onScreen && !reduceMotion();
+    const move = animate && mapCanAnimate();
     if(v.bounds) map.fitBounds(stateBounds(), {padding:[30,30], animate:move});
     else if(move) map.flyTo(v.center, v.zoom, {duration:.9});
     else map.setView(v.center, v.zoom);
@@ -1276,6 +1553,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
     try{ localStorage.setItem("toa-atlas-mapview", key); }catch(e){}
   }
   window.setMapView = applyMapView;
+  window.homeMap = () => applyMapView(mapView, true);
   document.querySelectorAll(".mv-btn").forEach(b=>
     b.addEventListener("click", ()=>applyMapView(b.dataset.view, true)));
 
@@ -1308,9 +1586,8 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
     if(on === clustered){ return; }
     map.removeLayer(pinGroup());
     clustered = on;
-    const g = pinGroup(); g.clearLayers();
-    DATA.forEach(d=>{ if(activeCats.has(d.cat)) g.addLayer(markers[d.id]); });
-    map.addLayer(g);
+    drawPins();
+    map.addLayer(pinGroup());
     try{ localStorage.setItem("toa-atlas-cluster", on ? "on" : "off"); }catch(e){}
     document.querySelectorAll(".map-cluster-toggle").forEach(b=>{
       b.classList.toggle("off", !on);
@@ -1358,9 +1635,9 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
       `<button type="button" class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</button>`,
       {maxWidth:260});
     pinOf.set(m.getPopup(), m);
-    pinGroup().addLayer(m);
     markers[d.id] = m;
   });
+  drawPins();
   map.addLayer(pinGroup());
 
   // A pin's popup takes the focus when it opens, so the keyboard reaches "Full details →".
@@ -1388,26 +1665,20 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
 
   // apply the remembered preset now the pins are on the map (no animation on load)
   applyMapView(mapView, false);
+  if(dirNeeds.size || dirStage || dirOpenOnly) framePins();
 
   // categories
-  buildCatBar($("mapCatBar"), activeCats, k=>{
-    DATA.forEach(d=>{
-      if(d.cat!==k) return;
-      if(activeCats.has(k)) pinGroup().addLayer(markers[d.id]); else pinGroup().removeLayer(markers[d.id]);
-    });
-  });
+  buildCatBar($("mapCatBar"), activeCats, ()=>filtersChanged());
   // The category row is filled in after Leaflet has measured the map, and it wraps to a
   // second line on narrower screens, so tell Leaflet whenever the map's box changes size.
   new ResizeObserver(()=>{ if(currentView==="map") map.invalidateSize(); }).observe(map.getContainer());
 
   // search: a pick flies the map to the pin and opens its popup
   const search = searchBox($("mapSearch"), $("mapResults"), "mapr",
-    q => DATA.filter(d =>
-      d.name.toLowerCase().includes(q) ||
-      (d.tags||[]).some(t=>t.toLowerCase().includes(q)) ||
-      d.desc.toLowerCase().includes(q) ||
-      cLabel(d.cat).toLowerCase().includes(q)),
+    q => searchEntries(q).list,
     id => {
+      // the filters may be hiding this pin, and a hidden pin has no popup to open
+      if(!mapEntries().list.includes(byId[id])) return openDrawer(id);
       // The popup opens when the flight ends. Until 2026-11 a 950 ms timer opened it, and when
       // a busy machine finished the 900 ms flight late, the pin was still inside a cluster,
       // where openPopup() does nothing, so no popup appeared.
@@ -1797,8 +2068,7 @@ function gxFocusOn(id){
 (function initGxSearch(){
   const inp = $("gxSearch");
   const search = searchBox(inp, $("gxResults"), "gxr",
-    q => DATA.filter(d =>
-      d.name.toLowerCase().includes(q) || (d.tags||[]).some(t=>t.toLowerCase().includes(q))),
+    q => searchEntries(q).list,
     gxFocusOn, ()=>{ gxLocked = null; });
   document.addEventListener("keydown", e=>{
     if(e.key==="Escape" && gxLocked){ gxLocked = null; inp.value = ""; search.close(); if(gxTipHow==="touch") gxHideTip(); }
@@ -1985,105 +2255,92 @@ function renderJourney(){
 renderStepper(); renderJourney();
 
 /* ---------- directory ---------- */
-const dirCats = new Set(Object.keys(CATS));
-const dirNeeds = new Set();   // soft needs — values from the `offers` vocabulary
-let dirOpenOnly = false;      // ⏳ hard constraint: is this org accepting applications?
 (function initDirectory(){
-  // "I need…" chips — filter by what an org gives founders, plus open applications
-  const nc = $("needChips");
-  const lab = document.createElement("span");
-  lab.className = "need-label"; lab.textContent = "I need:";
-  nc.appendChild(lab);
+  // "I need…" chips — filter by what an org gives founders, plus open applications.
+  // The map has the same row, and the two show one state.
   const needs = Object.entries(OFFERS_META).map(([k,m])=>[k, `${m.icon} ${m.label}`])
     .concat([["open","⏳ Open to apply now"]]);
-  needs.forEach(([key, label])=>{
-    const el = document.createElement("button");
-    el.className = "need-chip"; el.type = "button"; el.textContent = label;
-    el.setAttribute("aria-pressed","false");
-    el.addEventListener("click", ()=>{
-      let on;
-      if(key === "open") on = (dirOpenOnly = !dirOpenOnly);
-      else { dirNeeds.has(key) ? dirNeeds.delete(key) : dirNeeds.add(key); on = dirNeeds.has(key); }
-      el.classList.toggle("on", on);
-      el.setAttribute("aria-pressed", String(on));
-      renderCards();
+  [$("needChips"), $("mapNeeds")].forEach(row=>{
+    const lab = document.createElement("span");
+    lab.className = "need-label"; lab.textContent = "I need:";
+    row.appendChild(lab);
+    needs.forEach(([key, label])=>{
+      const el = document.createElement("button");
+      el.className = "need-chip"; el.type = "button"; el.textContent = label; el.dataset.need = key;
+      el.addEventListener("click", ()=>{
+        if(key === "open") dirOpenOnly = !dirOpenOnly;
+        else if(dirNeeds.has(key)) dirNeeds.delete(key);
+        else dirNeeds.add(key);
+        filtersChanged();
+        framePins();
+      });
+      row.appendChild(el);
     });
-    nc.appendChild(el);
   });
-  // stage options
-  STAGES.forEach(s=>{
-    const o=document.createElement("option"); o.value=s.n; o.textContent=`${s.icon} Stage ${s.n}: ${s.t}`;
-    $("dirStage").appendChild(o);
+  // stage options, for the map's list and the Directory's
+  document.querySelectorAll(".stage-select").forEach(sel=>{
+    STAGES.forEach(s=>{
+      const o=document.createElement("option"); o.value=s.n; o.textContent=`${s.icon} Stage ${s.n}: ${s.t}`;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", ()=>{ dirStage = sel.value; filtersChanged(); framePins(); });
   });
   // category chips: buttons that say whether their category is shown (aria-pressed), as the
   // "I need…" chips do. Until 2026-11 they were spans that took only a click.
-  const cc=$("catChips");
+  const cc=$("catChips"), allCats=Object.keys(CATS);
   Object.entries(CATS).forEach(([k,v])=>{
     const el=document.createElement("button");
     // the label in the category's ink, which darkens in light mode; the dot keeps the bright colour
-    el.type="button"; el.className="cat-chip on"; el.style.color=cInk(k); el.dataset.cat=k;
-    el.setAttribute("aria-pressed","true");
+    el.type="button"; el.className="cat-chip"; el.style.color=cInk(k); el.dataset.cat=k;
     el.innerHTML=`<span class="lg-dot" style="background:${v.color};color:${v.color}"></span>${v.label}`;
     el.addEventListener("click",()=>{
       // if all on, clicking isolates; else toggle
-      if(dirCats.size===Object.keys(CATS).length){ dirCats.clear(); dirCats.add(k); }
-      else if(dirCats.has(k)){ dirCats.delete(k); if(!dirCats.size) Object.keys(CATS).forEach(x=>dirCats.add(x)); }
-      else dirCats.add(k);
-      cc.querySelectorAll(".cat-chip").forEach(c=>{
-        const on = dirCats.has(c.dataset.cat);
-        c.classList.toggle("on", on); c.setAttribute("aria-pressed", String(on));
-      });
-      renderCards();
+      if(activeCats.size===allCats.length){ activeCats.clear(); activeCats.add(k); }
+      else if(activeCats.has(k)){ activeCats.delete(k); if(!activeCats.size) allCats.forEach(x=>activeCats.add(x)); }
+      else activeCats.add(k);
+      filtersChanged();
     });
     cc.appendChild(el);
   });
+  const sort = new URLSearchParams(location.search).get("sort");
+  if(sort === "cat" || sort === "new") $("dirSort").value = sort;
+  syncFilters();
   // debounced because #dirCount is a live region — an undebounced handler would
   // queue one screen-reader announcement per keystroke
   let dirSearchT = 0;
   $("dirSearch").addEventListener("input", ()=>{ clearTimeout(dirSearchT); dirSearchT = setTimeout(renderCards, 220); });
-  $("dirStage").addEventListener("change", renderCards);
-  $("dirSort").addEventListener("change", renderCards);
+  $("dirSort").addEventListener("change", filtersChanged);
+  // The headline figures open the Directory with that set showing. They are real links, so one
+  // can be opened in a new tab; a plain click stays on this page.
+  $("stats").addEventListener("click", e=>{
+    const a = e.target.closest("a.stat");
+    if(!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    readFilters(new URLSearchParams(a.search));
+    $("dirSearch").value = "";
+    filtersChanged();
+    framePins();
+    switchView("directory");
+    $("view-directory").scrollIntoView();
+  });
 })();
 function renderCards(){
-  const q=$("dirSearch").value.trim().toLowerCase();
-  const st=$("dirStage").value;
-  let list = DATA.filter(d=>dirCats.has(d.cat));
-  if(st) list = list.filter(d=>(d.stages||[]).includes(+st));
-  // ⏳ gates the list; it is a fact about the org, not a need it satisfies, so it
-  // must never become a term in need matching (or, later, in need scoring).
-  if(dirOpenOnly) list = list.filter(applyOpen);
-  if(q) list = list.filter(d=>
-    d.name.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q) ||
-    (d.why||"").toLowerCase().includes(q) ||
-    (d.tags||[]).some(t=>t.toLowerCase().includes(q)) ||
-    d.loc.toLowerCase().includes(q) || cLabel(d.cat).toLowerCase().includes(q));
-  // Needs run last, against whatever the hard filters left, and they relax instead
-  // of dead-ending: show the entries meeting the most selected needs that anything
-  // here meets. 97 of 171 orgs offer exactly one thing, so demanding all of three
-  // returned nothing in 40 of 56 combinations — an empty page while a good answer
-  // sat one band below. The band is constant across the result set, so the sort the
-  // reader chose still means what it says.
-  let band = 0;
-  if(dirNeeds.size){
-    const needs = [...dirNeeds];
-    const met = d => needs.reduce((n,x)=>n + ((d.offers||[]).includes(x) ? 1 : 0), 0);
-    band = list.reduce((hi,d)=>Math.max(hi, met(d)), 0);
-    // Relax, but never all the way down to "meets any one of these" — with two or
-    // more chips that band is not an answer, it is the whole directory wearing a
-    // filter (funding+talent would return 130 of 171). Measured: this floor leaves
-    // 3- and 4-chip results untouched and cuts the 2-chip worst case from 130 to 22.
-    // Below the floor we show nothing, which is the honest report that no org here
-    // does both — the very thing the founder was asking.
-    if(needs.length > 1 && band < 2) band = 0;
-    list = band ? list.filter(d=>met(d) === band) : [];
-  }
-  const relaxed = dirNeeds.size > 1 && band > 0 && band < dirNeeds.size;
+  const q=$("dirSearch").value.trim();
+  let list = DATA.filter(passesFilters);
+  const found = q ? searchEntries(q, list) : null;
+  if(found) list = found.list;
+  const { list: meeting, band } = meetNeeds(list);
+  list = meeting;
+  const relaxed = needsRelaxed(band), closest = found && !found.exact;
+  // A search comes back best first, so the first sort says so while there is one.
   const sort=$("dirSort").value;
-  list.sort((a,b)=> sort==="cat" ? (a.cat===b.cat ? a.name.localeCompare(b.name) : a.cat.localeCompare(b.cat))
-                  : sort==="new" ? ((b.added||"").localeCompare(a.added||"") || a.name.localeCompare(b.name))
-                                 : a.name.localeCompare(b.name));
-  $("dirCount").textContent = `${list.length} of ${DATA.length} organizations`
-    + (relaxed ? ` · none offer all ${dirNeeds.size} — these meet ${band}` : "");
+  $("dirSort").options[0].textContent = q ? "Sort: Best match" : "Sort: A → Z";
+  if(sort==="cat") list.sort((a,b)=> a.cat===b.cat ? a.name.localeCompare(b.name) : a.cat.localeCompare(b.cat));
+  else if(sort==="new") list.sort((a,b)=> (b.added||"").localeCompare(a.added||"") || a.name.localeCompare(b.name));
+  else if(!q) list.sort((a,b)=> a.name.localeCompare(b.name));
+  $("dirCount").textContent = `${list.length} of ${DATA.length} organizations` + needsNote(band)
+    + (closest && list.length ? " · none match every word, closest first" : "");
+  document.querySelector(".dir-count-row .filter-clear").hidden = !(q || filtersOn());
   $("cards").innerHTML = list.map(d=>{
     const col=cColor(d.cat);
     const canCompare = d.cat==="vc" || d.cat==="accel" || d.cat==="angel";
@@ -2098,9 +2355,9 @@ function renderCards(){
       <div class="card-tools">${canCompare?`<button class="card-tool cmp ${cmpSet.has(d.id)?'on':''}" title="Compare" aria-pressed="${cmpSet.has(d.id)}" aria-label="Add ${esc(d.name)} to comparison" onclick="event.stopPropagation();toggleCompare('${d.id}')">⚖</button>`:""}<button class="card-tool star ${starSet.has(d.id)?'on':''}" title="Save to shortlist" aria-pressed="${starSet.has(d.id)}" aria-label="Save ${esc(d.name)} to your shortlist" onclick="event.stopPropagation();toggleStar('${d.id}')">${starSet.has(d.id)?"★":"☆"}</button></div>
       <div class="c-cat" style="color:${cInk(d.cat)}">${cLabel(d.cat)} · ${esc(d.loc.split(",")[0])}</div>
       <p>${esc(d.desc.length>150 ? d.desc.slice(0,150)+"…" : d.desc)}</p>
-      <div class="c-meta">${relaxed ? (d.offers||[]).filter(o=>dirNeeds.has(o)).map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join("") : ""}${isNew(d)?`<span class="tag new-tag">✨ New</span>`:""}${eventHosts[d.id]?`<span class="tag event-tag" title="${esc(eventHosts[d.id].title)}">🎟 event this week</span>`:""}${d.applyBy && d.applyBy!=="rolling" && applyOpen(d) ? `<span class="tag apply-tag">⏳ Apply by ${esc(fmtDeadline(d.applyBy))}</span>`:""}${isStale(d)?`<span class="tag stale-tag" title="Last verified ${fmtMonth(d.lastVerified)}">⚠ not recently verified</span>`:""}${d.badge?`<span class="badge">${esc(d.badge)}</span>`:""}${(d.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+      <div class="c-meta">${closest ? (found.words[d.id]||[]).slice(0,3).map(w=>`<span class="tag match-tag">${esc(w)}</span>`).join("") : ""}${relaxed ? (d.offers||[]).filter(o=>dirNeeds.has(o)).map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join("") : ""}${isNew(d)?`<span class="tag new-tag">✨ New</span>`:""}${eventHosts[d.id]?`<span class="tag event-tag" title="${esc(eventHosts[d.id].title)}">🎟 event this week</span>`:""}${d.applyBy && d.applyBy!=="rolling" && applyOpen(d) ? `<span class="tag apply-tag">⏳ Apply by ${esc(fmtDeadline(d.applyBy))}</span>`:""}${isStale(d)?`<span class="tag stale-tag" title="Last verified ${fmtMonth(d.lastVerified)}">⚠ not recently verified</span>`:""}${d.badge?`<span class="badge">${esc(d.badge)}</span>`:""}${(d.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
     </div>`;
-  }).join("") || `<div style="color:var(--muted)">No matches — try clearing filters, or <a href="#" onclick="suggestEntry();return false" style="color:#ffc600">suggest a new entry</a>.</div>`;
+  }).join("") || `<div style="color:var(--muted)">No matches — try fewer words or clearing the filters, or <a href="#" onclick="suggestEntry();return false" style="color:#ffc600">suggest a new entry</a>.</div>`;
 }
 renderCards();
 
@@ -2112,8 +2369,9 @@ function updateURL(){
   // link lost its list the first time the recipient opened a drawer or switched views.
   const u = new URL(location.href);
   if(drawerId) u.searchParams.set("entry", drawerId); else u.searchParams.delete("entry");
+  writeFilters(u.searchParams);
   u.hash = currentView !== "map" ? currentView : "";
-  try{ history.replaceState(null, "", u.pathname + u.search + u.hash); }catch(e){}
+  try{ history.replaceState(null, "", u.pathname + u.search.replace(/%2C/g, ",") + u.hash); }catch(e){}
 }
 function copyLink(btn){
   if(!navigator.clipboard) return;
@@ -2233,10 +2491,10 @@ const TOUR = [
     text:`${DATA.length} verified organizations — VCs, labs, accelerators, spaces and communities — in four views: the Map, the Galaxy of connections, a stage-by-stage Founder Journey, and a searchable Directory.` },
   { view:"map", sel:"#mapSearch",
     title:"The Map",
-    text:"Search anything, toggle categories in the row above the map, and click any colored pin for details. Top right switches between the Boston area and the whole Commonwealth; ⌖ re-frames the view you picked and ∴ groups or un-groups nearby pins." },
+    text:"Search anything, filter by category, by what you need, or by stage in the rows above the map, and click any colored pin for details. Top right switches between the Boston area and the whole Commonwealth; ⌖ re-frames the view you picked and ∴ groups or un-groups nearby pins." },
   { view:"directory", sel:"#catChips",
     title:"The Directory",
-    text:"Full-text search plus category and founder-stage filters — the fastest way to answer “who can help me right now?”" },
+    text:"Search in your own words, or filter by category, need, and founder stage — the fastest way to answer “who can help me right now?” Filters carry over to the map, and the page's link keeps them." },
   { view:"journey", sel:"#stepper",
     title:"Founder Journey",
     text:"Pick your stage — Spark, Validate, Build, Fund or Scale — and see the resources curated for exactly that moment." },
