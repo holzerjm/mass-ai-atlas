@@ -48,9 +48,12 @@ older versions to patch.
 Worth knowing before you report, so you can tell a real finding from an intended
 behavior:
 
-- **There is no backend and no accounts.** No server-side code, no database, no login, no
-  user data collected, no analytics. Everything a visitor does stays in their browser, in
-  6 `localStorage` keys, all starting with `toa-atlas-`.
+- **There is no backend and no accounts.** No server-side code, no database, and no login, and
+  the atlas's own code collects nothing about visitors. What a visitor does on the page stays
+  in their browser, in 6 `localStorage` keys, all starting with `toa-atlas-`.
+- **Cloudflare counts page views.** Cloudflare serves the site and adds its Web Analytics script
+  to each page, outside this repository. The script reports the page's address, without its
+  query string, along with load timings, and it sets no cookies.
 - **The URL carries filters and ids, never what someone typed.** Filter values are checked
   against the atlas's fixed lists and anything else is ignored. Text typed into a search box
   stays out of the URL, so links and logs don't carry a founder's own words.
