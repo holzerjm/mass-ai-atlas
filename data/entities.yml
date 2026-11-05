@@ -1249,9 +1249,9 @@
 - id: matrix
   name: Matrix (fka Matrix Partners)
   cat: vc
-  loc: Bay Colony, Waltham
-  lat: 42.3895
-  lng: -71.2265
+  loc: 101 Main St, Cambridge
+  lat: 42.3622
+  lng: -71.0813
   url: https://matrix.vc/
   desc: Early-stage VC with deep Boston roots — among the region's most established firms for seed and Series A.
   why: Led early rounds in HubSpot, Ocient, CloudBees. Strong thesis in SaaS, infrastructure, and applied AI.
@@ -1507,10 +1507,9 @@
 - id: accomplice
   name: Accomplice
   cat: vc
-  loc: Cambridge
-  approx: true
-  lat: 42.3736
-  lng: -71.121
+  loc: 56 Wareham St, Boston
+  lat: 42.3391
+  lng: -71.0674
   url: https://www.accomplice.co
   desc: Community-driven seed firm (Boston roots of Atlas Venture's tech practice); behind BOSS and other ecosystem efforts.
   why: Long history of seeding Boston's startup community itself.
@@ -2043,9 +2042,9 @@
   lat: 42.3601
   lng: -71.0852
   url: https://entrepreneurship.mit.edu/accelerator/
-  desc: 'MIT''s summer venture accelerator: up to $20K equity-free plus living stipends, ending in a famous September Demo Day.'
+  desc: 'MIT''s summer venture accelerator: up to $75K in equity-free funding, ending in a famous September Demo Day.'
   why: The single best on-ramp for MIT student founders. Zero dilution.
-  facts: [[Check size, Up to $20K plus living stipend], [Equity, 0% — equity-free], [Program length, Summer; Demo Day in September], [Focus, MIT student founders]]
+  facts: [[Check size, Up to $75K equity-free], [Equity, 0% — equity-free], [Program length, Summer; Demo Day in September], [Focus, MIT student founders]]
   tags: [equity-free, students]
   stages: [3, 4]
   links: [trust, deltav-demo]

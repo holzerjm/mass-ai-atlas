@@ -123,6 +123,26 @@ mapmakers:
       - { label: "PR #120", url: "https://github.com/holzerjm/mass-ai-atlas/pull/120" }
       - { label: "PR #80", url: "https://github.com/holzerjm/mass-ai-atlas/pull/80" }
 
+  - github: VJ-yadav
+    name: Vijay Yadav
+    photo: true
+    team: VJe
+    since: 2026-10-31
+    kinds: [data, research]
+    story: "Checked the atlas against each organization's own page, with a quoted sentence as the receipt for every claim. That found 3 entries the pages contradicted: Accomplice's and Matrix's offices and delta v's funding."
+    links:
+      - { label: "PR #125", url: "https://github.com/holzerjm/mass-ai-atlas/pull/125" }
+
+  - github: pjsk02
+    name: Je Sai Kailash Pulipati
+    photo: true
+    team: VJe
+    since: 2026-10-31
+    kinds: [data, research]
+    story: "Checked the atlas against each organization's own page, with a quoted sentence as the receipt for every claim. That found 3 entries the pages contradicted: Accomplice's and Matrix's offices and delta v's funding."
+    links:
+      - { label: "PR #125", url: "https://github.com/holzerjm/mass-ai-atlas/pull/125" }
+
 milestones:
   - date: 2026-06-15
     title: "The first outside suggestions"
