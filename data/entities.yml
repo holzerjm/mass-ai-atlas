@@ -460,13 +460,13 @@
   added: 2026-06
   lastVerified: 2026-10
 - id: salesforce-bos
-  name: Salesforce (Cambridge)
+  name: Salesforce (Boston)
   cat: corporate
-  loc: 955 Massachusetts Ave, Cambridge
-  lat: 42.3691
-  lng: -71.1099
+  loc: 500 Boylston St, Boston
+  lat: 42.3504
+  lng: -71.074
   url: https://salesforce.com
-  desc: CRM and enterprise AI vendor. Salesforce lists a Cambridge office at 955 Massachusetts Avenue, alongside Boston and Burlington locations. Its AI platform is now branded Agentforce, with Einstein covering the embedded predictive-AI layer.
+  desc: CRM and enterprise AI vendor. Salesforce lists offices at 500 Boylston Street in Boston and 5 Wall Street in Burlington. Its AI platform is now branded Agentforce, with Einstein covering the embedded predictive-AI layer.
   why: An enterprise platform many AI startups build on or sell through.
   tags: [enterprise, infrastructure]
   stages: [5]
