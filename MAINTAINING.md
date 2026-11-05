@@ -214,6 +214,9 @@ If the work came from someone outside the core team, credit them in `data/credit
 the same pull request or the next one: a new entry, or a new link on theirs. Use their GitHub
 handle. Add a real name or photo only once they have said yes.
 
+If a visitor would notice the change, add a line to `data/updates.yml` for the
+[What's new page](#whats-new). New organizations don't need one: the page lists them on its own.
+
 ➡️ Now publish it → [Part 3](#part-3--publish-to-the-live-site).
 
 ---
@@ -221,7 +224,7 @@ handle. Add a real name or photo only once they have said yes.
 ## Part 3 — Publish to the live site
 
 **Publishing is automatic.** When a change to `index.html`, `atlas-data.js`, `data/`,
-`map-style-dark.json`, `events/` or `credits/` lands on `main` (i.e. when you merge a PR), a GitHub Action
+`map-style-dark.json`, `events/`, `credits/` or `updates/` lands on `main` (i.e. when you merge a PR), a GitHub Action
 re-checks the data and copies the files to the web server. Within about a minute
 the public atlas at **the-open-accelerator.com/ecosystem** shows the change, and a
 summary lands in the TOA Slack channel (what deployed, which entries are new or
@@ -320,6 +323,26 @@ links people have shared, so keep it once a pathway is live.
 
 Pathways are optional. If you copied this template for another region, write your own, or set
 the file to `[]` and the Journey shows its stages alone.
+
+---
+
+## What's new
+
+`data/updates.yml` feeds the What's new page at `/ecosystem/updates/`, and the banner that shows
+a returning visitor the newest line once. It's a short hand-written list, not a changelog: most
+merged work is invisible to a visitor, and listing it would bury what they can use.
+
+- **Add a line when a visitor would notice the change,** in the same pull request. For an
+  outside contribution, a maintainer adds it at merge. Leave out fixes and work behind the scenes.
+- **Say what a visitor can now do,** in one or two plain sentences.
+- **Give a `try` link when there's a place to see it,** such as `?pathway=build-compute#journey`.
+  `node scripts/validate.js` stops if it names a pathway or an entry that doesn't exist.
+- **Skip new organizations.** The page lists them by month from each entry's `added` field. The
+  first month in the data is where the record starts, so it isn't shown as new.
+
+When two lines share a date, the banner shows the one written first. The page's dates make a
+quiet stretch visible, so a gap means nothing shipped that a visitor would notice, or someone
+forgot. If you copied this template, replace the list or set the file to `[]`.
 
 ---
 
@@ -477,6 +500,8 @@ pattern …`. Common ones:
 | `must NOT have additional properties "…"` | A field name is misspelled (e.g. `lastverified`) or isn't one of the fields in Appendix A. |
 | `must be string` | A field was left empty (e.g. `badge:` with nothing after it). Fill it in or delete the line. |
 | `links to unknown entry` | A value in `links` doesn't match any `id`. Fix the spelling or remove it. |
+| `[updates.yml] … links to unknown pathway` (or `entry`) | A `try` link names a pathway or an entry that doesn't exist. Fix the link, or remove it if the feature moved. |
+| `[updates.yml] … in the future` | Check the date. Use the day the change goes live. |
 | `[pathways.yml] … unknown entry` | A step in `data/pathways.yml` names an `id` that doesn't exist. Fix the spelling, or take it out of the step if the entry was removed. |
 | `[pathways.yml] … isn't listed at stage` (a ⚠ warning, not a failure) | A pathway and the entry disagree about the stage. Add the stage to the entry's `stages`, or move the entry out of that pathway. |
 | `missing lastVerified` (a ⚠ warning, not a failure) | Add the month you last confirmed this entry: `lastVerified: YYYY-MM`. |

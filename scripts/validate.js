@@ -147,6 +147,33 @@ for (const d of DATA)
   } catch (e) { perr(e.message); }   // a YAML syntax error names the line and column
 }
 
+// data/updates.yml feeds the updates page and the banner on the atlas page, and like the two
+// files above it is checked here, not in the browser. A `try` link that names a pathway or an
+// entry has to resolve, so renaming one can't leave a dead "Try it" on the page.
+{
+  const fs = require("fs"), path = require("path"), yaml = require("js-yaml"), Ajv = require("ajv");
+  const { DATA_DIR } = require("./load-data");
+  const uerr = msg => errors.push(`  ✗ [updates.yml] ${msg}`);
+  try {
+    const read = f => yaml.load(fs.readFileSync(path.join(DATA_DIR, f), "utf8"), { schema: yaml.CORE_SCHEMA, filename: f });
+    const schema = read("updates.schema.yml"), updates = read("updates.yml");
+    const ajv = new Ajv({ allErrors: true });
+    if (!ajv.validate(schema, updates)) {
+      for (const e of ajv.errors) uerr(`${e.instancePath || "/"} ${e.message}`);
+    } else {
+      const pathways = new Set(read("pathways.yml").map(p => p.id)), seen = new Set();
+      for (const u of updates) {
+        if (u.date > TODAY) uerr(`"${u.title}" is dated ${u.date}, in the future`);
+        if (seen.has(u.title)) uerr(`"${u.title}" is listed twice`);
+        seen.add(u.title);
+        const q = new URLSearchParams((u.try || "").split("#")[0].split("?")[1] || "");
+        if (q.get("pathway") && !pathways.has(q.get("pathway"))) uerr(`"${u.title}" links to unknown pathway "${q.get("pathway")}"`);
+        if (q.get("entry") && !ids.has(q.get("entry"))) uerr(`"${u.title}" links to unknown entry "${q.get("entry")}"`);
+      }
+    }
+  } catch (e) { uerr(e.message); }   // a YAML syntax error names the line and column
+}
+
 if (warn.length) console.log("Warnings:\n" + warn.join("\n") + "\n");
 if (errors.length) {
   console.log("Errors:\n" + errors.join("\n"));

@@ -65,10 +65,11 @@ if (withSuggestForm === withoutCurated) throw new Error("footer: the Suggest an 
 const REPO_LINK = /<a id="footGhLink" href="[^"]*"/;
 if (!REPO_LINK.test(withSuggestForm)) throw new Error("footer: the GitHub link (#footGhLink) was not found in index.html, so a copy's events page could link to the repository it was copied from");
 const withRepoLink = withSuggestForm.replace(REPO_LINK, `<a id="footGhLink" href="https://github.com/${GH_REPO}"`);
-// The footer's link to the credits page is relative to the atlas page. This page sits
-// one folder down, at events/, so the same href would point at events/credits/. Point
-// it up a level. tests/credits.spec.js checks that both footers reach the credits page.
-const footer = withRepoLink.replace('href="credits/"', 'href="../credits/"');
+// The footer's links to the credits and updates pages are relative to the atlas page. This
+// page sits one folder down, at events/, so the same hrefs would point at events/credits/.
+// Point them up a level. tests/credits.spec.js and tests/updates.spec.js check that both
+// footers reach those pages.
+const footer = withRepoLink.replace('href="credits/"', 'href="../credits/"').replace('href="updates/"', 'href="../updates/"');
 const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color:var(--gold);text-decoration:none}");
 // The footer band has to stay dark in both themes: its partner marks are white artwork (the
 // reverse Red Hat wordmark, and IBM's logo inverted by `.partners img.ibm`). index.html keeps it

@@ -397,8 +397,8 @@ html:not(.dark) .event-tag,html:not(.dark) .dr-event{color:#be185d;border-color:
 .new-banner{position:sticky;top:0;z-index:900;display:flex;gap:8px;align-items:center;justify-content:center;
   padding:8px 40px;font-size:13.5px;background:rgba(255,198,0,.12);border-bottom:1px solid rgba(255,198,0,.3);color:#ffc600}
 .new-banner a{color:#ffc600;text-decoration:underline}
-html:not(.dark) .new-banner{background:rgba(180,83,9,.08);border-color:rgba(180,83,9,.3);color:#b45309}
-html:not(.dark) .new-banner a{color:#b45309}
+html:not(.dark) .new-banner{background:rgba(180,83,9,.08);border-color:rgba(180,83,9,.3);color:#92400e}   /* 6.3:1 on this tint; #b45309 was 4.4:1 */
+html:not(.dark) .new-banner a{color:#92400e}
 .nb-x{position:absolute;right:12px;background:none;border:none;color:inherit;cursor:pointer;font-size:14px}
 .modal{position:fixed;inset:0;z-index:9400;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}
 .modal-card{background:#14171c;border:1px solid #2a2f38;border-radius:14px;max-width:520px;width:100%;
@@ -544,7 +544,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 
 <div id="newBanner" class="new-banner" style="display:none">
   <span id="newBannerText"></span>
-  <a href="#" onclick="switchView('directory');document.getElementById('dirSort').value='new';filtersChanged();return false">see what's new</a>
+  <a href="updates/" onclick="dismissNewBanner()">see what's new</a>
   <button class="nb-x" aria-label="Dismiss" onclick="dismissNewBanner()">✕</button>
 </div>
 
@@ -640,7 +640,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
       <h1 id="atlasTitle">Mass <span>AI Atlas</span></h1>
     </div>
     <p class="eyebrow">Presented by The Open Accelerator · an initiative between the MA AI Hub, Red Hat &amp; IBM</p>
-    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br><span class="tag-more">Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br></span>Your contributions make this a valuable resource. Meet the <a href="credits/">mapmakers</a>.</p>
+    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br><span class="tag-more">Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br></span>Your contributions make this a valuable resource. Meet the <a href="credits/">mapmakers</a>, or see <a href="updates/">what's new</a>.</p>
     <div class="hero-cta">
       <a class="btn btn-pri" href="https://the-open-accelerator.com/residency/" target="_blank" rel="noopener">Learn about the TOA Residency</a>
       <a class="btn btn-sec" href="https://the-open-accelerator.com/community/" target="_blank" rel="noopener">Join the Community</a>
@@ -778,7 +778,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     <b>Mass AI Atlas</b> · A project of <a href="https://the-open-accelerator.com" target="_blank" rel="noopener">The Open Accelerator</a> · Curated <span id="footCurated" data-computed>—</span> · <span id="footCount" data-computed>—</span> organizations across Massachusetts.<br>
     Some pin locations are approximate (nearest neighborhood) and community groups move between venues — always check the official site before visiting.<br>
     Know something we missed? <a href="#" onclick="suggestEntry();return false">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a id="footGhLink" href="https://github.com/holzerjm/mass-ai-atlas" target="_blank" rel="noopener">GitHub</a>.<br>
-    Meet the <a href="credits/">mapmakers</a> whose work is in the atlas.
+    Meet the <a href="credits/">mapmakers</a> whose work is in the atlas, or see <a href="updates/">what's new</a>.
   </div>
 </footer>
 </main>
@@ -2570,9 +2570,14 @@ function closeCompare(){ $("compareModal").style.display="none"; dialogClosed();
 window.toggleCompare=toggleCompare; window.openCompare=openCompare; window.closeCompare=closeCompare;
 
 /* stickiness init: saved stars, shared ?list= URLs, the new-this-month banner */
+// toa-atlas-newbanner holds how far someone has read: a month, or an update's date. "2026-11"
+// sorts before "2026-11-05", so one comparison covers both, and a value from before updates
+// existed still shows the newest one once.
+let newestUpdate = "";
 function dismissNewBanner(){
   $("newBanner").style.display="none";
-  try{ localStorage.setItem("toa-atlas-newbanner", localYM(new Date())); }catch(e){}
+  const readTo = [localYM(new Date()), newestUpdate].sort().pop();
+  try{ localStorage.setItem("toa-atlas-newbanner", readTo); }catch(e){}
 }
 window.dismissNewBanner = dismissNewBanner;
 (function initStickiness(){
@@ -2585,11 +2590,28 @@ window.dismissNewBanner = dismissNewBanner;
   const month = localYM(new Date());
   const fresh = DATA.filter(d=>d.added===month).length;
   let seen = null; try{ seen = localStorage.getItem("toa-atlas-newbanner"); }catch(e){}
-  if(fresh >= 2 && seen !== month && !lp){
+  if(fresh >= 2 && (seen||"") < month && !lp){
     $("newBannerText").textContent = `✨ ${fresh} organizations added this month — `;
     $("newBanner").style.display = "";
   }
 })();
+// The newest line in data/updates.yml, shown once to someone who has been here before. A first
+// visit gets the tour instead, when all of it is new. The page reads the file on its own, the
+// way it reads the pathways: without it, the banner goes back to counting new organizations.
+fetch("data/updates.yml")
+  .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+  .then(text=>{
+    const latest = [...(jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA }) || [])].sort((a,b)=>b.date.localeCompare(a.date))[0];
+    if(!latest) return;
+    newestUpdate = latest.date;
+    let seen = null, visited = null;
+    try{ seen = localStorage.getItem("toa-atlas-newbanner"); visited = localStorage.getItem("toa-atlas-tour"); }catch(e){}
+    if(visited && (seen||"") < latest.date && !new URLSearchParams(location.search).get("list")){
+      $("newBannerText").textContent = `✨ New: ${latest.title} — `;
+      $("newBanner").style.display = "";
+    }
+  })
+  .catch(err=>console.warn("No updates list, so the banner only counts new organizations:", err));
 
 /* ---------- guided tour (first visit, or via the nav link) ---------- */
 const TOUR = [
@@ -2601,8 +2623,8 @@ const TOUR = [
     text:"Search anything, filter by category, by what you need, or by stage in the rows above the map, and click any colored pin for details. Top right switches between the Boston area and the whole Commonwealth; ⌖ re-frames the view you picked and ∴ groups or un-groups nearby pins." },
   { view:"directory", sel:"#catChips",
     title:"The Directory",
-    text:"Search in your own words, or filter by category, need, and founder stage — the fastest way to answer “who can help me right now?” Filters carry over to the map, and the page's link keeps them." },
-  { view:"journey", sel:"#stepper",
+    text:"Search in your own words, or filter by category, need, and founder stage — the fastest way to answer “who can help me right now?” ⏳ Open to apply now and Sort: Closing soon show what closes next. Filters carry over to the map, and the page's link keeps them." },
+  { view:"journey", sel:".pw-picks", alt:"#stepper",
     title:"Founder Journey",
     text:"Pick your stage — Spark, Validate, Build, Fund or Scale — then the pathway that sounds like you, for an ordered list of what to do next and why." },
   { view:"map", sel:"#suggestBtn",
@@ -2626,7 +2648,7 @@ function nextTourStep(){
   document.querySelectorAll(".tour-spot").forEach(el=>el.classList.remove("tour-spot"));
   if(s.view && currentView !== s.view) switchView(s.view);
   setTimeout(()=>{
-    const t = document.querySelector(s.sel);
+    const t = document.querySelector(s.sel) || (s.alt && document.querySelector(s.alt));
     if(t){ t.classList.add("tour-spot"); t.scrollIntoView({block:"center", behavior: reduceMotion() ? "auto" : "smooth"}); }
     $("tourTitle").textContent = s.title;
     $("tourText").textContent = s.text;

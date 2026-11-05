@@ -42,13 +42,14 @@ const crypto = require("crypto");
 
 const ROOT = path.join(__dirname, "..", "..");
 // index.html fetches every one of these at load, so a deploy that misses one
-// leaves the page showing its "data failed to load" banner. data/pathways.yml is the
-// exception: without it the Founder Journey loses its pathways and nothing else.
+// leaves the page showing its "data failed to load" banner. data/pathways.yml and
+// data/updates.yml are the exceptions: without them the Founder Journey loses its pathways
+// and the banner its newest update, and nothing else.
 const DEFAULT_FILES = ["index.html", "atlas-data.js", "data/entities.yml",
   "data/entities.schema.yml", "data/categories.yml", "data/categories.schema.yml",
   "data/stages.yml", "data/stages.schema.yml", "data/pathways.yml", "data/pathways.schema.yml",
-  "data/credits.yml", "data/credits.schema.yml",
-  "events/index.html", "credits/index.html", "map-style-dark.json"];
+  "data/credits.yml", "data/credits.schema.yml", "data/updates.yml", "data/updates.schema.yml",
+  "events/index.html", "credits/index.html", "updates/index.html", "map-style-dark.json"];
 
 const args = process.argv.slice(2);
 let base = "https://the-open-accelerator.com/ecosystem/";

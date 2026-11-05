@@ -122,6 +122,8 @@ Accelerator. Change these before you go far:
 - **`CODE_OF_CONDUCT.md`** names `conduct@the-open-accelerator.com`. Change it.
 - **`data/credits.yml`** credits the people who built the atlas upstream, and its links point
   at the upstream repository. Keep them credited, and add your own contributors below them.
+- **`data/pathways.yml` and `data/updates.yml`** describe the upstream atlas. Write your own,
+  or set either file to `[]`: the Founder Journey and the What's new page work without them.
 - **Run `scripts/setup-labels.sh <owner/repo>` first.** Labels do **not** come with a
   template copy, and GitHub *silently* drops a label an issue form asks for when it does
   not exist — so the suggest and flag forms would quietly arrive unlabelled, and the

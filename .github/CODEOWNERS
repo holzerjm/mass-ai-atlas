@@ -12,7 +12,7 @@
 # replacing @holzerjm below):
 #
 #   - The narrative and data files — the founder-stage tips in data/stages.yml, the
-#     pathways in data/pathways.yml, user-visible copy in index.html, README.md,
+#     pathways in data/pathways.yml, data/updates.yml, user-visible copy in index.html, README.md,
 #     CONTRIBUTING.md, MAINTAINING.md and docs/ — are approved by someone other than the
 #     person who wrote the change, so no one person can reword the project's own framing
 #     alone.

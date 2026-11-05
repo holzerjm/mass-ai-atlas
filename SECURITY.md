@@ -74,6 +74,8 @@ behavior:
   in CI only. The page inserts every value as text, never as HTML, and accepts only
   `https:` links. The Founder Journey's `data/pathways.yml` is also checked in CI only. The
   page escapes every value, and shows an organization only if its id resolves to an entry.
+  `data/updates.yml` is checked in CI only too. Its page inserts every value as text and
+  accepts only links inside the atlas.
 
 ## What is not a security issue
 

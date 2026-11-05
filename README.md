@@ -19,6 +19,9 @@ MA AI Hub, Red Hat & IBM).
 - 🧭 **Founder Journey** — from first spark to scale: hand-written pathways, with an ordered list of what to do next and why
 - 📇 **Directory** — search in your own words, with category, need, and stage filters
 
+The [What's new page](https://the-open-accelerator.com/ecosystem/updates/) lists recent features,
+with a link to try each one, and new organizations by month.
+
 Each entry's drawer says what the organization offers founders, shows when a maintainer
 last verified it, and under **places to meet** lists the cafés, quick bites and quieter
 spots within a five-minute walk.
@@ -50,7 +53,7 @@ The maintenance scripts (`scripts/`) need Node 20+ and the two npm dependencies
 ## Deploy
 
 **Merging is publishing.** A GitHub Action deploys `index.html`, `atlas-data.js`,
-`data/`, the map style, the events page and the credits page to [the live site](https://the-open-accelerator.com/ecosystem/) on every
+`data/`, the map style, the events page, the credits page and the updates page to [the live site](https://the-open-accelerator.com/ecosystem/) on every
 merge to `main` that touches them — it re-validates the data first, then rsyncs to
 the server and posts a summary to the TOA Slack. (Not GitHub Pages.)
 
@@ -96,8 +99,10 @@ data/entities.yml                 the dataset — this is what you edit
 data/categories.yml, stages.yml   the categories and founder stages
 data/pathways.yml                 hand-written routes through the Founder Journey
 data/credits.yml                  who has contributed, and the milestones (consent rules inside)
+data/updates.yml                  what a visitor would notice, for the What's new page
 data/*.schema.yml                 JSON Schemas for the data files
 credits/index.html                the credits page, which reads data/credits.yml
+updates/index.html                What's new, which reads data/updates.yml and data/entities.yml
 atlas-data.js                     shared loader: parses data/*.yml + validates against
                                   the schemas (used by index.html and scripts/)
 package.json                      npm deps for the scripts (js-yaml, Ajv) — `npm ci`

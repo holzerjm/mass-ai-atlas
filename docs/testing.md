@@ -119,7 +119,7 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | footer `#footCurated` | the curation month being hand-typed again (it still said "Curated June 2026" in October). The test takes the newest `lastVerified` in the data, the way the page does, so it never needs updating by hand |
 | | every entry opens a drawer | one malformed entry (unknown category, stage with no row) throwing only when someone opens it |
 | | co-located pins | a pin that shares its spot losing the others: every pin within 25 m of another (exact or near, by the map's own haversine) must list them in its popup's `.pop-colocated`, each name there must open that entry's drawer, and markers must stay at their exact coordinates. Without it, 16 entries could not be reached from the map at street zoom (2026-11-01) |
-| | category rows and the credits link on the first screen | the categories dropping below the first screen again. In a 1366 × 650 window, the map's and the galaxy's rows of category buttons, and the header's link to the credits page, must end above the fold. Until 2026-11 the categories were a legend in the canvas's bottom-left corner, which always sat just below the first screen, and the credits page was linked only from the footer |
+| | category rows and the credits and updates links on the first screen | the categories dropping below the first screen again. In a 1366 × 650 window, the map's and the galaxy's rows of category buttons, and the header's link to the credits page, must end above the fold. Until 2026-11 the categories were a legend in the canvas's bottom-left corner, which always sat just below the first screen, and the credits page was linked only from the footer |
 | | a `#map` or `#galaxy` link opens at the top | the browser scrolling such a link down to the element with that id (the map or the galaxy canvas), past its category row. The canvases' `scroll-margin-top` keeps the page at the top, where a tab click leaves it |
 | | the nav's and the footer's GitHub links follow `GH_REPO` | a copy of this repository linking to the one it was copied from. The test serves `index.html` with a different `GH_REPO` and checks both links. The footer's link was written into the HTML and ignored `GH_REPO` until 2026-11 |
 | | a category button hides and shows its pins | a category toggle that stops removing that category's pins, or doesn't put them back, or doesn't report its state in `aria-pressed` |
@@ -187,6 +187,23 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | a kind filter, and All | the filter hiding the wrong people, or All failing to bring everyone back |
 | | no photo or real name without consent | a card showing a GitHub photo or a real name that `data/credits.yml` doesn't opt in to with `photo: true` or `name` |
 | | both footers link to the credits page | the events page's copy of the footer pointing one folder too deep. `scripts/build-events-page.js` rewrites that link |
+| `updates.spec.js` | every update, newest first | the page drifting from `data/updates.yml`, or a date out of order |
+| | every Try it link lands inside the atlas | a `try` link pointing at something that isn't there. A pathway link must open that pathway |
+| | a Try it link on the page opens what it says | the page building the wrong address from a `try` value |
+| | new organizations by month, and where the record starts | the first month in `added` being counted as new. That month is when the field began, so 116 "new" organizations would be false |
+| | a new organization's link opens its entry | a name on the page leading nowhere |
+| | the updates show without the entries | one failed file blanking the page |
+| | the page says so without the updates | a missing file leaving an empty page with no explanation |
+| | the atlas loads as usual without the updates | the atlas depending on the file. `deploy.yml` sends the page before `data/` |
+| | both footers link to the updates page | the events page's copy of the footer pointing one folder too deep |
+| | the banner names the newest update, and shows once | a returning visitor seeing it on every visit, or not at all |
+| | its link opens the updates page, and counts as reading it | the banner coming back after someone followed it |
+| | a newer update beats last month's dismissal | a month saved before updates existed hiding a new one |
+| | a shared shortlist link isn't interrupted | the banner covering what someone was sent to see |
+| | a first visit gets the tour | news about what changed reaching someone who hasn't seen any of it |
+| | the tour mentions applying, and points at the pathways | the tour falling behind the page again. Its text is hand-written, so nothing else notices |
+| | the tour without pathways | the Journey step pointing at nothing. It falls back to the stages |
+| | the updates page fits a phone | a long name forcing the page sideways at 390 px |
 | `a11y.spec.js` | axe on each view | see below |
 | | every allowlist entry is scoped | a `KNOWN_SERIOUS` entry with no `within`, which would tolerate its rule on every element of that page, including ones added later |
 | | one banner, one main and one footer landmark, each told apart | the atlas page's landmarks going wrong again (#58). Until 2026-11 screen readers listed two contentinfo and two banner landmarks with nothing to tell them apart, and no main one, and its two `<nav>`s had no names. The views and the atlas's own footer now sit in `<main>`, so the TOA site footer is the page's one footer. The hero is a section named by the page's title, so the TOA site header is the one banner. Each `<nav>` has a name. axe rates the four rules moderate, which the gate reports without failing, so this test runs `landmark-no-duplicate-contentinfo`, `landmark-one-main`, `landmark-no-duplicate-banner` and `landmark-unique` on their own |
@@ -210,7 +227,9 @@ Every spec imports `test` from `tests/helpers/atlas.js`, which adds:
   `eventsFeed: "missing"` to get a 404.
 - **No tour.** The first-visit tour starts 1.4 s after a plain page load and
   switches views, which would race other assertions, so it is marked as seen.
-  `test.use({ firstVisit: true })` turns it back on.
+  `test.use({ firstVisit: true })` turns it back on. The what's-new banner is off the same way,
+  because it arrives after load and moves the page down: `test.use({ newBanner: true })` turns it
+  back on.
 
 If a test fails because you changed that behaviour on purpose, change the test
 in the same PR and say why in the commit message — the tests are the written
@@ -229,8 +248,8 @@ loader the page uses (`atlas-data.js`), exactly as
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
 an open entry drawer, a founder pathway with open and closed programs, a shared shortlist,
-the first-visit tour card, the events page and
-the credits page, each in both the dark and the light theme; and the galaxy's keyboard
+the first-visit tour card, the what's-new banner, the events page, the credits page and the
+updates page, each in both the dark and the light theme; and the galaxy's keyboard
 list and search with a category open and results showing, in the dark theme.
 
 The gate was set from what the pristine baseline (main @ 76cf38e) actually
@@ -354,7 +373,7 @@ A checkout of `main` should report `OK`; a branch with unmerged changes to the
 files it compares will (correctly) report a mismatch. The script:
 
 1. hashes (sha256) this checkout's `index.html`, `atlas-data.js`, the data and
-   schema files in `data/`, `events/index.html`, `credits/index.html` and
+   schema files in `data/`, `events/index.html`, `credits/index.html`, `updates/index.html` and
    `map-style-dark.json`
    (`DEFAULT_FILES` at the top of the script), or only the files you name;
 2. fetches each from `https://the-open-accelerator.com/ecosystem/` through

@@ -78,6 +78,11 @@ const SCANS = [
   { name: "credits page", url: "./credits/", credits: true },
   { name: "credits page (light theme)", url: "./credits/", credits: true,
     theme: "light" },
+  { name: "updates page", url: "./updates/", updates: true },
+  { name: "updates page (light theme)", url: "./updates/", updates: true, theme: "light" },
+  // the banner that shows a returning visitor the newest update
+  { name: "what's-new banner", url: "./", newBanner: true, include: "#newBanner" },
+  { name: "what's-new banner (light theme)", url: "./", newBanner: true, include: "#newBanner", theme: "light" },
 ];
 
 // For each flagged node, the `within` selector it falls under, or null. axe's
@@ -99,6 +104,7 @@ function describeViolation(v){
 for(const scan of SCANS){
   test.describe(() => {
     if(scan.firstVisit) test.use({ firstVisit: true });
+    if(scan.newBanner) test.use({ newBanner: true });
 
     test(`axe: ${scan.name}`, async ({ page }, testInfo) => {
       if(scan.theme === "light"){
@@ -109,6 +115,8 @@ for(const scan of SCANS){
       await page.goto(scan.url);
       if(scan.events){
         await expect(page.locator("#list .ev").first()).toBeVisible();
+      } else if(scan.updates){
+        await expect(page.locator("#months .month").first()).toBeVisible();
       } else if(scan.credits){
         // wait for the cards and the timeline, which render from data/credits.yml
         await expect(page.locator("#cards .card").first()).toBeVisible();

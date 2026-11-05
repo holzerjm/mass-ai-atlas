@@ -24,6 +24,10 @@ All data lives in YAML files under [`data/`](data/): the entries in
 has a JSON Schema next to it (`*.schema.yml`) that defines every field and its rules. The
 rules for writing a pathway are in [`MAINTAINING.md`](MAINTAINING.md#founder-pathways).
 
+If your change is something a visitor would notice, add a line to
+[`data/updates.yml`](data/updates.yml) for the What's new page, or a maintainer will at merge.
+New organizations don't need one: the page lists them on its own.
+
 ### Adding an entry
 
 1. Fork and clone the repo

@@ -1,0 +1,35 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: updates.schema.yml
+title: Mass AI Atlas updates
+description: >
+  What a visitor would notice, newest first: a short hand-written list, not a changelog. Read by
+  updates/index.html and by the banner in index.html, and checked by scripts/validate.js. New
+  organizations don't go here: the page lists those from each entry's `added` month. An empty
+  list is valid. MAINTAINING.md says when to add a line.
+type: array
+definitions:
+  text:
+    type: string
+    minLength: 1
+    pattern: '^[^<>]*$'
+items:
+  type: object
+  required: [date, title, text]
+  additionalProperties: false
+  properties:
+    date:
+      description: the day it went live, YYYY-MM-DD
+      type: string
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+    title:
+      description: what changed, in a few words. The banner shows the newest one
+      allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 60 }]
+    text:
+      description: one or two plain sentences on what a visitor can now do
+      allOf: [{ $ref: '#/definitions/text' }, { type: string, minLength: 20, maxLength: 240 }]
+    try:
+      description: >
+        where to see it, relative to the atlas page: a query, a hash, or a folder, such as
+        '?pathway=build-compute#journey' or 'credits/'
+      type: string
+      pattern: '^(\?|#|[a-z][a-z0-9-]*/)[^\s"<>]*$'
