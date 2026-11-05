@@ -154,6 +154,11 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | on a phone, the map and the first card are on the first screen | the header filling a phone's first screen again (the map started 792 px down and the first card 1,428 px down, until 2026-11), or the sticky tabs going back to three rows |
 | | the menu button has no gray box | the browser's default button background returning behind the white menu icon (1.15:1), on the atlas and on the events page, which lifts the header from it |
 | | the hero's button | the hero promising an open application again. It said "Apply" while the residency page said applications had closed |
+| `apply.spec.js` | an open application gets an Apply button | the apply link going missing, or 2 main buttons competing. Apply is the main button only while applications are open |
+| | with no application page, the website stays the main button | an empty Apply button, or the drawer losing its main button |
+| | a closed program says when to come back | a program between windows looking blank, or showing an Apply button for a form that's shut |
+| | a deadline that has passed shows nothing | an expired date, or the note that described it, outliving the deadline |
+| | Closing soon lists the nearest date first | the sort dropping dated deadlines below rolling ones, or leaving the address |
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
 | | `?list=` of unknown ids | a stale list link breaking the page |
 | `events.spec.js` | `/events/` loads and lists events | the events page breaking |

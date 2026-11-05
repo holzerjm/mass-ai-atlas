@@ -91,7 +91,8 @@ async function probe(url) {
 
 (async () => {
   const results = [];
-  const queue = [...DATA];
+  // An entry's application page rots on its own schedule, so it gets its own check.
+  const queue = DATA.flatMap(d => d.applyUrl ? [d, { id: d.id, name: d.name, url: d.applyUrl }] : [d]);
   const workers = Array.from({ length: 8 }, async () => {
     while (queue.length) {
       const d = queue.shift();

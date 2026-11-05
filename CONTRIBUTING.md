@@ -57,7 +57,9 @@ An annotated example:
                                     # talent | customers (powers the "I need…" filter)
   applyBy: '2026-10-15'             # optional: rolling, or the current application
                                     # deadline — past dates auto-hide in the app
-  applyNote: Fall 2026 cohort       # optional, max 40 chars, shown next to the deadline
+  applyNote: Fall 2026 cohort       # optional, max 40 chars, shown next to the deadline,
+                                    # or on its own while applications are closed
+  applyUrl: https://example.org/apply  # optional: the application page, if it isn't `url`
   facts: [[Check size, $500K–$2M],
           [Equity, 6%]]             # optional "at a glance" table, 1-6 rows; labels:
                                     # Check size | Stage | Terms | Equity | Board seat |

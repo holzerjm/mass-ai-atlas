@@ -416,6 +416,8 @@ html:not(.dark) .need-chip{border-color:#d8d3ca;color:#5d574e}
 html:not(.dark) .need-chip.on{border-color:#b45309;color:#b45309;background:rgba(180,83,9,.07)}
 .dr-apply{margin-top:14px;font-size:13.5px;font-weight:500;color:#4ade80}
 html:not(.dark) .dr-apply{color:#15803d}
+.dr-closed,html:not(.dark) .dr-closed{color:var(--muted)}
+.dr-apply a{color:inherit;text-decoration:underline}
 .apply-tag{color:#4ade80;border-color:rgba(74,222,128,.4)}
 html:not(.dark) .apply-tag{color:#166534;border-color:rgba(21,128,61,.35)}   /* 6.3:1 on --panel2; #15803d was 4.43:1 */
 .dr-facts{margin-top:8px;border-collapse:collapse;font-size:13px;width:100%}
@@ -713,6 +715,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
       <option value="name">Sort: A → Z</option>
       <option value="cat">Sort: Category</option>
       <option value="new">Sort: Recently added</option>
+      <option value="deadline">Sort: Closing soon</option>
     </select>
   </div>
   <div class="cat-chips" id="catChips"></div>
@@ -999,6 +1002,9 @@ fetch("events.json").then(r => r.ok ? r.json() : null).then(j => {
 }).catch(()=>{});
 // open = rolling, or a deadline that hasn't passed; expired dates render as nothing
 const applyOpen = d => d.applyBy === "rolling" || (!!d.applyBy && d.applyBy >= todayYMD());
+// closed = no deadline, and a note saying when the next window is. An expired date isn't this:
+// its note described that deadline, so it stays hidden until someone updates the entry.
+const applyClosed = d => !d.applyBy && !!d.applyNote;
 // Checked at call time, not cached: the preference can change mid-session.
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 // CSS handles animations and transitions; these are the motions JS drives.
@@ -1303,6 +1309,7 @@ function openDrawer(id){
   let html = `<p>${esc(d.desc)}</p>`;
   if(d.why) html += `<div class="dr-why" style="--cc:${col}"><b>Why it matters for founders</b><div>${esc(d.why)}</div></div>`;
   if(applyOpen(d)) html += `<div class="dr-apply">⏳ Applications open — ${d.applyBy==="rolling" ? "rolling" : "apply by " + fmtDeadline(d.applyBy)}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`;
+  else if(applyClosed(d)) html += `<div class="dr-apply dr-closed">⏸ Applications closed · ${esc(d.applyNote)}${d.applyUrl ? ` — <a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">how to apply ↗</a>` : ""}</div>`;
   if(eventHosts[d.id]) html += `<div class="dr-apply dr-event">🎟 Hosting: ${esc(eventHosts[d.id].title)} — <a href="events/" target="_blank" rel="noopener">all events</a></div>`;
   if(d.offers && d.offers.length) html += `<div class="dr-sec">What founders get</div><div class="chips">` +
     d.offers.map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join(" ") + `</div>`;
@@ -1327,8 +1334,10 @@ function openDrawer(id){
   if(d.lastVerified) html += isStale(d)
     ? `<div class="dr-verified stale">⚠️ Last verified ${fmtMonth(d.lastVerified)} — details may have changed. Spot something off? Use 🚩 Flag below.</div>`
     : `<div class="dr-verified">✓ ${fmtVerified(d.lastVerified)}</div>`;
+  const applyNow = applyOpen(d) && d.applyUrl;
   html += `<div class="dr-actions">
-    <a class="btn btn-pri" href="${esc(d.url)}" target="_blank" rel="noopener">Visit website ↗</a>
+    ${applyNow ? `<a class="btn btn-pri" href="${esc(d.applyUrl)}" target="_blank" rel="noopener">Apply ↗</a>` : ""}
+    <a class="btn ${applyNow ? "btn-sec" : "btn-pri"}" href="${esc(d.url)}" target="_blank" rel="noopener">Visit website ↗</a>
     <button class="btn btn-sec" onclick="goToMap('${d.id}')">Show on map</button>
     <button class="btn btn-sec" onclick="toggleStar('${d.id}');openDrawer('${d.id}')" title="Save to your shortlist">${starSet.has(d.id)?"★ Saved":"☆ Save"}</button>
     <button class="btn btn-sec" onclick="copyLink(this)" title="Copy a shareable link to this entry">🔗 Copy link</button>
@@ -2303,7 +2312,7 @@ renderStepper(); renderJourney();
     cc.appendChild(el);
   });
   const sort = new URLSearchParams(location.search).get("sort");
-  if(sort === "cat" || sort === "new") $("dirSort").value = sort;
+  if(sort === "cat" || sort === "new" || sort === "deadline") $("dirSort").value = sort;
   syncFilters();
   // debounced because #dirCount is a live region — an undebounced handler would
   // queue one screen-reader announcement per keystroke
@@ -2337,6 +2346,11 @@ function renderCards(){
   $("dirSort").options[0].textContent = q ? "Sort: Best match" : "Sort: A → Z";
   if(sort==="cat") list.sort((a,b)=> a.cat===b.cat ? a.name.localeCompare(b.name) : a.cat.localeCompare(b.cat));
   else if(sort==="new") list.sort((a,b)=> (b.added||"").localeCompare(a.added||"") || a.name.localeCompare(b.name));
+  else if(sort==="deadline"){
+    // the nearest date first, then rolling, then everything not taking applications
+    const when = d => !applyOpen(d) ? "2" : d.applyBy==="rolling" ? "1" : "0" + d.applyBy;
+    list.sort((a,b)=> when(a).localeCompare(when(b)) || a.name.localeCompare(b.name));
+  }
   else if(!q) list.sort((a,b)=> a.name.localeCompare(b.name));
   $("dirCount").textContent = `${list.length} of ${DATA.length} organizations` + needsNote(band)
     + (closest && list.length ? " · none match every word, closest first" : "");
@@ -2449,7 +2463,9 @@ function openCompare(){
     ["", list.map(d=>`<b>${esc(d.name)}</b><br><span style="color:${cInk(d.cat)}">${cLabel(d.cat)}</span>`)],
     ["Location", list.map(d=>esc(d.loc))],
     ["What you get", list.map(d=>(d.offers||[]).map(o=>OFFERS_META[o]?.icon+" "+OFFERS_META[o]?.label).join("<br>")||"—")],
-    ["Applications", list.map(d=>applyOpen(d) ? (d.applyBy==="rolling"?"Open — rolling":"Open — by "+esc(fmtDeadline(d.applyBy))) : "—")],
+    ["Applications", list.map(d=>applyOpen(d) ? (d.applyBy==="rolling"?"Open — rolling":"Open — by "+esc(fmtDeadline(d.applyBy)))
+      + (d.applyUrl ? `<br><a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">Apply ↗</a>` : "")
+      : applyClosed(d) ? "Closed · "+esc(d.applyNote) : "—")],
     ...factLabels.map(l=>[esc(l), list.map(d=>cell(d,l))]),
     ["Stages", list.map(d=>(d.stages||[]).map(n=>STAGES.find(s=>s.n===n)?.t).join(", ")||"—")],
     ["", list.map(d=>`<a href="#" onclick="closeCompare();openDrawer('${d.id}');return false">Full entry →</a>`)],

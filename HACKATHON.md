@@ -72,7 +72,7 @@ build artifact in between.
 | `data/*.schema.yml` | JSON Schema for each — these are a safety control, not just a type check |
 | `atlas-data.js` | the shared loader, used by the page and by every script |
 | `scripts/` | validate, exports, link check, freshness rota, the events pipeline |
-| `tests/` | about 95 Playwright tests over the four views, deep links, search, filters, the Galaxy on phones, keyboard use, the shortlist, events, credits, and accessibility in both themes |
+| `tests/` | about 100 Playwright tests over the four views, deep links, search, filters, the Galaxy on phones, keyboard use, the shortlist, events, credits, and accessibility in both themes |
 
 Map stack: Leaflet 1.9.4 with a MapLibre GL 5.24.0 vector basemap from OpenFreeMap (keyless),
 markercluster 1.5.3. All from CDNs — there is nothing to bundle.

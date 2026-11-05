@@ -33,6 +33,7 @@ test("every KNOWN_SERIOUS entry is scoped to named elements", () => {
 });
 
 const entry = DATA.find(d => d.id === "csail") || DATA[0];
+const closed = DATA.find(d => !d.applyBy && d.applyNote && d.applyUrl) || entry;
 
 const SCANS = [
   { name: "map view", url: "./" },
@@ -58,6 +59,9 @@ const SCANS = [
   { name: "journey view (light theme)", url: "./#journey", theme: "light" },
   { name: "directory view (light theme)", url: "./#directory", theme: "light" },
   { name: "entry drawer (light theme)", url: `./?entry=${entry.id}`, include: "#drawer", theme: "light" },
+  // the "Applications closed" line and its link, which only a closed program has
+  { name: "closed program's drawer", url: `./?entry=${closed.id}`, include: "#drawer" },
+  { name: "closed program's drawer (light theme)", url: `./?entry=${closed.id}`, include: "#drawer", theme: "light" },
   { name: "shared shortlist (light theme)", url: `./?list=${DATA[0].id},${DATA[1].id}`, include: "#shortlistModal",
     theme: "light" },
   { name: "first-visit tour", url: "./", firstVisit: true, include: "#tourCard" },

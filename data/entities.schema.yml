@@ -96,10 +96,14 @@ items:
         - type: string
           pattern: ^\d{4}-\d{2}-\d{2}$
     applyNote:
-      description: short note shown next to the deadline
+      description: short note shown next to the deadline, or on its own while applications are closed
       type: string
       pattern: *nohtml
       maxLength: 40
+    applyUrl:
+      description: direct https:// link to the application page, when it isn't the homepage
+      type: string
+      pattern: ^https://[^\s"'<>\\]*$
     facts:
       description: 1-6 [label, value] pairs
       type: array
