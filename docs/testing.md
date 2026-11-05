@@ -196,7 +196,7 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | without clipboard access, the prompt shows selected | a browser that refuses the clipboard leaving the button dead |
 | | `?ask=1` opens the dialog once | the dialog coming back on every reload |
 | | a pathway offers it | the way in from the Journey going missing |
-| | the dialog offers the data and a way to attach it | an assistant that can't browse leaving a founder stuck |
+| | the dialog recommends attaching the data, offers a look at it, and states its limits | a founder left relying on a web tool that cuts or summarizes the file, or the privacy and accuracy notes going missing |
 | | the dialog fits a phone | the dialog running off the screen at 390 px |
 | | `atlas-ai.txt` lists every organization, A to Z | an entry missing, or the order depending on anything but the name |
 | | it carries every pathway, with entries that exist | a pathway dropped, or a step naming something that isn't there |

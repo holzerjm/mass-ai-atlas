@@ -415,6 +415,7 @@ html:not(.dark) .modal-card{background:#fff;border-color:#ddd}
 .ask-rules summary{cursor:pointer;font-weight:600}
 .ask-rules pre{margin-top:8px;padding:10px 11px;max-height:190px;overflow:auto;background:var(--panel2);border:1px solid var(--line);border-radius:10px;font:12px/1.5 "Red Hat Mono",ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
 .ask-note{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.ask-note b{color:var(--text)}
 .ask-note a,.pw-note a{color:var(--gold-ink);text-decoration:underline}
 .sl-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid rgba(128,128,128,.15)}
 .sl-main{flex:1;min-width:0}
@@ -576,9 +577,10 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     <label class="ask-label" for="askSituation">Your situation</label>
     <textarea class="ask-box" id="askSituation" placeholder="For example: two of us in Worcester with a working demo, and we need a first hospital pilot." oninput="renderAsk()"></textarea>
     <details class="ask-rules" id="askRules"><summary>Read the whole prompt</summary><pre id="askPrompt" tabindex="0"></pre></details>
-    <p class="ask-note">What you type stays in this browser until you paste it. After that, your assistant's own terms apply. If it can't open the data, <a href="atlas-ai.txt" download>download the file</a> and attach it. Answers come from your assistant, not the atlas, so check anything important with the organization.</p>
+    <p class="ask-note"><b>For the fullest answer, attach the data file.</b> Download it and add it to your message along with the prompt. Without it, your assistant has to fetch the file itself, and web tools can cut a long file short or pass on only a summary.</p>
+    <p class="ask-note">What you type stays in this browser until you paste it. After that, your assistant's own terms apply. Answers come from your assistant, not the atlas, so check anything important with the organization. You can also <a href="atlas-ai.txt" target="_blank" rel="noopener">read the data yourself</a>.</p>
     <div class="modal-actions">
-      <a class="btn btn-sec" href="atlas-ai.txt" target="_blank" rel="noopener">See the data</a>
+      <a class="btn btn-sec" href="atlas-ai.txt" download>Download the data</a>
       <button class="btn btn-pri" id="askCopy" onclick="copyAskPrompt(this)">Copy the prompt</button>
     </div>
   </div>
@@ -2654,7 +2656,7 @@ function askPrompt(){
   return `Help me find what I need in Massachusetts' AI ecosystem, using the Mass AI Atlas.
 
 Read this file first: ${file}
-If you can't open all of it, tell me and ask me to attach it. It ends with the line "End of file". Don't answer from memory.
+If I attached a copy, read that instead. If you can only get part of it, or a summary, tell me and ask me to attach it. It ends with the line "End of file". Don't answer from memory.
 
 Today is ${today}.
 

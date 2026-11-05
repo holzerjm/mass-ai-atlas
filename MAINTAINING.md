@@ -363,11 +363,17 @@ prompt points at, `atlas-ai.txt`, on every deploy.
 - **The file's last line is "End of file".** Web tools can cut a long page without saying so, and
   a file cut at M would quietly lose everything after it. Keep that line, and the prompt's line
   that asks for it.
+- **Attaching beats fetching.** On 2026-11-05, one web tool stopped about three-quarters of the
+  way through the file and passed on a smaller model's summary, not the text. Both models we tried
+  noticed, but their answers lost detail and links. So the dialog recommends attaching the file,
+  and the prompt asks the assistant to speak up if it gets only part of the file or a summary.
+  Don't shrink the file to fit one tool: that would cut the catches, and an assistant would still
+  get a summary.
 
-Before you change the prompt, try it on more than one model. Include a question it should refuse
-to rank ("which accelerator is best?"), one the atlas can't answer, and a fact the file doesn't
-hold. Check that every link resolves, that it says what it doesn't know, and that TOA and the
-sponsors get the same treatment as everyone else.
+Before you change the prompt, try it on more than one model, with the file attached and with only
+the live URL. Include a question it should refuse to rank ("which accelerator is best?"), one the
+atlas can't answer, and a fact the file doesn't hold. Check that every link resolves, that it says
+what it doesn't know, and that TOA and the sponsors get the same treatment as everyone else.
 
 ---
 

@@ -43,6 +43,8 @@ test("the prompt points at the file, carries the rules, and says what day it is"
   expect(text).toContain("Recommend only organizations in the file");
   expect(text).toContain("Don't answer from memory");
   expect(text).toContain("End of file");
+  expect(text).toContain("If I attached a copy, read that instead");
+  expect(text).toContain("If you can only get part of it, or a summary, tell me and ask me to attach it");
   expect(text).toContain("don't favor an organization because of who sponsors or runs the atlas");
   expect(text).toContain(`Today is ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}.`);
   expect(text).toContain("My situation: [Describe your stage");
@@ -108,10 +110,13 @@ test("a pathway offers it to someone it doesn't fit", async ({ page }) => {
   await expect(dialog(page)).toBeVisible();
 });
 
-test("the dialog offers the data and a way to attach it", async ({ page }) => {
+test("the dialog recommends attaching the data, offers a look at it, and states its limits", async ({ page }) => {
   await openFromDirectory(page);
-  await expect(page.locator('#askModal a[download][href="atlas-ai.txt"]')).toBeVisible();
-  await expect(page.locator('#askModal a.btn[href="atlas-ai.txt"]')).toBeVisible();
+  await expect(dialog(page)).toContainText("For the fullest answer, attach the data file");
+  await expect(dialog(page)).toContainText("What you type stays in this browser until you paste it");
+  await expect(dialog(page)).toContainText("Answers come from your assistant, not the atlas");
+  await expect(page.locator('#askModal a.btn[download][href="atlas-ai.txt"]')).toHaveText("Download the data");
+  await expect(page.locator('#askModal a[target="_blank"][href="atlas-ai.txt"]')).toBeVisible();
 });
 
 test.describe("on a phone", () => {
