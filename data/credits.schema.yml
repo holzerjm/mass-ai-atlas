@@ -5,7 +5,7 @@ description: >
   The people outside the core team whose work is in the atlas, and the milestones of how it got
   here. Read by credits/index.html and checked by scripts/validate.js. A GitHub handle and the
   person's public pull requests and issues are public already, so they are all an entry needs.
-  `name` and `photo` are shown only with that person's consent.
+  `name`, `photo`, and `linkedin` are shown only with that person's consent.
 type: object
 required: [contributing, corrections, mapmakers, milestones]
 additionalProperties: false
@@ -59,6 +59,10 @@ properties:
         photo:
           description: true shows the GitHub avatar, only with the person's consent
           type: boolean
+        linkedin:
+          description: LinkedIn profile, only with the person's consent
+          type: string
+          pattern: '^https://(www\.)?linkedin\.com/in/[A-Za-z0-9%_-]+/?$'
         team:
           description: a hackathon team or similar group
           allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 40 }]

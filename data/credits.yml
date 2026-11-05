@@ -3,8 +3,8 @@
 # scripts/validate.js against credits.schema.yml.
 #
 # Consent. A GitHub handle and that person's public pull requests and issues are
-# public already, so every entry starts with just those. Add `name`, or
-# `photo: true` to show their GitHub avatar, only after the person has said yes.
+# public already, so every entry starts with just those. Add `name`, `linkedin`,
+# or `photo: true` to show their GitHub avatar, only after the person has said yes.
 # Anyone can ask to change or remove their credit through `corrections`.
 #
 # When an outside contribution merges, credit it in the same pull request: add
@@ -97,6 +97,7 @@ mapmakers:
       - { label: "Issue #87", url: "https://github.com/holzerjm/mass-ai-atlas/issues/87" }
 
   - github: arshmehar
+    linkedin: https://www.linkedin.com/in/arshmeharkaur05
     team: TBTT
     since: 2026-10-31
     kinds: [data, research]
@@ -106,6 +107,7 @@ mapmakers:
       - { label: "PR #80", url: "https://github.com/holzerjm/mass-ai-atlas/pull/80" }
 
   - github: kartsen03
+    linkedin: https://www.linkedin.com/in/karthik-sengupta
     team: TBTT
     since: 2026-10-31
     kinds: [data, research]
@@ -115,6 +117,7 @@ mapmakers:
       - { label: "PR #80", url: "https://github.com/holzerjm/mass-ai-atlas/pull/80" }
 
   - github: bhoomig11
+    linkedin: https://www.linkedin.com/in/bhoomikag11
     team: TBTT
     since: 2026-10-31
     kinds: [data, research]

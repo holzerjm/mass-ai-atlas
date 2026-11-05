@@ -106,7 +106,7 @@
 
   <section class="about" aria-label="About these credits">
     <p>Credit here is for individual work. Sponsors are thanked on the atlas page, and credit here can't be bought.</p>
-    <p>Everyone is listed by their public GitHub handle. A real name or photo appears only with that person's consent. To change or remove your credit, <a id="corrections" href="#">open an issue</a>.</p>
+    <p>Everyone is listed by their public GitHub handle. A real name, photo, or LinkedIn link appears only with that person's consent. To change or remove your credit, <a id="corrections" href="#">open an issue</a>.</p>
   </section>
 </main>
 
@@ -169,7 +169,8 @@ function card(m){
   const kinds = el("ul", { class: "kinds", "aria-label": "Kinds of work" },
     ...m.kinds.map(k => el("li", { class: "kind" }, el("span", { "aria-hidden": "true", text: ((KINDS[k] || {}).icon || "") + " " }), (KINDS[k] || { label: k }).label)));
   return el("li", { class: "card", "data-github": m.github, "data-kinds": m.kinds.join(" ") },
-    who, el("p", { class: "story", text: m.story }), kinds, joinLinks(m.links),
+    who, el("p", { class: "story", text: m.story }), kinds,
+    joinLinks(m.linkedin ? [...m.links, { label: "LinkedIn", url: m.linkedin }] : m.links),
     el("p", { class: "since" }, "Since ", el("time", { datetime: m.since, text: fmt(m.since, true) })));
 }
 

@@ -165,7 +165,7 @@ Use this path for a change outside `data/`, such as an issue labelled
 - Flags with a source link get fast-tracked
 - When your contribution merges, you're credited on the atlas's credits page, from
   `data/credits.yml`, by your GitHub handle. Say in your pull request if you'd also like
-  your real name or photo shown
+  your real name, LinkedIn link, or photo shown
 
 ## Maintainers
 

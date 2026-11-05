@@ -185,7 +185,7 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | `credits.spec.js` | one card per mapmaker | the credits page drifting from `data/credits.yml`: a missing card, a wrong handle link, a story that doesn't match, or a hand-typed count |
 | | the timeline, oldest first | a milestone going missing or out of order |
 | | a kind filter, and All | the filter hiding the wrong people, or All failing to bring everyone back |
-| | no photo or real name without consent | a card showing a GitHub photo or a real name that `data/credits.yml` doesn't opt in to with `photo: true` or `name` |
+| | no photo, real name, or LinkedIn link without consent | a card showing a GitHub photo, a real name, or a LinkedIn link that `data/credits.yml` doesn't opt in to with `photo: true`, `name`, or `linkedin`, or a LinkedIn link going to the wrong profile |
 | | both footers link to the credits page | the events page's copy of the footer pointing one folder too deep. `scripts/build-events-page.js` rewrites that link |
 | `ask.spec.js` | the Directory opens the dialog, and closing it puts the focus back | a dialog the keyboard can't leave, or one that loses the reader's place |
 | | Tab stays inside the dialog | the keyboard walking the page behind it |

@@ -212,7 +212,7 @@ contribution).
 
 If the work came from someone outside the core team, credit them in `data/credits.yml`, in
 the same pull request or the next one: a new entry, or a new link on theirs. Use their GitHub
-handle. Add a real name or photo only once they have said yes.
+handle. Add a real name, LinkedIn link, or photo only once they have said yes.
 
 If a visitor would notice the change, add a line to `data/updates.yml` for the
 [What's new page](#whats-new). New organizations don't need one: the page lists them on its own.

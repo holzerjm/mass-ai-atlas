@@ -45,15 +45,22 @@ test("a kind filter on the credits page shows only that kind, and All brings eve
   await expect(page.locator("#cards .card:visible")).toHaveCount(PEOPLE.length);
 });
 
-test("nobody on the credits page gets a photo or a real name without consent", async ({ page }) => {
-  // `photo: true` and `name` are opt-in in data/credits.yml. Without them a card shows
-  // initials and the public GitHub handle, and nothing else about the person.
+test("nobody on the credits page gets a photo, a real name, or a LinkedIn link without consent", async ({ page }) => {
+  // `photo: true`, `name`, and `linkedin` are opt-in in data/credits.yml. Without them a
+  // card shows initials and the public GitHub handle, and nothing else about the person.
   await page.goto("./credits/");
   await expect(page.locator("#cards .card")).toHaveCount(PEOPLE.length);
+  await expect(page.locator("body")).toContainText("A real name, photo, or LinkedIn link appears only with that person's consent");
   for (const m of PEOPLE) {
     const card = page.locator(`#cards .card[data-github="${m.github}"]`);
     await expect(card.locator("img")).toHaveCount(m.photo ? 1 : 0);
     await expect(card.locator(".name")).toHaveCount(m.name ? 1 : 0);
+    const linkedin = card.locator('a[href*="linkedin.com"]');
+    await expect(linkedin).toHaveCount(m.linkedin ? 1 : 0);
+    if (m.linkedin) {
+      await expect(linkedin).toHaveAttribute("href", m.linkedin);
+      await expect(linkedin).toHaveText("LinkedIn");
+    }
   }
 });
 
