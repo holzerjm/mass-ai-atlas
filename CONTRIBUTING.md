@@ -19,8 +19,10 @@ A maintainer reviews each issue and turns accepted suggestions into pull request
 
 All data lives in YAML files under [`data/`](data/): the entries in
 [`data/entities.yml`](data/entities.yml) (one list item per organization), plus
-[`categories.yml`](data/categories.yml) and [`stages.yml`](data/stages.yml). Each file
-has a JSON Schema next to it (`*.schema.yml`) that defines every field and its rules.
+[`categories.yml`](data/categories.yml), [`stages.yml`](data/stages.yml), and
+[`pathways.yml`](data/pathways.yml), the hand-written routes in the Founder Journey. Each file
+has a JSON Schema next to it (`*.schema.yml`) that defines every field and its rules. The
+rules for writing a pathway are in [`MAINTAINING.md`](MAINTAINING.md#founder-pathways).
 
 ### Adding an entry
 

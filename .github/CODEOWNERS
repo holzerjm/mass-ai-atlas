@@ -11,10 +11,11 @@
 # Planned two-person rule, once a second owner exists (a team with at least two members,
 # replacing @holzerjm below):
 #
-#   - The narrative and data files — the founder-stage tips in data/stages.yml,
-#     user-visible copy in index.html, README.md, CONTRIBUTING.md, MAINTAINING.md and
-#     docs/ — are approved by someone other than the person who wrote the change, so no
-#     one person can reword the project's own framing alone.
+#   - The narrative and data files — the founder-stage tips in data/stages.yml, the
+#     pathways in data/pathways.yml, user-visible copy in index.html, README.md,
+#     CONTRIBUTING.md, MAINTAINING.md and docs/ — are approved by someone other than the
+#     person who wrote the change, so no one person can reword the project's own framing
+#     alone.
 #   - CODEOWNERS matches files, not lines, so assigning data/entities.yml to the team
 #     means every maintainer-authored data change gets a second reviewer. Community PRs
 #     are unaffected in practice: the author is not a maintainer, so one maintainer

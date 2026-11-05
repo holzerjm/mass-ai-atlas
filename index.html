@@ -274,6 +274,32 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
 .jr-tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:22px}
 .jr-tip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5}
 .jr-tip b{display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#9fb4ff}
+/* pathways: hand-written routes through a stage, above the stage's full list (data/pathways.yml) */
+.pw{margin-bottom:24px}
+.pw-ask,.jr-all{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:10px}
+.pw-picks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.pw-pick{font:inherit;font-size:13.5px;font-weight:600;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;text-align:left;transition:.15s}
+.pw-pick:hover{border-color:rgba(148,163,255,.45)}
+.pw-pick[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.pw-lead{font-size:14px;line-height:1.6;max-width:780px;margin-bottom:18px}
+.pw-steps{list-style:none;counter-reset:pw;margin:0;padding:0}
+.pw-step{counter-increment:pw;position:relative;padding:0 0 20px 44px}
+.pw-step::before{content:counter(pw);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;background:var(--panel2);color:var(--gold-ink);border:2px solid var(--line)}
+.pw-step:not(:last-child)::after{content:"";position:absolute;left:14px;top:34px;bottom:4px;width:2px;background:var(--line)}
+.pw-step h5{font-size:15px;font-weight:700;margin:4px 0 3px}
+.pw-why{color:var(--muted);font-size:13.5px;line-height:1.55;max-width:780px;margin-bottom:10px}
+.pw-orgs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.pw-org{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.5}
+.pw-name{background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;text-align:left}
+.pw-name:hover{text-decoration:underline}
+.pw-name .lg-dot{display:inline-block;margin-right:7px;vertical-align:1px}
+.pw-status{font-size:12.5px;font-weight:500;color:#4ade80;margin-top:2px}
+html:not(.dark) .pw-status{color:#166534}
+.pw-status.closed,html:not(.dark) .pw-status.closed{color:var(--muted)}
+.pw-org p{margin-top:5px}
+.pw-verified{color:var(--muted);font-size:11.5px;margin-top:6px}
+.pw-more{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;color:var(--gold-ink)}
+.pw-note{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:780px}
 .jr-group{margin-bottom:18px}
 .jr-group h4{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:10px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
@@ -700,7 +726,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 
 <section id="view-journey" class="view">
   <h2 class="jr-head">The Founder Journey</h2>
-  <p class="jr-sub">Massachusetts' ecosystem mapped to where <em>you</em> are. Pick your stage — every resource below is curated for that moment, with a reason why it matters.</p>
+  <p class="jr-sub">Massachusetts' ecosystem mapped to where <em>you</em> are. Pick your stage, then the pathway that sounds like you: an ordered list of what to do next, with the reason for each step. Everything at that stage is listed below it.</p>
   <div class="stepper" id="stepper" role="group" aria-label="Your founder stage"></div>
   <div class="jr-panel" id="jrPanel"></div>
 </section>
@@ -1005,6 +1031,10 @@ const applyOpen = d => d.applyBy === "rolling" || (!!d.applyBy && d.applyBy >= t
 // closed = no deadline, and a note saying when the next window is. An expired date isn't this:
 // its note described that deadline, so it stays hidden until someone updates the entry.
 const applyClosed = d => !d.applyBy && !!d.applyNote;
+// The Directory's Closing soon sort, and the order inside a pathway's step: the nearest date
+// first, then rolling, then everything not taking applications, then by name.
+const applyRank = d => !applyOpen(d) ? "2" : d.applyBy==="rolling" ? "1" : "0" + d.applyBy;
+const byClosing = (a,b)=> applyRank(a).localeCompare(applyRank(b)) || a.name.localeCompare(b.name);
 // Checked at call time, not cached: the preference can change mid-session.
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 // CSS handles animations and transitions; these are the motions JS drives.
@@ -2229,6 +2259,13 @@ function gxKeepInView(n){
 
 /* ---------- journey ---------- */
 let jrStage = 1;
+// Hand-written routes through a stage, from data/pathways.yml. They add to the Journey and
+// nothing depends on them, so the page reads the file on its own, after the atlas has loaded:
+// a missing file, or a deploy that has sent the page but not yet the data, leaves the stages
+// as they always were. validate.js checks the file, the way it checks credits.yml.
+let PATHWAYS = [];
+// The pathway someone chose or linked to. "" means the stage's first one, and leaves the link alone.
+let jrPathway = new URLSearchParams(location.search).get("pathway") || "";
 // The stages are buttons that say which one is chosen (aria-pressed), so the keyboard can pick
 // one too: until 2026-11 they were divs that took only a click, and the keyboard could see
 // only stage 1. Redrawing them removes the button just pressed, so its focus moves to the new one.
@@ -2241,16 +2278,59 @@ function renderStepper(){
       <span class="step-sub">${s.s}</span>
     </button>`).join("");
   st.querySelectorAll(".step").forEach(el=>
-    el.addEventListener("click", ()=>{ jrStage=+el.dataset.n; renderStepper(); renderJourney(); }));
+    el.addEventListener("click", ()=>{ jrStage=+el.dataset.n; jrPathway=""; renderStepper(); renderJourney(); updateURL(); }));
   if(hadFocus) st.querySelector(`.step[data-n="${jrStage}"]`).focus();
+}
+// One organization in a step: its own reason, and the same status and date the drawer shows, so
+// a pathway never restates a fact that lives in the entry.
+function pathwayOrg(d){
+  const status = applyOpen(d)
+    ? `<div class="pw-status">⏳ ${d.applyBy==="rolling" ? "Open" : "Apply by " + esc(fmtDeadline(d.applyBy))}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`
+    : applyClosed(d) ? `<div class="pw-status closed">⏸ Closed · ${esc(d.applyNote)}</div>` : "";
+  const verified = !d.lastVerified ? "" : isStale(d) ? `⚠️ Last verified ${fmtMonth(d.lastVerified)}` : fmtVerified(d.lastVerified);
+  return `<li class="pw-org">
+    <button type="button" class="pw-name" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</button>
+    ${status}<p>${esc(d.why || d.desc)}</p>${verified ? `<div class="pw-verified">${verified}</div>` : ""}
+  </li>`;
+}
+// A step can point at the Directory instead of naming a few organizations when many fit it,
+// so a pathway never has to pick three funds out of forty.
+function pathwayMore(more, stage){
+  const params = new URLSearchParams();
+  if(more.cat) params.set("cat", more.cat);
+  if(more.need) params.set("need", more.need);
+  params.set("stage", stage);
+  const n = DATA.filter(d=>(d.stages||[]).includes(stage) && (!more.cat || d.cat===more.cat)
+    && (!more.need || (d.offers||[]).includes(more.need))).length;
+  return `<a class="pw-more" href="?${params}#directory">See all ${n} in the Directory →</a>`;
+}
+function pathwayHtml(s){
+  const paths = PATHWAYS.filter(p=>p.stage===s.n);
+  if(!paths.length) return "";
+  const path = paths.find(p=>p.id===jrPathway) || paths[0];
+  // validate.js stops a build on an unknown id, so a miss here means a copy of the atlas has
+  // removed an entry. Its step keeps whatever still resolves, and a step left with nothing goes.
+  const steps = path.steps.map(step=>{
+    const orgs = (step.entries||[]).map(id=>byId[id]).filter(Boolean).sort(byClosing);
+    if(!orgs.length && !step.more) return "";
+    return `<li class="pw-step"><h5>${esc(step.do)}</h5><p class="pw-why">${esc(step.why)}</p>` +
+      (orgs.length ? `<ul class="pw-orgs">${orgs.map(pathwayOrg).join("")}</ul>` : "") +
+      (step.more ? pathwayMore(step.more, s.n) : "") + `</li>`;
+  }).join("");
+  return `<section class="pw" aria-labelledby="pwAsk"><h4 class="pw-ask" id="pwAsk">Which sounds like you?</h4>
+    <div class="pw-picks" role="group" aria-labelledby="pwAsk">${paths.map(p=>
+      `<button type="button" class="pw-pick" data-pathway="${esc(p.id)}" aria-pressed="${p===path}">${esc(p.title)}</button>`).join("")}</div>
+    <p class="pw-lead">${esc(path.lead)}</p><ol class="pw-steps">${steps}</ol>
+    <p class="pw-note">A step is a kind of option, not a ranking: organizations in it are listed by closing date, then by name. Nobody pays to appear here.</p></section>`;
 }
 function renderJourney(){
   const s = STAGES.find(x=>x.n===jrStage);
   const ents = DATA.filter(d=>(d.stages||[]).includes(jrStage));
   const groups = {};
   ents.forEach(d=>{ (groups[d.cat]=groups[d.cat]||[]).push(d); });
-  let html = `<h3>${s.icon} ${s.t} — ${s.s}</h3><div class="jr-desc">${s.desc}</div>`;
+  let html = `<h3>${s.icon} ${s.t} — ${s.s}</h3><div class="jr-desc">${s.desc}</div>` + pathwayHtml(s);
   html += `<div class="jr-tips">` + s.tips.map(([b,t])=>`<div class="jr-tip"><b>${b}</b>${t}</div>`).join("") + `</div>`;
+  html += `<h4 class="jr-all">All ${ents.length} organizations at this stage</h4>`;
   const order = ["community","space","accel","university","student","event","angel","vc","gov","corporate","startup"];
   // buttons, so the keyboard can open them too: until 2026-11 they were spans that took only a click
   order.filter(c=>groups[c]).forEach(c=>{
@@ -2260,8 +2340,22 @@ function renderJourney(){
       `</div></div>`;
   });
   $("jrPanel").innerHTML = html;
+  // Redrawing removes the button just pressed, so the focus moves to the new one.
+  $("jrPanel").querySelectorAll(".pw-pick").forEach(el=>el.addEventListener("click", ()=>{
+    jrPathway = el.dataset.pathway; renderJourney(); updateURL();
+    $("jrPanel").querySelector(`.pw-pick[aria-pressed="true"]`).focus();
+  }));
 }
 renderStepper(); renderJourney();
+fetch("data/pathways.yml")
+  .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+  .then(text=>{
+    PATHWAYS = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA }) || [];
+    const linked = PATHWAYS.find(p=>p.id===jrPathway);
+    if(linked){ jrStage = linked.stage; renderStepper(); } else jrPathway = "";
+    renderJourney();
+  })
+  .catch(err=>console.warn("No pathways, so the Journey shows its stages alone:", err));
 
 /* ---------- directory ---------- */
 (function initDirectory(){
@@ -2346,11 +2440,7 @@ function renderCards(){
   $("dirSort").options[0].textContent = q ? "Sort: Best match" : "Sort: A → Z";
   if(sort==="cat") list.sort((a,b)=> a.cat===b.cat ? a.name.localeCompare(b.name) : a.cat.localeCompare(b.cat));
   else if(sort==="new") list.sort((a,b)=> (b.added||"").localeCompare(a.added||"") || a.name.localeCompare(b.name));
-  else if(sort==="deadline"){
-    // the nearest date first, then rolling, then everything not taking applications
-    const when = d => !applyOpen(d) ? "2" : d.applyBy==="rolling" ? "1" : "0" + d.applyBy;
-    list.sort((a,b)=> when(a).localeCompare(when(b)) || a.name.localeCompare(b.name));
-  }
+  else if(sort==="deadline") list.sort(byClosing);
   else if(!q) list.sort((a,b)=> a.name.localeCompare(b.name));
   $("dirCount").textContent = `${list.length} of ${DATA.length} organizations` + needsNote(band)
     + (closest && list.length ? " · none match every word, closest first" : "");
@@ -2384,6 +2474,7 @@ function updateURL(){
   const u = new URL(location.href);
   if(drawerId) u.searchParams.set("entry", drawerId); else u.searchParams.delete("entry");
   writeFilters(u.searchParams);
+  if(currentView === "journey" && jrPathway) u.searchParams.set("pathway", jrPathway); else u.searchParams.delete("pathway");
   u.hash = currentView !== "map" ? currentView : "";
   try{ history.replaceState(null, "", u.pathname + u.search.replace(/%2C/g, ",") + u.hash); }catch(e){}
 }
@@ -2513,7 +2604,7 @@ const TOUR = [
     text:"Search in your own words, or filter by category, need, and founder stage — the fastest way to answer “who can help me right now?” Filters carry over to the map, and the page's link keeps them." },
   { view:"journey", sel:"#stepper",
     title:"Founder Journey",
-    text:"Pick your stage — Spark, Validate, Build, Fund or Scale — and see the resources curated for exactly that moment." },
+    text:"Pick your stage — Spark, Validate, Build, Fund or Scale — then the pathway that sounds like you, for an ordered list of what to do next and why." },
   { view:"map", sel:"#suggestBtn",
     title:"Help it stay alive",
     text:"Every entry shows when we last verified it, and 🔗 copies a shareable link. Know an org we're missing? Suggest it here — a maintainer reviews every submission." },

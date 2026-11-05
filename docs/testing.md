@@ -159,6 +159,18 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | a closed program says when to come back | a program between windows looking blank, or showing an Apply button for a form that's shut |
 | | a deadline that has passed shows nothing | an expired date, or the note that described it, outliving the deadline |
 | | Closing soon lists the nearest date first | the sort dropping dated deadlines below rolling ones, or leaving the address |
+| `pathways.spec.js` | every pathway shows its steps in order | a pathway drifting from `data/pathways.yml`: a step out of order, a missing organization, or an organization shown without its own reason |
+| | a step lists its organizations by closing date, then by name | someone's place in a step becoming a judgment. Real entries get fixed statuses, so a deadline passing can't change the result |
+| | a closed program says so in a step | a closed program reading like an open one, or like one with no information |
+| | a chosen pathway goes into the link | a shared pathway opening at the wrong one, or a link that keeps a pathway after a new stage is chosen or the Journey is left |
+| | a link to a pathway that doesn't exist | a stale link breaking the Journey |
+| | a pathway can be chosen by keyboard | the focus falling off the page when a pathway redraws |
+| | an organization in a step opens its drawer | a step's organizations taking only a click, or closing the drawer losing the reader's place |
+| | a step's Directory link lands on as many organizations as it says | the count on the link and the filtered list disagreeing |
+| | an entry that doesn't exist never shows | an id reaching the page without resolving to an entry, in a copy of the atlas that removed one and skipped `validate.js`. A step left with nothing goes too |
+| | the whole list still follows the pathways | the stage's full list going missing, or its count drifting from the data |
+| | without `data/pathways.yml` | the Journey depending on the file. `deploy.yml` sends the page before `data/`, so a visitor can load a new page a moment before its file arrives |
+| | the longest pathway fits a phone | a pathway forcing the page sideways at 390 px |
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
 | | `?list=` of unknown ids | a stale list link breaking the page |
 | `events.spec.js` | `/events/` loads and lists events | the events page breaking |
@@ -216,7 +228,8 @@ loader the page uses (`atlas-data.js`), exactly as
 
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
-an open entry drawer, a shared shortlist, the first-visit tour card, the events page and
+an open entry drawer, a founder pathway with open and closed programs, a shared shortlist,
+the first-visit tour card, the events page and
 the credits page, each in both the dark and the light theme; and the galaxy's keyboard
 list and search with a category open and results showing, in the dark theme.
 

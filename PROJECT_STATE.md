@@ -30,7 +30,7 @@ detail. The design brief was: *same domain, far more engaging and useful.*
 |------|--------------|
 | 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; rows of category toggles and "I need…" and stage filters above it. The wheel scrolls the page; ⌘ or Ctrl + wheel zooms |
 | ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (179 cited edges across 129 entries as of 2026-11-04). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, a row of category toggles above it, and a search box that centers + locks any org's neighborhood. Drag/zoom/click. It opens fitted to its canvas, phones included; on a touch screen the first tap traces a node and the second opens it; the keyboard reaches every node through a tree of organizations by category, and the search's results take the arrow keys |
-| 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows curated tips plus every entry whose `stages` includes that number |
+| 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows hand-written pathways, curated tips, and every entry whose `stages` includes that number |
 | 📇 **Directory** | Card grid, word-by-word search, category chips, need and stage filters, sort. The map and the Directory share one set of filters, kept in the address (`?need=`, `?stage=`, `?open=`, `?cat=`, `?sort=`) |
 
 A detail **drawer** is shared by all views: description, "why it matters for founders",
@@ -46,11 +46,12 @@ Deliberately **buildless** — it must survive being copied into a static site a
 edited by non-developers.
 
 ```
-index.html          ~158KB  the entire app: HTML + CSS + vanilla JS in one file
+index.html          ~210KB  the entire app: HTML + CSS + vanilla JS in one file
 atlas-data.js               shared loader: parses data/*.yml, validates against the schemas
 data/entities.yml           DATA — the only file most contributors touch
 data/categories.yml         CATS
 data/stages.yml             STAGES
+data/pathways.yml           PATHWAYS — read by the page on its own, after the atlas loads
 data/*.schema.yml           JSON Schema (draft-07) for each data file
 ```
 
@@ -86,7 +87,9 @@ data/*.schema.yml           JSON Schema (draft-07) for each data file
 Three data sets, each a YAML file with a JSON Schema beside it: `CATS` in
 `categories.yml` (11 categories → label + colour), `STAGES` in `stages.yml` (5 founder
 stages with tips), and `DATA` in `entities.yml` (the list of entries, grouped under
-`# ---------- CATEGORY ----------` comment banners). One entry:
+`# ---------- CATEGORY ----------` comment banners). `PATHWAYS` in `pathways.yml` is a fourth,
+optional set: the page reads it after the atlas loads and works without it, and it is checked
+by `validate.js` in CI rather than in the browser. One entry:
 
 ```yaml
 - id: acme-ai

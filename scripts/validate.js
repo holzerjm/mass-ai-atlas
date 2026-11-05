@@ -107,6 +107,46 @@ for (const d of DATA)
   } catch (e) { cerr(e.message); }   // a YAML syntax error names the line and column
 }
 
+// data/pathways.yml feeds the Founder Journey. The page reads it on its own and works
+// without it, so atlas-data.js never loads it, and it is checked here the way credits.yml
+// is: its schema, then what a schema can't see, which is every reference to another file.
+// An unknown entry stops the build, so removing an entry can't quietly hollow out a pathway.
+{
+  const fs = require("fs"), path = require("path"), yaml = require("js-yaml"), Ajv = require("ajv");
+  const { DATA_DIR } = require("./load-data");
+  const perr = msg => errors.push(`  ✗ [pathways.yml] ${msg}`);
+  try {
+    const read = f => yaml.load(fs.readFileSync(path.join(DATA_DIR, f), "utf8"), { schema: yaml.CORE_SCHEMA, filename: f });
+    const schema = read("pathways.schema.yml"), pathways = read("pathways.yml");
+    const offers = new Set(read("entities.schema.yml").items.properties.offers.items.enum);
+    const ajv = new Ajv({ allErrors: true });
+    if (!ajv.validate(schema, pathways)) {
+      for (const e of ajv.errors) perr(`${e.instancePath || "/"} ${e.message}`);
+    } else {
+      const seen = new Set(), byId = new Map(DATA.map(d => [d.id, d]));
+      for (const p of pathways) {
+        if (seen.has(p.id)) perr(`duplicate id "${p.id}"`);
+        seen.add(p.id);
+        if (!validStages.has(p.stage)) perr(`${p.id}: invalid stage ${p.stage} (valid: ${[...validStages].join(", ")})`);
+        const used = new Set();
+        p.steps.forEach((s, i) => {
+          const at = `${p.id}, step ${i + 1}`;
+          for (const id of s.entries || []) {
+            const d = byId.get(id);
+            if (!d) { perr(`${at}: unknown entry "${id}"`); continue; }
+            if (used.has(id)) perr(`${at}: "${id}" is already in an earlier step`);
+            used.add(id);
+            if (!(d.stages || []).includes(p.stage))
+              warn.push(`  ⚠ [pathways.yml] ${at}: "${id}" isn't listed at stage ${p.stage}, so its entry and this pathway disagree`);
+          }
+          if (s.more && s.more.cat && !Object.hasOwn(CATS, s.more.cat)) perr(`${at}: unknown category "${s.more.cat}"`);
+          if (s.more && s.more.need && !offers.has(s.more.need)) perr(`${at}: unknown need "${s.more.need}"`);
+        });
+      }
+    }
+  } catch (e) { perr(e.message); }   // a YAML syntax error names the line and column
+}
+
 if (warn.length) console.log("Warnings:\n" + warn.join("\n") + "\n");
 if (errors.length) {
   console.log("Errors:\n" + errors.join("\n"));

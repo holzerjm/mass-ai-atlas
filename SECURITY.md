@@ -72,7 +72,8 @@ behavior:
 - **The atlas data is validated twice**: in CI before it ships, and again in the visitor's
   browser before anything is drawn. The credits page's data, `data/credits.yml`, is checked
   in CI only. The page inserts every value as text, never as HTML, and accepts only
-  `https:` links.
+  `https:` links. The Founder Journey's `data/pathways.yml` is also checked in CI only. The
+  page escapes every value, and shows an organization only if its id resolves to an entry.
 
 ## What is not a security issue
 

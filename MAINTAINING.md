@@ -279,12 +279,47 @@ To keep those honest, do a small sweep about once a month:
    all still right.
 3. Bump `lastVerified` to the current month for each one you checked, and put them all
    in **one PR**.
+4. If a change you made affects a [pathway](#founder-pathways), read that pathway again.
+   An organization can close, move, or stop fitting its step.
 
 `--cycle 12` sizes that list from the dataset, so it keeps pace as the atlas grows:
 every entry comes round within a year without anyone re-tuning a number. At 198
 entries that is **17 re-checks a month, about half an hour**. A fixed `--queue`
 quietly stops covering everything as soon as entries outrun it — at 13 a month it
 would now take **15 months** to come round, against a 12-month threshold.
+
+---
+
+## Founder pathways
+
+`data/pathways.yml` holds the hand-written routes at the top of each stage in the Founder
+Journey. A filter answers "what exists?" A pathway answers "what do I do first, and why?",
+so it's advice from the people who keep the atlas. These rules keep it advice a founder can
+trust:
+
+- **A step is a kind of option.** List every entry that fits it, or link to the Directory
+  with `more` when too many do. Don't pick 3 funds out of 46. If you can't say what puts an
+  organization in a step, it doesn't belong there.
+- **The order of the steps is the advice.** `lead` says why they come in that order, and each
+  step's `why` says why it comes where it does. Inside a step the page sorts by closing date,
+  then by name, so nobody's position is a judgment.
+- **Facts stay in the entry.** The page shows each organization's own `why`, its application
+  status, and the month it was verified. A step's `why` doesn't repeat them, so a correction
+  happens in one place.
+- **Say what it costs.** Write what a founder gets and what they give up, without selling.
+- **Nobody pays or partners their way in, and nobody is kept out.** Sponsoring TOA buys
+  nothing here. TOA and the sponsors face the same test as everyone else: an organization is
+  in a step because it fits the step, its card states the catch, and the page sorts it the
+  same way.
+
+`node scripts/validate.js` stops on an entry that doesn't exist, and warns when an entry isn't
+listed at its pathway's stage. To remove an entry, take it out of any pathway first.
+
+A link can open a pathway directly: `?pathway=build-compute#journey`. Changing an `id` breaks
+links people have shared, so keep it once a pathway is live.
+
+Pathways are optional. If you copied this template for another region, write your own, or set
+the file to `[]` and the Journey shows its stages alone.
 
 ---
 
@@ -442,6 +477,8 @@ pattern …`. Common ones:
 | `must NOT have additional properties "…"` | A field name is misspelled (e.g. `lastverified`) or isn't one of the fields in Appendix A. |
 | `must be string` | A field was left empty (e.g. `badge:` with nothing after it). Fill it in or delete the line. |
 | `links to unknown entry` | A value in `links` doesn't match any `id`. Fix the spelling or remove it. |
+| `[pathways.yml] … unknown entry` | A step in `data/pathways.yml` names an `id` that doesn't exist. Fix the spelling, or take it out of the step if the entry was removed. |
+| `[pathways.yml] … isn't listed at stage` (a ⚠ warning, not a failure) | A pathway and the entry disagree about the stage. Add the stage to the entry's `stages`, or move the entry out of that pathway. |
 | `missing lastVerified` (a ⚠ warning, not a failure) | Add the month you last confirmed this entry: `lastVerified: YYYY-MM`. |
 | `/lastVerified: must match pattern` | Fix the format: four-digit year, hyphen, two-digit month — e.g. `2026-08`. |
 | `lastVerified … is in the future` | Check the date — it can't be later than the current month. |

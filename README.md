@@ -16,7 +16,7 @@ MA AI Hub, Red Hat & IBM).
 
 - 🗺️ **Map** — every VC, lab, accelerator and community pinned across Massachusetts
 - ✨ **Galaxy** — an animated network of how the ecosystem connects (spinouts, funds, hosts)
-- 🧭 **Founder Journey** — resources curated by stage, from first spark to scale
+- 🧭 **Founder Journey** — from first spark to scale: hand-written pathways, with an ordered list of what to do next and why
 - 📇 **Directory** — search in your own words, with category, need, and stage filters
 
 Each entry's drawer says what the organization offers founders, shows when a maintainer
@@ -94,6 +94,7 @@ index.html                        the app — one file of HTML/CSS/vanilla JS (L
                                   MapLibre GL, Tailwind & web fonts via CDN; TOA-branded)
 data/entities.yml                 the dataset — this is what you edit
 data/categories.yml, stages.yml   the categories and founder stages
+data/pathways.yml                 hand-written routes through the Founder Journey
 data/credits.yml                  who has contributed, and the milestones (consent rules inside)
 data/*.schema.yml                 JSON Schemas for the data files
 credits/index.html                the credits page, which reads data/credits.yml

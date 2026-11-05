@@ -388,7 +388,7 @@ test("the Founder Journey's organizations can be reached with Tab and opened wit
   const chip = page.locator("#jrPanel .chip").first(), name = (await chip.textContent()).trim();
   await page.locator('.tab[data-view="journey"]').focus();
   const onChip = () => page.evaluate(() => document.activeElement.matches("#jrPanel .chip"));
-  for(let i = 0; i < 30 && !(await onChip()); i++) await page.keyboard.press("Tab");
+  for(let i = 0; i < 60 && !(await onChip()); i++) await page.keyboard.press("Tab");
   await expect(chip).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.locator("#drawer")).toHaveClass(/\bopen\b/);

@@ -48,6 +48,11 @@ const SCANS = [
       await expect(page.locator("#gxResults")).toBeVisible();
     } },
   { name: "journey view", url: "./#journey" },
+  // a pathway with open and closed programs, which the first stage's pathways don't have
+  { name: "founder pathway", url: "./?pathway=fund-equity-free#journey", include: "#view-journey",
+    prepare: page => expect(page.locator(".pw-status.closed").first()).toBeVisible() },
+  { name: "founder pathway (light theme)", url: "./?pathway=fund-equity-free#journey", include: "#view-journey",
+    theme: "light", prepare: page => expect(page.locator(".pw-status.closed").first()).toBeVisible() },
   { name: "directory view", url: "./#directory" },
   { name: "entry drawer", url: `./?entry=${entry.id}`, include: "#drawer" },
   { name: "shared shortlist", url: `./?list=${DATA[0].id},${DATA[1].id}`, include: "#shortlistModal" },

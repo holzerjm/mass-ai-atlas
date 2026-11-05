@@ -1,0 +1,196 @@
+# Mass AI Atlas — founder pathways: hand-written routes through a stage of the Founder Journey.
+# Schema: pathways.schema.yml · Validate: node scripts/validate.js · Rules: MAINTAINING.md
+#
+# A step is a kind of option, not a recommendation of one organization. List every entry
+# that fits it, or link to the Directory with `more` when too many do. The page shows each
+# entry's own `why` and its live application status, and sorts a step's entries by closing
+# date, then by name, so the order written here means nothing.
+#
+# `why` explains why the step comes where it does. Facts about an organization belong in
+# its entry, so there is one place to correct them. The order of the steps is the advice.
+
+# --- Spark -----------------------------------------------------------------
+- id: spark-new-here
+  stage: 1
+  title: I'm new here and know no one
+  lead: Start in rooms anyone can walk into, then move to rooms where people build. Each step makes the next one easier.
+  steps:
+    - do: Go to an open gathering
+      why: You don't need an idea or an invitation. Go more than once, because that's when people start to remember you.
+      entries: [startupboston, vcafe]
+    - do: Watch people show what they built
+      why: Demo nights show you who is building what here. Register ahead, because rooms are often curated and some charge a small fee.
+      entries: [genai-collective, genai-meetup, tinkerers]
+    - do: Build something with strangers
+      why: A day of building next to someone tells you more about them than a month of coffees.
+      entries: [sundai, toa]
+
+- id: spark-student
+  stage: 1
+  title: I'm a student and want to start something
+  lead: Your campus gives you people to build with and low-cost ways to try an idea. Use it first, then step outside it.
+  steps:
+    - do: Join an AI or startup club on your campus
+      why: It's where you meet people to build with, before anyone is looking for a cofounder.
+      more: { cat: student }
+    - do: Try your campus startup program
+      why: These are open only to people at your school, so use them while you're there.
+      entries: [etower, harvard-ventures, mit-sandbox, nu-eclub, trust]
+    - do: Build with people beyond your campus
+      why: Working next to people who already have jobs shows you what the work is like after school.
+      entries: [sundai]
+
+# --- Validate --------------------------------------------------------------
+- id: validate-at-university
+  stage: 2
+  title: I'm testing an idea at a university
+  lead: Much of the state's free mentoring and small grant money runs through campuses. Use what your school offers before you look anywhere else.
+  steps:
+    - do: Get a mentor through your school
+      why: This costs you nothing if you're eligible. Each program sets its own rules on who counts, so check before you apply.
+      entries: [ilab, trust, vms]
+    - do: Apply for small, equity-free money
+      why: Small grants pay for your first experiments and leave your equity alone. Most have set windows, so check the status shown here.
+      entries: [idea-neu, mit-sandbox, nu-eclub, venturewell]
+    - do: Test it outside your campus
+      why: Classmates are polite. Strangers who have built products will tell you what doesn't work.
+      entries: [tinkerers, vcafe]
+
+- id: validate-on-my-own
+  stage: 2
+  title: I have no university behind me
+  lead: Help exists without a campus, but it's more selective or it comes with terms. Read the catch in each entry first.
+  steps:
+    - do: Look for a free desk and a peer group
+      why: Other founders will tell you what isn't working. All of these choose who joins, so apply early.
+      entries: [build617, startup-worcester, toa]
+    - do: Pay for structure only if you need it
+      why: A paid program gives you a schedule and mentors, and it asks for money and equity in return. Decide what that's worth to you.
+      entries: [founder-institute]
+    - do: Get your pitch pressure-tested
+      why: Investors hear many pitches, so a no comes with useful reasons if you ask for them. Go when you can use the feedback, not only when you need a check.
+      entries: [bha, foundersedge, tie]
+
+- id: validate-first-pilot
+  stage: 2
+  title: I need a first pilot customer
+  lead: Start with programs that exist to run pilots. Each covers one field or one city, so if yours isn't covered, go to the companies directly.
+  steps:
+    - do: Start with a public pilot program
+      why: These put new technology in front of real users. Some run in rounds, so check the status shown here and ask when the next one opens.
+      entries: [boston-oet, masscec, mehi-sandbox]
+    - do: Ask companies that want to pilot
+      why: This route runs through Massachusetts companies rather than public money, so it doesn't depend on a program's next round.
+      entries: [mass-ai-coalition]
+
+# --- Build -----------------------------------------------------------------
+- id: build-compute
+  stage: 3
+  title: I need GPUs
+  lead: Ask for public compute first, then apply for startup credits, then look at offers that bundle compute with something else. Pay list price last.
+  steps:
+    - do: Ask for public compute
+      why: Access is by request and each use is reviewed, so ask well before you need it.
+      entries: [aihub, mghpcc, ndif]
+    - do: Apply for cloud credits
+      why: Each cloud runs its own program with its own rules, so you can apply to more than one.
+      entries: [amazon-sea, google, nerd]
+    - do: Look for compute that comes with a desk or a check
+      why: Some programs include credits or GPU time with something else. Read what you give in return.
+      entries: [link-ventures, mass-ai-coalition, toa, worclab]
+
+- id: build-bench
+  stage: 3
+  title: I need a lab or a bench
+  lead: Start on a low-cost bench. Apply to a specialist lab once you know what you need from it.
+  steps:
+    - do: Prototype somewhere cheap
+      why: Early prototypes change fast, so don't commit to more space than you need yet.
+      entries: [artisans, umassd-cie, worclab]
+    - do: Apply to the lab for your field
+      why: These are built around one field, with equipment and neighbors to match. Each has its own application.
+      entries: [greentown, labcentral, massrobotics]
+    - do: Rent tough-tech space if you outgrow those
+      why: When the equipment costs more than you could raise at this stage, paying month to month beats buying it.
+      entries: [engine]
+
+- id: build-team
+  stage: 3
+  title: I need a cofounder or first engineer
+  lead: Work beside people before you ask anyone to join you. Formal recruiting comes last.
+  steps:
+    - do: Build with people first
+      why: A shared project shows you how someone works before you have to decide anything.
+      entries: [sundai, tinkerers, toa]
+    - do: Go where student builders are
+      why: These run once a year and are for students. If you've graduated, sponsoring is the way in, so plan ahead.
+      entries: [hackharvard, hackmit]
+    - do: Try someone out on a university project
+      why: Sponsored projects and internships let you work with someone for a semester before you make an offer.
+      entries: [brandeis-cs, cdsai]
+
+# --- Fund ------------------------------------------------------------------
+- id: fund-equity-free
+  stage: 4
+  title: I'd rather not sell equity yet
+  lead: Start with what's open to anyone, then money tied to your school, then state money for your field.
+  steps:
+    - do: Enter a zero-equity competition
+      why: This costs you time rather than ownership, and you don't need a school behind you.
+      entries: [masschallenge]
+    - do: Use money set aside for your school
+      why: These are limited to students or alumni, often of one school, so check whether you count.
+      entries: [deltav, ilab, mit-sandbox, venturewell]
+    - do: Match state money to your field
+      why: State grants don't take equity, but they're narrow, and some need a university or nonprofit to apply with you. Read the catch in each entry first.
+      entries: [masscec, massventures, mehi-sandbox, mlsc]
+      more: { need: grants }
+
+- id: fund-first-round
+  stage: 4
+  title: I'm ready to raise a first round
+  lead: Start with people who write smaller checks, then decide whether an accelerator's terms are worth it, then go to funds with something to show.
+  steps:
+    - do: Talk to angel groups
+      why: Angel groups often invest together, so one good meeting can reach several. Some favor their own alumni, so check the fit first.
+      entries: [bha, hbsaa, hub-angels, launchpad, mit-angels, tie, walnut]
+    - do: Compare accelerators that invest
+      why: You trade equity for a check, mentors, and a deadline. Compare what each one takes and what it gives you.
+      entries: [auxilium, c10, ssc, techstars]
+    - do: Shortlist funds by thesis and check size
+      why: We don't rank investors. The Directory lists every fund at this stage, so save the ones that match your focus, then compare them.
+      more: { cat: vc }
+
+# --- Scale -----------------------------------------------------------------
+- id: scale-customers
+  stage: 5
+  title: I need enterprise customers
+  lead: Get ready for what large buyers ask first. Then work the routes to them, and start government conversations early, because those take longer.
+  steps:
+    - do: Get ready for what enterprise buyers ask
+      why: Large buyers ask about security and compliance before they talk price, so close those gaps before you meet them.
+      entries: [masscybercenter, toa]
+    - do: Talk to strategic investors
+      why: A corporate investor can open its customers and channels to you. Ask what the check commits you to before you take it.
+      entries: [bosch-v, hubspot-v, ibm-ventures, suffolk-tech]
+    - do: Start on government and defense early
+      why: These buyers work on their own calendars and have their own rules of entry, so read each entry before you contact them.
+      entries: [diu, draper-laboratory]
+    - do: Sell through a platform your customers use
+      why: Selling through a platform can reach buyers you couldn't get to alone, but you depend on its rules.
+      entries: [oracle-bos, salesforce-bos]
+
+- id: scale-hire
+  stage: 5
+  title: I need to hire senior AI people
+  lead: Try people through a university program, know where the experienced engineers work, and be visible where they go.
+  steps:
+    - do: Work with a university program
+      why: Co-ops, internships, and sponsored projects let you work with someone before you make an offer.
+      entries: [brandeis-cs, cdsai, eai]
+    - do: Know the large local AI teams
+      why: This is where experienced people work now. Each entry says what the team does, so look for the skills you need.
+      more: { cat: corporate }
+    - do: Show up where engineers go
+      why: Recruiting starts before the job post. A talk or a booth puts your team in front of people who aren't looking yet.
+      entries: [aiweek, odsc]
