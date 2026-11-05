@@ -187,6 +187,23 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | a kind filter, and All | the filter hiding the wrong people, or All failing to bring everyone back |
 | | no photo or real name without consent | a card showing a GitHub photo or a real name that `data/credits.yml` doesn't opt in to with `photo: true` or `name` |
 | | both footers link to the credits page | the events page's copy of the footer pointing one folder too deep. `scripts/build-events-page.js` rewrites that link |
+| `ask.spec.js` | the Directory opens the dialog, and closing it puts the focus back | a dialog the keyboard can't leave, or one that loses the reader's place |
+| | Tab stays inside the dialog | the keyboard walking the page behind it |
+| | the prompt points at the file and carries the rules | a change dropping the rules that keep answers honest, such as "Don't answer from memory" |
+| | what someone types goes into the prompt, and nowhere else | a founder's words reaching the address, storage, or the network |
+| | a search already typed starts the situation | someone having to type their sentence twice |
+| | the copy button copies the prompt as shown | the prompt copied differing from the prompt shown |
+| | without clipboard access, the prompt shows selected | a browser that refuses the clipboard leaving the button dead |
+| | `?ask=1` opens the dialog once | the dialog coming back on every reload |
+| | a pathway offers it | the way in from the Journey going missing |
+| | the dialog offers the data and a way to attach it | an assistant that can't browse leaving a founder stuck |
+| | the dialog fits a phone | the dialog running off the screen at 390 px |
+| | `atlas-ai.txt` lists every organization, A to Z | an entry missing, or the order depending on anything but the name |
+| | it carries every pathway, with entries that exist | a pathway dropped, or a step naming something that isn't there |
+| | it ends where it says it does | the last line or the count going missing, so an assistant couldn't tell it read only part |
+| | it holds no instructions for an assistant | rules creeping into the file. They belong in the prompt a founder reads |
+| | it shows the same application status as the page | the file and the page disagreeing about what's open |
+| | it stays compact | the file growing until web tools cut it |
 | `updates.spec.js` | every update, newest first | the page drifting from `data/updates.yml`, or a date out of order |
 | | every Try it link lands inside the atlas | a `try` link pointing at something that isn't there. A pathway link must open that pathway |
 | | a Try it link on the page opens what it says | the page building the wrong address from a `try` value |
@@ -248,8 +265,8 @@ loader the page uses (`atlas-data.js`), exactly as
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
 an open entry drawer, a founder pathway with open and closed programs, a shared shortlist,
-the first-visit tour card, the what's-new banner, the events page, the credits page and the
-updates page, each in both the dark and the light theme; and the galaxy's keyboard
+the first-visit tour card, the what's-new banner, the Ask your own AI dialog, the events page,
+the credits page and the updates page, each in both the dark and the light theme; and the galaxy's keyboard
 list and search with a category open and results showing, in the dark theme.
 
 The gate was set from what the pristine baseline (main @ 76cf38e) actually
@@ -418,7 +435,7 @@ behind it, for GitHub's default limit of six hours.
   overwrite (a TOA site deploy an hour afterwards), goes unnoticed until someone
   does. A step at the end of `deploy.yml` would catch the first, and a scheduled
   run of `npm run verify:live` against `main` would catch the second.
-- `atlas.json`, `atlas.csv`, `sitemap.xml` and the `/e/<id>/` share stubs are
+- `atlas.json`, `atlas.csv`, `atlas-ai.txt`, `sitemap.xml` and the `/e/<id>/` share stubs are
   deployed but not compared.
 - Edge-cached copies. The cache-busting query bypasses Cloudflare's cache on
   purpose, so the check sees the origin. On 2026-09-30 none of the plain URLs

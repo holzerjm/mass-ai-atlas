@@ -20,7 +20,8 @@ MA AI Hub, Red Hat & IBM).
 - 📇 **Directory** — search in your own words, with category, need, and stage filters
 
 The [What's new page](https://the-open-accelerator.com/ecosystem/updates/) lists recent features,
-with a link to try each one, and new organizations by month.
+with a link to try each one, and new organizations by month. **Ask your own AI** writes a prompt
+for the assistant you already use, so it can answer from the atlas's data. The atlas runs no AI itself.
 
 Each entry's drawer says what the organization offers founders, shows when a maintainer
 last verified it, and under **places to meet** lists the cafés, quick bites and quieter
@@ -112,6 +113,7 @@ scripts/load-data.js              Node wrapper around atlas-data.js — scripts 
 test/data-refactor-equivalence.test.js  one-time check that data/ matches the old data.js
 scripts/stale.js                  freshness report — entries longest unverified
 scripts/export-csv.js             export the dataset to a spreadsheet-friendly CSV
+scripts/export-ai.js              export a compact text file for a founder's own AI assistant
 scripts/issue-to-entry.js         the suggestion bot's form parser / entry builder
 scripts/fetch-events.js           events aggregator — feeds /ecosystem/events/ weekly
 scripts/build-events-page.js      assembles events/index.html (generated — see docs/)
@@ -131,11 +133,13 @@ PROJECT_STATE.md                  architecture, decisions & backlog (start here 
 ## The data
 
 The atlas is also an **open dataset** — the only maintained, human-verified dataset of
-Massachusetts' AI ecosystem. Two machine-readable endpoints regenerate on every
+Massachusetts' AI ecosystem. Three machine-readable endpoints regenerate on every
 deploy:
 
 - **JSON** — <https://the-open-accelerator.com/ecosystem/atlas.json> — a versioned
   envelope (`schema: 1`) with all entries, categories, stages and per-category counts
+- **For AI assistants** — <https://the-open-accelerator.com/ecosystem/atlas-ai.txt> — every
+  organization and pathway as compact plain text, for the Ask your own AI prompt
 - **CSV** — <https://the-open-accelerator.com/ecosystem/atlas.csv> — one row per
   organization, ready for Google Sheets (*File → Import*) or Excel (*Data → From
   Text/CSV*)
@@ -143,7 +147,8 @@ deploy:
 Columns/fields include name, category, location, lat/lng, website, description, tags,
 founder stages and the month a maintainer last verified the entry.
 
-To regenerate locally: `node scripts/export-json.js` and `node scripts/export-csv.js`.
+To regenerate locally: `node scripts/export-json.js`, `node scripts/export-csv.js`, and
+`node scripts/export-ai.js`.
 
 **Methodology:** every entry is checked by a human against the organization's own
 website plus an independent source before it ships, and re-verified on a rolling

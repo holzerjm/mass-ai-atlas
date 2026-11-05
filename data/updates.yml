@@ -11,6 +11,11 @@
 # A copy of this template should replace this list, or set it to [].
 
 - date: 2026-11-05
+  title: Ask your own AI
+  text: Copy a prompt into the AI assistant you already use, and it answers from the atlas's own data, with a link to each organization. The atlas runs no AI itself, and what you type stays in your browser until you paste it.
+  try: '?ask=1#directory'
+
+- date: 2026-11-05
   title: Founder pathways
   text: Each stage of the Founder Journey now asks which situation sounds like you, then gives an ordered list of what to do next, with the reason for each step.
   try: '?pathway=build-compute#journey'

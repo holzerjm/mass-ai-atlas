@@ -78,6 +78,11 @@ const SCANS = [
   { name: "credits page", url: "./credits/", credits: true },
   { name: "credits page (light theme)", url: "./credits/", credits: true,
     theme: "light" },
+  // the prompt dialog with its full text showing, which is the part that scrolls
+  { name: "ask your own AI", url: "./?ask=1#directory", include: "#askModal",
+    prepare: page => page.locator("#askRules summary").click() },
+  { name: "ask your own AI (light theme)", url: "./?ask=1#directory", include: "#askModal", theme: "light",
+    prepare: page => page.locator("#askRules summary").click() },
   { name: "updates page", url: "./updates/", updates: true },
   { name: "updates page (light theme)", url: "./updates/", updates: true, theme: "light" },
   // the banner that shows a returning visitor the newest update

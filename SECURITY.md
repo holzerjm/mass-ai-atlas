@@ -57,6 +57,9 @@ behavior:
 - **The URL carries filters and ids, never what someone typed.** Filter values are checked
   against the atlas's fixed lists and anything else is ignored. Text typed into a search box
   stays out of the URL, so links and logs don't carry a founder's own words.
+- **Ask your own AI sends nothing.** The atlas runs no model. What someone types goes into a
+  prompt on the page, and stays out of the URL, storage, and the network. It leaves only if they
+  copy it and paste it into their own assistant, whose own terms then apply.
 - **No secret reaches the browser.** The deploy credentials and Slack webhooks are GitHub
   Actions secrets, used only inside CI.
 - **Untrusted input is gated by a human.** The suggestion bot runs only on the `bot:draft`

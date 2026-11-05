@@ -57,10 +57,11 @@ jobs:
       - run: npm ci
       - name: Validate data/ before shipping
         run: node scripts/validate.js
-      - name: Generate public dataset (atlas.json + atlas.csv)
+      - name: Generate public dataset (atlas.json + atlas.csv + atlas-ai.txt)
         run: |
           node scripts/export-json.js
           node scripts/export-csv.js
+          node scripts/export-ai.js
       - name: Build entry share pages + sitemap
         run: node scripts/build-pages.js
       # events/index.html is generated from index.html's chrome. validate.yml
@@ -79,7 +80,7 @@ jobs:
       - name: Rsync atlas
         id: rsync
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_deploy" index.html atlas-data.js map-style-dark.json atlas.json atlas.csv site-pages/sitemap.xml \
+          rsync -avz -e "ssh -i ~/.ssh/id_deploy" index.html atlas-data.js map-style-dark.json atlas.json atlas.csv atlas-ai.txt site-pages/sitemap.xml \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/"
           # the page fetches data/*.yml (data + schemas) at load time
           rsync -avz -e "ssh -i ~/.ssh/id_deploy" data/ \

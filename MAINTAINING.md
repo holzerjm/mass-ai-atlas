@@ -346,6 +346,31 @@ forgot. If you copied this template, replace the list or set the file to `[]`.
 
 ---
 
+## Ask your own AI
+
+The atlas runs no model. **Ask your own AI**, in the Directory and under each pathway, writes a
+prompt for the assistant someone already uses, and `scripts/export-ai.js` builds the file that
+prompt points at, `atlas-ai.txt`, on every deploy.
+
+- **The rules live in the prompt, not the file.** The prompt is `askPrompt()` in `index.html`.
+  A founder can read it, and pastes it in themselves. A careful assistant is right to distrust
+  instructions it finds inside something it fetched, so `atlas-ai.txt` stays data only. A test
+  checks that.
+- **Nothing typed leaves the page.** What someone types goes into the prompt and nowhere else:
+  not the address, not storage, not the network. Don't add links that open a named assistant
+  with the prompt filled in. They would put a founder's words in a URL, and favor one vendor.
+- **Organizations go A to Z,** so a position depends on nothing but a name.
+- **The file's last line is "End of file".** Web tools can cut a long page without saying so, and
+  a file cut at M would quietly lose everything after it. Keep that line, and the prompt's line
+  that asks for it.
+
+Before you change the prompt, try it on more than one model. Include a question it should refuse
+to rank ("which accelerator is best?"), one the atlas can't answer, and a fact the file doesn't
+hold. Check that every link resolves, that it says what it doesn't know, and that TOA and the
+sponsors get the same treatment as everyone else.
+
+---
+
 ## Appendix A — Field-by-field cheat sheet
 
 Every entry has these fields. ⭐ = required.
