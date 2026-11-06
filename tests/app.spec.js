@@ -382,8 +382,8 @@ test("the map search's results can be chosen with the arrow keys and Enter", asy
 
 // Show on map flies to the pin and opens its popup when the map gets there. Until 2026-11 a
 // 950 ms timer opened it against a 900 ms flight, so whether a popup appeared came down to how
-// busy the machine was. Nothing here does: slowFlights makes every flight take 2 s, and the
-// stray moveend comes from the flight's own first frame.
+// busy the machine was. Nothing here does: slowFlights makes every flight take 2 s or more, and
+// the stray moveend comes from the flight's own first frame.
 test.describe("Show on map", () => {
   const FLIGHT_MS = 2000;
   const show = page => page.getByRole("button", { name: "Show on map" }).click();
@@ -502,7 +502,7 @@ test.describe("Show on map", () => {
     await page.setViewportSize({ width: 1280, height: 1000 });   // tall enough to have the map to drag
     await page.goto(`./?entry=${entry.id}`);
     await waitForApp(page);
-    await slowFlights(page, 5000);
+    await slowFlights(page, 2 * test.info().timeout);   // it can't arrive first, however busy the machine
     await show(page);
     const start = await page.evaluate(() => map.getZoom());
     await expect.poll(() => page.evaluate(() => map.getZoom()), "the flight has begun").not.toBe(start);
