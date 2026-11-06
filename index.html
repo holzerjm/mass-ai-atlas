@@ -1072,6 +1072,7 @@ const byClosing = (a,b)=> applyRank(a).localeCompare(applyRank(b)) || a.name.loc
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 // CSS handles animations and transitions; these are the motions JS drives.
 const mapGoTo = (ll, z) => reduceMotion() ? map.setView(ll, z) : map.flyTo(ll, z, {duration:.9});
+const STREET_ZOOM = 15;   // from here in, no pin is inside a cluster
 const fmtDeadline = v => { const [y,m,dd] = v.split("-"); return `${MONTH_NAMES[+m-1]} ${+dd}, ${y}`; };
 
 /* ---------- filters ---------- */
@@ -1463,22 +1464,42 @@ document.addEventListener("keydown", e=>{
   else closeDrawer();
 });
 
+// Flies the map to a pin and opens its popup when the map gets there. Until 2026-11 Show on map
+// opened it on a 950 ms timer against a 900 ms flight, and when the timer won, the pin was still
+// inside a cluster and no popup appeared. The first moveend isn't the arrival either: a pan that
+// the flight stops ends inside flyTo, and a zoom or a resize can end during it. So only a moveend
+// at the pin counts. The listeners go on before the map moves, because with reduced motion it can
+// arrive before mapGoTo returns. A newer flight replaces this one, and dragging the map takes it
+// over, so a popup can't open later, out of nowhere.
+let pinFlight = null;
+function flyToPin(id){
+  const pin = markers[id], ll = pin.getLatLng();
+  const stop = ()=>{ map.off(pinFlight); pinFlight = null; };
+  if(pinFlight) stop();
+  pinFlight = {
+    moveend(){
+      if(map.getZoom() !== STREET_ZOOM || !map.getBounds().contains(ll)) return;
+      // A pin that was alone and off the screen can still be missing: the cluster group's zoom
+      // animation only brings in what was inside its clusters, and it ignores moveend until it
+      // ends. So it gets another moveend then, which adds the pin and brings this back here.
+      if(!map.hasLayer(pin)) return clusterGroup.once("animationend", ()=>map.fire("moveend"));
+      stop();
+      pin.openPopup();
+    },
+    dragstart: stop,
+  };
+  map.on(pinFlight);
+  mapGoTo(ll, STREET_ZOOM);
+}
 function goToMap(id){
   closeDrawer();
   const d = byId[id];
   // asked to see this one on the map, so filters that hide its pin give way
   if(!mapEntries().list.includes(d)){ readFilters(new URLSearchParams()); filtersChanged(); }
+  // the map is going to the pin, so framing what the filters left would only fight the flight
+  frameOnShow = false;
   switchView("map");
-  setTimeout(()=>{
-    mapGoTo([d.lat,d.lng], 15);
-    const m = markers[id];
-    if(m) setTimeout(()=>{
-      // at z15 clustering is disabled, so this resolves immediately; the
-      // helper covers any edge where the marker is still inside a cluster
-      if(clusterGroup && clusterGroup.hasLayer(m)) clusterGroup.zoomToShowLayer(m, ()=>m.openPopup());
-      else m.openPopup();
-    }, 950);
-  }, 120);
+  setTimeout(()=>flyToPin(id), 120);
 }
 window.goToMap = goToMap;
 
@@ -1648,7 +1669,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   // cluster stacked pins at city zoom; street zoom (15+) shows every pin.
   // flatGroup is the unclustered alternative — the ∴ control swaps them.
   clusterGroup = L.markerClusterGroup({
-    showCoverageOnHover:false, maxClusterRadius:46, disableClusteringAtZoom:15,
+    showCoverageOnHover:false, maxClusterRadius:46, disableClusteringAtZoom:STREET_ZOOM,
     spiderfyOnMaxZoom:false,
     iconCreateFunction: c => L.divIcon({className:"",
       html:`<div class="cluster-chip">${c.getChildCount()}</div>`,
@@ -1753,11 +1774,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
     id => {
       // the filters may be hiding this pin, and a hidden pin has no popup to open
       if(!mapEntries().list.includes(byId[id])) return openDrawer(id);
-      // The popup opens when the flight ends. Until 2026-11 a 950 ms timer opened it, and when
-      // a busy machine finished the 900 ms flight late, the pin was still inside a cluster,
-      // where openPopup() does nothing, so no popup appeared.
-      map.once("moveend", ()=>markers[id].openPopup());
-      mapGoTo([byId[id].lat, byId[id].lng], 15);
+      flyToPin(id);
     });
   document.addEventListener("click", e=>{ if(!e.target.closest(".map-search")) search.close(); });
 })();

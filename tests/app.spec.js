@@ -380,6 +380,158 @@ test("the map search's results can be chosen with the arrow keys and Enter", asy
   expect(await page.evaluate(() => map.getZoom())).toBe(15);
 });
 
+// Show on map flies to the pin and opens its popup when the map gets there. Until 2026-11 a
+// 950 ms timer opened it against a 900 ms flight, so whether a popup appeared came down to how
+// busy the machine was. Nothing here does: slowFlights makes every flight take 2 s, and the
+// stray moveend comes from the flight's own first frame.
+test.describe("Show on map", () => {
+  const FLIGHT_MS = 2000;
+  const show = page => page.getByRole("button", { name: "Show on map" }).click();
+  const isOpen = (page, id) => page.evaluate(id => markers[id].isPopupOpen(), id);
+  const popupOpens = (page, id) => expect.poll(() => isOpen(page, id), "the pin's popup").toBe(true);
+  const goToPin = (page, id) => page.evaluate(id => { map.setView(markers[id].getLatLng(), 15, { animate: false }); }, id);
+  const eastOf = (page, id, zoom, widths) => page.evaluate(({ id, zoom, widths }) => {
+    const at = map.project(markers[id].getLatLng(), zoom).add([map.getSize().x * widths, 0]);
+    map.setView(map.unproject(at, zoom), zoom, { animate: false });
+  }, { id, zoom, widths });
+  // Date.now() is the clock flyTo itself runs on, so a popup that waited for the end of the
+  // flight can't report less than the whole flight.
+  const slowFlights = (page, ms = FLIGHT_MS) => page.evaluate(ms => {
+    const fly = map.flyTo;
+    map.flyTo = function(ll, z, options){
+      const start = Date.now();
+      map.once("popupopen", () => { window.popupAfter = Date.now() - start; });
+      return fly.call(this, ll, z, { ...options, duration: ms / 1000 });
+    };
+  }, ms);
+  const popupWaited = async page => expect(await page.evaluate(() => popupAfter)).toBeGreaterThanOrEqual(FLIGHT_MS);
+
+  test("the popup opens when the flight ends, however long that takes", async ({ page }) => {
+    await page.goto(`./?entry=${entry.id}`);
+    await waitForApp(page);
+    await slowFlights(page);
+    await show(page);
+    await popupOpens(page, entry.id);
+    await popupWaited(page);
+    expect(await page.evaluate(() => map.getZoom())).toBe(15);
+  });
+
+  // A pan the flight stops ends inside flyTo, and a zoom or a resize can end during it. With the
+  // pins ungrouped the pin is on the map the whole way, so only the check for arriving can hold
+  // the popup back: at city zoom with the pin on the screen, and at street zoom with it just off
+  // the screen, where the zoom alone already looks like an arrival.
+  for(const [zoom, widths] of [[13, 0], [15, .8]]){
+    test(`a move that ends during the flight isn't the arrival, from zoom ${zoom}`, async ({ page }) => {
+      await page.goto("./");
+      await waitForApp(page);
+      await page.evaluate(() => setClustered(false));
+      await eastOf(page, entry.id, zoom, widths);
+      await page.evaluate(id => openDrawer(id), entry.id);
+      await slowFlights(page);
+      await page.evaluate(() => map.once("zoomstart", () => map.once("move", () => map.fire("moveend"))));
+      await show(page);
+      await popupOpens(page, entry.id);
+      await popupWaited(page);
+    });
+  }
+
+  // Filters set in the Directory frame the map on the way back to it, but this trip goes to one
+  // pin. Framing as well sent the camera to the filters' zoom in the middle of the flight.
+  test("the map goes straight to the pin, past the framing filters were waiting for", async ({ page }) => {
+    const pin = DATA.find(d => d.offers.includes("compute"));
+    await page.goto("./#directory");
+    await waitForApp(page);
+    await page.locator('#needChips .need-chip[data-need="compute"]').click();
+    await page.locator("#cards").getByRole("button", { name: pin.name, exact: true }).click();
+    await expect(page.locator("#drName")).toHaveText(pin.name);
+    const start = await page.evaluate(() => {
+      window.stops = [];
+      map.on("moveend", () => stops.push(map.getZoom()));
+      return map.getZoom();
+    });
+    await show(page);
+    await popupOpens(page, pin.id);
+    expect((await page.evaluate(() => stops)).filter(z => z !== start)).toEqual([15]);
+  });
+
+  // Ungrouping leaves the pins inside the cluster group too, which is off the map by then. Until
+  // 2026-11 this asked that group to show the pin, which threw, so no popup ever appeared.
+  test("it works with the pins not grouped", async ({ page }) => {
+    await page.goto("./");
+    await waitForApp(page);
+    await page.locator(".map-cluster-toggle").click();
+    await page.evaluate(id => openDrawer(id), entry.id);
+    await show(page);
+    await popupOpens(page, entry.id);
+  });
+
+  // The cluster group draws one map's width past each side of the screen, and its zoom animation
+  // only brings in what was inside its clusters. So a pin that was alone, beyond that edge, stayed
+  // off the map after a flight to it: until 2026-11 three pins showed nothing from the first
+  // view, not even the pin. The map starts just past the edge here, whatever the data holds.
+  for(const reducedMotion of ["no-preference", "reduce"]){
+    test(`it reaches a pin the cluster group hasn't drawn (${reducedMotion})`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion });
+      await page.goto("./");
+      await waitForApp(page);
+      const id = await page.evaluate(() => DATA.find(d => markers[d.id].__parent._zoom < 13).id);
+      await eastOf(page, id, 13, 1.6);
+      await page.evaluate(id => openDrawer(id), id);
+      expect(await page.evaluate(id => map.hasLayer(markers[id]), id), "the pin starts off the map").toBe(false);
+      await show(page);
+      await popupOpens(page, id);
+    });
+  }
+
+  // Nothing has to move here. A flight still runs, but with reduced motion the only moveend comes
+  // before setView returns, so a listener added after it would wait for good.
+  for(const reducedMotion of ["no-preference", "reduce"]){
+    test(`it works from the pin itself (${reducedMotion})`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion });
+      await page.goto(`./?entry=${entry.id}`);
+      await waitForApp(page);
+      await goToPin(page, entry.id);
+      await show(page);
+      await popupOpens(page, entry.id);
+    });
+  }
+
+  // Each of these leaves a flight that will never arrive, so the map stops waiting for it. If it
+  // didn't, the popup would open whenever the map next came to rest at the pin.
+  test("dragging the map during the flight means no popup later", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1000 });   // tall enough to have the map to drag
+    await page.goto(`./?entry=${entry.id}`);
+    await waitForApp(page);
+    await slowFlights(page, 5000);
+    await show(page);
+    const start = await page.evaluate(() => map.getZoom());
+    await expect.poll(() => page.evaluate(() => map.getZoom()), "the flight has begun").not.toBe(start);
+    const box = await page.locator("#map").boundingBox();
+    await page.mouse.move(box.x + 300, box.y + 100);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 380, box.y + 100, { steps: 5 });
+    await page.mouse.up();
+    await goToPin(page, entry.id);
+    expect(await isOpen(page, entry.id)).toBe(false);
+  });
+
+  test("a newer flight replaces the one it interrupts", async ({ page }) => {
+    const pick = async d => {
+      await page.locator("#mapSearch").fill(d.name);
+      await page.locator(`#mapResults [data-id="${d.id}"]`).click();
+    };
+    const other = DATA.find(d => metersBetween(d, entry) > 5000);
+    await page.goto("./");
+    await waitForApp(page);
+    await slowFlights(page);
+    await pick(entry);
+    await pick(other);
+    await popupOpens(page, other.id);
+    await goToPin(page, entry.id);
+    expect(await isOpen(page, entry.id)).toBe(false);
+  });
+});
+
 // The Founder Journey's organizations were spans that took only a click until 2026-11. As
 // buttons, Tab reaches them from the Journey's tab, Enter opens one, and closing its drawer
 // puts focus back on it.
