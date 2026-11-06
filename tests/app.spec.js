@@ -981,9 +981,9 @@ test.describe("the map search's list", () => {
       await expect.poll(() => scrolled(page)).toBe(0);
     });
 
-    // Each stop on the way down is a scroll event, so one stop is one jump. The reverse doesn't
-    // hold: a glide that runs during a stall can arrive as one event too, so for a glide this
-    // goes by what the page asked for.
+    // A jump is one stop on the way down, but one stop doesn't prove a jump: a glide that runs
+    // during a stall can arrive as one scroll event too. So this goes by what the page asked for
+    // as well.
     for(const reducedMotion of ["no-preference", "reduce"]){
       test(`the page ${reducedMotion === "reduce" ? "jumps there with reduced motion" : "glides there otherwise"}`, async ({ page }) => {
         await page.emulateMedia({ reducedMotion });
