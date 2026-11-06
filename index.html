@@ -251,7 +251,8 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
 .gx-tip span{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px}
 .gx-tip em{display:block;font-style:normal;color:var(--muted);font-size:12px;margin-top:3px}
 .gx-hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:12.5px;color:var(--muted);
-  background:rgba(10,15,30,.8);border:1px solid var(--line);padding:7px 16px;border-radius:99px;backdrop-filter:blur(6px);white-space:nowrap}
+  background:rgba(10,15,30,.8);border:1px solid var(--line);padding:7px 16px;border-radius:99px;backdrop-filter:blur(6px);white-space:nowrap;
+  pointer-events:none}   /* only text, so the wheel it asks for goes through to the canvas */
 /* the hint names what the visitor has: a mouse, a finger, or the keys (while the
    organization list behind the canvas has focus) */
 .gx-hint .for-touch,.gx-hint .for-keys{display:none}

@@ -317,7 +317,7 @@ test.describe("the wheel over the map and the galaxy", () => {
 
   // Near the bottom of the part of the canvas on screen, clear of what sits along its top edge.
   // A fixed point isn't safe: how far down the canvases start depends on the fonts, and a wheel
-  // turn over the galaxy's hint bar, or just above the map, may never reach the canvas.
+  // turn just above the map may never reach the canvas.
   async function moveToCanvas(page, selector){
     const box = await page.locator(selector).boundingBox();
     const y = Math.min(box.y + box.height, page.viewportSize().height) - 20;
@@ -378,6 +378,30 @@ test.describe("the wheel over the map and the galaxy", () => {
     await page.keyboard.up("Control");
     await expect.poll(auto).toBe(false);
     expect(await scale()).toBeGreaterThan(s0);
+  });
+
+  // The hint bar sits on the galaxy and says to hold Ctrl and scroll, so that has to work on the
+  // bar too. Until 2026-11 the bar took the wheel itself: the canvas never saw it and nothing
+  // prevented the default, so the page scrolled, and a trackpad pinch zoomed the whole page.
+  test("Ctrl + wheel over the galaxy's hint bar zooms the galaxy", async ({ page }) => {
+    await page.goto("./#galaxy");
+    await waitForApp(page);
+    const bar = await page.locator(".gx-hint").boundingBox();
+    // The page reads the scale either side of the canvas's own handler: as the layout settles the
+    // scale can fall about 11% by itself, nearly all of the 12% one wheel turn adds.
+    await page.evaluate(() => {
+      let before;
+      addEventListener("wheel", () => { before = gxScale; }, { capture: true, once: true });
+      addEventListener("wheel", e => {
+        window.wheeled = { zoomed: gxScale > before, prevented: e.defaultPrevented };
+      }, { once: true });
+    });
+    await page.mouse.move(bar.x + bar.width / 2, bar.y + bar.height / 2);
+    await page.keyboard.down("Control");
+    await page.mouse.wheel(0, -100);
+    await page.keyboard.up("Control");
+    await expect.poll(() => page.evaluate(() => window.wheeled), "what the wheel turn did")
+      .toEqual({ zoomed: true, prevented: true });
   });
 });
 
