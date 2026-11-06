@@ -2173,22 +2173,22 @@
 - id: masschallenge
   name: MassChallenge
   cat: accel
-  loc: Seaport, Boston
+  loc: Seaport, Boston (moving to the Fenway)
   approx: true
   lat: 42.3496
   lng: -71.044
   url: https://masschallenge.org
-  desc: Zero-equity global accelerator headquartered in Boston, awarding up to $1M in non-dilutive prizes per cohort.
-  why: Free money and a massive partner network. Apply every year you're eligible.
-  facts: [[Equity, 0% — zero-equity], [Terms, Up to $1M non-dilutive prizes per cohort]]
+  desc: Zero-equity accelerator headquartered in Boston. Its challenge programs match startups with corporate partners for pilots, and some programs carry prizes.
+  why: Pilots with big partners and a massive network, at no equity. Read the challenge statements before you apply.
+  facts: [[Equity, 0% — zero-equity], [Terms, Partner pilots; prizes in some programs]]
   tags: [equity-free]
   stages: [3, 4]
-  offers: [grants, mentorship, community]
+  offers: [customers, grants, mentorship, community]
   applyBy: '2026-11-09'
   applyNote: 2026–2027 Challenge programs
   applyUrl: https://masschallenge.org/2026-2027-challenge-cycle/
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: massrobotics
   name: MassRobotics
   cat: accel
@@ -2451,7 +2451,7 @@
   links: [cic, techweek]
   offers: [community, mentorship]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: venturelane
   name: The Venture Lane
   cat: space
@@ -2946,11 +2946,11 @@
   added: 2026-06
   lastVerified: 2026-10
 - id: odsc
-  name: ODSC East / AiX Summit
+  name: ODSC AI East
   cat: event
-  loc: Hynes Convention Center, Boston
-  lat: 42.3477
-  lng: -71.0858
+  loc: Boston Convention & Exhibition Center
+  lat: 42.3456
+  lng: -71.0463
   url: https://odsc.ai/east/
   desc: One of the world's largest applied data science & AI conferences, held in Boston every spring.
   why: Thousands of practitioners in town — recruiting and learning in one badge.
@@ -2958,7 +2958,7 @@
   stages: [1, 5]
   offers: [community, talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: hackmit
   name: HackMIT
   cat: event
