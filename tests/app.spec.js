@@ -380,6 +380,15 @@ test("the map search's results can be chosen with the arrow keys and Enter", asy
   expect(await page.evaluate(() => map.getZoom())).toBe(15);
 });
 
+const scrolled = page => page.evaluate(() => scrollY);
+// where the nav reaches the top of the window, with the category row right under it
+const navAtTop = page => page.evaluate(() =>
+  document.querySelector("#view-map").getBoundingClientRect().top + scrollY - document.querySelector(".nav").offsetHeight);
+const restsAtNav = async (page, slack = 1) => {
+  const y = await navAtTop(page);
+  await expect.poll(async () => Math.abs(await scrolled(page) - y), "the page's distance from the nav's place").toBeLessThanOrEqual(slack);
+};
+
 // Show on map flies to the pin and opens its popup when the map gets there. Until 2026-11 a
 // 950 ms timer opened it against a 900 ms flight, so whether a popup appeared came down to how
 // busy the machine was. Nothing here does: slowFlights makes every flight take 2 s or more, and
@@ -541,14 +550,6 @@ test.describe("Show on map", () => {
     return { pin: fits(markers[id].getElement()), popup: fits(markers[id].getPopup().getElement()) };
   }, id);
   const onScreen = (page, id) => expect.poll(() => inWindow(page, id), "the pin and its popup").toEqual({ pin: true, popup: true });
-  const scrolled = page => page.evaluate(() => scrollY);
-  // where the nav reaches the top of the window, with the category row right under it
-  const navAtTop = page => page.evaluate(() =>
-    document.querySelector("#view-map").getBoundingClientRect().top + scrollY - document.querySelector(".nav").offsetHeight);
-  const restsAtNav = async page => {
-    const y = await navAtTop(page);
-    await expect.poll(async () => Math.abs(await scrolled(page) - y), "the page's distance from the nav's place").toBeLessThanOrEqual(1);
-  };
 
   // A big window and a tall phone show the pin from the top of the page, so nothing moves there.
   for(const [width, height, moves, touch] of [[1366, 650, true], [1280, 720, true], [1440, 900, true], [1920, 1080, false], [390, 844, false, true]]){
@@ -624,12 +625,15 @@ test.describe("Show on map", () => {
       await expect.poll(() => scrolled(page)).toBe(0);
     });
 
-    // Enter picks a result without the page scrolling to it, so this is the search at its worst.
+    // Enter picks a result without the page scrolling to it. This window is taller than the rest
+    // here because a short list fits it, so the page hasn't moved for the list and the pick has
+    // to do it: this is the search at its worst.
     test("a search pick brings its pin on screen, then leaves the page alone", async ({ page }) => {
       const input = page.locator("#mapSearch");
-      const pick = async d => {
+      const pick = async (d, before) => {
         await input.fill(d.name);
         await expect(page.locator(`#mapResults [data-id="${d.id}"]`)).toBeAttached();
+        if(before !== undefined) expect(await scrolled(page), "the page before the pick").toBe(before);
         const place = await page.locator('#mapResults [role="option"][data-id]').evaluateAll((all, id) => all.findIndex(o => o.dataset.id === id), d.id);
         for(let i = 0; i <= place; i++) await input.press("ArrowDown");
         await input.press("Enter");
@@ -637,9 +641,10 @@ test.describe("Show on map", () => {
         await onScreen(page, d.id);
       };
       const other = DATA.find(d => metersBetween(d, entry) > 5000);
+      await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto("./");
       await waitForApp(page);
-      await pick(entry);
+      await pick(entry, 0);
       await restsAtNav(page);
       const y = await scrolled(page);
       await pick(other);
@@ -688,6 +693,289 @@ test.describe("Show on map", () => {
       await popupOpens(page, id);
       await onScreen(page, id);
     });
+  });
+});
+
+// The search box sits at the top of the map, most of a screen down the page, so until 2026-11 the
+// list dropped below the window as someone typed: with the page at the top, 11 px of it showed at
+// 1366 × 650, and none at 1024 × 700. A list that doesn't fit now brings the page to it.
+test.describe("the map search's list", () => {
+  const TALLEST = "robot";   // more matches than a list holds, so eight rows
+  const GLIDE_MS = 600;      // longer than the page takes to move
+  const input = page => page.locator("#mapSearch");
+  const type = (page, text) => input(page).pressSequentially(text, { delay: 30 });
+  const open = async page => {
+    await page.goto("./");
+    await waitForApp(page);
+  };
+  // The part of the window that shows, the box and the list, and whether each of the list's rows
+  // is what's really at its spot on the screen. Boxes alone would pass a list under the nav.
+  const read = page => page.evaluate(() => {
+    const list = document.querySelector("#mapResults"), rows = [...list.querySelectorAll('[role="option"]')];
+    const nav = document.querySelector(".nav").getBoundingClientRect().bottom, view = visualViewport;
+    const box = document.querySelector("#mapSearch").getBoundingClientRect(), { top, bottom } = list.getBoundingClientRect();
+    const seen = row => {
+      const { left, top, width, height } = row.getBoundingClientRect();
+      return list.contains(document.elementFromPoint(left + width / 2, top + height / 2));
+    };
+    return { from: Math.max(nav, view.offsetTop), to: view.offsetTop + view.height, boxTop: box.top, top, bottom, rows: rows.length, seen: rows.every(seen) };
+  });
+  // Two pixels to spare, because the page can stop that far off. scrollY is rounded down and the
+  // nav's place is fractional, and each key works out the place again from a position in passing.
+  const SLACK = 2;
+  const fits = ({ from, to, boxTop, top, bottom, rows, seen }) => rows > 0 && seen && boxTop >= from - SLACK && top >= from && bottom <= to + SLACK;
+  const shows = page => expect.poll(async () => fits(await read(page)), "the box and the whole list").toBe(true);
+  const atNav = page => restsAtNav(page, SLACK);
+  // A scroll event comes with the next frame, so this waits, or it would land in what's recorded next.
+  const placeAt = (page, top) => page.evaluate(top => {
+    window.scrollTo({ top, behavior: "instant" });
+    return new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done)));
+  }, top);
+  const watch = page => page.evaluate(() => {
+    window.tops = [];
+    addEventListener("scroll", () => tops.push(scrollY));
+  });
+  const stays = async (page, y) => {
+    await page.waitForTimeout(GLIDE_MS);
+    expect(await page.evaluate(() => tops), "the page's moves").toEqual([]);
+    expect(await scrolled(page)).toBe(y);
+  };
+
+  for(const [width, height, touch] of [[1366, 650], [1280, 720], [375, 667, true], [1024, 700]]){
+    test.describe(`in a ${width} × ${height} window`, () => {
+      test.use({ viewport: { width, height }, ...touch && { isMobile: true, hasTouch: true } });
+
+      test("the whole list shows while typing", async ({ page }) => {
+        await open(page);
+        await type(page, TALLEST);
+        await expect(page.locator('#mapResults [role="option"]')).toHaveCount(8);
+        await shows(page);
+        await atNav(page);
+      });
+    });
+  }
+
+  // Here the nav's place isn't far enough, so the category row gives way.
+  test.describe("in a short window with the nav on two rows", () => {
+    test.use({ viewport: { width: 820, height: 600 } });
+
+    test("the page goes past the nav's place", async ({ page }) => {
+      await open(page);
+      await type(page, TALLEST);
+      await shows(page);
+      expect(await scrolled(page)).toBeGreaterThan(await navAtTop(page));
+    });
+  });
+
+  // This window fits the box and a whole list only because the nav doesn't come along. It sticks
+  // as far as the foot of <body>, one window down, and the box starts lower than that. Allowing
+  // for a nav that isn't there cut the list off, even from a place where it fitted.
+  test.describe("on a phone on its side", () => {
+    test.use({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true });
+
+    test("the whole list shows, with no nav to clear", async ({ page }) => {
+      await open(page);
+      await type(page, TALLEST);
+      await shows(page);
+    });
+
+    test("a list that fits below a nav that isn't there leaves the page alone", async ({ page }) => {
+      await open(page);
+      await placeAt(page, await input(page).evaluate(box => box.getBoundingClientRect().top + scrollY - 10));
+      const y = await scrolled(page);
+      await watch(page);
+      await input(page).fill(TALLEST);
+      await shows(page);
+      await stays(page, y);
+    });
+  });
+
+  // The browsers Playwright drives have no on-screen keyboard. A real one leaves innerHeight alone
+  // and shrinks the visual viewport, which is what these stand in for. Keeping innerHeight would
+  // leave a 390 × 844 phone's list under the keyboard, because it fits the window.
+  const keyboardUp = (page, height) => page.evaluate(height =>
+    Object.defineProperty(window, "visualViewport", { value: { offsetTop: 0, height } }), height);
+
+  for(const [width, height, keyboard] of [[375, 667, 260], [390, 844, 330]]){
+    test.describe(`on a ${width} × ${height} phone with its keyboard up`, () => {
+      test.use({ viewport: { width, height }, isMobile: true, hasTouch: true });
+
+      test("the whole list clears the keyboard", async ({ page }) => {
+        await open(page);
+        await keyboardUp(page, height - keyboard);
+        await type(page, TALLEST);
+        await shows(page);
+      });
+    });
+  }
+
+  // Too little shows for the box and a whole list, so the box stays in sight, as high as it can
+  // go, and the list takes what's left. It scrolls inside itself, so nothing is out of reach. A
+  // nav still in reach of the box stops it, and on a phone on its side there's none to stop it.
+  for(const [width, height, keyboard, under] of [[375, 667, 300, "the nav"], [844, 390, 200, "the top of the window"]]){
+    test.describe(`on a ${width} × ${height} phone with its keyboard up`, () => {
+      test.use({ viewport: { width, height }, isMobile: true, hasTouch: true });
+
+      test(`the box stops right under ${under}`, async ({ page }) => {
+        await open(page);
+        await keyboardUp(page, height - keyboard);
+        await type(page, TALLEST);
+        await expect.poll(async () => {
+          const { from, boxTop } = await read(page);
+          return Math.abs(boxTop - from);
+        }, "how far the box is from where it should stop").toBeLessThanOrEqual(1);
+      });
+    });
+  }
+
+  // Bringing up the keyboard can also pan what shows down the page. Going to the nav's place then
+  // would carry the box up out of sight, and going by the height alone would go too far.
+  test.describe("on a phone with what shows panned down the page", () => {
+    test.use({ viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true });
+    const panned = (page, offsetTop) => page.evaluate(offsetTop =>
+      Object.defineProperty(window, "visualViewport", { value: { offsetTop, height: 407 } }), offsetTop);
+
+    test("the box and the list stay in sight", async ({ page }) => {
+      await open(page);
+      await panned(page, 260);
+      await type(page, TALLEST);
+      await shows(page);
+    });
+
+    test("the page goes no further than it has to", async ({ page }) => {
+      await open(page);
+      await panned(page, 100);
+      await type(page, TALLEST);
+      await shows(page);
+      await atNav(page);
+    });
+  });
+
+  test.describe("in a 1920 × 1080 window", () => {
+    test.use({ viewport: { width: 1920, height: 1080 } });
+
+    test("the tallest list fits, so the page stays where it is", async ({ page }) => {
+      await open(page);
+      await watch(page);
+      await type(page, TALLEST);
+      await shows(page);
+      await stays(page, 0);
+    });
+  });
+
+  // A short list fits this window and the tallest doesn't, so what counts is the list, not the box.
+  test.describe("in a 1440 × 900 window", () => {
+    test.use({ viewport: { width: 1440, height: 900 } });
+
+    test("a short list stays where it is, and a tall one brings the page", async ({ page }) => {
+      await open(page);
+      await watch(page);
+      await input(page).fill(entry.name);
+      await shows(page);
+      await stays(page, 0);
+      await input(page).fill(TALLEST);
+      await shows(page);
+      await atNav(page);
+    });
+  });
+
+  // With the box out of sight a glide doesn't survive. The browser scrolls to the caret after each
+  // key, which stops it, and after a stall it starts from an old position and drags a finished
+  // glide back up: at 1024 × 700 the page reached 389 and went back to 34, with the list cut off.
+  // That takes a stall to happen, so these check for what prevents it, which is one stop.
+  for(const [width, height, y, where] of [[1024, 700, 0, "below"], [1366, 650, 900, "above"]]){
+    test.describe(`in a ${width} × ${height} window`, () => {
+      test.use({ viewport: { width, height } });
+
+      test(`with the box ${where} the window, the page jumps there`, async ({ page }) => {
+        await open(page);
+        await input(page).evaluate(box => box.focus({ preventScroll: true }));
+        await placeAt(page, y);
+        await watch(page);
+        await page.keyboard.type(TALLEST, { delay: 30 });
+        await shows(page);
+        await atNav(page);
+        expect(new Set(await page.evaluate(() => tops)).size, "the page's stops").toBe(1);
+      });
+    });
+  }
+
+  test.describe("in a laptop's window", () => {
+    test.use({ viewport: { width: 1366, height: 650 } });
+
+    // It goes down in one go, however fast the keys come, and then stays there whatever's typed.
+    test("the page moves once, not on every key", async ({ page }) => {
+      await open(page);
+      await watch(page);
+      await type(page, TALLEST);
+      await shows(page);
+      await atNav(page);
+      await page.waitForTimeout(GLIDE_MS);
+      const y = await scrolled(page), way = await page.evaluate(() => tops.splice(0));
+      expect(way, "the page's way down").toEqual([...way].sort((a, b) => a - b));
+      for(let i = 0; i < TALLEST.length; i++) await input(page).press("Backspace");
+      await type(page, "boston lab");
+      for(let i = 0; i < 4; i++) await input(page).press("Backspace");   // and the list grows again
+      await shows(page);
+      await stays(page, y);
+    });
+
+    // Moving on focus would mean guessing at a list that isn't there yet, for someone who may not
+    // be typing at all. A closing popup hands the box the focus too.
+    test("the box taking the focus leaves the page alone", async ({ page }) => {
+      await open(page);
+      await watch(page);
+      await input(page).click();
+      await stays(page, 0);
+      await input(page).fill(entry.name);
+      await input(page).press("Enter");
+      await expect.poll(() => page.evaluate(id => markers[id].isPopupOpen(), entry.id), "the pin's popup").toBe(true);
+      await placeAt(page, 0);
+      await page.evaluate(() => { tops.length = 0; });
+      await page.keyboard.press("Escape");
+      await expect(input(page)).toBeFocused();
+      await stays(page, 0);
+    });
+
+    // The list fits and the box is on the screen, but it's under the nav, so what's typed doesn't show.
+    test("with the box under the nav, the page comes back", async ({ page }) => {
+      await open(page);
+      const nav = await page.evaluate(() => document.querySelector(".nav").offsetHeight);
+      await placeAt(page, await input(page).evaluate((box, nav) => box.getBoundingClientRect().top + scrollY - nav / 2, nav));
+      await input(page).evaluate(box => box.focus({ preventScroll: true }));
+      await page.keyboard.type(TALLEST, { delay: 30 });
+      await shows(page);
+      await atNav(page);
+    });
+
+    test("a tab still goes to the top of the page afterwards", async ({ page }) => {
+      await open(page);
+      await type(page, TALLEST);
+      await atNav(page);
+      await page.locator('.tab[data-view="map"]').click();
+      await expect.poll(() => scrolled(page)).toBe(0);
+    });
+
+    // Each stop on the way down is a scroll event, so one stop is one jump. The reverse doesn't
+    // hold: a glide that runs during a stall can arrive as one event too, so for a glide this
+    // goes by what the page asked for.
+    for(const reducedMotion of ["no-preference", "reduce"]){
+      test(`the page ${reducedMotion === "reduce" ? "jumps there with reduced motion" : "glides there otherwise"}`, async ({ page }) => {
+        await page.emulateMedia({ reducedMotion });
+        await open(page);
+        await watch(page);
+        await page.evaluate(() => {
+          const go = window.scrollTo;
+          window.asked = [];
+          window.scrollTo = function(options){ asked.push(options.behavior); return go.call(this, options); };
+        });
+        await type(page, TALLEST);
+        await shows(page);
+        await atNav(page);
+        if(reducedMotion === "reduce") expect(new Set(await page.evaluate(() => tops)).size).toBe(1);
+        expect([...new Set(await page.evaluate(() => asked))]).toEqual([reducedMotion === "reduce" ? "auto" : "smooth"]);
+      });
+    }
   });
 });
 

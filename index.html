@@ -1464,22 +1464,34 @@ document.addEventListener("keydown", e=>{
   else closeDrawer();
 });
 
-// The map starts most of a screen down the page and a flight ends in the middle of it, so until
-// 2026-11 the pin could land below the window: after Show on map at 1366 × 650 it was off the
-// screen with 5% of its popup showing, and a search pick was no better. So the page moves, as the
-// flight starts, if it has to: to where the nav reaches the top of the window, with the category
-// row under it. Leaflet keeps a popup inside the map, and one that needs more than half the map
-// pushes its pin down. So what has to show is the map's top, clear of the sticky nav, down to the
-// lowest place the pin can stop. A window too short for all that gives up the category row.
+// The map starts most of a screen down the page, so what happens on it can be out of sight. This
+// moves the page, if it has to, to show a stretch of the map's view, from `top` to `bottom`, which
+// are where it is on the screen now. It goes to where the nav reaches the top of the window, with
+// the category row under it, and further if `bottom` needs it, which gives up the category row. It
+// stops before `top` is covered. The nav can't cover anything lower down than the foot of <body>,
+// which is as far as it sticks, and in a short window that's above where the map starts. The visual
+// viewport is the part of the window that shows: a phone's on-screen keyboard shortens it and can
+// pan it down the page, and innerHeight sees neither.
+function bringOnScreen(top, bottom, behavior = reduceMotion() ? "auto" : "smooth"){
+  const nav = document.querySelector(".nav").offsetHeight, seen = visualViewport;
+  const covered = top + scrollY < document.body.offsetHeight ? nav : 0;
+  const most = top - Math.max(covered, seen.offsetTop);   // any further down the page, and the top is covered
+  const least = bottom - seen.offsetTop - seen.height;   // any less, and the bottom is out of sight
+  if(least <= 0 && most >= 0) return;
+  const navPlace = $("view-map").getBoundingClientRect().top - nav;
+  window.scrollTo({top: scrollY + Math.min(Math.max(least, navPlace), most), behavior});
+}
+
+// A flight ends in the middle of the map, so until 2026-11 the pin could land below the window:
+// after Show on map at 1366 × 650 it was off the screen with 5% of its popup showing, and a search
+// pick was no better. So the page moves as the flight starts. Leaflet keeps a popup inside the
+// map, and one that needs more than half the map pushes its pin down. So what has to show is the
+// map's top down to the lowest place the pin can stop.
 const POPUP_ROOM = 240;   // the tallest popup, its tip, and Leaflet's gap at the map's edge
 const PIN_ROOM = 24;      // the pin, and a little of the map under it
 function bringPinOnScreen(){
-  const nav = document.querySelector(".nav").offsetHeight, box = $("map").getBoundingClientRect();
-  const most = box.top - nav;   // any further down the page, and the nav covers the map's top
-  const least = box.top + Math.max(box.height / 2, POPUP_ROOM) + PIN_ROOM - innerHeight;   // any less, and the pin is below the window
-  if(least <= 0 && most >= 0) return;
-  const navPlace = $("view-map").getBoundingClientRect().top - nav;
-  window.scrollTo({top: scrollY + Math.max(least, navPlace), behavior: reduceMotion() ? "auto" : "smooth"});
+  const box = $("map").getBoundingClientRect();
+  bringOnScreen(box.top, box.top + Math.max(box.height / 2, POPUP_ROOM) + PIN_ROOM);
 }
 
 // Flies the map to a pin and opens its popup when the map gets there. Until 2026-11 Show on map
@@ -1581,8 +1593,9 @@ function buildCatBar(bar, shown, onToggle){
 // listbox that the arrow keys move through and Enter picks from, as a click does, and Escape
 // closes it. Until 2026-11 only a mouse could pick a result. find(q) returns the entries that
 // match the lowercased query (the first eight are listed), pick(id) acts on the one picked,
-// and cleared(), if given, runs when the box is emptied. Returns close(), to shut the list.
-function searchBox(inp, res, prefix, find, pick, cleared){
+// cleared(), if given, runs when the box is emptied, and listed(), if given, runs when a list
+// has been drawn. Returns close(), to shut the list.
+function searchBox(inp, res, prefix, find, pick, cleared, listed){
   let active = -1;
   const opts = () => [...res.querySelectorAll('[role="option"][data-id]')];
   function setActive(i){
@@ -1603,6 +1616,7 @@ function searchBox(inp, res, prefix, find, pick, cleared){
     res.querySelectorAll("div[data-id]").forEach(el=>{
       el.addEventListener("click", ()=>choose(el.dataset.id));
     });
+    if(listed) listed();
   });
   inp.addEventListener("keydown", e=>{
     const o = opts(), open = res.classList.contains("open");
@@ -1790,14 +1804,27 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   // second line on narrower screens, so tell Leaflet whenever the map's box changes size.
   new ResizeObserver(()=>{ if(currentView==="map") map.invalidateSize(); }).observe(map.getContainer());
 
-  // search: a pick flies the map to the pin and opens its popup
+  // search: a pick flies the map to the pin and opens its popup. The box sits at the top of the
+  // map, so until 2026-11 the list dropped below the window as someone typed: 11 px of it showed
+  // at 1366 × 650, and none at 1024 × 700. So a list that doesn't fit brings the page to it. That
+  // waits for the list, because the focus has nothing to show yet: moving on focus took the page
+  // 387 px for a click in the box, and again when a closing popup gave the box the focus back.
+  // With the box out of sight the page jumps instead of gliding, because a glide doesn't survive:
+  // the browser scrolls to the caret after the input event, which stops one, and after a stall it
+  // can start from an old position and drag a finished one back up. A jump leaves it nothing to do.
+  const listShown = () => {
+    const box = $("mapSearch").getBoundingClientRect(), seen = visualViewport;
+    const hidden = box.top < seen.offsetTop || box.bottom > seen.offsetTop + seen.height;
+    bringOnScreen(box.top, $("mapResults").getBoundingClientRect().bottom, hidden ? "instant" : undefined);
+  };
   const search = searchBox($("mapSearch"), $("mapResults"), "mapr",
     q => searchEntries(q).list,
     id => {
       // the filters may be hiding this pin, and a hidden pin has no popup to open
       if(!mapEntries().list.includes(byId[id])) return openDrawer(id);
       flyToPin(id);
-    });
+    },
+    null, listShown);
   document.addEventListener("click", e=>{ if(!e.target.closest(".map-search")) search.close(); });
 })();
 
