@@ -315,18 +315,42 @@ test("a category button hides and shows that category's pins", async ({ page }) 
 test.describe("the wheel over the map and the galaxy", () => {
   test.use({ viewport: { width: 1366, height: 650 } });
 
+  // Near the bottom of the part of the canvas on screen, clear of what sits along its top edge.
+  // A fixed point isn't safe: how far down the canvases start depends on the fonts, and a wheel
+  // turn over the galaxy's hint bar, or just above the map, may never reach the canvas.
+  async function moveToCanvas(page, selector){
+    const box = await page.locator(selector).boundingBox();
+    const y = Math.min(box.y + box.height, page.viewportSize().height) - 20;
+    expect(y, `${selector} shows too little to aim at`).toBeGreaterThan(box.y);
+    await page.mouse.move(box.x + box.width / 2, y);
+  }
+
+  // How long the zoom hint stayed, in ms, once it has gone. The page keeps the record because the
+  // hint lasts 1.4 s, and on a busy machine the map's first frames can hold the page for longer,
+  // so a check made after the wheel, however soon, can find the hint already gone.
+  async function watchHint(page, selector){
+    await page.evaluate(selector => {
+      const hint = document.querySelector(selector);
+      new MutationObserver(() => {
+        window[hint.classList.contains("show") ? "hintShown" : "hintGone"] ??= performance.now();
+      }).observe(hint, { attributes: true, attributeFilter: ["class"] });
+    }, selector);
+    return () => page.evaluate(() => window.hintGone - window.hintShown);
+  }
+
   test("over the map it scrolls the page; Ctrl + wheel zooms the map", async ({ page }) => {
     await page.goto("./");
     await waitForApp(page);
     const zoom = () => page.evaluate(() => map.getZoom());
     const z0 = await zoom();
-    await page.mouse.move(600, 600);   // the map starts below the header, at about y = 530
+    const hintLasted = await watchHint(page, ".map-wrap .zoom-hint");
+    await moveToCanvas(page, "#map");
     await page.mouse.wheel(0, 300);
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
-    await expect(page.locator(".map-wrap .zoom-hint")).toHaveClass(/\bshow\b/);
+    await expect.poll(hintLasted, "how long the zoom hint stayed, in ms").toBeGreaterThan(1000);
     expect(await zoom()).toBe(z0);
 
-    await page.mouse.move(600, 400);   // still over the map, now that the page has moved
+    await moveToCanvas(page, "#map");   // the map has moved with the page
     await page.keyboard.down("Control");
     await page.mouse.wheel(0, -300);
     await page.keyboard.up("Control");
@@ -340,13 +364,14 @@ test.describe("the wheel over the map and the galaxy", () => {
     await waitForApp(page);
     const scale = () => page.evaluate(() => gxScale);
     const auto = () => page.evaluate(() => gxAuto);
-    await page.mouse.move(600, 600);
+    const hintLasted = await watchHint(page, ".galaxy-wrap .zoom-hint");
+    await moveToCanvas(page, "#galaxy");
     await page.mouse.wheel(0, 300);
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
-    await expect(page.locator(".galaxy-wrap .zoom-hint")).toHaveClass(/\bshow\b/);
+    await expect.poll(hintLasted, "how long the zoom hint stayed, in ms").toBeGreaterThan(1000);
     expect(await auto()).toBe(true);
 
-    await page.mouse.move(600, 400);
+    await moveToCanvas(page, "#galaxy");
     const s0 = await scale();
     await page.keyboard.down("Control");
     await page.mouse.wheel(0, -100);
