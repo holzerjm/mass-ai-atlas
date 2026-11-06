@@ -530,6 +530,165 @@ test.describe("Show on map", () => {
     await goToPin(page, entry.id);
     expect(await isOpen(page, entry.id)).toBe(false);
   });
+
+  // The map starts most of a screen down the page and a flight ends in the middle of it, so until
+  // 2026-11 the pin could land below the window: at 1366 × 650 it was off the screen, with 5% of
+  // its popup showing. Each of these has to end with the pin and the whole popup on screen, clear
+  // of the sticky nav.
+  const inWindow = (page, id) => page.evaluate(id => {
+    const top = document.querySelector(".nav").getBoundingClientRect().bottom;
+    const fits = el => { const box = el.getBoundingClientRect(); return box.top >= top && box.bottom <= innerHeight; };
+    return { pin: fits(markers[id].getElement()), popup: fits(markers[id].getPopup().getElement()) };
+  }, id);
+  const onScreen = (page, id) => expect.poll(() => inWindow(page, id), "the pin and its popup").toEqual({ pin: true, popup: true });
+  const scrolled = page => page.evaluate(() => scrollY);
+  // where the nav reaches the top of the window, with the category row right under it
+  const navAtTop = page => page.evaluate(() =>
+    document.querySelector("#view-map").getBoundingClientRect().top + scrollY - document.querySelector(".nav").offsetHeight);
+  const restsAtNav = async page => {
+    const y = await navAtTop(page);
+    await expect.poll(async () => Math.abs(await scrolled(page) - y), "the page's distance from the nav's place").toBeLessThanOrEqual(1);
+  };
+
+  // A big window and a tall phone show the pin from the top of the page, so nothing moves there.
+  for(const [width, height, moves, touch] of [[1366, 650, true], [1280, 720, true], [1440, 900, true], [1920, 1080, false], [390, 844, false, true]]){
+    test.describe(`in a ${width} × ${height} window`, () => {
+      test.use({ viewport: { width, height }, ...touch && { isMobile: true, hasTouch: true } });
+
+      test("the pin and its popup end on screen", async ({ page }) => {
+        await page.goto(`./?entry=${entry.id}`);
+        await waitForApp(page);
+        await show(page);
+        await popupOpens(page, entry.id);
+        await onScreen(page, entry.id);
+        if(moves) await restsAtNav(page);
+        else expect(await scrolled(page)).toBe(0);
+      });
+    });
+  }
+
+  test.describe("in a laptop's window", () => {
+    test.use({ viewport: { width: 1366, height: 650 } });
+
+    // The page has smooth scrolling on, so a tab's move to the top is a glide of about 400 ms, and
+    // the flight starts 120 ms in. Near the map, that's a moment when the page looks well placed,
+    // so a flight that took its reading then left it to glide on up. Until the page stopped
+    // gliding here, 300 px down ended at the top every time, and 1,500 px down never did.
+    for(const y of [300, 600, 1500]){
+      test(`it works from another view, ${y} px down the page`, async ({ page }) => {
+        await page.goto(`./?entry=${entry.id}#directory`);
+        await waitForApp(page);
+        await page.evaluate(top => window.scrollTo({ top, behavior: "instant" }), y);
+        await show(page);
+        await popupOpens(page, entry.id);
+        await onScreen(page, entry.id);
+        await restsAtNav(page);
+      });
+    }
+
+    // A tab goes to the top of the page. Show on map used to go through one, so with the map
+    // already in view the page jumped up and took the pin away.
+    test("with the map already in view, the page stays where it is", async ({ page }) => {
+      await page.goto("./");
+      await waitForApp(page);
+      const y = await page.evaluate(({ top, id }) => {
+        window.scrollTo({ top, behavior: "instant" });
+        window.tops = [];
+        addEventListener("scroll", () => tops.push(scrollY));
+        openDrawer(id);
+        return scrollY;
+      }, { top: await navAtTop(page), id: entry.id });
+      await show(page);
+      await popupOpens(page, entry.id);
+      await onScreen(page, entry.id);
+      expect(await page.evaluate(() => Math.min(scrollY, ...tops))).toBe(y);
+    });
+
+    test("from past the top of the map, the page comes back up", async ({ page }) => {
+      await page.goto(`./?entry=${entry.id}`);
+      await waitForApp(page);
+      await page.evaluate(() => window.scrollTo({ top: 900, behavior: "instant" }));
+      await show(page);
+      await popupOpens(page, entry.id);
+      await onScreen(page, entry.id);
+      await restsAtNav(page);
+    });
+
+    test("a tab still goes to the top of the page afterwards", async ({ page }) => {
+      await page.goto(`./?entry=${entry.id}`);
+      await waitForApp(page);
+      await show(page);
+      await popupOpens(page, entry.id);
+      await restsAtNav(page);
+      await page.locator('.tab[data-view="map"]').click();
+      await expect.poll(() => scrolled(page)).toBe(0);
+    });
+
+    // Enter picks a result without the page scrolling to it, so this is the search at its worst.
+    test("a search pick brings its pin on screen, then leaves the page alone", async ({ page }) => {
+      const input = page.locator("#mapSearch");
+      const pick = async d => {
+        await input.fill(d.name);
+        await expect(page.locator(`#mapResults [data-id="${d.id}"]`)).toBeAttached();
+        const place = await page.locator('#mapResults [role="option"][data-id]').evaluateAll((all, id) => all.findIndex(o => o.dataset.id === id), d.id);
+        for(let i = 0; i <= place; i++) await input.press("ArrowDown");
+        await input.press("Enter");
+        await popupOpens(page, d.id);
+        await onScreen(page, d.id);
+      };
+      const other = DATA.find(d => metersBetween(d, entry) > 5000);
+      await page.goto("./");
+      await waitForApp(page);
+      await pick(entry);
+      await restsAtNav(page);
+      const y = await scrolled(page);
+      await pick(other);
+      expect(await scrolled(page)).toBe(y);
+    });
+
+    // Every stop on the way down is a scroll event, so one stop is one jump.
+    for(const reducedMotion of ["no-preference", "reduce"]){
+      test(`the page ${reducedMotion === "reduce" ? "jumps there with reduced motion" : "glides there otherwise"}`, async ({ page }) => {
+        await page.emulateMedia({ reducedMotion });
+        await page.goto(`./?entry=${entry.id}`);
+        await waitForApp(page);
+        await page.evaluate(() => {
+          window.stops = new Set();
+          addEventListener("scroll", () => stops.add(scrollY));
+        });
+        await show(page);
+        await popupOpens(page, entry.id);
+        await restsAtNav(page);
+        const stops = await page.evaluate(() => stops.size);
+        if(reducedMotion === "reduce") expect(stops).toBe(1);
+        else expect(stops).toBeGreaterThan(1);
+      });
+    }
+  });
+
+  // A popup that needs more than half the map pushes its pin down, and a phone on its side has the
+  // shortest map there is. The nav's place isn't enough here, so the category row gives way.
+  test.describe("on a phone on its side", () => {
+    test.use({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true });
+
+    test("the pin and the tallest popup end on screen", async ({ page }) => {
+      await page.goto("./");
+      await waitForApp(page);
+      const id = await page.evaluate(() => {
+        setClustered(false);
+        const height = d => {
+          markers[d.id].openPopup();
+          return markers[d.id].getPopup().getElement().offsetHeight;
+        };
+        return DATA.map(d => [height(d), d.id]).sort((a, b) => b[0] - a[0])[0][1];
+      });
+      await page.goto(`./?entry=${id}`);
+      await waitForApp(page);
+      await show(page);
+      await popupOpens(page, id);
+      await onScreen(page, id);
+    });
+  });
 });
 
 // The Founder Journey's organizations were spans that took only a click until 2026-11. As
