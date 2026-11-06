@@ -65,7 +65,9 @@ An annotated example:
                                     # deadline — past dates auto-hide in the app
   applyNote: Fall 2026 cohort       # optional, max 40 chars, shown next to the deadline,
                                     # or on its own while applications are closed
-  applyUrl: https://example.org/apply  # optional: the application page, if it isn't `url`
+  applyUrl: https://example.org/apply  # optional: the application page, if it isn't `url`.
+                                    # On a VC or angel group with no applyBy or applyNote,
+                                    # its page for pitches, shown as "Takes pitches"
   facts: [[Check size, $500K–$2M],
           [Equity, 6%]]             # optional "at a glance" table, 1-6 rows; labels:
                                     # Check size | Stage | Terms | Equity | Board seat |

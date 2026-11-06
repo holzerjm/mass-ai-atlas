@@ -182,7 +182,9 @@ test.describe("atlas-ai.txt", () => {
     expect(block(closed.id)).toContain(`Applications: closed (${closed.applyNote})`);
     const dated = DATA.find(d => d.applyBy && d.applyBy !== "rolling" && d.applyBy >= today);
     if(dated) expect(block(dated.id)).toContain(`Applications: apply by ${dated.applyBy}`);
-    const none = DATA.find(d => !d.applyBy && !d.applyNote);
+    const pitch = DATA.find(d => ["vc", "angel"].includes(d.cat) && d.applyUrl && !d.applyBy && !d.applyNote);
+    if(pitch) expect(block(pitch.id)).toContain(`Applications: takes pitches. Pitch at ${pitch.applyUrl}`);
+    const none = DATA.find(d => !d.applyBy && !d.applyNote && !d.applyUrl);
     expect(block(none.id)).not.toContain("Applications:");
   });
 

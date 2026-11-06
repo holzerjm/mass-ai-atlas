@@ -69,6 +69,17 @@ test.describe("pathways", () => {
     await expect(page.locator(".pw-status.closed")).toHaveText("⏸ Closed · Next round in spring");
   });
 
+  test("a funder that takes pitches says so in a step", async ({ page }) => {
+    await openJourney(page);
+    const id = DATA.find(d => d.cat === "vc").id;
+    await page.evaluate(id => {
+      delete byId[id].applyBy; delete byId[id].applyNote;
+      byId[id].applyUrl = "https://example.org/pitch";
+    }, id);
+    await drawPathway(page, [{ do: "A step", why: "Why", entries: [id] }]);
+    await expect(page.locator(".pw-status.pitch")).toHaveText("📨 Takes pitches");
+  });
+
   test("a chosen pathway goes into the link, and the link brings it back", async ({ page }) => {
     const p = PATHS.find(x => stageOf(x)[0] !== x);
     test.skip(!p, "no stage has a second pathway to choose");

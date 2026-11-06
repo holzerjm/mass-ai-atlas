@@ -62,7 +62,8 @@ for (const d of DATA) {
     if (!validStages.has(s)) err(id, `invalid stage ${s} (valid: ${[...validStages].join(", ")})`);
   if (d.applyBy !== undefined && d.applyBy !== "rolling" && d.applyBy < TODAY)
     warn.push(`  ⚠ [${id}] applyBy ${d.applyBy} has passed — set the next deadline or remove it`);
-  if (d.applyUrl && !d.applyBy && !d.applyNote)
+  // On a funder, applyUrl alone means "takes pitches". Anywhere else, the page shows nothing for it.
+  if (d.applyUrl && !d.applyBy && !d.applyNote && d.cat !== "vc" && d.cat !== "angel")
     warn.push(`  ⚠ [${id}] applyUrl never shows without applyBy or applyNote — add one or remove it`);
   if (d.added === undefined)
     warn.push(`  ⚠ [${id}] missing added — the month the entry joined the atlas ("YYYY-MM")`);

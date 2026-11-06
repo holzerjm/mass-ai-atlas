@@ -34,6 +34,9 @@ test("every KNOWN_SERIOUS entry is scoped to named elements", () => {
 
 const entry = DATA.find(d => d.id === "csail") || DATA[0];
 const closed = DATA.find(d => !d.applyBy && d.applyNote && d.applyUrl) || entry;
+const pitch = DATA.find(d => ["vc", "angel"].includes(d.cat) && d.applyUrl && !d.applyBy && !d.applyNote) || entry;
+const openComparison = page => page.evaluate(ids => { ids.forEach(toggleCompare); openCompare(); },
+  [...new Set([pitch.id, ...DATA.filter(d => d.cat === "vc").slice(0, 2).map(d => d.id)])].slice(0, 3));
 
 const SCANS = [
   { name: "map view", url: "./" },
@@ -67,6 +70,12 @@ const SCANS = [
   // the "Applications closed" line and its link, which only a closed program has
   { name: "closed program's drawer", url: `./?entry=${closed.id}`, include: "#drawer" },
   { name: "closed program's drawer (light theme)", url: `./?entry=${closed.id}`, include: "#drawer", theme: "light" },
+  // the "Takes pitches" line and its link, which only a funder with no application has
+  { name: "funder that takes pitches", url: `./?entry=${pitch.id}`, include: "#drawer" },
+  { name: "funder that takes pitches (light theme)", url: `./?entry=${pitch.id}`, include: "#drawer", theme: "light" },
+  // Compare, whose links were the browser's default blue, 1.91:1 on the dark panel, until 2026-11
+  { name: "compare", url: "./#directory", include: "#compareModal", open: openComparison },
+  { name: "compare (light theme)", url: "./#directory", include: "#compareModal", theme: "light", open: openComparison },
   { name: "shared shortlist (light theme)", url: `./?list=${DATA[0].id},${DATA[1].id}`, include: "#shortlistModal",
     theme: "light" },
   { name: "first-visit tour", url: "./", firstVisit: true, include: "#tourCard" },
@@ -128,6 +137,7 @@ for(const scan of SCANS){
         await expect(page.locator("#timeline li").first()).toBeVisible();
       } else {
         await waitForApp(page);
+        if(scan.open) await scan.open(page);
         if(scan.include) await expect(page.locator(scan.include)).toBeVisible({ timeout: 8000 });
         if(scan.prepare) await scan.prepare(page);
       }

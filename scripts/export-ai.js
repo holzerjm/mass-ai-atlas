@@ -26,13 +26,15 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const LAST_LINE = "End of file";
 const stageName = Object.fromEntries(STAGES.map(s => [s.n, s.t]));
 const byId = Object.fromEntries(DATA.map(d => [d.id, d]));
+const PITCHES = "takes pitches";
 
-// The same three states the page shows. A date that has passed says nothing, as it does there.
+// The same four states the page shows. A date that has passed says nothing, as it does there.
 function applications(d) {
   const note = d.applyNote ? ` (${d.applyNote})` : "";
   if (d.applyBy === "rolling") return `open, rolling${note}`;
   if (d.applyBy && d.applyBy >= TODAY) return `apply by ${d.applyBy}${note}`;
   if (!d.applyBy && d.applyNote) return `closed${note}`;
+  if (!d.applyBy && d.applyUrl && (d.cat === "vc" || d.cat === "angel")) return PITCHES;
   return "";
 }
 
@@ -46,7 +48,7 @@ function entry(d) {
   ].filter(Boolean).join(" ");
   lines.push(about);
   const status = applications(d);
-  if (status) lines.push(`Applications: ${status}.` + (d.applyUrl ? ` Apply at ${d.applyUrl}` : ""));
+  if (status) lines.push(`Applications: ${status}.` + (d.applyUrl ? ` ${status === PITCHES ? "Pitch" : "Apply"} at ${d.applyUrl}` : ""));
   lines.push(`Site: ${d.url}`);
   lines.push(`About: ${d.desc}`);
   if (d.why) lines.push(`Why it matters: ${d.why}`);
@@ -76,7 +78,7 @@ const text = [
   "## How to read it",
   `An organization's atlas page is ${SITE}?entry=ID, where ID is the value in square brackets after its name.`,
   "\"verified\" is the month a person last confirmed the organization is real and its entry is right.",
-  "Applications: \"open, rolling\" means taking applications now, \"apply by\" gives the next deadline, and \"closed\" means not now. With no Applications line, the atlas has no information, which doesn't mean there's no way in.",
+  "Applications: \"open, rolling\" means taking applications now, \"apply by\" gives the next deadline, \"closed\" means not now, and \"takes pitches\" means a funder's own page invites pitches, with no set application process. With no Applications line, the atlas has no information, which doesn't mean there's no way in.",
   `Stages: ${STAGES.map(s => `${s.t} (${s.s})`).join(", ")}.`,
   "",
   "## Pathways",

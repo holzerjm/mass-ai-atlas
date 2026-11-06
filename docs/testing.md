@@ -157,11 +157,18 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | `apply.spec.js` | an open application gets an Apply button | the apply link going missing, or 2 main buttons competing. Apply is the main button only while applications are open |
 | | with no application page, the website stays the main button | an empty Apply button, or the drawer losing its main button |
 | | a closed program says when to come back | a program between windows looking blank, or showing an Apply button for a form that's shut |
+| | a funder's pitch page says it takes pitches | a cold pitch form reading like an open application, or losing its link |
+| | a funder with a real application is open | an angel group's application being talked down to a pitch |
+| | only a funder takes pitches | an accelerator's stray link appearing as a way to pitch |
+| | the Open filter leaves out a funder that only takes pitches | the filter promising applications that don't exist |
+| | Compare links a funder's pitch page | the Compare table and the entry disagreeing |
 | | a deadline that has passed shows nothing | an expired date, or the note that described it, outliving the deadline |
+| | a funder's deadline that has passed doesn't turn into a pitch | an entry that needs updating claiming a way in |
 | | Closing soon lists the nearest date first | the sort dropping dated deadlines below rolling ones, or leaving the address |
 | `pathways.spec.js` | every pathway shows its steps in order | a pathway drifting from `data/pathways.yml`: a step out of order, a missing organization, or an organization shown without its own reason |
 | | a step lists its organizations by closing date, then by name | someone's place in a step becoming a judgment. Real entries get fixed statuses, so a deadline passing can't change the result |
 | | a closed program says so in a step | a closed program reading like an open one, or like one with no information |
+| | a funder that takes pitches says so in a step | a pathway hiding what the entry shows |
 | | a chosen pathway goes into the link | a shared pathway opening at the wrong one, or a link that keeps a pathway after a new stage is chosen or the Journey is left |
 | | a link to a pathway that doesn't exist | a stale link breaking the Journey |
 | | a pathway can be chosen by keyboard | the focus falling off the page when a pathway redraws |
@@ -264,7 +271,8 @@ loader the page uses (`atlas-data.js`), exactly as
 
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
-an open entry drawer, a founder pathway with open and closed programs, a shared shortlist,
+an open entry drawer, a closed program's and a funder's drawer, Compare, a founder pathway with open
+and closed programs, a shared shortlist,
 the first-visit tour card, the what's-new banner, the Ask your own AI dialog, the events page,
 the credits page and the updates page, each in both the dark and the light theme; and the galaxy's keyboard
 list and search with a category open and results showing, in the dark theme.

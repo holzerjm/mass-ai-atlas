@@ -296,6 +296,7 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
 .pw-status{font-size:12.5px;font-weight:500;color:#4ade80;margin-top:2px}
 html:not(.dark) .pw-status{color:#166534}
 .pw-status.closed,html:not(.dark) .pw-status.closed{color:var(--muted)}
+.pw-status.pitch,html:not(.dark) .pw-status.pitch{color:var(--text)}
 .pw-org p{margin-top:5px}
 .pw-verified{color:var(--muted);font-size:11.5px;margin-top:6px}
 .pw-more{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;color:var(--gold-ink)}
@@ -434,6 +435,7 @@ html:not(.dark) .cmp-bar{background:#fff;border-color:#ddd}
 .cmp-table{border-collapse:collapse;width:100%;font-size:13.5px}
 .cmp-table td{padding:8px 12px;border-bottom:1px solid rgba(128,128,128,.15);vertical-align:top;min-width:130px}
 .cmp-table td:first-child{color:var(--muted);white-space:nowrap;min-width:0}
+.cmp-table a{color:inherit;text-decoration:underline}
 @media print{
   body.shortlist-open > :not(#shortlistModal){display:none!important}
   body.shortlist-open #shortlistModal{position:static;background:none;padding:0;display:block!important}
@@ -453,6 +455,7 @@ html:not(.dark) .need-chip.on{border-color:#b45309;color:#b45309;background:rgba
 .dr-apply{margin-top:14px;font-size:13.5px;font-weight:500;color:#4ade80}
 html:not(.dark) .dr-apply{color:#15803d}
 .dr-closed,html:not(.dark) .dr-closed{color:var(--muted)}
+.dr-pitch,html:not(.dark) .dr-pitch{color:var(--text)}
 .dr-apply a{color:inherit;text-decoration:underline}
 .apply-tag{color:#4ade80;border-color:rgba(74,222,128,.4)}
 html:not(.dark) .apply-tag{color:#166534;border-color:rgba(21,128,61,.35)}   /* 6.3:1 on --panel2; #15803d was 4.43:1 */
@@ -1058,6 +1061,9 @@ const applyOpen = d => d.applyBy === "rolling" || (!!d.applyBy && d.applyBy >= t
 // closed = no deadline, and a note saying when the next window is. An expired date isn't this:
 // its note described that deadline, so it stays hidden until someone updates the entry.
 const applyClosed = d => !d.applyBy && !!d.applyNote;
+// pitches = a funder's own page invites founders to send a pitch, with no application process
+// behind it. That's a way in, not an open application, so it never counts as open.
+const takesPitches = d => (d.cat === "vc" || d.cat === "angel") && !!d.applyUrl && !d.applyBy && !d.applyNote;
 // The Directory's Closing soon sort, and the order inside a pathway's step: the nearest date
 // first, then rolling, then everything not taking applications, then by name.
 const applyRank = d => !applyOpen(d) ? "2" : d.applyBy==="rolling" ? "1" : "0" + d.applyBy;
@@ -1367,6 +1373,7 @@ function openDrawer(id){
   if(d.why) html += `<div class="dr-why" style="--cc:${col}"><b>Why it matters for founders</b><div>${esc(d.why)}</div></div>`;
   if(applyOpen(d)) html += `<div class="dr-apply">⏳ Applications open — ${d.applyBy==="rolling" ? "rolling" : "apply by " + fmtDeadline(d.applyBy)}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`;
   else if(applyClosed(d)) html += `<div class="dr-apply dr-closed">⏸ Applications closed · ${esc(d.applyNote)}${d.applyUrl ? ` — <a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">how to apply ↗</a>` : ""}</div>`;
+  else if(takesPitches(d)) html += `<div class="dr-apply dr-pitch">📨 Takes pitches — <a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">how to pitch ↗</a></div>`;
   if(eventHosts[d.id]) html += `<div class="dr-apply dr-event">🎟 Hosting: ${esc(eventHosts[d.id].title)} — <a href="events/" target="_blank" rel="noopener">all events</a></div>`;
   if(d.offers && d.offers.length) html += `<div class="dr-sec">What founders get</div><div class="chips">` +
     d.offers.map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join(" ") + `</div>`;
@@ -2314,7 +2321,8 @@ function renderStepper(){
 function pathwayOrg(d){
   const status = applyOpen(d)
     ? `<div class="pw-status">⏳ ${d.applyBy==="rolling" ? "Open" : "Apply by " + esc(fmtDeadline(d.applyBy))}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`
-    : applyClosed(d) ? `<div class="pw-status closed">⏸ Closed · ${esc(d.applyNote)}</div>` : "";
+    : applyClosed(d) ? `<div class="pw-status closed">⏸ Closed · ${esc(d.applyNote)}</div>`
+    : takesPitches(d) ? `<div class="pw-status pitch">📨 Takes pitches</div>` : "";
   const verified = !d.lastVerified ? "" : isStale(d) ? `⚠️ Last verified ${fmtMonth(d.lastVerified)}` : fmtVerified(d.lastVerified);
   return `<li class="pw-org">
     <button type="button" class="pw-name" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</button>
@@ -2585,7 +2593,8 @@ function openCompare(){
     ["What you get", list.map(d=>(d.offers||[]).map(o=>OFFERS_META[o]?.icon+" "+OFFERS_META[o]?.label).join("<br>")||"—")],
     ["Applications", list.map(d=>applyOpen(d) ? (d.applyBy==="rolling"?"Open — rolling":"Open — by "+esc(fmtDeadline(d.applyBy)))
       + (d.applyUrl ? `<br><a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">Apply ↗</a>` : "")
-      : applyClosed(d) ? "Closed · "+esc(d.applyNote) : "—")],
+      : applyClosed(d) ? "Closed · "+esc(d.applyNote)
+      : takesPitches(d) ? `Takes pitches<br><a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">How to pitch ↗</a>` : "—")],
     ...factLabels.map(l=>[esc(l), list.map(d=>cell(d,l))]),
     ["Stages", list.map(d=>(d.stages||[]).map(n=>STAGES.find(s=>s.n===n)?.t).join(", ")||"—")],
     ["", list.map(d=>`<a href="#" onclick="closeCompare();openDrawer('${d.id}');return false">Full entry →</a>`)],

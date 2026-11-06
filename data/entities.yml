@@ -1227,6 +1227,7 @@
   tags: [seed, consumer]
   stages: [3, 4]
   offers: [funding]
+  applyUrl: https://nextview.vc/#contactmodal
   added: 2026-06
   lastVerified: 2026-11
 - id: rough-draft
@@ -1244,6 +1245,9 @@
   stages: [1, 2, 3]
   links: [gc]
   offers: [funding]
+  applyBy: rolling
+  applyNote: Student-run companies
+  applyUrl: https://airtable.com/appslPddN0o2Hymcu/shrykFVbaFXmZvpBG
   added: 2026-06
   lastVerified: 2026-08
 - id: matrix
@@ -1274,6 +1278,7 @@
   stages: [4, 5]
   links: [toa]
   offers: [funding, customers]
+  applyUrl: https://forms.monday.com/forms/1b11eac6857d1c54702eee60a70d271b?r=use1
   added: 2026-06
   lastVerified: 2026-11
 - id: gc
@@ -1367,6 +1372,7 @@
   tags: [seed, enterprise]
   stages: [2, 4]
   offers: [funding, mentorship, community]
+  applyUrl: https://underscore.vc/faqs/
   added: 2026-06
   lastVerified: 2026-11
 - id: fc
@@ -1472,6 +1478,9 @@
   stages: [4, 5]
   links: [engine]
   offers: [funding]
+  applyBy: rolling
+  applyNote: Tough Tech founders
+  applyUrl: https://engineventures.com/connect
   added: 2026-06
   lastVerified: 2026-06
 - id: e14
@@ -1488,6 +1497,9 @@
   stages: [4]
   links: [medialab]
   offers: [funding]
+  applyBy: rolling
+  applyNote: Startups with key MIT contributors
+  applyUrl: https://www.e14.vc/apply
   added: 2026-06
   lastVerified: 2026-08
 - id: converge
@@ -1582,6 +1594,7 @@
   tags: [pre-seed, enterprise, AI-native]
   stages: [2, 4]
   offers: [funding, mentorship, community]
+  applyUrl: https://www.foundersedge.com/apply
   added: 2026-08
   lastVerified: 2026-08
 - id: milemark
@@ -1644,6 +1657,7 @@
   tags: [applied AI, seed]
   stages: [4]
   offers: [funding]
+  applyUrl: https://innospark.vc/contact/
   added: 2026-08
   lastVerified: 2026-08
 - id: first-star
@@ -1676,6 +1690,7 @@
   stages: [3, 4]
   links: [liquid]
   offers: [funding, compute, space]
+  applyUrl: https://www.linkventures.com/contact
   added: 2026-08
   lastVerified: 2026-08
 - id: hubspot-v
@@ -1721,6 +1736,7 @@
   tags: [multi-stage, infrastructure]
   stages: [4, 5]
   offers: [funding, mentorship]
+  applyUrl: https://baincapitalventures.com/contact/
   added: 2026-08
   lastVerified: 2026-08
 - id: gv
@@ -1797,6 +1813,7 @@
   tags: [industrial]
   stages: [4, 5]
   offers: [funding, customers, mentorship]
+  applyUrl: https://suffolktech.com/#connect
   added: 2026-08
   lastVerified: 2026-08
 - id: january
@@ -1813,6 +1830,7 @@
   tags: [pre-seed, diverse founders]
   stages: [4]
   offers: [funding]
+  applyUrl: https://www.january.ventures/contact-us
   added: 2026-08
   lastVerified: 2026-08
 - id: companyon
@@ -1828,6 +1846,7 @@
   tags: [seed, enterprise]
   stages: [4]
   offers: [funding, mentorship]
+  applyUrl: https://companyon.vc/contact/
   added: 2026-08
   lastVerified: 2026-08
 - id: xfund
@@ -1842,6 +1861,7 @@
   tags: [MIT spinout, seed]
   stages: [4]
   offers: [funding]
+  applyUrl: https://www.xfund.com/pitch
   added: 2026-08
   lastVerified: 2026-08
 - id: boston-seed
@@ -1857,6 +1877,7 @@
   tags: [pre-seed, seed]
   stages: [4]
   offers: [funding]
+  applyUrl: https://bostonseed.com/#book-consultation
   added: 2026-08
   lastVerified: 2026-08
 - id: fprime
@@ -1941,6 +1962,9 @@
   tags: [events]
   stages: [2, 4]
   offers: [funding]
+  applyBy: rolling
+  applyNote: $400 fee if invited to present
+  applyUrl: https://bostonharborangels.com/entrepreneurs/
   added: 2026-06
   lastVerified: 2026-06
 - id: hub-angels
@@ -1971,6 +1995,9 @@
   tags: [MIT]
   stages: [4]
   offers: [funding, community]
+  applyBy: rolling
+  applyNote: Prefers MIT-affiliated startups
+  applyUrl: https://www.mitalumniangels.com/apply-now
   added: 2026-06
   lastVerified: 2026-08
 - id: tie
@@ -1986,6 +2013,8 @@
   tags: [seed, founders]
   stages: [2, 4]
   offers: [funding, mentorship, community]
+  applyNote: Deadline set for each Investor Forum
+  applyUrl: https://www.tieboston.org/angels
   added: 2026-06
   lastVerified: 2026-08
 - id: walnut
@@ -2016,6 +2045,9 @@
   tags: [seed]
   stages: [4]
   offers: [funding]
+  applyBy: rolling
+  applyNote: New England science or tech startups
+  applyUrl: https://www.launchpadventuregroup.com/prescreen
   added: 2026-06
   lastVerified: 2026-06
 - id: hbsaa

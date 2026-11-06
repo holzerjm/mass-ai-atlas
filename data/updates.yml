@@ -11,6 +11,11 @@
 # A copy of this template should replace this list, or set it to [].
 
 - date: 2026-11-05
+  title: How to reach funders
+  text: See how to get in front of VCs and angel groups, when their own site says. Some take applications and others take pitches, and each entry links to the right page.
+  try: '?entry=xfund#directory'
+
+- date: 2026-11-05
   title: Ask your own AI
   text: Copy a prompt into the AI assistant you already use, and it answers from the atlas's own data, with a link to each organization. The atlas runs no AI itself, and what you type stays in your browser until you paste it.
   try: '?ask=1#directory'

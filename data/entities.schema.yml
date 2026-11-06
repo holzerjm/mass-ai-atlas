@@ -101,7 +101,7 @@ items:
       pattern: *nohtml
       maxLength: 40
     applyUrl:
-      description: direct https:// link to the application page, when it isn't the homepage
+      description: direct https:// link to the application page, when it isn't the homepage. On a VC or angel group with no applyBy or applyNote, its page for pitches
       type: string
       pattern: ^https://[^\s"'<>\\]*$
     facts:
