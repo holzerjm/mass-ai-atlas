@@ -188,12 +188,18 @@ html:not(.dark) .map-note.on{background:rgba(255,255,255,.94)}
 .filter-clear,.ask-open{appearance:none;flex:none;border:1px solid var(--line);background:var(--panel);color:var(--text);font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;padding:5px 11px;border-radius:99px;cursor:pointer}
 .filter-clear:hover,.ask-open:hover{border-color:rgba(255,198,0,.45)}
 /* shown when the wheel scrolls the page over the map or the galaxy instead of zooming */
-.zoom-hint{position:absolute;z-index:1001;top:50%;left:50%;transform:translate(-50%,-50%);padding:10px 18px;
+.zoom-hint{position:absolute;z-index:1102;top:50%;left:50%;transform:translate(-50%,-50%);padding:10px 18px;
   border-radius:99px;background:rgba(10,15,30,.92);border:1px solid rgba(148,163,255,.25);color:#e6ecff;
   font-size:13.5px;font-weight:600;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden;
   transition:opacity .2s,visibility .2s}
 .zoom-hint.show{opacity:1;visibility:visible}
 .map-search{position:absolute;z-index:1000;top:14px;left:54px;right:auto;width:300px}
+/* A pin's popup opens over everything on the map, and under the nav: the map's init says why. Only
+   the keyboard's focus brings something back over it, or the search's results and a focused button
+   could sit behind one. A tap doesn't count: the focus stays on what it hit, which would then sit
+   on top of the popup. */
+.leaflet-popupsOver-pane{z-index:1100}
+:is(.map-search,.map-view-switch,.map-note,.leaflet-top,.leaflet-bottom):has(:focus-visible){z-index:1101}
 /* map area presets — sits under .map-search's z-index so the search results overlay it */
 .map-view-switch{position:absolute;z-index:999;top:14px;right:14px;display:flex;gap:3px;padding:3px;
   background:rgba(10,15,30,.92);border:1px solid var(--line);border-radius:99px;backdrop-filter:blur(8px)}
@@ -1668,6 +1674,18 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
          .setView(MAP_VIEWS.boston.center, MAP_VIEWS.boston.zoom);
   mapTiles = makeBasemap().addTo(map);
 
+  // Popups get a pane of their own, above everything that floats on the map. Leaflet's popup pane
+  // is inside its map pane, and that pane's z-index of 400 keeps every popup under the search box,
+  // the view switch, the filter note and the map's buttons, at 999 and 1000. Leaflet only keeps a
+  // popup 5 px inside the map, so until 2026-11 most names on a phone were partly hidden (197 of
+  // 198 at 375 × 667), and a tap on × landed on the search box. Padding the popups down instead
+  // pushed pins off a short map once a filter's note showed. This pane is outside the map pane, so
+  // it copies what the map pane does: where it is, and the class that makes a zoom glide.
+  const popupsOver = map.createPane("popupsOver", map.getContainer());
+  map.on("move", ()=>L.DomUtil.setPosition(popupsOver, L.DomUtil.getPosition(map.getPane("mapPane"))));
+  map.on("zoomanim", ()=>popupsOver.classList.add("leaflet-zoom-anim"));
+  map.on("zoomend", ()=>popupsOver.classList.remove("leaflet-zoom-anim"));
+
   function applyMapView(key, animate){
     const v = MAP_VIEWS[key]; if(!v) return;
     mapView = key;
@@ -1764,7 +1782,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
       (colocated[d.id].length ? `<div class="pop-colocated">Also here: ${colocated[d.id].map(o =>
         `<a href="?entry=${o.id}" onclick="openDrawer('${o.id}');return false">${esc(o.name)}</a>`).join(", ")}</div>` : "")+
       `<button type="button" class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</button>`,
-      {maxWidth:260});
+      {maxWidth:260, pane:"popupsOver"});
     pinOf.set(m.getPopup(), m);
     markers[d.id] = m;
   });
