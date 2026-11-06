@@ -676,22 +676,29 @@ test.describe("Show on map", () => {
       expect(await scrolled(page)).toBe(y);
     });
 
-    // Every stop on the way down is a scroll event, so one stop is one jump.
+    // A jump has moved the page by the time scrollTo returns, and a glide hasn't begun, so that's
+    // when this looks. Scroll events can't tell them apart: a glide runs on the compositor, so when
+    // the main thread is busy the page hears of it once, at the end, the same as a jump. `auto`
+    // glides here too, but only because of `scroll-smooth`, so the page has to ask for `smooth`.
     for(const reducedMotion of ["no-preference", "reduce"]){
       test(`the page ${reducedMotion === "reduce" ? "jumps there with reduced motion" : "glides there otherwise"}`, async ({ page }) => {
         await page.emulateMedia({ reducedMotion });
         await page.goto(`./?entry=${entry.id}`);
         await waitForApp(page);
         await page.evaluate(() => {
-          window.stops = new Set();
-          addEventListener("scroll", () => stops.add(scrollY));
+          const go = window.scrollTo;
+          window.calls = [];
+          window.scrollTo = function(...args){   // Leaflet passes two numbers, not an object
+            const from = scrollY;
+            go.apply(this, args);
+            calls.push({ behavior: args[0].behavior, jumped: scrollY !== from });
+          };
         });
         await show(page);
-        await popupOpens(page, entry.id);
+        await expect.poll(() => page.evaluate(() => calls.length), "calls to scrollTo").toBeGreaterThan(0);
         await restsAtNav(page);
-        const stops = await page.evaluate(() => stops.size);
-        if(reducedMotion === "reduce") expect(stops).toBe(1);
-        else expect(stops).toBeGreaterThan(1);
+        const wanted = reducedMotion === "reduce" ? { jumped: true } : { behavior: "smooth", jumped: false };
+        expect(await page.evaluate(() => calls)).toEqual([expect.objectContaining(wanted)]);
       });
     }
   });
@@ -992,7 +999,10 @@ test.describe("the map search's list", () => {
         await page.evaluate(() => {
           const go = window.scrollTo;
           window.asked = [];
-          window.scrollTo = function(options){ asked.push(options.behavior); return go.call(this, options); };
+          window.scrollTo = function(...args){   // Leaflet passes two numbers, not an object
+            asked.push(args[0].behavior);
+            return go.apply(this, args);
+          };
         });
         await type(page, TALLEST);
         await shows(page);
