@@ -10,6 +10,11 @@
 #
 # A copy of this template should replace this list, or set it to [].
 
+- date: 2026-11-07
+  title: The view tabs stay at the top
+  text: The Map, Galaxy, Founder Journey, and Directory tabs now stay at the top of the window however far you scroll, so you can switch views from anywhere. In a short window, such as a phone on its side, they take one row.
+  try: '#directory'
+
 - date: 2026-11-05
   title: How to reach funders
   text: See how to get in front of VCs and angel groups, when their own site says. Some take applications and others take pitches, and each entry links to the right page.

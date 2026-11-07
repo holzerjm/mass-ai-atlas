@@ -620,7 +620,7 @@ test.describe("Show on map", () => {
   test.describe("in a laptop's window", () => {
     test.use({ viewport: { width: 1366, height: 650 } });
 
-    // The page has smooth scrolling on, so a tab's move to the top is a glide of about 400 ms, and
+    // The page has smooth scrolling on, so a tab's move to the top was a glide of about 400 ms, and
     // the flight starts 120 ms in. Near the map, that's a moment when the page looks well placed,
     // so a flight that took its reading then left it to glide on up. Until the page stopped
     // gliding here, 300 px down ended at the top every time, and 1,500 px down never did.
@@ -762,7 +762,7 @@ test.describe("Show on map", () => {
 const SEARCH_LISTS = [
   { name: "map", url: "./", box: "#mapSearch", list: "#mapResults", label: "#mapCatLabel", short: [820, 600], some: [1440, 900], below: [1024, 700],
     windows: [[1366, 650], [1280, 720], [375, 667, true], [1024, 700]], fit: [[1920, 1080]] },
-  { name: "galaxy", url: "./#galaxy", box: "#gxSearch", list: "#gxResults", label: "#gxCatLabel", short: [820, 500], some: [1366, 800], below: [820, 600],
+  { name: "galaxy", url: "./#galaxy", box: "#gxSearch", list: "#gxResults", label: "#gxCatLabel", short: [820, 520], some: [1366, 800], below: [820, 600],
     windows: [[1366, 650], [1280, 720], [375, 667, true], [1024, 700], [820, 600]], fit: [[1920, 1080], [1440, 900], [390, 844, true]] },
 ];
 for(const { name, url, box, list, label, short, some, below, windows, fit } of SEARCH_LISTS) test.describe(`the ${name} search's list`, () => {
@@ -835,21 +835,21 @@ for(const { name, url, box, list, label, short, some, below, windows, fit } of S
     });
   });
 
-  // This window fits the box and a whole list only because the nav doesn't come along. It sticks
-  // as far as the foot of <body>, one window down, and the box starts lower than that. Allowing
-  // for a nav that isn't there cut the list off, even from a place where it fitted.
+  // This window fits the box and a whole list only because the nav takes one row in a short window:
+  // two rows left the list 43 px short, on the map and on the galaxy, which took its last row.
   test.describe("on a phone on its side", () => {
     test.use({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true });
 
-    test("the whole list shows, with no nav to clear", async ({ page }) => {
+    test("the whole list shows below the nav", async ({ page }) => {
       await open(page);
       await type(page, TALLEST);
       await shows(page);
     });
 
-    test("a list that fits below a nav that isn't there leaves the page alone", async ({ page }) => {
+    test("a list that fits leaves the page alone", async ({ page }) => {
       await open(page);
-      await placeAt(page, await input(page).evaluate(box => box.getBoundingClientRect().top + scrollY - 10));
+      await placeAt(page, await input(page).evaluate(box =>
+        box.getBoundingClientRect().top + scrollY - document.querySelector(".nav").offsetHeight - 10));
       const y = await scrolled(page);
       await watch(page);
       await input(page).fill(TALLEST);
@@ -877,14 +877,13 @@ for(const { name, url, box, list, label, short, some, below, windows, fit } of S
     });
   }
 
-  // Too little shows for the box and a whole list, so the box stays in sight, as high as it can
-  // go, and the list takes what's left. It scrolls inside itself, so nothing is out of reach. A
-  // nav still in reach of the box stops it, and on a phone on its side there's none to stop it.
-  for(const [width, height, keyboard, under] of [[375, 667, 320, "the nav"], [844, 390, 200, "the top of the window"]]){
+  // Too little shows for the box and a whole list, so the box stays in sight, as high as the nav
+  // lets it go, and the list takes what's left. It scrolls inside itself, so nothing is out of reach.
+  for(const [width, height, keyboard] of [[375, 667, 320], [844, 390, 200]]){
     test.describe(`on a ${width} × ${height} phone with its keyboard up`, () => {
       test.use({ viewport: { width, height }, isMobile: true, hasTouch: true });
 
-      test(`the box stops right under ${under}`, async ({ page }) => {
+      test("the box stops right under the nav", async ({ page }) => {
         await open(page);
         await keyboardUp(page, height - keyboard);
         await type(page, TALLEST);
@@ -1017,6 +1016,29 @@ for(const { name, url, box, list, label, short, some, below, windows, fit } of S
       await page.keyboard.type(TALLEST, { delay: 30 });
       await shows(page);
       await atNav(page);
+    });
+
+    // A glide from there doesn't survive either. scroll-padding-top tells the browser that the box
+    // is out of sight under the nav, so its move to the caret stopped a glide as soon as the caret
+    // cleared the nav, with the box still 12 px under it: 25 of 30 times with the CPU slowed, and
+    // once in CI. It takes keys that come faster than the page's frames, so this checks for what
+    // prevents it: the page asks for a jump, and stops once.
+    test("with the box under the nav, the page jumps there", async ({ page }) => {
+      await open(page);
+      const nav = await page.evaluate(() => document.querySelector(".nav").offsetHeight);
+      await placeAt(page, await input(page).evaluate((box, nav) => box.getBoundingClientRect().top + scrollY - nav / 2, nav));
+      await input(page).evaluate(box => box.focus({ preventScroll: true }));
+      await watch(page);
+      await page.evaluate(() => {
+        const go = window.scrollTo;
+        window.asked = [];
+        window.scrollTo = function(...args){ asked.push(args[0].behavior); return go.apply(this, args); };
+      });
+      await page.keyboard.type(TALLEST, { delay: 30 });
+      await shows(page);
+      await atNav(page);
+      expect([...new Set(await page.evaluate(() => asked))], "what the page asked for").toEqual(["instant"]);
+      expect(new Set(await page.evaluate(() => tops)).size, "the page's stops").toBe(1);
     });
 
     test("a tab still goes to the top of the page afterwards", async ({ page }) => {
