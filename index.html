@@ -75,7 +75,11 @@ footer.py-16 a{color:inherit}
    text-gray-500 (#6b7280) read 4.08:1 (until 2026-11). Gray-400 reads 7.7:1. An element-qualified
    rule, so it wins over the utility class and survives the class going away. */
 footer.py-16{color:#9ca3af}
-html,body{height:100%}
+/* <body> is the sticky nav's containing block, so it has to be as tall as the page. At height:100%
+   it was one window tall, and the nav left with its foot, one window down (until 2026-11). The
+   padding keeps what the browser scrolls to, such as the keyboard's focus, clear of the nav. */
+html{height:100%;scroll-padding-top:var(--nav-h)}
+body{min-height:100%}
 body{background:var(--bg);color:var(--text);font-family:'Red Hat Display','Segoe UI',system-ui,-apple-system,sans-serif;overflow-x:hidden}
 ::selection{background:var(--gold);color:#000}
 
@@ -86,7 +90,7 @@ html:not(.dark){
   --gold-ink:#96690a;   /* 4.86:1 on white — brand gold reads at 1.58:1 */
 }
 html:not(.dark) body{background:var(--bg);color:var(--text)}
-html:not(.dark) .nav{background:rgba(255,255,255,.9)}
+html:not(.dark) .nav{background:rgba(255,255,255,.97)}   /* over the dark footer band, .9 took --gold-ink to 3.9:1 */
 html:not(.dark) .stat b{background:linear-gradient(90deg,#1e293b,#3b4a6b);-webkit-background-clip:text;background-clip:text}
 html:not(.dark) .dr-body p,html:not(.dark) .dr-why div{color:#3a4258}
 html:not(.dark) .dr-why b,html:not(.dark) .jr-tip b{color:#5b6478}
@@ -337,7 +341,6 @@ button.chip{font-family:inherit;color:inherit;line-height:inherit;text-align:inh
 .cat-chip.on{color:var(--text);border-color:currentColor;background:rgba(148,163,255,.07)}
 .dir-count-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:14px}
 .dir-count{font-size:13px;color:var(--muted)}
-#view-directory{scroll-margin-top:64px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;
   cursor:pointer;transition:.18s;overflow:hidden}
@@ -391,7 +394,8 @@ button.chip{font-family:inherit;color:inherit;line-height:inherit;text-align:inh
 .tour-actions{display:flex;gap:10px;justify-content:flex-end}
 html:not(.dark) .tour-card{background:#fff;border-color:#ddd;box-shadow:0 12px 40px rgba(0,0,0,.18)}
 html:not(.dark) .tour-card p{color:#444}
-.tour-spot{outline:3px solid #ffc600;outline-offset:3px;border-radius:10px}
+/* the margin cancels the room kept for the nav, which would take the spot down towards the card */
+.tour-spot{outline:3px solid #ffc600;outline-offset:3px;border-radius:10px;scroll-margin-bottom:var(--nav-h)}
 /* shortlist + compare + new-this-month */
 .card{position:relative}
 .card-tools{position:absolute;top:10px;right:10px;display:flex;gap:6px}
@@ -408,7 +412,7 @@ html:not(.dark) .tour-card p{color:#444}
 .dr-event{color:#f472b6}
 html:not(.dark) .new-tag{color:#b45309;border-color:rgba(180,83,9,.4)}
 html:not(.dark) .event-tag,html:not(.dark) .dr-event{color:#be185d;border-color:rgba(190,24,93,.35)}
-.new-banner{position:sticky;top:0;z-index:900;display:flex;gap:8px;align-items:center;justify-content:center;
+.new-banner{position:relative;display:flex;gap:8px;align-items:center;justify-content:center;
   padding:8px 40px;font-size:13.5px;background:rgba(255,198,0,.12);border-bottom:1px solid rgba(255,198,0,.3);color:#ffc600}
 .new-banner a{color:#ffc600;text-decoration:underline}
 html:not(.dark) .new-banner{background:rgba(180,83,9,.08);border-color:rgba(180,83,9,.3);color:#92400e}   /* 6.3:1 on this tint; #b45309 was 4.4:1 */
@@ -522,13 +526,6 @@ html:not(.dark) .dr-verified.stale,html:not(.dark) .stale-tag{color:#b45309;bord
   .stat b{font-size:17px}
   .stat span{display:block;font-size:9.5px;letter-spacing:.3px;line-height:1.25}
   .view{padding:12px 16px 70px}
-  /* one row of tabs that scrolls sideways: this bar sticks, and its three rows took a fifth of the screen */
-  .nav-inner{flex-wrap:nowrap;overflow-x:auto;padding:6px 10px;scrollbar-width:none}
-  .nav-inner::-webkit-scrollbar{display:none}
-  .tab{flex:none;padding:7px 11px;font-size:13px}
-  .tab .ico{display:none}
-  .nav-gh{flex:none}
-  .nav-hint{display:none}
   /* the Directory's chips scroll sideways too, like the category row above the map */
   .dir-controls{gap:8px;margin-bottom:10px}
   .dir-search{flex-basis:100%;min-width:0;padding-top:10px;padding-bottom:10px}
@@ -554,6 +551,17 @@ html:not(.dark) .dr-verified.stale,html:not(.dark) .stale-tag{color:#b45309;bord
   /* the search takes the galaxy's top row too, so its hint wraps at the foot of the canvas */
   .gx-hint{top:auto;bottom:10px;width:max-content;max-width:calc(100% - 24px);white-space:normal;
     text-align:center;font-size:12px;padding:6px 14px}
+}
+/* One row of tabs that scrolls sideways: this bar sticks, and on a phone its three rows took a fifth
+   of the screen. A short window takes it too, such as a phone on its side or a zoomed-in laptop,
+   where two rows took 107 px of 390 and left the map search's list no room. */
+@media (max-width:720px),(max-height:500px){
+  .nav-inner{flex-wrap:nowrap;overflow-x:auto;padding:6px 10px;scrollbar-width:none}
+  .nav-inner::-webkit-scrollbar{display:none}
+  .tab{flex:none;padding:7px 11px;font-size:13px}
+  .tab .ico{display:none}
+  .nav-gh{flex:none}
+  .nav-hint{display:none}
 }
 /* On a touch screen one finger pans the map, so a map as tall as the screen left no page
    to swipe. Keep the map and the galaxy to two-thirds of the screen there. */
@@ -1003,6 +1011,9 @@ const cInk = c => `var(--cat-${c}, ${cColor(c)})`;
 
 /* ---------- tabs ---------- */
 let currentView = "map";
+// How tall the tabs are, for the CSS that keeps things clear of them. That depends on how they wrap.
+new ResizeObserver(([{target}])=>document.documentElement.style.setProperty("--nav-h", target.offsetHeight + "px"))
+  .observe(document.querySelector(".nav"));
 document.querySelectorAll(".tab[data-view]").forEach(t=>{
   t.addEventListener("click", ()=>{
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
@@ -1012,7 +1023,11 @@ document.querySelectorAll(".tab[data-view]").forEach(t=>{
     $("view-"+currentView).classList.add("active");
     if(currentView==="map" && map) setTimeout(()=>{ map.invalidateSize(); if(frameOnShow) framePins(); },60);
     if(currentView==="galaxy") { gxResize(); gxKick(); }
-    window.scrollTo({top:0});
+    // A jump, because the tabs can be clicked from anywhere and a glide didn't survive that. A view
+    // that's shorter leaves the page at its foot, where the glide waited for seconds behind the
+    // map's work. From the foot of a view that's longer, the browser keeps the footer in place,
+    // which took the page to the foot of the new view, to glide back up through all of it.
+    window.scrollTo({top:0, behavior:"instant"});
     updateURL();
   });
 });
@@ -1481,14 +1496,12 @@ document.addEventListener("keydown", e=>{
 // of sight. This moves the page, if it has to, to show a stretch of the view on show, from `top` to
 // `bottom`, which are where it is on the screen now. It goes to where the nav reaches the top of
 // the window, with the category row under it, and further if `bottom` needs it, which gives up the
-// category row. It stops before `top` is covered. The nav can't cover anything lower down than the
-// foot of <body>, which is as far as it sticks, and in a short window that's above where the view's
-// canvas starts. The visual viewport is the part of the window that shows: a phone's on-screen
-// keyboard shortens it and can pan it down the page, and innerHeight sees neither.
+// category row. It stops before `top` is under the nav. The visual viewport is the part of the
+// window that shows: a phone's on-screen keyboard shortens it and can pan it down the page, and
+// innerHeight sees neither.
 function bringOnScreen(top, bottom, behavior = reduceMotion() ? "auto" : "smooth"){
   const nav = document.querySelector(".nav").offsetHeight, seen = visualViewport;
-  const covered = top + scrollY < document.body.offsetHeight ? nav : 0;
-  const most = top - Math.max(covered, seen.offsetTop);   // any further down the page, and the top is covered
+  const most = top - Math.max(nav, seen.offsetTop);   // any further down the page, and the top is covered
   const least = bottom - seen.offsetTop - seen.height;   // any less, and the bottom is out of sight
   if(least <= 0 && most >= 0) return;
   const navPlace = $("view-"+currentView).getBoundingClientRect().top - nav;
@@ -1542,10 +1555,9 @@ function goToMap(id){
   if(!mapEntries().list.includes(d)){ readFilters(new URLSearchParams()); filtersChanged(); }
   // the map is going to the pin, so framing what the filters left would only fight the flight
   frameOnShow = false;
-  // A tab glides to the top of the page. From the map that would only take the pin away, so the
-  // page stays put. From another view the page goes there at once: a flight that started while
-  // it was gliding could find it in a good place for a moment, and leave it to carry on up.
-  if(currentView !== "map"){ switchView("map"); window.scrollTo({top:0, behavior:"instant"}); }
+  // A tab goes to the top of the page. From the map that would only take the pin away, so the
+  // page stays put.
+  if(currentView !== "map") switchView("map");
   setTimeout(()=>flyToPin(id), 120);
 }
 window.goToMap = goToMap;
