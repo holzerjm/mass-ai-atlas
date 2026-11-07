@@ -26,7 +26,10 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # The tests take about 10 minutes, and on some runners installing Chromium's system
+    # libraries takes another 8 to 10 before they start. At 15 minutes, 4 of 14 runs on
+    # 2026-11-06 and 07 were cancelled that way, which reports neither a pass nor a failure.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

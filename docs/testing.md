@@ -422,6 +422,11 @@ there either.
 but gates nothing, on purpose — the comment at the top of `e2e.yml` says why, and what to
 change to promote it.
 
+**Browser tests has 25 minutes.** The tests take about 10, and on some runners the step
+that installs Chromium's system libraries takes another 8 to 10 before they start. A run
+that hits the limit is cancelled, which is neither a pass nor a failure: count the `✓`
+lines in its log to see how far it got.
+
 CI retries a failed test twice (`retries: CI ? 2 : 0`). Locally it does not, so a flake
 stays visible while you work.
 
