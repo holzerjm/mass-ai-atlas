@@ -209,11 +209,17 @@ html:not(.dark) .map-note.on{background:rgba(255,255,255,.94)}
 .mv-btn:hover{color:var(--text);background:rgba(148,163,255,.12)}
 .mv-btn[aria-pressed="true"]{color:#000;background:linear-gradient(90deg,#ffd54f,#ffc600)}
 html:not(.dark) .map-view-switch{background:rgba(255,255,255,.92)}
-.gx-search{left:14px}
+/* The list opens where the re-center button sits, so it goes over the button. Until 2026-11 the
+   button hid the first row's dot, and a click there cleared the search instead of picking the row.
+   The focus rule above lifts the box only while it has the focus: pressing a row takes the focus
+   away, and the button would come back before the release, so the click would miss the row.
+   Tab from the box lands on the button, so with the focus on it, it comes back on top. */
+.gx-search{left:14px;z-index:1001}
 .gx-home{position:absolute;z-index:1000;top:60px;left:14px;width:34px;height:34px;border-radius:9px;
   background:rgba(10,15,30,.92);border:1px solid var(--line);color:#e6ecff;font-size:18px;
   cursor:pointer;line-height:1}
 .gx-home:hover{border-color:#ffc600;color:#ffc600}
+.gx-home:focus{z-index:1002}
 html:not(.dark) .gx-search input{background:rgba(10,15,30,.92);color:#e6ecff} /* galaxy stays dark */
 html:not(.dark) .gx-search .map-results{background:rgba(10,15,30,.97);color:#e6ecff}
 .map-search input{width:100%;background:rgba(10,15,30,.92);border:1px solid var(--line);color:var(--text);
@@ -1471,21 +1477,21 @@ document.addEventListener("keydown", e=>{
   else closeDrawer();
 });
 
-// The map starts most of a screen down the page, so what happens on it can be out of sight. This
-// moves the page, if it has to, to show a stretch of the map's view, from `top` to `bottom`, which
-// are where it is on the screen now. It goes to where the nav reaches the top of the window, with
-// the category row under it, and further if `bottom` needs it, which gives up the category row. It
-// stops before `top` is covered. The nav can't cover anything lower down than the foot of <body>,
-// which is as far as it sticks, and in a short window that's above where the map starts. The visual
-// viewport is the part of the window that shows: a phone's on-screen keyboard shortens it and can
-// pan it down the page, and innerHeight sees neither.
+// The map and the galaxy start most of a screen down the page, so what happens on them can be out
+// of sight. This moves the page, if it has to, to show a stretch of the view on show, from `top` to
+// `bottom`, which are where it is on the screen now. It goes to where the nav reaches the top of
+// the window, with the category row under it, and further if `bottom` needs it, which gives up the
+// category row. It stops before `top` is covered. The nav can't cover anything lower down than the
+// foot of <body>, which is as far as it sticks, and in a short window that's above where the view's
+// canvas starts. The visual viewport is the part of the window that shows: a phone's on-screen
+// keyboard shortens it and can pan it down the page, and innerHeight sees neither.
 function bringOnScreen(top, bottom, behavior = reduceMotion() ? "auto" : "smooth"){
   const nav = document.querySelector(".nav").offsetHeight, seen = visualViewport;
   const covered = top + scrollY < document.body.offsetHeight ? nav : 0;
   const most = top - Math.max(covered, seen.offsetTop);   // any further down the page, and the top is covered
   const least = bottom - seen.offsetTop - seen.height;   // any less, and the bottom is out of sight
   if(least <= 0 && most >= 0) return;
-  const navPlace = $("view-map").getBoundingClientRect().top - nav;
+  const navPlace = $("view-"+currentView).getBoundingClientRect().top - nav;
   window.scrollTo({top: scrollY + Math.min(Math.max(least, navPlace), most), behavior});
 }
 
@@ -1597,12 +1603,11 @@ function buildCatBar(bar, shown, onToggle){
   });
 }
 // The search boxes over the map and the galaxy, each a WAI-ARIA combobox: the results are a
-// listbox that the arrow keys move through and Enter picks from, as a click does, and Escape
-// closes it. Until 2026-11 only a mouse could pick a result. find(q) returns the entries that
-// match the lowercased query (the first eight are listed), pick(id) acts on the one picked,
-// cleared(), if given, runs when the box is emptied, and listed(), if given, runs when a list
-// has been drawn. Returns close(), to shut the list.
-function searchBox(inp, res, prefix, find, pick, cleared, listed){
+// listbox that the arrow keys move through and Enter picks from, as a click does, and Escape or
+// a click away closes it. Until 2026-11 only a mouse could pick a result. find(q) returns the
+// entries that match the lowercased query (the first eight are listed), pick(id) acts on the one
+// picked, and cleared(), if given, runs when the box is emptied. Returns close(), to shut the list.
+function searchBox(inp, res, prefix, find, pick, cleared){
   let active = -1;
   const opts = () => [...res.querySelectorAll('[role="option"][data-id]')];
   function setActive(i){
@@ -1623,7 +1628,7 @@ function searchBox(inp, res, prefix, find, pick, cleared, listed){
     res.querySelectorAll("div[data-id]").forEach(el=>{
       el.addEventListener("click", ()=>choose(el.dataset.id));
     });
-    if(listed) listed();
+    listOnScreen(inp, res);
   });
   inp.addEventListener("keydown", e=>{
     const o = opts(), open = res.classList.contains("open");
@@ -1635,7 +1640,21 @@ function searchBox(inp, res, prefix, find, pick, cleared, listed){
       choose(o[Math.max(active, 0)].dataset.id);   // Enter with no result chosen takes the first
     } else if(e.key==="Escape") close();
   });
+  document.addEventListener("click", e=>{ if(!e.target.closest(".map-search")) close(); });
   return { close };
+}
+// Each box sits at the top of its canvas, most of a screen down the page, so until 2026-11 the list
+// dropped below the window as someone typed: at 1366 × 650, 11 px of it showed on the map and 56 px
+// on the galaxy. So a list that doesn't fit brings the page to it. That waits for the list, because
+// the focus has nothing to show yet: moving on focus took the page 387 px for a click in the box,
+// and again when a closing popup gave the box the focus back. With the box out of sight the page
+// jumps instead of gliding, because a glide doesn't survive: the browser scrolls to the caret after
+// the input event, which stops one, and after a stall it can start from an old position and drag a
+// finished one back up. A jump leaves it nothing to do.
+function listOnScreen(inp, res){
+  const box = inp.getBoundingClientRect(), seen = visualViewport;
+  const hidden = box.top < seen.offsetTop || box.bottom > seen.offsetTop + seen.height;
+  bringOnScreen(box.top, res.getBoundingClientRect().bottom, hidden ? "instant" : undefined);
 }
 // OpenFreeMap vector basemap via maplibre-gl-leaflet — keyless, unlimited,
 // commercial use permitted. Leaflet stays the map engine; only the base layer
@@ -1823,28 +1842,14 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   // second line on narrower screens, so tell Leaflet whenever the map's box changes size.
   new ResizeObserver(()=>{ if(currentView==="map") map.invalidateSize(); }).observe(map.getContainer());
 
-  // search: a pick flies the map to the pin and opens its popup. The box sits at the top of the
-  // map, so until 2026-11 the list dropped below the window as someone typed: 11 px of it showed
-  // at 1366 × 650, and none at 1024 × 700. So a list that doesn't fit brings the page to it. That
-  // waits for the list, because the focus has nothing to show yet: moving on focus took the page
-  // 387 px for a click in the box, and again when a closing popup gave the box the focus back.
-  // With the box out of sight the page jumps instead of gliding, because a glide doesn't survive:
-  // the browser scrolls to the caret after the input event, which stops one, and after a stall it
-  // can start from an old position and drag a finished one back up. A jump leaves it nothing to do.
-  const listShown = () => {
-    const box = $("mapSearch").getBoundingClientRect(), seen = visualViewport;
-    const hidden = box.top < seen.offsetTop || box.bottom > seen.offsetTop + seen.height;
-    bringOnScreen(box.top, $("mapResults").getBoundingClientRect().bottom, hidden ? "instant" : undefined);
-  };
-  const search = searchBox($("mapSearch"), $("mapResults"), "mapr",
+  // search: a pick flies the map to the pin and opens its popup
+  searchBox($("mapSearch"), $("mapResults"), "mapr",
     q => searchEntries(q).list,
     id => {
       // the filters may be hiding this pin, and a hidden pin has no popup to open
       if(!mapEntries().list.includes(byId[id])) return openDrawer(id);
       flyToPin(id);
-    },
-    null, listShown);
-  document.addEventListener("click", e=>{ if(!e.target.closest(".map-search")) search.close(); });
+    });
 })();
 
 /* ---------- galaxy ---------- */

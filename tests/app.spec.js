@@ -431,10 +431,10 @@ test("the map search's results can be chosen with the arrow keys and Enter", asy
 
 const scrolled = page => page.evaluate(() => scrollY);
 // where the nav reaches the top of the window, with the category row right under it
-const navAtTop = page => page.evaluate(() =>
-  document.querySelector("#view-map").getBoundingClientRect().top + scrollY - document.querySelector(".nav").offsetHeight);
-const restsAtNav = async (page, slack = 1) => {
-  const y = await navAtTop(page);
+const navAtTop = (page, view = "map") => page.evaluate(view =>
+  document.querySelector(`#view-${view}`).getBoundingClientRect().top + scrollY - document.querySelector(".nav").offsetHeight, view);
+const restsAtNav = async (page, slack = 1, view = "map") => {
+  const y = await navAtTop(page, view);
   await expect.poll(async () => Math.abs(await scrolled(page) - y), "the page's distance from the nav's place").toBeLessThanOrEqual(slack);
 };
 
@@ -752,36 +752,48 @@ test.describe("Show on map", () => {
   });
 });
 
-// The search box sits at the top of the map, most of a screen down the page, so until 2026-11 the
-// list dropped below the window as someone typed: with the page at the top, 11 px of it showed at
-// 1366 × 650, and none at 1024 × 700. A list that doesn't fit now brings the page to it.
-test.describe("the map search's list", () => {
+// Each search box sits at the top of its canvas, most of a screen down the page, so until 2026-11
+// the list dropped below the window as someone typed. With the page at the top, 11 px of it showed
+// on the map at 1366 × 650, and none at 1024 × 700. On the galaxy it was 56 px and 63 px, and none at
+// 820 × 600. A list that doesn't fit now brings the page to it.
+// The galaxy has a row less over its box, so some things happen in other windows there. `short` is
+// a window where the nav's place isn't far enough, `some` is one that fits a short list and not the
+// tallest, and `below` is one with the box out of sight, under the window, with the page at the top.
+const SEARCH_LISTS = [
+  { name: "map", url: "./", box: "#mapSearch", list: "#mapResults", label: "#mapCatLabel", short: [820, 600], some: [1440, 900], below: [1024, 700],
+    windows: [[1366, 650], [1280, 720], [375, 667, true], [1024, 700]], fit: [[1920, 1080]] },
+  { name: "galaxy", url: "./#galaxy", box: "#gxSearch", list: "#gxResults", label: "#gxCatLabel", short: [820, 500], some: [1366, 800], below: [820, 600],
+    windows: [[1366, 650], [1280, 720], [375, 667, true], [1024, 700], [820, 600]], fit: [[1920, 1080], [1440, 900], [390, 844, true]] },
+];
+for(const { name, url, box, list, label, short, some, below, windows, fit } of SEARCH_LISTS) test.describe(`the ${name} search's list`, () => {
   const TALLEST = "robot";   // more matches than a list holds, so eight rows
   const GLIDE_MS = 600;      // longer than the page takes to move
-  const input = page => page.locator("#mapSearch");
+  const input = page => page.locator(box);
   const type = (page, text) => input(page).pressSequentially(text, { delay: 30 });
   const open = async page => {
-    await page.goto("./");
+    await page.goto(url);
     await waitForApp(page);
   };
   // The part of the window that shows, the box and the list, and whether each of the list's rows
-  // is what's really at its spot on the screen. Boxes alone would pass a list under the nav.
-  const read = page => page.evaluate(() => {
-    const list = document.querySelector("#mapResults"), rows = [...list.querySelectorAll('[role="option"]')];
+  // is what's really at its spot on the screen, at both ends as well as in the middle. Boxes alone
+  // would pass a list under the nav, and the middle alone would pass the galaxy's first row with
+  // the re-center button over its left end.
+  const read = page => page.evaluate(({ box, list }) => {
+    const res = document.querySelector(list), rows = [...res.querySelectorAll('[role="option"]')];
     const nav = document.querySelector(".nav").getBoundingClientRect().bottom, view = visualViewport;
-    const box = document.querySelector("#mapSearch").getBoundingClientRect(), { top, bottom } = list.getBoundingClientRect();
+    const inp = document.querySelector(box).getBoundingClientRect(), { top, bottom } = res.getBoundingClientRect();
     const seen = row => {
-      const { left, top, width, height } = row.getBoundingClientRect();
-      return list.contains(document.elementFromPoint(left + width / 2, top + height / 2));
+      const { left, right, top, height } = row.getBoundingClientRect();
+      return [left + 6, (left + right) / 2, right - 6].every(x => res.contains(document.elementFromPoint(x, top + height / 2)));
     };
-    return { from: Math.max(nav, view.offsetTop), to: view.offsetTop + view.height, boxTop: box.top, top, bottom, rows: rows.length, seen: rows.every(seen) };
-  });
+    return { from: Math.max(nav, view.offsetTop), to: view.offsetTop + view.height, boxTop: inp.top, top, bottom, rows: rows.length, seen: rows.every(seen) };
+  }, { box, list });
   // Two pixels to spare, because the page can stop that far off. scrollY is rounded down and the
   // nav's place is fractional, and each key works out the place again from a position in passing.
   const SLACK = 2;
   const fits = ({ from, to, boxTop, top, bottom, rows, seen }) => rows > 0 && seen && boxTop >= from - SLACK && top >= from && bottom <= to + SLACK;
   const shows = page => expect.poll(async () => fits(await read(page)), "the box and the whole list").toBe(true);
-  const atNav = page => restsAtNav(page, SLACK);
+  const atNav = page => restsAtNav(page, SLACK, name);
   // A scroll event comes with the next frame, so this waits, or it would land in what's recorded next.
   const placeAt = (page, top) => page.evaluate(top => {
     window.scrollTo({ top, behavior: "instant" });
@@ -797,14 +809,14 @@ test.describe("the map search's list", () => {
     expect(await scrolled(page)).toBe(y);
   };
 
-  for(const [width, height, touch] of [[1366, 650], [1280, 720], [375, 667, true], [1024, 700]]){
+  for(const [width, height, touch] of windows){
     test.describe(`in a ${width} × ${height} window`, () => {
       test.use({ viewport: { width, height }, ...touch && { isMobile: true, hasTouch: true } });
 
       test("the whole list shows while typing", async ({ page }) => {
         await open(page);
         await type(page, TALLEST);
-        await expect(page.locator('#mapResults [role="option"]')).toHaveCount(8);
+        await expect(page.locator(`${list} [role="option"]`)).toHaveCount(8);
         await shows(page);
         await atNav(page);
       });
@@ -813,13 +825,13 @@ test.describe("the map search's list", () => {
 
   // Here the nav's place isn't far enough, so the category row gives way.
   test.describe("in a short window with the nav on two rows", () => {
-    test.use({ viewport: { width: 820, height: 600 } });
+    test.use({ viewport: { width: short[0], height: short[1] } });
 
     test("the page goes past the nav's place", async ({ page }) => {
       await open(page);
       await type(page, TALLEST);
       await shows(page);
-      expect(await scrolled(page)).toBeGreaterThan(await navAtTop(page));
+      expect(await scrolled(page)).toBeGreaterThan(await navAtTop(page, name));
     });
   });
 
@@ -868,7 +880,7 @@ test.describe("the map search's list", () => {
   // Too little shows for the box and a whole list, so the box stays in sight, as high as it can
   // go, and the list takes what's left. It scrolls inside itself, so nothing is out of reach. A
   // nav still in reach of the box stops it, and on a phone on its side there's none to stop it.
-  for(const [width, height, keyboard, under] of [[375, 667, 300, "the nav"], [844, 390, 200, "the top of the window"]]){
+  for(const [width, height, keyboard, under] of [[375, 667, 320, "the nav"], [844, 390, 200, "the top of the window"]]){
     test.describe(`on a ${width} × ${height} phone with its keyboard up`, () => {
       test.use({ viewport: { width, height }, isMobile: true, hasTouch: true });
 
@@ -907,21 +919,23 @@ test.describe("the map search's list", () => {
     });
   });
 
-  test.describe("in a 1920 × 1080 window", () => {
-    test.use({ viewport: { width: 1920, height: 1080 } });
+  for(const [width, height, touch] of fit){
+    test.describe(`in a ${width} × ${height} window`, () => {
+      test.use({ viewport: { width, height }, ...touch && { isMobile: true, hasTouch: true } });
 
-    test("the tallest list fits, so the page stays where it is", async ({ page }) => {
-      await open(page);
-      await watch(page);
-      await type(page, TALLEST);
-      await shows(page);
-      await stays(page, 0);
+      test("the tallest list fits, so the page stays where it is", async ({ page }) => {
+        await open(page);
+        await watch(page);
+        await type(page, TALLEST);
+        await shows(page);
+        await stays(page, 0);
+      });
     });
-  });
+  }
 
   // A short list fits this window and the tallest doesn't, so what counts is the list, not the box.
-  test.describe("in a 1440 × 900 window", () => {
-    test.use({ viewport: { width: 1440, height: 900 } });
+  test.describe(`in a ${some[0]} × ${some[1]} window`, () => {
+    test.use({ viewport: { width: some[0], height: some[1] } });
 
     test("a short list stays where it is, and a tall one brings the page", async ({ page }) => {
       await open(page);
@@ -939,7 +953,7 @@ test.describe("the map search's list", () => {
   // key, which stops it, and after a stall it starts from an old position and drags a finished
   // glide back up: at 1024 × 700 the page reached 389 and went back to 34, with the list cut off.
   // That takes a stall to happen, so these check for what prevents it, which is one stop.
-  for(const [width, height, y, where] of [[1024, 700, 0, "below"], [1366, 650, 900, "above"]]){
+  for(const [width, height, y, where] of [[...below, 0, "below"], [1366, 650, 900, "above"]]){
     test.describe(`in a ${width} × ${height} window`, () => {
       test.use({ viewport: { width, height } });
 
@@ -983,6 +997,7 @@ test.describe("the map search's list", () => {
       await watch(page);
       await input(page).click();
       await stays(page, 0);
+      if(name !== "map") return;   // the galaxy has no popup to give the focus back
       await input(page).fill(entry.name);
       await input(page).press("Enter");
       await expect.poll(() => page.evaluate(id => markers[id].isPopupOpen(), entry.id), "the pin's popup").toBe(true);
@@ -1008,8 +1023,17 @@ test.describe("the map search's list", () => {
       await open(page);
       await type(page, TALLEST);
       await atNav(page);
-      await page.locator('.tab[data-view="map"]').click();
+      await page.locator(`.tab[data-view="${name}"]`).click();
       await expect.poll(() => scrolled(page)).toBe(0);
+    });
+
+    test("a click away closes the list", async ({ page }) => {
+      await open(page);
+      await type(page, TALLEST);
+      await shows(page);
+      await page.locator(label).click();
+      await expect(page.locator(list)).toBeHidden();
+      await expect(input(page)).toHaveAttribute("aria-expanded", "false");
     });
 
     // A jump is one stop on the way down, but one stop doesn't prove a jump: a glide that runs
@@ -1035,6 +1059,50 @@ test.describe("the map search's list", () => {
         expect([...new Set(await page.evaluate(() => asked))]).toEqual([reducedMotion === "reduce" ? "auto" : "smooth"]);
       });
     }
+  });
+});
+
+// The galaxy's list opens where the re-center button sits. Until 2026-11 the button lay over the
+// list: it hid the first row's dot, and a click there cleared the search instead of picking the row.
+test.describe("the galaxy search's list and the re-center button", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });   // the tallest list fits, so nothing moves
+  const home = page => page.locator(".gx-home");
+  const open = async (page, query = "robot") => {
+    await page.goto("./#galaxy");
+    await waitForApp(page);
+    await page.locator("#gxSearch").fill(query);
+    await expect(page.locator('#gxResults [role="option"]').first()).toBeVisible();
+  };
+
+  // A box with the focus goes over the button by itself, and pressing a row takes the focus away,
+  // so only a real press and release shows the list going under the button.
+  test("a click on the first row's left end picks it", async ({ page }) => {
+    await open(page);
+    const row = page.locator('#gxResults [role="option"]').first(), id = await row.getAttribute("data-id");
+    const { x, y, height } = await row.boundingBox();
+    await page.mouse.click(x + 12, y + height / 2);   // goes wherever a real click would, unlike row.click()
+    await expect(page.locator("#gxSearch")).toHaveValue(DATA.find(d => d.id === id).name);
+    expect(await page.evaluate(() => gxLocked && gxLocked.id), "the organization the search locked").toBe(id);
+  });
+
+  // The list would otherwise keep the button from the mouse for as long as it stayed open.
+  test("the button can be clicked again after a click away", async ({ page }) => {
+    await open(page);
+    await page.locator("#gxCatLabel").click();
+    await home(page).click();
+    await expect(page.locator("#gxSearch")).toHaveValue("");
+  });
+
+  // Tab from the box lands on the button, with the list still open. A list that scrolls takes a
+  // stop of its own first, so this one is short.
+  test("with the focus on it, the button comes back on top", async ({ page }) => {
+    await open(page, entry.name);
+    await page.locator("#gxSearch").press("Tab");
+    await expect(home(page)).toBeFocused();
+    expect(await home(page).evaluate(button => {
+      const { left, top, width, height } = button.getBoundingClientRect();
+      return document.elementFromPoint(left + width / 2, top + height / 2) === button;
+    }), "the button is what's at its spot on the screen").toBe(true);
   });
 });
 
