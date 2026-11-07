@@ -23,7 +23,7 @@ name: Deploy to TOA site
 on:
   push:
     branches: [main]
-    paths: ["index.html", "atlas-data.js", "data/**", "map-style-dark.json", "events/**", "credits/**", "updates/**"]
+    paths: ["index.html", "atlas3d.html", "atlas-data.js", "data/**", "map-style-dark.json", "events/**", "credits/**", "updates/**"]
   workflow_dispatch:
 
 # One deploy at a time. Without this, two quick merges start two runs that upload
@@ -80,7 +80,7 @@ jobs:
       - name: Rsync atlas
         id: rsync
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_deploy" index.html atlas-data.js map-style-dark.json atlas.json atlas.csv atlas-ai.txt site-pages/sitemap.xml \
+          rsync -avz -e "ssh -i ~/.ssh/id_deploy" index.html atlas3d.html atlas-data.js map-style-dark.json atlas.json atlas.csv atlas-ai.txt site-pages/sitemap.xml \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/"
           # the page fetches data/*.yml (data + schemas) at load time
           rsync -avz -e "ssh -i ~/.ssh/id_deploy" data/ \
