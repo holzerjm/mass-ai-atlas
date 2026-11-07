@@ -242,6 +242,12 @@ dedicated ed25519 key whose `authorized_keys` line on the server is
 Manual fallback: `./scripts/sync-to-site.sh <dest>` from a local checkout with SSH
 access. The atlas is **not** on GitHub Pages.
 
+**A weekly check since 2026-11:** `.github/workflows/server-check.yml` runs every Sunday at
+18:17 UTC (and on demand). It runs `ssh-keyscan` against `DEPLOY_HOST`, then the deploy's own
+rsync with `-n`, so it changes nothing, and posts a 🚨 to `SLACK_WEBHOOK_URL` if either fails.
+It exists because on 2026-11-06 the server's address changed without notice and deploys failed
+for about 18 hours. The rrsync restriction means it can't read the server's disk use.
+
 **The site-wide deploy must never touch `/ecosystem/`.** The rest of
 the-open-accelerator.com deploys separately via Eleventy from
 `~/notes/OpenAccelerator/TOAsite` (`npm run deploy` → rsync `_site/` to the docroot,
