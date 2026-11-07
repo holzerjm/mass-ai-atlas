@@ -1018,6 +1018,29 @@ for(const { name, url, box, list, label, short, some, below, windows, fit } of S
       await atNav(page);
     });
 
+    // A glide from there doesn't survive either. scroll-padding-top tells the browser that the box
+    // is out of sight under the nav, so its move to the caret stopped a glide as soon as the caret
+    // cleared the nav, with the box still 12 px under it: 25 of 30 times with the CPU slowed, and
+    // once in CI. It takes keys that come faster than the page's frames, so this checks for what
+    // prevents it: the page asks for a jump, and stops once.
+    test("with the box under the nav, the page jumps there", async ({ page }) => {
+      await open(page);
+      const nav = await page.evaluate(() => document.querySelector(".nav").offsetHeight);
+      await placeAt(page, await input(page).evaluate((box, nav) => box.getBoundingClientRect().top + scrollY - nav / 2, nav));
+      await input(page).evaluate(box => box.focus({ preventScroll: true }));
+      await watch(page);
+      await page.evaluate(() => {
+        const go = window.scrollTo;
+        window.asked = [];
+        window.scrollTo = function(...args){ asked.push(args[0].behavior); return go.apply(this, args); };
+      });
+      await page.keyboard.type(TALLEST, { delay: 30 });
+      await shows(page);
+      await atNav(page);
+      expect([...new Set(await page.evaluate(() => asked))], "what the page asked for").toEqual(["instant"]);
+      expect(new Set(await page.evaluate(() => tops)).size, "the page's stops").toBe(1);
+    });
+
     test("a tab still goes to the top of the page afterwards", async ({ page }) => {
       await open(page);
       await type(page, TALLEST);

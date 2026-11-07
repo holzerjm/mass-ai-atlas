@@ -1662,10 +1662,12 @@ function searchBox(inp, res, prefix, find, pick, cleared){
 // and again when a closing popup gave the box the focus back. With the box out of sight the page
 // jumps instead of gliding, because a glide doesn't survive: the browser scrolls to the caret after
 // the input event, which stops one, and after a stall it can start from an old position and drag a
-// finished one back up. A jump leaves it nothing to do.
+// finished one back up. A jump leaves it nothing to do. Under the nav counts as out of sight,
+// because scroll-padding-top tells the browser so: its move to the caret stopped the glide there.
 function listOnScreen(inp, res){
   const box = inp.getBoundingClientRect(), seen = visualViewport;
-  const hidden = box.top < seen.offsetTop || box.bottom > seen.offsetTop + seen.height;
+  const clear = Math.max(document.querySelector(".nav").offsetHeight, seen.offsetTop);
+  const hidden = box.top < clear || box.bottom > seen.offsetTop + seen.height;
   bringOnScreen(box.top, res.getBoundingClientRect().bottom, hidden ? "instant" : undefined);
 }
 // OpenFreeMap vector basemap via maplibre-gl-leaflet — keyless, unlimited,
