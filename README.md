@@ -124,6 +124,9 @@ scripts/sync-to-site.sh           manual deploy fallback (CI normally deploys on
 .github/workflows/deploy.yml      auto-deploy to the live site + Slack notification
 .github/workflows/suggest-to-pr.yml  the suggestion bot (maintainer-gated, drafts PRs)
 .github/workflows/weekly-events.yml  Monday 7am ET events refresh + Slack post
+.github/workflows/e2e.yml         browser tests on every pull request and push to main
+.github/workflows/monthly-health.yml  monthly link check + re-check queue, posted to Slack
+.github/workflows/server-check.yml  Sunday check that a deploy can still reach the server
 docs/events-guide.md              how the events page & weekly refresh work
 CONTRIBUTING.md                   entry schema & contributor workflow
 MAINTAINING.md                    maintainer guide — turn issues & PRs into data/entities.yml

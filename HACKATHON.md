@@ -111,8 +111,8 @@ it, read the published dataset instead of scraping:
 This template is a working copy of a live site, so some of it points back at The Open
 Accelerator. Change these before you go far:
 
-- **The workflows that touch TOA infrastructure** — `deploy`, `weekly-events`, `monthly-health`
-  and the suggestion bot — are guarded with `if: github.repository == 'holzerjm/mass-ai-atlas'`.
+- **The workflows that touch TOA infrastructure** — `deploy`, `weekly-events`, `monthly-health`,
+  `server-check` and the suggestion bot — are guarded with `if: github.repository == 'holzerjm/mass-ai-atlas'`.
   They will skip in your copy rather than fail. Delete them, or replace the guard with your own
   repo and supply your own secrets. **`validate` is deliberately not guarded** — you want it.
 - **`SECURITY.md`** uses relative GitHub links, so its advisory and issue routes already

@@ -1,0 +1,95 @@
+# Weekly server check: can a deploy still reach the server?
+#
+# On 2026-11-06 the server's address changed without notice, and every deploy failed at
+# "Set up SSH" for about 18 hours before anyone looked. Monday's events refresh uses the
+# same secrets and would have failed too. This runs on Sunday afternoon, a day before that
+# refresh, and posts a 🚨 to Slack when the server doesn't answer or a deploy would be
+# refused. When the server is fine it posts nothing.
+#
+# It changes nothing on the server. The deploy key is rrsync-restricted to writing the
+# ecosystem folder, so the check does what a deploy does, as a dry run: it uploads
+# index.html with `rsync -n`, which connects, logs in and compares, then copies nothing.
+# For the same reason it can't read the server's disk use.
+#
+# Secrets: DEPLOY_* (shared with deploy.yml and weekly-events.yml), SLACK_WEBHOOK_URL
+# (the deploy alerts' channel; the alert is skipped when it's unset).
+
+name: Weekly server check
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: "17 18 * * 0"   # Sundays 18:17 UTC: 1:17 PM EST, 2:17 PM EDT
+  workflow_dispatch:
+
+jobs:
+  check:
+    # A copy made from this template has none of TOA's secrets, so this skips there.
+    if: github.repository == 'holzerjm/mass-ai-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Reach the server and try a dry-run deploy
+        id: check
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          d="$RUNNER_TEMP/ssh"
+          mkdir -p "$d" && chmod 700 "$d"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$d/id_deploy" && chmod 600 "$d/id_deploy"
+          problem=""
+
+          # 1. Does anything answer on port 22? Three tries, 20 s each, a minute in all.
+          keys=""
+          for try in 1 2 3; do
+            keys=$(ssh-keyscan -T 20 -H "$DEPLOY_HOST" 2>/dev/null) || true
+            [ -n "$keys" ] && break
+            [ "$try" -lt 3 ] && sleep 10
+          done
+          if [ -z "$keys" ]; then
+            problem="The server didn't answer on SSH (port 22) in 3 tries over a minute. If its address changed, update the DEPLOY_HOST secret."
+          else
+            printf '%s\n' "$keys" > "$d/known_hosts"
+            # 2. Would a deploy go through? The same rsync a deploy runs, with -n.
+            if out=$(rsync -n -e "ssh -i $d/id_deploy -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=20 -o UserKnownHostsFile=$d/known_hosts" \
+                     index.html "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/" 2>&1); then
+              echo "The server answered, and a dry-run upload of index.html was accepted." | tee -a "$GITHUB_STEP_SUMMARY"
+            else
+              code=$?
+              echo "$out"
+              problem="The server answered, but a dry-run upload with the deploy key failed (rsync exit $code), so a real deploy would fail too. Check the key's line in authorized_keys and the deploy folder on the server."
+            fi
+          fi
+
+          if [ -n "$problem" ]; then
+            echo "problem=$problem" >> "$GITHUB_OUTPUT"
+            echo "::error::$problem"
+            echo "$problem" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: Alert Slack
+        if: failure() || cancelled()
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          PROBLEM: ${{ steps.check.outputs.problem }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && { echo "SLACK_WEBHOOK_URL not set — skipping"; exit 0; }
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          [ -z "$PROBLEM" ] && PROBLEM="The check didn't finish: it failed or hit its 5-minute limit before it could test the server."
+          jq -n --arg problem "$PROBLEM" --arg run "$RUN_URL" '
+            {text: "🚨 Mass AI Atlas server check FAILED",
+             blocks: [
+               {type:"header", text:{type:"plain_text", text:"🚨 Atlas server check failed", emoji:true}},
+               {type:"section", text:{type:"mrkdwn",
+                 text:($problem + " Deploys and the Monday events refresh will fail until this is fixed. <" + $run + "|View the run>.")}}
+             ]}' \
+          | curl -sS -X POST -H 'Content-type: application/json' -d @- "$SLACK_WEBHOOK_URL"

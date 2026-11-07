@@ -245,6 +245,15 @@ again from the current `main`. Don't use **Re-run jobs** on the failed run inste
 deploys that run's own commit, so if a newer deploy has finished since, it puts older files
 back on the live site. **Run workflow** also triggers a deploy by hand at any time.
 
+**A Sunday check warns before a deploy fails.** Every Sunday afternoon the **Weekly server
+check** workflow does what a deploy does, as a dry run that copies nothing. If the server
+doesn't answer, or answers but refuses the deploy key, a 🚨 lands in the same Slack channel and
+says which. A server that stops answering usually has a new address: update the `DEPLOY_HOST`
+secret under **Settings → Secrets and variables → Actions**. Then run the check again from
+**Actions → Weekly server check → Run workflow**, and if a deploy failed in the meantime, use
+**Run workflow** on **Deploy to TOA site** as above. Monday's events refresh uses the same
+secrets, so fix it before Monday morning.
+
 Manual fallback (only if GitHub Actions is unavailable), from a computer with the
 repo checked out and SSH access to the server:
 
