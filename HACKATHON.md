@@ -109,7 +109,8 @@ it, read the published dataset instead of scraping:
 ## Make it yours
 
 This template is a working copy of a live site, so some of it points back at The Open
-Accelerator. Change these before you go far:
+Accelerator. Change these before you go far. If you're starting an atlas for another
+region, [docs/your-region.md](docs/your-region.md) also lists what's specific to Massachusetts.
 
 - **The workflows that touch TOA infrastructure** — `deploy`, `weekly-events`, `monthly-health`
   and the suggestion bot — are guarded with `if: github.repository == 'holzerjm/mass-ai-atlas'`.
