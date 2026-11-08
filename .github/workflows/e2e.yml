@@ -10,9 +10,9 @@
 # alone. Whether that happens on a GitHub runner is unknown — so this runs and
 # reports, and nobody is blocked by it, until there is enough history to say.
 #
-# To promote it once the history looks clean: add "e2e" to the required status
-# checks of the `main` ruleset. To demote it again: remove it. Nothing in this file
-# changes either way.
+# To promote it once the history looks clean: add both of its checks, "e2e (1 of 2)"
+# and "e2e (2 of 2)", to the required status checks of the `main` ruleset. To demote
+# it again: remove them. Nothing in this file changes either way.
 #
 # Unlike deploy/weekly-events/monthly-health, this is deliberately NOT restricted to
 # the upstream repository: a copy made from this template should absolutely run it.
@@ -25,10 +25,22 @@ on:
 
 jobs:
   e2e:
+    name: e2e (${{ matrix.shard }} of 2)
     runs-on: ubuntu-latest
-    # The tests take about 10 minutes, and on some runners installing Chromium's system
-    # libraries takes another 8 to 10 before they start. At 15 minutes, 4 of 14 runs on
-    # 2026-11-06 and 07 were cancelled that way, which reports neither a pass nor a failure.
+    # Playwright's own image has Chromium and its system libraries built in, so no step
+    # installs them. Until 2026-11 one did, and on some runners it took 8 to 10 minutes.
+    # Keep the tag equal to @playwright/test's version in package-lock.json: if they
+    # drift, every test fails at launch with Playwright's own message naming the image
+    # it needs. --ipc=host is what Playwright recommends for Chromium in Docker, whose
+    # default shared memory is too small for it.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
+    # Half the suite each, in parallel: about 5 minutes per job instead of 10 to 12.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
@@ -38,30 +50,13 @@ jobs:
           cache: npm
       - run: npm ci
 
-      # The browser is ~130 MB and changes only when @playwright/test does, so key
-      # the cache on the lockfile.
-      - name: Cache the Playwright browser
-        id: pw-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - name: Install Chromium
-        if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-      # A cache hit restores the browser but not its OS libraries, which are not in
-      # the cached path.
-      - name: Install browser OS dependencies
-        if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
-
-      - run: npm run test:e2e
+      - run: npm run test:e2e -- --shard=${{ matrix.shard }}/2
 
       # The HTML report is what makes a failure diagnosable without a local repro.
       - name: Upload the report
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}
           path: playwright-report/
           retention-days: 7

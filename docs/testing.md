@@ -18,8 +18,9 @@ is deployed, and nobody editing `data/entities.yml` needs to install anything.
 
 > **In CI.** `.github/workflows/e2e.yml` runs this suite on every pull request. It is
 > deliberately **not** a required check while there is no history on GitHub runners — see
-> the note below. Promote it by adding `e2e` to the required status checks of the `main`
-> ruleset; nothing in the workflow changes.
+> the note below. Promote it by adding both of its checks, `e2e (1 of 2)` and
+> `e2e (2 of 2)`, to the required status checks of the `main` ruleset; nothing in the
+> workflow changes.
 
 > **A note on workers.** Every spec renders a WebGL basemap and the Galaxy canvas, so
 > the suite is sensitive to how many browsers run at once. The config uses 4 locally
@@ -30,15 +31,16 @@ is deployed, and nobody editing `data/entities.yml` needs to install anything.
 > re-run only settles frames: when the page says "the atlas data failed to load", read
 > the failure first (see [Telling a flake from a failure](#telling-a-flake-from-a-failure)).
 
-> **A note on the test server.** The suite serves the repo with the server
-> `python3 -m http.server` runs, but from a one-line script in `playwright.config.js`
-> that raises its listen backlog from Python's default of 5 to 128. The page requests
-> every `data/*.yml` file at once, and on a Mac, parallel browsers overflowed a queue of
-> 5: Chrome got `net::ERR_CONNECTION_RESET` or `net::ERR_SOCKET_NOT_CONNECTED`, the page
-> said "Sorry — the atlas data failed to load", and the test timed out in `waitForApp`.
-> On 2026-11-01, 4 of 10 local runs at `--workers=2` failed that way before the change,
-> and none of 10 after it; GitHub's Linux runners had not shown it in their last 10
-> runs. Keep the backlog if you change `webServer.command`. Serving the atlas by hand
+> **A note on the test server.** The suite serves the repo with `tests/server.js`, a
+> small Node static server that `playwright.config.js` starts, with a listen backlog of
+> 511. The page requests every `data/*.yml` file at once, and on a Mac, parallel browsers
+> overflowed the queue of 5 that `python3 -m http.server` keeps by default: Chrome got
+> `net::ERR_CONNECTION_RESET` or `net::ERR_SOCKET_NOT_CONNECTED`, the page said "Sorry —
+> the atlas data failed to load", and the test timed out in `waitForApp`. On 2026-11-01,
+> 4 of 10 local runs at `--workers=2` failed that way, and none of 10 once the queue was
+> raised to 128. In 2026-11 the server moved from Python to Node, so CI can run in
+> Playwright's own image, which has no Python. Keep a long backlog if you change
+> `webServer.command`. Serving the atlas by hand
 > with the stock server is rarely affected: one browser opens at most six connections to
 > a host, and 300 requests six at a time drew no resets. Rarely is not never, though: the
 > same day, a `--workers=1` run, which is a single browser, still lost `axe: map view` to a
@@ -46,9 +48,8 @@ is deployed, and nobody editing `data/entities.yml` needs to install anything.
 
 ## Running the suite locally
 
-You need Node 20+ and Python 3 (the tests serve the repo with Python's
-`http.server`, the same way you would by hand, with a longer connection queue: see
-the note on the test server above).
+You need Node 20+. The tests serve the repo with `tests/server.js`, which keeps a long
+connection queue: see the note on the test server above.
 
 ```sh
 npm ci                              # once: installs Playwright + axe (dev only)
@@ -427,16 +428,17 @@ there either.
 | Workflow | Job | What it does |
 |---|---|---|
 | Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit `index.html`); then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
-| Browser tests | `e2e` | `npm ci`, Chromium restored from a cache keyed on the lockfile, `npm run test:e2e`; on failure uploads `playwright-report/` as the **playwright-report** artifact, kept 7 days |
+| Browser tests | `e2e (1 of 2)`, `e2e (2 of 2)` | Two jobs at once, each running half the suite with `npm run test:e2e -- --shard=N/2`, inside Playwright's image (`mcr.microsoft.com/playwright`, Chromium and its system libraries built in, its tag kept equal to `@playwright/test`'s version); on failure each uploads `playwright-report/` as **playwright-report-1** or **-2**, kept 7 days |
 
 **Only `validate` is a required status check** on `main`. Browser tests runs and reports
 but gates nothing, on purpose — the comment at the top of `e2e.yml` says why, and what to
 change to promote it.
 
-**Browser tests has 25 minutes.** The tests take about 10, and on some runners the step
-that installs Chromium's system libraries takes another 8 to 10 before they start. A run
-that hits the limit is cancelled, which is neither a pass nor a failure: count the `✓`
-lines in its log to see how far it got.
+**Each Browser tests job has 25 minutes.** Each runs half the tests, about 5 minutes'
+worth, and Playwright's image already holds the browser, so no setup step installs it.
+Until 2026-11 one did, and on some runners it took 8 to 10 minutes. A job that hits the
+limit is cancelled, which is neither a pass nor a failure: count the `✓` lines in its log
+to see how far it got, and add the two jobs' counts for the whole suite.
 
 CI retries a failed test twice (`retries: CI ? 2 : 0`). Locally it does not, so a flake
 stays visible while you work.
