@@ -969,6 +969,33 @@ for(const { name, url, box, list, label, short, some, below, windows, fit } of S
     });
   }
 
+  // Someone who tabs to the box and types at once types while the page glides to it: a box that
+  // takes the focus comes into view, and `scroll-smooth` makes that a glide. Until 2026-11 the jump
+  // to the nav's place then went where it was sent, and the glide's latest step was added on top:
+  // up to 56 px at 1024 × 700, or 128 px with the machine busy, which put the category row under the
+  // nav. It takes a key that comes between the page's frames, and Playwright's keys can't be timed
+  // to one, so the page types for itself, between frames, once the glide has begun. The galaxy's
+  // search runs the same code; this checks the map's, where CI caught it.
+  if(name === "map") test.describe(`in a ${below[0]} × ${below[1]} window`, () => {
+    test.use({ viewport: { width: below[0], height: below[1] } });
+
+    test("typing as the box glides into view still stops at the nav's place", async ({ page }) => {
+      await open(page);
+      const glided = await input(page).evaluate((box, text) => new Promise(done => {
+        box.focus();
+        let frames = 60;
+        requestAnimationFrame(function moved(){
+          if(scrollY === 0 && --frames) return requestAnimationFrame(moved);
+          const y = scrollY;
+          setTimeout(() => { box.value = text; box.dispatchEvent(new Event("input")); done(y > 0); });
+        });
+      }), TALLEST);
+      expect(glided, "the page gliding to the box as it takes the focus").toBe(true);
+      await shows(page);
+      await atNav(page);
+    });
+  });
+
   test.describe("in a laptop's window", () => {
     test.use({ viewport: { width: 1366, height: 650 } });
 

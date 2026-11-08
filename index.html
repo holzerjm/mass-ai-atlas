@@ -1667,7 +1667,26 @@ function bringOnScreen(top, bottom, behavior = reduceMotion() ? "auto" : "smooth
   const least = bottom - seen.offsetTop - seen.height;   // any less, and the bottom is out of sight
   if(least <= 0 && most >= 0) return;
   const navPlace = $("view-"+currentView).getBoundingClientRect().top - nav;
+  heldJump = null;   // this move takes over from a jump still being held
   window.scrollTo({top: scrollY + Math.min(Math.max(least, navPlace), most), behavior});
+  if(behavior === "instant") holdJump();
+}
+
+// A jump made while the page is gliding lands where it was sent, and then the glide's latest step,
+// which the screen had taken before the script saw it, is added on top. Until 2026-11 a key typed
+// as the map search's box glided into view on focus left the page up to 56 px past the nav's place
+// at 1024 × 700, or 128 px with the machine busy, with the category row tucked under the nav. CI saw
+// 12 px. So for three frames after a jump, a page that has moved on goes back, unless a newer move
+// has taken over.
+let heldJump = null;
+function holdJump(){
+  const hold = heldJump = { y: scrollY, frames: 3 };   // a jump sets scrollY at once, as far as the page goes
+  requestAnimationFrame(function check(){
+    if(heldJump !== hold) return;
+    if(Math.abs(scrollY - hold.y) > 1){ heldJump = null; window.scrollTo({top: hold.y, behavior: "instant"}); }
+    else if(--hold.frames) requestAnimationFrame(check);
+    else heldJump = null;
+  });
 }
 
 // A flight ends in the middle of the map, so until 2026-11 the pin could land below the window:
