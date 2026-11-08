@@ -11,7 +11,7 @@
  * made computed. It now comes from the newest lastVerified in the data, and the
  * second pattern here keeps a typed month from returning.
  *
- *   node scripts/lint-copy.js                # index.html, events/index.html, README.md
+ *   node scripts/lint-copy.js                # index.html, events/index.html, README.md, HACKATHON.md
  *   node scripts/lint-copy.js some/file.html # any files (fixtures, tests)
  *
  * Exit 0 with one OK line, or exit 1 listing file:line and the offending text.
@@ -29,7 +29,8 @@
  * Escape hatch for a genuine non-count sentence the pattern trips on: put
  * "lint-copy: ignore" anywhere on that line (in a comment).
  *
- * Dependency-free on purpose — it runs in CI before anything is installed.
+ * Dependency-free on purpose: it needs no npm packages, so it runs wherever Node
+ * does, before or without npm ci. In CI it runs after npm ci, in the validate job.
  */
 const fs = require("fs");
 const path = require("path");

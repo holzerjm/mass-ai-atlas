@@ -73,6 +73,9 @@
 /* A visible focus ring everywhere. Before this, only two inputs had one, so a
    keyboard user could not see where they were. */
 :focus-visible{outline:2px solid var(--gold-ink);outline-offset:2px;border-radius:4px}
+/* Read by screen readers and reached by Tab, but never drawn: the galaxy's list of
+   organizations, whose focus the canvas draws instead. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 /* Honour a stated preference for less motion: the drifting background, the map
    fly-to and the galaxy's perpetual settling all stop. Nothing is lost — the
    galaxy still lays itself out, it just stops moving once it has. */
@@ -86,7 +89,15 @@
 /* Preflight off — restore link reset for the ported standard header/footer (scoped so app links are untouched). */
 #site-header a,#mobile-nav a,footer.py-16 a{text-decoration:none}
 footer.py-16 a{color:inherit}
-html,body{height:100%}
+/* The site footer sits on a dark band in both themes, where the ported footer's Tailwind
+   text-gray-500 (#6b7280) read 4.08:1 (until 2026-11). Gray-400 reads 7.7:1. An element-qualified
+   rule, so it wins over the utility class and survives the class going away. */
+footer.py-16{color:#9ca3af}
+/* <body> is the sticky nav's containing block, so it has to be as tall as the page. At height:100%
+   it was one window tall, and the nav left with its foot, one window down (until 2026-11). The
+   padding keeps what the browser scrolls to, such as the keyboard's focus, clear of the nav. */
+html{height:100%;scroll-padding-top:var(--nav-h)}
+body{min-height:100%}
 body{background:var(--bg);color:var(--text);font-family:'Red Hat Display','Segoe UI',system-ui,-apple-system,sans-serif;overflow-x:hidden}
 ::selection{background:var(--gold);color:#000}
 
@@ -97,7 +108,7 @@ html:not(.dark){
   --gold-ink:#96690a;   /* 4.86:1 on white — brand gold reads at 1.58:1 */
 }
 html:not(.dark) body{background:var(--bg);color:var(--text)}
-html:not(.dark) .nav{background:rgba(255,255,255,.9)}
+html:not(.dark) .nav{background:rgba(255,255,255,.97)}   /* over the dark footer band, .9 took --gold-ink to 3.9:1 */
 html:not(.dark) .stat b{background:linear-gradient(90deg,#1e293b,#3b4a6b);-webkit-background-clip:text;background-clip:text}
 html:not(.dark) .dr-body p,html:not(.dark) .dr-why div{color:#3a4258}
 html:not(.dark) .dr-why b,html:not(.dark) .jr-tip b{color:#5b6478}
@@ -109,10 +120,8 @@ html:not(.dark) .galaxy-wrap,html:not(.dark) .footer,html:not(.dark) footer.py-1
 }
 html:not(.dark) .galaxy-wrap{color:#e6ecff}
 html:not(.dark) .footer,html:not(.dark) footer.py-16{background:#0a0a0f}
-/* Light map: tiles swap to OpenFreeMap positron (JS), the container backdrop and floating controls follow so the popups/legend/search read as light. */
+/* Light map: tiles swap to OpenFreeMap positron (JS), the container backdrop and floating controls follow so the popups/search read as light. */
 html:not(.dark) #map{background:#e8eaed}
-html:not(.dark) .map-legend{background:rgba(255,255,255,.92)}
-html:not(.dark) #gxLegend{background:rgba(10,15,30,.92)} /* the galaxy stays dark in light mode */
 html:not(.dark) .map-search input{background:rgba(255,255,255,.94)}
 html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 ::-webkit-scrollbar{width:10px;height:10px}
@@ -135,8 +144,12 @@ html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 .brand h1 span{background:linear-gradient(90deg,#ffd54f,#ffc600);-webkit-background-clip:text;background-clip:text;color:transparent}
 .eyebrow{margin-top:12px;font-size:12px;text-transform:uppercase;letter-spacing:1.6px;color:var(--gold-ink);font-weight:700}
 .tagline{margin-top:8px;color:var(--muted);font-size:14.5px;max-width:900px;line-height:1.55}
+.tagline a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
 .hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .stats{display:flex;gap:26px;margin-top:18px;flex-wrap:wrap}
+a.stat{display:block;color:inherit;text-decoration:none}
+a.stat span{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
+a.stat:hover span{color:var(--text);text-decoration-color:currentColor}
 .stat b{font-size:22px;font-weight:800;display:block;background:linear-gradient(90deg,#cfe0ff,#9fb4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .stat span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px}
 
@@ -163,19 +176,52 @@ html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 .view-full{max-width:none;padding:0}
 
 /* ---------- MAP ---------- */
-#view-map.active{display:block}
-.map-wrap{position:relative;height:calc(100vh - 64px);min-height:540px}
+/* The map and the galaxy each fill one screen below the sticky nav: a row of category
+   buttons on top, the canvas below it. Until 2026-11 the categories floated at the
+   canvas's bottom-left corner, which always landed just below the first screen. */
+#view-map.active,#view-galaxy.active{display:flex;flex-direction:column;height:calc(100vh - 64px);min-height:600px}
+.map-wrap{position:relative;flex:1;min-height:0}
 #map{position:absolute;inset:0;background:#0a0f1e}
+/* A #map or #galaxy link makes the browser scroll the element with that id (the map, or the
+   galaxy canvas) to the top of the window, which hides its category row behind the nav. A
+   margin this large leaves the page at the top instead, where a tab click leaves it. */
+#map,#galaxy{scroll-margin-top:200vh}
 .leaflet-container{font:inherit}
-.map-legend{position:absolute;z-index:1000;left:14px;bottom:14px;background:rgba(10,15,30,.92);
-  border:1px solid var(--line);border-radius:14px;padding:12px 14px;max-width:230px;backdrop-filter:blur(8px)}
-.map-legend h4{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:8px}
-.lg-item{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 4px;border-radius:7px;cursor:pointer;user-select:none;
-  background:none;border:0;color:inherit;font-family:inherit;text-align:left;width:100%}
-.lg-item:hover{background:rgba(148,163,255,.1)}
-.lg-item.off{opacity:.32}
+.cat-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.cat-bar-label{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-right:4px}
+.cat-btn{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--text);font-family:inherit;font-size:12.5px;
+  font-weight:600;line-height:1.2;white-space:nowrap;transition:.15s}
+.cat-btn:hover{border-color:rgba(148,163,255,.45)}
+/* a hidden category: muted text and a hollow dot, so the state is not carried by colour alone */
+.cat-btn[aria-pressed="false"]{background:transparent;color:var(--muted)}
+.cat-btn[aria-pressed="false"] .lg-dot{background:transparent!important;box-shadow:none;border:1.5px solid currentColor}
 .lg-dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 8px currentColor}
+.cat-btn .lg-dot{width:9px;height:9px}
+/* What a founder needs and their stage: the Directory's filters, over the map as well */
+.map-filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.map-filters .need-chips{margin-top:0;gap:6px}
+.map-filters .need-chip{padding:5px 9px;font-size:12px}
+.map-filters .dir-select{padding:4px 8px;font-size:12px;border-radius:99px}
+/* how many pins the filters leave, under the search box so it shows without scrolling */
+.map-note{position:absolute;z-index:999;top:62px;left:54px;max-width:calc(100% - 66px);display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:var(--text)}
+.map-note.on{padding:6px 7px 6px 14px;border-radius:18px;background:rgba(10,15,30,.92);border:1px solid var(--line)}
+html:not(.dark) .map-note.on{background:rgba(255,255,255,.94)}
+.filter-clear,.ask-open{appearance:none;flex:none;border:1px solid var(--line);background:var(--panel);color:var(--text);font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;padding:5px 11px;border-radius:99px;cursor:pointer}
+.filter-clear:hover,.ask-open:hover{border-color:rgba(255,198,0,.45)}
+/* shown when the wheel scrolls the page over the map or the galaxy instead of zooming */
+.zoom-hint{position:absolute;z-index:1102;top:50%;left:50%;transform:translate(-50%,-50%);padding:10px 18px;
+  border-radius:99px;background:rgba(10,15,30,.92);border:1px solid rgba(148,163,255,.25);color:#e6ecff;
+  font-size:13.5px;font-weight:600;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden;
+  transition:opacity .2s,visibility .2s}
+.zoom-hint.show{opacity:1;visibility:visible}
 .map-search{position:absolute;z-index:1000;top:14px;left:54px;right:auto;width:300px}
+/* A pin's popup opens over everything on the map, and under the nav: the map's init says why. Only
+   the keyboard's focus brings something back over it, or the search's results and a focused button
+   could sit behind one. A tap doesn't count: the focus stays on what it hit, which would then sit
+   on top of the popup. */
+.leaflet-popupsOver-pane{z-index:1100}
+:is(.map-search,.map-view-switch,.map-note,.leaflet-top,.leaflet-bottom):has(:focus-visible){z-index:1101}
 /* map area presets — sits under .map-search's z-index so the search results overlay it */
 .map-view-switch{position:absolute;z-index:999;top:14px;right:14px;display:flex;gap:3px;padding:3px;
   background:rgba(10,15,30,.92);border:1px solid var(--line);border-radius:99px;backdrop-filter:blur(8px)}
@@ -185,11 +231,17 @@ html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 .mv-btn:hover{color:var(--text);background:rgba(148,163,255,.12)}
 .mv-btn[aria-pressed="true"]{color:#000;background:linear-gradient(90deg,#ffd54f,#ffc600)}
 html:not(.dark) .map-view-switch{background:rgba(255,255,255,.92)}
-.gx-search{left:14px}
+/* The list opens where the re-center button sits, so it goes over the button. Until 2026-11 the
+   button hid the first row's dot, and a click there cleared the search instead of picking the row.
+   The focus rule above lifts the box only while it has the focus: pressing a row takes the focus
+   away, and the button would come back before the release, so the click would miss the row.
+   Tab from the box lands on the button, so with the focus on it, it comes back on top. */
+.gx-search{left:14px;z-index:1001}
 .gx-home{position:absolute;z-index:1000;top:60px;left:14px;width:34px;height:34px;border-radius:9px;
   background:rgba(10,15,30,.92);border:1px solid var(--line);color:#e6ecff;font-size:18px;
   cursor:pointer;line-height:1}
 .gx-home:hover{border-color:#ffc600;color:#ffc600}
+.gx-home:focus{z-index:1002}
 html:not(.dark) .gx-search input{background:rgba(10,15,30,.92);color:#e6ecff} /* galaxy stays dark */
 html:not(.dark) .gx-search .map-results{background:rgba(10,15,30,.97);color:#e6ecff}
 .map-search input{width:100%;background:rgba(10,15,30,.92);border:1px solid var(--line);color:var(--text);
@@ -199,13 +251,16 @@ html:not(.dark) .gx-search .map-results{background:rgba(10,15,30,.97);color:#e6e
 .map-results.open{display:block}
 .map-results div{padding:9px 13px;font-size:13px;cursor:pointer;display:flex;gap:8px;align-items:center}
 .map-results div:hover{background:rgba(148,163,255,.12)}
+.map-results div[aria-selected="true"]{background:rgba(148,163,255,.2)}
 .leaflet-popup-content-wrapper{background:var(--panel);color:var(--text);border-radius:14px;border:1px solid var(--line)}
 .leaflet-popup-tip{background:var(--panel)}
 .pop-name{font-weight:700;font-size:14.5px;margin-bottom:3px}
 .pop-cat{font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
 .pop-desc{font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:8px}
+.pop-colocated{font-size:12px;color:var(--muted);line-height:1.45;margin:-2px 0 8px}
+.pop-colocated a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
 .pop-btn{display:inline-block;font-size:12px;font-weight:700;color:#000;background:linear-gradient(90deg,#ffd54f,#ffc600);
-  padding:6px 12px;border-radius:8px;cursor:pointer;text-decoration:none}
+  padding:6px 12px;border-radius:8px;cursor:pointer;text-decoration:none;border:0;font-family:inherit;line-height:inherit;text-align:inherit}
 .pulse-dot{border-radius:50%;box-shadow:0 0 10px 2px currentColor;border:2px solid rgba(255,255,255,.75)}
 .cluster-chip{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
   font:700 13px/1 'Red Hat Display',sans-serif;background:rgba(20,23,28,.92);color:#fff;
@@ -214,28 +269,38 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
   border-color:#ee0000;box-shadow:0 0 10px rgba(238,0,0,.25)}
 
 /* ---------- GALAXY ---------- */
-.galaxy-wrap{position:relative;height:calc(100vh - 64px);min-height:540px;background:radial-gradient(ellipse at 50% 40%,#0d1530 0%,#070b16 70%)}
-#galaxy{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
+.galaxy-wrap{position:relative;flex:1;min-height:0;background:radial-gradient(ellipse at 50% 40%,#0d1530 0%,#070b16 70%)}
+/* touch-action: one finger pans the galaxy, as it pans the map, instead of also scrolling the page */
+#galaxy{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
 #galaxy:active{cursor:grabbing}
 .gx-tip{position:absolute;pointer-events:none;background:rgba(10,15,30,.95);border:1px solid var(--line);
   border-radius:10px;padding:8px 12px;font-size:12.5px;display:none;z-index:1000;max-width:240px}
 .gx-tip b{display:block;font-size:13px}
 .gx-tip span{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.gx-tip em{display:block;font-style:normal;color:var(--muted);font-size:12px;margin-top:3px}
 .gx-hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:12.5px;color:var(--muted);
-  background:rgba(10,15,30,.8);border:1px solid var(--line);padding:7px 16px;border-radius:99px;backdrop-filter:blur(6px);white-space:nowrap}
+  background:rgba(10,15,30,.8);border:1px solid var(--line);padding:7px 16px;border-radius:99px;backdrop-filter:blur(6px);white-space:nowrap;
+  pointer-events:none}   /* only text, so the wheel it asks for goes through to the canvas */
+/* the hint names what the visitor has: a mouse, a finger, or the keys (while the
+   organization list behind the canvas has focus) */
+.gx-hint .for-touch,.gx-hint .for-keys{display:none}
+@media (hover:none),(pointer:coarse){.gx-hint .for-mouse{display:none}.gx-hint .for-touch{display:inline}}
+.galaxy-wrap.kbd .gx-hint .for-mouse,.galaxy-wrap.kbd .gx-hint .for-touch{display:none}
+.galaxy-wrap.kbd .gx-hint .for-keys{display:inline}
 
 /* ---------- JOURNEY ---------- */
 .jr-head{margin:8px 0 4px;font-size:24px;font-weight:800}
 .jr-sub{color:var(--muted);font-size:14px;margin-bottom:24px;max-width:720px;line-height:1.55}
 .stepper{display:flex;gap:0;margin-bottom:28px;overflow-x:auto;padding-bottom:6px}
-.step{flex:1;min-width:150px;position:relative;cursor:pointer;padding:14px 12px 12px;border-radius:14px;border:1px solid transparent;transition:.18s;text-align:center}
+.step{flex:1;min-width:150px;position:relative;cursor:pointer;padding:14px 12px 12px;border-radius:14px;border:1px solid transparent;transition:.18s;text-align:center;
+  font-family:inherit;font-size:inherit;color:inherit;line-height:inherit;background:transparent}
 .step:hover{background:rgba(148,163,255,.06)}
 .step.active{background:var(--panel);border-color:var(--line)}
 .step-num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;margin:0 auto 8px;
   font-weight:800;font-size:14px;background:var(--panel2);color:var(--muted);border:2px solid var(--line);transition:.18s}
 .step.active .step-num{background:linear-gradient(135deg,#ffd54f,#ffc600);color:#000;border-color:transparent;box-shadow:0 0 18px rgba(255,198,0,.5)}
-.step-title{font-size:13.5px;font-weight:700}
-.step-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.step-title{display:block;font-size:13.5px;font-weight:700}
+.step-sub{display:block;font-size:11px;color:var(--muted);margin-top:2px}
 .step::after{content:"";position:absolute;top:30px;right:-2px;width:4px;height:4px;border-radius:50%;background:var(--line)}
 .step:last-child::after{display:none}
 .jr-panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px}
@@ -244,6 +309,33 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
 .jr-tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:22px}
 .jr-tip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5}
 .jr-tip b{display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#9fb4ff}
+/* pathways: hand-written routes through a stage, above the stage's full list (data/pathways.yml) */
+.pw{margin-bottom:24px}
+.pw-ask,.jr-all{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:10px}
+.pw-picks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.pw-pick{font:inherit;font-size:13.5px;font-weight:600;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;text-align:left;transition:.15s}
+.pw-pick:hover{border-color:rgba(148,163,255,.45)}
+.pw-pick[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.pw-lead{font-size:14px;line-height:1.6;max-width:780px;margin-bottom:18px}
+.pw-steps{list-style:none;counter-reset:pw;margin:0;padding:0}
+.pw-step{counter-increment:pw;position:relative;padding:0 0 20px 44px}
+.pw-step::before{content:counter(pw);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;background:var(--panel2);color:var(--gold-ink);border:2px solid var(--line)}
+.pw-step:not(:last-child)::after{content:"";position:absolute;left:14px;top:34px;bottom:4px;width:2px;background:var(--line)}
+.pw-step h5{font-size:15px;font-weight:700;margin:4px 0 3px}
+.pw-why{color:var(--muted);font-size:13.5px;line-height:1.55;max-width:780px;margin-bottom:10px}
+.pw-orgs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.pw-org{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.5}
+.pw-name{background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;text-align:left}
+.pw-name:hover{text-decoration:underline}
+.pw-name .lg-dot{display:inline-block;margin-right:7px;vertical-align:1px}
+.pw-status{font-size:12.5px;font-weight:500;color:#4ade80;margin-top:2px}
+html:not(.dark) .pw-status{color:#166534}
+.pw-status.closed,html:not(.dark) .pw-status.closed{color:var(--muted)}
+.pw-status.pitch,html:not(.dark) .pw-status.pitch{color:var(--text)}
+.pw-org p{margin-top:5px}
+.pw-verified{color:var(--muted);font-size:11.5px;margin-top:6px}
+.pw-more{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;color:var(--gold-ink)}
+.pw-note{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:780px}
 .jr-group{margin-bottom:18px}
 .jr-group h4{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:10px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
@@ -251,6 +343,7 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
   padding:7px 13px;border-radius:99px;font-size:13px;cursor:pointer;transition:.15s}
 .chip:hover{transform:translateY(-1px);border-color:rgba(148,163,255,.45);box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .chip .lg-dot{width:8px;height:8px}
+button.chip{font-family:inherit;color:inherit;line-height:inherit;text-align:inherit}
 
 /* ---------- DIRECTORY ---------- */
 .dir-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
@@ -260,10 +353,12 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
 .dir-select{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px 14px;font-size:13.5px;outline:none}
 .cat-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
 .cat-chip{display:inline-flex;gap:7px;align-items:center;border:1px solid var(--line);background:var(--panel);
-  color:var(--muted);padding:7px 14px;border-radius:99px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;user-select:none}
+  color:var(--muted);padding:7px 14px;border-radius:99px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;user-select:none;
+  font-family:inherit;line-height:inherit;text-align:inherit}
 .cat-chip:hover{color:var(--text)}
 .cat-chip.on{color:var(--text);border-color:currentColor;background:rgba(148,163,255,.07)}
-.dir-count{font-size:13px;color:var(--muted);margin-bottom:14px}
+.dir-count-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:14px}
+.dir-count{font-size:13px;color:var(--muted)}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;
   cursor:pointer;transition:.18s;overflow:hidden}
@@ -313,11 +408,12 @@ html:not(.dark) .cluster-chip{background:rgba(255,255,255,.95);color:#1c1a17;
   border-radius:12px;padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .tour-card p{margin:8px 0 12px;color:#b7bdc6;font-size:14px;line-height:1.5}
 .tour-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
-.tour-step{font-size:12px;color:#6b7280;white-space:nowrap}
+.tour-step{font-size:12px;color:var(--muted);white-space:nowrap}
 .tour-actions{display:flex;gap:10px;justify-content:flex-end}
 html:not(.dark) .tour-card{background:#fff;border-color:#ddd;box-shadow:0 12px 40px rgba(0,0,0,.18)}
 html:not(.dark) .tour-card p{color:#444}
-.tour-spot{outline:3px solid #ffc600;outline-offset:3px;border-radius:10px}
+/* the margin cancels the room kept for the nav, which would take the spot down towards the card */
+.tour-spot{outline:3px solid #ffc600;outline-offset:3px;border-radius:10px;scroll-margin-bottom:var(--nav-h)}
 /* shortlist + compare + new-this-month */
 .card{position:relative}
 .card-tools{position:absolute;top:10px;right:10px;display:flex;gap:6px}
@@ -334,11 +430,11 @@ html:not(.dark) .tour-card p{color:#444}
 .dr-event{color:#f472b6}
 html:not(.dark) .new-tag{color:#b45309;border-color:rgba(180,83,9,.4)}
 html:not(.dark) .event-tag,html:not(.dark) .dr-event{color:#be185d;border-color:rgba(190,24,93,.35)}
-.new-banner{position:sticky;top:0;z-index:900;display:flex;gap:8px;align-items:center;justify-content:center;
+.new-banner{position:relative;display:flex;gap:8px;align-items:center;justify-content:center;
   padding:8px 40px;font-size:13.5px;background:rgba(255,198,0,.12);border-bottom:1px solid rgba(255,198,0,.3);color:#ffc600}
 .new-banner a{color:#ffc600;text-decoration:underline}
-html:not(.dark) .new-banner{background:rgba(180,83,9,.08);border-color:rgba(180,83,9,.3);color:#b45309}
-html:not(.dark) .new-banner a{color:#b45309}
+html:not(.dark) .new-banner{background:rgba(180,83,9,.08);border-color:rgba(180,83,9,.3);color:#92400e}   /* 6.3:1 on this tint; #b45309 was 4.4:1 */
+html:not(.dark) .new-banner a{color:#92400e}
 .nb-x{position:absolute;right:12px;background:none;border:none;color:inherit;cursor:pointer;font-size:14px}
 .modal{position:fixed;inset:0;z-index:9400;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}
 .modal-card{background:#14171c;border:1px solid #2a2f38;border-radius:14px;max-width:520px;width:100%;
@@ -347,11 +443,24 @@ html:not(.dark) .new-banner a{color:#b45309}
 html:not(.dark) .modal-card{background:#fff;border-color:#ddd}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:16px}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+/* Ask your own AI */
+.ask-lead{font-size:13.5px;line-height:1.55;margin-bottom:12px}
+.ask-label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}
+.ask-box{width:100%;min-height:76px;resize:vertical;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);font:inherit;font-size:13.5px;line-height:1.5;padding:9px 11px}
+.ask-rules{margin-top:10px;font-size:13px}
+.ask-rules summary{cursor:pointer;font-weight:600}
+.ask-rules pre{margin-top:8px;padding:10px 11px;max-height:190px;overflow:auto;background:var(--panel2);border:1px solid var(--line);border-radius:10px;font:12px/1.5 "Red Hat Mono",ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.ask-note{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.ask-note b{color:var(--text)}
+.ask-note a,.pw-note a{color:var(--gold-ink);text-decoration:underline}
 .sl-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid rgba(128,128,128,.15)}
 .sl-main{flex:1;min-width:0}
 .sl-main a{color:inherit}
 .sl-sub{display:block;font-size:12px;color:var(--muted)}
 .sl-url{opacity:.8}
+/* on the light modal, muted ink at .8 opacity was 3.8:1; a solid grey a shade lighter than the
+   line around it keeps the URL quieter and reads 4.8:1 */
+html:not(.dark) .sl-url{opacity:1;color:#6b7280}
 .sl-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px}
 .sl-x:hover{color:#ff5c45}
 .cmp-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:9300;display:flex;gap:14px;
@@ -361,6 +470,7 @@ html:not(.dark) .cmp-bar{background:#fff;border-color:#ddd}
 .cmp-table{border-collapse:collapse;width:100%;font-size:13.5px}
 .cmp-table td{padding:8px 12px;border-bottom:1px solid rgba(128,128,128,.15);vertical-align:top;min-width:130px}
 .cmp-table td:first-child{color:var(--muted);white-space:nowrap;min-width:0}
+.cmp-table a{color:inherit;text-decoration:underline}
 @media print{
   body.shortlist-open > :not(#shortlistModal){display:none!important}
   body.shortlist-open #shortlistModal{position:static;background:none;padding:0;display:block!important}
@@ -379,12 +489,16 @@ html:not(.dark) .need-chip{border-color:#d8d3ca;color:#5d574e}
 html:not(.dark) .need-chip.on{border-color:#b45309;color:#b45309;background:rgba(180,83,9,.07)}
 .dr-apply{margin-top:14px;font-size:13.5px;font-weight:500;color:#4ade80}
 html:not(.dark) .dr-apply{color:#15803d}
+.dr-closed,html:not(.dark) .dr-closed{color:var(--muted)}
+.dr-pitch,html:not(.dark) .dr-pitch{color:var(--text)}
+.dr-apply a{color:inherit;text-decoration:underline}
 .apply-tag{color:#4ade80;border-color:rgba(74,222,128,.4)}
-html:not(.dark) .apply-tag{color:#15803d;border-color:rgba(21,128,61,.35)}
+html:not(.dark) .apply-tag{color:#166534;border-color:rgba(21,128,61,.35)}   /* 6.3:1 on --panel2; #15803d was 4.43:1 */
 .dr-facts{margin-top:8px;border-collapse:collapse;font-size:13px;width:100%}
 .dr-facts td{padding:5px 12px 5px 0;border-bottom:1px solid rgba(128,128,128,.15);vertical-align:top}
 .dr-facts td:first-child{color:var(--muted);white-space:nowrap;width:1%}
 .offer-tag{font-size:12.5px}
+.match-tag{color:var(--text)}
 .dr-verified{font-size:12px;color:var(--muted);margin-top:16px}
 .dr-verified.stale{color:#fbbf24}
 .stale-tag{color:#fbbf24;border-color:rgba(251,191,36,.4)}
@@ -410,17 +524,68 @@ html:not(.dark) .dr-verified.stale,html:not(.dark) .stale-tag{color:#b45309;bord
 .toa-links a{color:var(--gold);text-decoration:none;font-weight:600}
 .toa-links a:hover{text-decoration:underline}
 .footer a{color:var(--gold);text-decoration:none}
+/* Links in the footer's sentences are underlined, so colour isn't the only thing that marks them:
+   gold against the footer's muted text is 1.8:1, short of the 3:1 that colour alone would need
+   (until 2026-11). The events page underlines its copy of these links the same way. This rule
+   sits after the line above on purpose: scripts/build-events-page.js lifts the footer CSS up to
+   that line, and the events page has its own rule. */
+.footer-inner a{text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--muted)}
 
 @media(max-width:720px){
-  .hero{padding:24px 18px 16px}
-  .view{padding:18px 16px 70px}
-  .nav-inner{padding:8px 12px}
-  .tab{padding:8px 13px;font-size:13px}
-  .nav-hint{display:none}
+  /* The header filled a phone's first screen, so the map started 792 px down and the Directory's
+     first card 1,428 px down, on an 844 px screen (until 2026-11). */
+  .hero{padding:14px 16px 12px}
+  .eyebrow{margin-top:6px;font-size:10px;letter-spacing:.8px}
+  .tagline{margin-top:6px;font-size:13.5px;line-height:1.45}
+  .tagline .tag-more{display:none}
+  .hero-cta{margin-top:10px;gap:8px}
+  .hero-cta .btn{padding:9px 11px;font-size:12px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .stat b{font-size:17px}
+  .stat span{display:block;font-size:9.5px;letter-spacing:.3px;line-height:1.25}
+  .view{padding:12px 16px 70px}
+  /* the Directory's chips scroll sideways too, like the category row above the map */
+  .dir-controls{gap:8px;margin-bottom:10px}
+  .dir-search{flex-basis:100%;min-width:0;padding-top:10px;padding-bottom:10px}
+  .dir-select{flex:1;min-width:0;padding:9px 10px;font-size:13px}
+  .cat-chips,.need-chips,.map-filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .cat-chips::-webkit-scrollbar,.need-chips::-webkit-scrollbar,.map-filters::-webkit-scrollbar{display:none}
+  .cat-chips{margin-bottom:8px}
+  .need-chips{margin-top:0;margin-bottom:10px}
+  .cat-chip,.need-chip,.need-label{flex:none}
+  .need-label{white-space:nowrap}
+  .map-filters{padding:6px 12px}
+  .map-filters .need-chips{flex:none;margin-bottom:0;overflow:visible}
+  .map-filters .dir-select{flex:none}
   .map-search{width:calc(100% - 70px)}
   /* the search takes the whole top row on a phone, so the presets drop below it */
   .map-view-switch{top:60px}
+  .map-note{top:106px}
   .mv-btn{padding:7px 11px;font-size:12px}
+  /* one row of categories that scrolls sideways, rather than five rows above the map,
+     and it sits right under the nav, so it still makes the first screen */
+  .view-full{padding-top:0}
+  .cat-bar{flex-wrap:nowrap;overflow-x:auto;padding:8px 12px}
+  /* the search takes the galaxy's top row too, so its hint wraps at the foot of the canvas */
+  .gx-hint{top:auto;bottom:10px;width:max-content;max-width:calc(100% - 24px);white-space:normal;
+    text-align:center;font-size:12px;padding:6px 14px}
+}
+/* One row of tabs that scrolls sideways: this bar sticks, and on a phone its three rows took a fifth
+   of the screen. A short window takes it too, such as a phone on its side or a zoomed-in laptop,
+   where two rows took 107 px of 390 and left the map search's list no room. */
+@media (max-width:720px),(max-height:500px){
+  .nav-inner{flex-wrap:nowrap;overflow-x:auto;padding:6px 10px;scrollbar-width:none}
+  .nav-inner::-webkit-scrollbar{display:none}
+  .tab{flex:none;padding:7px 11px;font-size:13px}
+  .tab .ico{display:none}
+  .nav-gh{flex:none}
+  .nav-hint{display:none}
+}
+/* On a touch screen one finger pans the map, so a map as tall as the screen left no page
+   to swipe. Keep the map and the galaxy to two-thirds of the screen there. */
+@media (max-width:720px), (pointer:coarse){
+  #view-map.active,#view-galaxy.active{height:auto;min-height:0}
+  .map-wrap,.galaxy-wrap{flex:none;height:65vh;min-height:320px}
 }
 </style>
 </head>
@@ -431,7 +596,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 
 <div id="newBanner" class="new-banner" style="display:none">
   <span id="newBannerText"></span>
-  <a href="#" onclick="switchView('directory');document.getElementById('dirSort').value='new';renderCards();return false">see what's new</a>
+  <a href="updates/" onclick="dismissNewBanner()">see what's new</a>
   <button class="nb-x" aria-label="Dismiss" onclick="dismissNewBanner()">✕</button>
 </div>
 
@@ -443,6 +608,22 @@ browse the <a href="e/">full organization index</a> or use the open dataset
       <button class="btn btn-sec" id="slAdopt" style="display:none" onclick="adoptShortlist()">★ Save all to my shortlist</button>
       <button class="btn btn-sec" id="slShare" onclick="shareShortlist(this)">🔗 Copy share link</button>
       <button class="btn btn-pri" id="slPrint" onclick="window.print()">🖨 Print</button>
+    </div>
+  </div>
+</div>
+
+<div id="askModal" class="modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="askTitle" tabindex="-1">
+  <div class="modal-card">
+    <div class="modal-head"><b id="askTitle">Ask your own AI</b><button class="sl-x" aria-label="Close" onclick="closeAsk()">✕</button></div>
+    <p class="ask-lead">The atlas doesn't run a chatbot. Describe your situation, copy the prompt, and paste it into the AI assistant you already use. It tells the assistant to answer from the atlas's own data, with a link to each organization.</p>
+    <label class="ask-label" for="askSituation">Your situation</label>
+    <textarea class="ask-box" id="askSituation" placeholder="For example: two of us in Worcester with a working demo, and we need a first hospital pilot." oninput="renderAsk()"></textarea>
+    <details class="ask-rules" id="askRules"><summary>Read the whole prompt</summary><pre id="askPrompt" tabindex="0"></pre></details>
+    <p class="ask-note"><b>For the fullest answer, attach the data file.</b> Download it and add it to your message along with the prompt. Without it, your assistant has to fetch the file itself, and web tools can cut a long file short or pass on only a summary.</p>
+    <p class="ask-note">What you type stays in this browser until you paste it. After that, your assistant's own terms apply. Answers come from your assistant, not the atlas, so check anything important with the organization. You can also <a href="atlas-ai.txt" target="_blank" rel="noopener">read the data yourself</a>.</p>
+    <div class="modal-actions">
+      <a class="btn btn-sec" href="atlas-ai.txt" download>Download the data</a>
+      <button class="btn btn-pri" id="askCopy" onclick="copyAskPrompt(this)">Copy the prompt</button>
     </div>
   </div>
 </div>
@@ -474,7 +655,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     <a href="https://the-open-accelerator.com/" class="flex items-center gap-3 z-50">
       <img id="header-logo" src="https://the-open-accelerator.com/images/toa-white.png" alt="The Open Accelerator" class="h-10 w-auto">
     </a>
-    <nav class="hidden lg:flex items-center gap-5">
+    <nav class="hidden lg:flex items-center gap-5" aria-label="The Open Accelerator">
       <a href="https://the-open-accelerator.com/about-why.html" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">About<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
       <a href="https://the-open-accelerator.com/residency/" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">Residency<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
       <a href="https://the-open-accelerator.com/community/" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">Community<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
@@ -495,14 +676,14 @@ browse the <a href="e/">full organization index</a> or use the open dataset
         <svg class="w-5 h-5 hidden dark:block text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         <svg class="w-5 h-5 block dark:hidden text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-gray-800 dark:text-white focus:outline-none" aria-label="Open Menu" aria-expanded="false" id="mobile-menu-btn">&#9776;</button>
+      <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-gray-800 dark:text-white bg-transparent border-0 focus:outline-none" aria-label="Open Menu" aria-expanded="false" id="mobile-menu-btn">&#9776;</button>
     </div>
   </div>
 </header>
 
 <!-- Mobile Nav Overlay -->
 <div id="mobile-nav" class="fixed inset-0 bg-white/95 dark:bg-dark-bg/95 z-[3000] flex flex-col items-center justify-center gap-6 transform translate-x-full transition-transform duration-300 lg:hidden backdrop-blur-sm">
-  <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-4xl text-gray-800 dark:text-white" aria-label="Close Menu">&times;</button>
+  <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-4xl text-gray-800 dark:text-white bg-transparent border-0" aria-label="Close Menu">&times;</button>
   <a href="https://the-open-accelerator.com/about-why.html" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">About</a>
   <a href="https://the-open-accelerator.com/residency/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Residency</a>
   <a href="https://the-open-accelerator.com/community/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Community</a>
@@ -516,22 +697,27 @@ browse the <a href="e/">full organization index</a> or use the open dataset
   <a href="https://the-open-accelerator.com/TOAhack/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Help us</a>
 </div>
 
-<header class="hero">
+<!-- A <section> named by the page's title, not a <header>: as a <header> outside <main> it was a
+     second banner landmark beside the TOA site header (until 2026-11). It can't move into <main>,
+     because the sticky view tabs come between it and the views, and on a short phone the tabs
+     would stop sticking at the foot of <main>. As a named section it is a region landmark, so its
+     content still sits in a landmark. -->
+<section class="hero" aria-labelledby="atlasTitle">
   <div class="hero-inner">
     <div class="brand">
-      <h1>Mass <span>AI Atlas</span></h1>
+      <h1 id="atlasTitle">Mass <span>AI Atlas</span></h1>
     </div>
     <p class="eyebrow">Presented by The Open Accelerator · an initiative between the MA AI Hub, Red Hat &amp; IBM</p>
-    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br>Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br>Your contributions make this a valuable resource</p>
+    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br><span class="tag-more">Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br></span>Your contributions make this a valuable resource. Meet the <a href="credits/">mapmakers</a>, or see <a href="updates/">what's new</a>.</p>
     <div class="hero-cta">
-      <a class="btn btn-pri" href="https://the-open-accelerator.com/residency/" target="_blank" rel="noopener">Apply for the TOA Residency</a>
+      <a class="btn btn-pri" href="https://the-open-accelerator.com/residency/" target="_blank" rel="noopener">Learn about the TOA Residency</a>
       <a class="btn btn-sec" href="https://the-open-accelerator.com/community/" target="_blank" rel="noopener">Join the Community</a>
     </div>
     <div class="stats" id="stats"></div>
   </div>
-</header>
+</section>
 
-<nav class="nav">
+<nav class="nav" aria-label="Atlas views">
   <div class="nav-inner">
     <button class="tab active" data-view="map"><span class="ico">🗺️</span>Map</button>
     <button class="tab" data-view="galaxy"><span class="ico">✨</span>Galaxy</button>
@@ -545,14 +731,37 @@ browse the <a href="e/">full organization index</a> or use the open dataset
   </div>
 </nav>
 
+<!-- The views, the drawer and the atlas's own footer are the page's main content. Inside <main>
+     that footer is not a page landmark, so the TOA site footer below is the page's one footer
+     (contentinfo); until 2026-11 screen readers listed two, with nothing to tell them apart
+     (#58). Keep that footer's opening tag exactly as it is, and never quote it in a comment:
+     scripts/build-events-page.js finds the footer by that exact text and copies it to the events
+     page, where it is the footer. <main> starts after the view tabs, because their sticky bar
+     would stop sticking where <main> ends. -->
+<main>
 <section id="view-map" class="view view-full active">
+  <div class="cat-bar" id="mapCatBar" role="group" aria-labelledby="mapCatLabel">
+    <span class="cat-bar-label" id="mapCatLabel">Categories</span>
+  </div>
+  <div class="map-filters" role="group" aria-label="Filter the map">
+    <div class="need-chips" id="mapNeeds"></div>
+    <select class="dir-select stage-select" id="mapStage" aria-label="Filter the map by founder stage">
+      <option value="">Any founder stage</option>
+    </select>
+  </div>
   <div class="map-wrap">
     <div id="map"></div>
-    <div class="map-search">
-      <input id="mapSearch" type="text" placeholder="Search the ecosystem…" autocomplete="off">
-      <div class="map-results" id="mapResults"></div>
+    <div class="map-note" id="mapNote">
+      <span id="mapCount" role="status" aria-live="polite"></span>
+      <button type="button" class="filter-clear" hidden onclick="clearFilters()">Clear filters</button>
     </div>
-    <div class="map-legend" id="mapLegend"><h4>Categories · click to toggle</h4></div>
+    <div class="map-search">
+      <input id="mapSearch" type="text" placeholder="Search the ecosystem…" autocomplete="off"
+        role="combobox" aria-label="Search the ecosystem" aria-autocomplete="list"
+        aria-expanded="false" aria-controls="mapResults">
+      <div class="map-results" id="mapResults" role="listbox" aria-label="Matching organizations"></div>
+    </div>
+    <div class="zoom-hint" aria-hidden="true">Hold <span class="zoom-key">Ctrl</span> and scroll to zoom the map</div>
     <div class="map-view-switch" role="group" aria-label="Map area">
       <button type="button" class="mv-btn" data-view="boston" aria-pressed="true">Boston area</button>
       <button type="button" class="mv-btn" data-view="state" aria-pressed="false">Whole Commonwealth</button>
@@ -561,37 +770,46 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 </section>
 
 <section id="view-galaxy" class="view view-full">
+  <div class="cat-bar" id="gxCatBar" role="group" aria-labelledby="gxCatLabel">
+    <span class="cat-bar-label" id="gxCatLabel">Categories</span>
+  </div>
   <div class="galaxy-wrap">
-    <canvas id="galaxy" role="img" aria-label="Network diagram of how Massachusetts' AI organizations connect. The same information is available as text in the Directory; use the search box below to find and focus any organization."></canvas>
+    <canvas id="galaxy" role="img" aria-label="Network diagram of how Massachusetts' AI organizations connect. The search box and the list of organizations after it reach every one of them by keyboard."></canvas>
     <div class="map-search gx-search">
-      <input id="gxSearch" type="text" placeholder="Find an organization in the galaxy…" autocomplete="off">
-      <div class="map-results" id="gxResults"></div>
+      <input id="gxSearch" type="text" placeholder="Find an organization in the galaxy…" autocomplete="off"
+        role="combobox" aria-label="Find an organization in the galaxy" aria-autocomplete="list"
+        aria-expanded="false" aria-controls="gxResults">
+      <div class="map-results" id="gxResults" role="listbox" aria-label="Matching organizations"></div>
     </div>
     <button class="gx-home" onclick="gxHome()" title="Re-center the galaxy"
       aria-label="Re-center the galaxy view">⌖</button>
-    <div class="gx-hint">Drag to pan · scroll to zoom · hover to trace connections · click a node for details</div>
+    <div class="sr-only" id="gxTree" role="tree" aria-label="Organizations in the galaxy, by category"
+      aria-describedby="gxTreeKeys"></div>
+    <p class="sr-only" id="gxTreeKeys">The arrow keys move through the categories, the right arrow opens one, and Enter opens an organization's details.</p>
+    <div class="gx-hint" aria-hidden="true"><span class="for-mouse">Drag to pan · hold <span class="zoom-key">Ctrl</span> and scroll to zoom · hover to trace connections · click a node for details</span><span class="for-touch">Tap a node to trace its connections, and again for details · pinch to zoom</span><span class="for-keys">↑ ↓ move · → opens a category · ← goes back · Enter opens details</span></div>
     <div class="gx-tip" id="gxTip"></div>
-    <div class="map-legend" id="gxLegend"><h4>Categories · click to toggle</h4></div>
+    <div class="zoom-hint" aria-hidden="true">Hold <span class="zoom-key">Ctrl</span> and scroll to zoom the galaxy</div>
   </div>
 </section>
 
 <section id="view-journey" class="view">
   <h2 class="jr-head">The Founder Journey</h2>
-  <p class="jr-sub">Massachusetts' ecosystem mapped to where <em>you</em> are. Pick your stage — every resource below is curated for that moment, with a reason why it matters.</p>
-  <div class="stepper" id="stepper"></div>
+  <p class="jr-sub">Massachusetts' ecosystem mapped to where <em>you</em> are. Pick your stage, then the pathway that sounds like you: an ordered list of what to do next, with the reason for each step. Everything at that stage is listed below it.</p>
+  <div class="stepper" id="stepper" role="group" aria-label="Your founder stage"></div>
   <div class="jr-panel" id="jrPanel"></div>
 </section>
 
 <section id="view-directory" class="view">
   <div class="dir-controls">
-    <input class="dir-search" id="dirSearch" type="text" placeholder="Search by name, tag, or keyword…">
-    <select class="dir-select" id="dirStage" aria-label="Filter by founder stage">
+    <input class="dir-search" id="dirSearch" type="text" placeholder="Search by name, need, topic, or place…">
+    <select class="dir-select stage-select" id="dirStage" aria-label="Filter by founder stage">
       <option value="">Any founder stage</option>
     </select>
     <select class="dir-select" id="dirSort" aria-label="Sort organizations">
       <option value="name">Sort: A → Z</option>
       <option value="cat">Sort: Category</option>
       <option value="new">Sort: Recently added</option>
+      <option value="deadline">Sort: Closing soon</option>
     </select>
   </div>
   <div class="cat-chips" id="catChips"></div>
@@ -599,7 +817,11 @@ browse the <a href="e/">full organization index</a> or use the open dataset
   <!-- announced on change, so a screen-reader user hears the consequence of a
        filter, not just the chip's own pressed state. Search is debounced so this
        does not fire once per keystroke. -->
-  <div class="dir-count" id="dirCount" role="status" aria-live="polite"></div>
+  <div class="dir-count-row">
+    <div class="dir-count" id="dirCount" role="status" aria-live="polite"></div>
+    <button type="button" class="filter-clear" hidden onclick="clearFilters()">Clear filters</button>
+    <button type="button" class="ask-open" id="askOpen" onclick="openAsk()">🤖 Ask your own AI</button>
+  </div>
   <div class="cards" id="cards"></div>
 </section>
 
@@ -624,9 +846,11 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     </div>
     <b>Mass AI Atlas</b> · A project of <a href="https://the-open-accelerator.com" target="_blank" rel="noopener">The Open Accelerator</a> · Curated <span id="footCurated" data-computed>—</span> · <span id="footCount" data-computed>—</span> organizations across Massachusetts.<br>
     Some pin locations are approximate (nearest neighborhood) and community groups move between venues — always check the official site before visiting.<br>
-    Know something we missed? <a href="#" onclick="suggestEntry();return false">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a href="https://github.com/holzerjm/mass-ai-atlas" target="_blank" rel="noopener">GitHub</a>.
+    Know something we missed? <a href="#" onclick="suggestEntry();return false">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a id="footGhLink" href="https://github.com/holzerjm/mass-ai-atlas" target="_blank" rel="noopener">GitHub</a>.<br>
+    Meet the <a href="credits/">mapmakers</a> whose work is in the atlas, or see <a href="updates/">what's new</a>.
   </div>
 </footer>
+</main>
 
 <!-- ============ STANDARD TOA SITE FOOTER ============ -->
 <footer class="py-16 text-center text-gray-500 text-sm relative z-10 border-t border-white/10">
@@ -666,7 +890,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
 <!-- Ajv 8.17.1 is the newest browser build on a CDN (npm uses 8.20.0); its advisory
      GHSA-2g4f-4pwh-qvx6 needs the $data option, which atlas-data.js doesn't enable -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.17.1/ajv7.min.js"></script>
-<script src="atlas-data.js"></script>
+<script src="atlas-data.js?v=c62436b9fc"></script>
 <script>
 /* Data loader: fetch data/*.yml + schemas, validate (atlas-data.js), expose
    CATS / STAGES / DATA as globals, then start the app script below. The app is
@@ -731,6 +955,11 @@ window.flagEntry = flagEntry;
   if(sb) sb.addEventListener("click", suggestEntry);
   const gl = document.getElementById("ghLink");
   if(gl) gl.href = "https://github.com/"+GH_REPO;
+  // The footer's link to the repository is written into the HTML, so point it at GH_REPO too,
+  // or a copy's footer links to the repository it was copied from. The events page has no
+  // such script; scripts/build-events-page.js sets its copy of the link at build time.
+  const fg = document.getElementById("footGhLink");
+  if(fg) fg.href = "https://github.com/"+GH_REPO;
 })();
 
 /* ---------- category ink ----------
@@ -775,9 +1004,12 @@ const cInk = c => `var(--cat-${c}, ${cColor(c)})`;
   const nCats = Object.keys(CATS).length;
   const vcs = DATA.filter(d=>d.cat==="vc"||d.cat==="angel").length;
   const free = DATA.filter(d=>(d.offers||[]).includes("grants")).length;
+  // Three of these open the Directory with that set showing, as links (see initDirectory).
   $("stats").innerHTML = [
-    [total,"organizations"], [nCats,"categories"], [vcs,"capital sources"], [free,"equity-free resources"]
-  ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+    [total,"organizations","./#directory"], [nCats,"categories"],
+    [vcs,"capital sources","?cat=vc,angel#directory"], [free,"equity-free resources","?need=grants#directory"]
+  ].map(([b,s,href])=> href ? `<a class="stat" href="${href}"><b>${b}</b><span>${s}</span></a>`
+                            : `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
   // the footer used to carry a hand-typed count; it drifted to 101 while the atlas grew
   const fc = $("footCount"); if(fc) fc.textContent = total;
   // "Curated <month>" was hand-typed too, and said June 2026 well into October.
@@ -797,6 +1029,9 @@ const cInk = c => `var(--cat-${c}, ${cColor(c)})`;
 
 /* ---------- tabs ---------- */
 let currentView = "map";
+// How tall the tabs are, for the CSS that keeps things clear of them. That depends on how they wrap.
+new ResizeObserver(([{target}])=>document.documentElement.style.setProperty("--nav-h", target.offsetHeight + "px"))
+  .observe(document.querySelector(".nav"));
 document.querySelectorAll(".tab[data-view]").forEach(t=>{
   t.addEventListener("click", ()=>{
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
@@ -804,9 +1039,13 @@ document.querySelectorAll(".tab[data-view]").forEach(t=>{
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
     currentView = t.dataset.view;
     $("view-"+currentView).classList.add("active");
-    if(currentView==="map" && map) setTimeout(()=>map.invalidateSize(),60);
+    if(currentView==="map" && map) setTimeout(()=>{ map.invalidateSize(); if(frameOnShow) framePins(); },60);
     if(currentView==="galaxy") { gxResize(); gxKick(); }
-    window.scrollTo({top:0});
+    // A jump, because the tabs can be clicked from anywhere and a glide didn't survive that. A view
+    // that's shorter leaves the page at its foot, where the glide waited for seconds behind the
+    // map's work. From the foot of a view that's longer, the browser keeps the footer in place,
+    // which took the page to the foot of the new view, to glide back up through all of it.
+    window.scrollTo({top:0, behavior:"instant"});
     updateURL();
   });
 });
@@ -865,11 +1104,210 @@ fetch("events.json").then(r => r.ok ? r.json() : null).then(j => {
 }).catch(()=>{});
 // open = rolling, or a deadline that hasn't passed; expired dates render as nothing
 const applyOpen = d => d.applyBy === "rolling" || (!!d.applyBy && d.applyBy >= todayYMD());
+// closed = no deadline, and a note saying when the next window is. An expired date isn't this:
+// its note described that deadline, so it stays hidden until someone updates the entry.
+const applyClosed = d => !d.applyBy && !!d.applyNote;
+// pitches = a funder's own page invites founders to send a pitch, with no application process
+// behind it. That's a way in, not an open application, so it never counts as open.
+const takesPitches = d => (d.cat === "vc" || d.cat === "angel") && !!d.applyUrl && !d.applyBy && !d.applyNote;
+// The Directory's Closing soon sort, and the order inside a pathway's step: the nearest date
+// first, then rolling, then everything not taking applications, then by name.
+const applyRank = d => !applyOpen(d) ? "2" : d.applyBy==="rolling" ? "1" : "0" + d.applyBy;
+const byClosing = (a,b)=> applyRank(a).localeCompare(applyRank(b)) || a.name.localeCompare(b.name);
 // Checked at call time, not cached: the preference can change mid-session.
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 // CSS handles animations and transitions; these are the motions JS drives.
 const mapGoTo = (ll, z) => reduceMotion() ? map.setView(ll, z) : map.flyTo(ll, z, {duration:.9});
+const STREET_ZOOM = 15;   // from here in, no pin is inside a cluster
 const fmtDeadline = v => { const [y,m,dd] = v.split("-"); return `${MONTH_NAMES[+m-1]} ${+dd}, ${y}`; };
+
+/* ---------- filters ---------- */
+// One set of filters for the map and the Directory: the categories that show, what a founder
+// needs, their stage, and whether applications are open. Until 2026-11 only the Directory had
+// needs and stages, and a reload cleared them. They live in the address now, so a reload keeps
+// them and a link shares them (`?need=compute&stage=3`). What someone types in a search box
+// stays out of it on purpose: a link, a server log or an analytics beacon should never carry
+// a founder's own sentence.
+const activeCats = new Set();
+const dirNeeds = new Set();   // soft needs — values from the `offers` vocabulary
+let dirStage = "";            // a stage's number as a string, or "" for every stage
+let dirOpenOnly = false;      // ⏳ hard constraint: is this org accepting applications?
+// Unknown values are ignored, as they are for ?entry= and ?list=.
+function readFilters(params){
+  const listed = name => (params.get(name) || "").split(",");
+  const cats = listed("cat").filter(k => CATS[k]);
+  activeCats.clear();
+  (cats.length ? cats : Object.keys(CATS)).forEach(k => activeCats.add(k));
+  dirNeeds.clear();
+  listed("need").filter(k => OFFERS_META[k]).forEach(k => dirNeeds.add(k));
+  dirStage = STAGES.some(s => String(s.n) === params.get("stage")) ? params.get("stage") : "";
+  dirOpenOnly = params.get("open") === "1";
+}
+readFilters(new URLSearchParams(location.search));
+function writeFilters(params){
+  const put = (name, value) => { if(value) params.set(name, value); else params.delete(name); };
+  const cats = Object.keys(CATS).filter(k => activeCats.has(k));
+  put("cat", cats.length < Object.keys(CATS).length ? cats.join(",") : "");
+  put("need", Object.keys(OFFERS_META).filter(k => dirNeeds.has(k)).join(","));
+  put("stage", dirStage);
+  put("open", dirOpenOnly ? "1" : "");
+  put("sort", $("dirSort").value === "name" ? "" : $("dirSort").value);
+}
+const filtersOn = () => activeCats.size < Object.keys(CATS).length || dirNeeds.size > 0 || dirStage !== "" || dirOpenOnly;
+// Category and stage gate the list, and so does ⏳: it is a fact about the org, not a need it
+// satisfies, so it must never become a term in need matching (or, later, in need scoring).
+const passesFilters = d => activeCats.has(d.cat) && (!dirStage || (d.stages||[]).includes(+dirStage))
+  && (!dirOpenOnly || applyOpen(d));
+// Needs run last, against whatever the hard filters left, and they relax instead
+// of dead-ending: show the entries meeting the most selected needs that anything
+// here meets. 97 of 171 orgs offer exactly one thing, so demanding all of three
+// returned nothing in 40 of 56 combinations — an empty page while a good answer
+// sat one band below. The band is constant across the result set, so the sort the
+// reader chose still means what it says.
+function meetNeeds(list){
+  if(!dirNeeds.size) return { list, band: 0 };
+  const needs = [...dirNeeds];
+  const met = d => needs.reduce((n,x)=>n + ((d.offers||[]).includes(x) ? 1 : 0), 0);
+  let band = list.reduce((hi,d)=>Math.max(hi, met(d)), 0);
+  // Relax, but never all the way down to "meets any one of these" — with two or
+  // more chips that band is not an answer, it is the whole directory wearing a
+  // filter (funding+talent would return 130 of 171). Measured: this floor leaves
+  // 3- and 4-chip results untouched and cuts the 2-chip worst case from 130 to 22.
+  // Below the floor we show nothing, which is the honest report that no org here
+  // does both — the very thing the founder was asking.
+  if(needs.length > 1 && band < 2) band = 0;
+  return { list: band ? list.filter(d=>met(d) === band) : [], band };
+}
+const needsRelaxed = band => dirNeeds.size > 1 && band > 0 && band < dirNeeds.size;
+const needsNote = band => needsRelaxed(band) ? ` · none offer all ${dirNeeds.size} — these meet ${band}` : "";
+// Every control for a filter shows the same state, on the map and in the Directory.
+function syncFilters(){
+  document.querySelectorAll(".need-chip").forEach(chip=>{
+    const on = chip.dataset.need === "open" ? dirOpenOnly : dirNeeds.has(chip.dataset.need);
+    chip.classList.toggle("on", on);
+    chip.setAttribute("aria-pressed", String(on));
+  });
+  document.querySelectorAll(".stage-select").forEach(sel=>{ sel.value = dirStage; });
+  document.querySelectorAll("#catChips .cat-chip, #mapCatBar .cat-btn").forEach(el=>{
+    const on = activeCats.has(el.dataset.cat);
+    el.classList.toggle("on", on);
+    el.setAttribute("aria-pressed", String(on));
+  });
+}
+function filtersChanged(){ syncFilters(); drawPins(); renderCards(); updateURL(); }
+function clearFilters(){
+  readFilters(new URLSearchParams());
+  $("dirSearch").value = "";
+  filtersChanged();
+  framePins();
+  // the button just pressed has gone, so the focus moves to the first filter in this view
+  document.querySelector(currentView === "map" ? "#mapNeeds .need-chip" : "#needChips .need-chip").focus({preventScroll:true});
+}
+window.clearFilters = clearFilters;
+window.filtersChanged = filtersChanged;
+
+/* ---------- search ---------- */
+// Word by word, in the founder's words rather than the atlas's. Until 2026-11 each search box
+// looked for the whole query as one exact string, so any sentence found nothing, "wet lab"
+// missed LabCentral's "wet-lab", "women" missed January Ventures' "Woman-led", and "grant"
+// missed 8 of the 17 entries that offer grants. The three boxes share this now.
+const foldText = s => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .replace(/['’]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const SEARCH_SKIP = new Set(("a about after again all also am an and any are around as at be been being but by can could " +
+  "did do does doing dont for from get getting go going got had has have having help here how i id if im in into is it its " +
+  "ive just know let like looking lot make me more most much my need needs no not now of on one only or our out over please " +
+  "really right so some still than that the their them then there these they thing things this those to too two three four " +
+  "five six seven eight nine ten up us very want wants was we were what when where which who why will with would yet you your").split(" "));
+// In a sentence these say nothing: most of the atlas is AI, for startups, in Massachusetts.
+const SEARCH_VAGUE = new Set(["ai", "startup", "founder", "company", "massachusett"]);
+// Words that mean the same thing here. A founder's word finds the atlas's, and the other way round.
+const SEARCH_SAME = [
+  ["grant", "non dilutive", "nondilutive", "equity free", "no equity", "prize", "win money", "free money"],
+  ["pre seed", "preseed"],
+  ["community", "network", "networking", "meet people", "peer"],
+  ["accelerator", "incubator"],
+  ["lab space", "lab bench"],
+  ["government", "state", "public sector"],
+  ["woman", "women", "female"],
+  ["cofounder", "co founder"],
+  ["gpu", "compute", "cloud credit"],
+  ["pilot", "customer", "design partner"],
+  ["invest", "investor", "investment", "fund", "funder", "funding"],
+  ["vc", "venture capital"],
+  ["hire", "hiring", "recruit", "recruiting", "talent"],
+  ["desk", "coworking", "co working", "office space"],
+  ["mentor", "mentorship", "advisor", "coach"],
+  ["health", "healthcare", "medical", "medtech", "clinical"],
+  ["biotech", "life science", "pharma"],
+  ["climate", "cleantech", "clean tech"],
+  ["defense", "defence", "dual use", "military"],
+  ["security", "cybersecurity", "cyber"],
+  ["meetup", "meet up"],
+];
+const searchSame = new Map(SEARCH_SAME.flatMap(group => group.map(w => [w, group])));
+const singular = w => w.length > 4 && w.endsWith("ies") ? w.slice(0, -3) + "y"
+  : w.length > 3 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w;
+// A query becomes terms: each a word or phrase, with the other ways to say it. A term's first
+// form identifies it, so "grant" and "non-dilutive" in one query count once.
+function searchTerms(query){
+  const words = foldText(query).split(" ").filter(Boolean), terms = [], seen = new Set();
+  const add = (label, forms) => { if(!seen.has(forms[0])){ seen.add(forms[0]); terms.push({label, forms}); } };
+  for(let i = 0; i < words.length; ){
+    const n = [3, 2, 1].find(n => { const p = words.slice(i, i + n).join(" "); return i + n <= words.length && (searchSame.has(p) || searchSame.has(singular(p))); });
+    if(n){
+      const phrase = words.slice(i, i + n).join(" ");
+      add(phrase, searchSame.get(phrase) || searchSame.get(singular(phrase)));
+      i += n;
+      continue;
+    }
+    const w = words[i++], one = singular(w);
+    if(!SEARCH_SKIP.has(w)) add(w, one === w ? [w] : [one, w]);
+  }
+  if(!terms.length) words.forEach(w => add(w, [w]));   // nothing but small words: look for them after all
+  const specific = terms.filter(t => !SEARCH_VAGUE.has(t.forms[0]));
+  return terms.length > 3 && specific.length ? Object.assign(specific, {sentence:true}) : terms;
+}
+// Each field is folded once, with a space at each end so a word's start can be found. A name, a
+// tag or an offer says more about an entry than a passing word in its description does.
+const SEARCH_FIELDS = [["name", 4], ["vocab", 4], ["place", 3], ["cat", 2], ["text", .25]];
+let searchDocs = null;
+function searchDoc(d){
+  const pad = s => " " + foldText(s) + " ";
+  searchDocs = searchDocs || Object.fromEntries(DATA.map(e => [e.id, {
+    name: pad(e.name), place: pad(e.loc), cat: pad(cLabel(e.cat)), text: pad(e.desc + " " + (e.why||"")),
+    vocab: pad([...(e.tags||[]), ...(e.offers||[]).map(o => OFFERS_META[o].label)].join(" ")),
+  }]));
+  return searchDocs[d.id];
+}
+// A form matches at the start of a word, so "robot" finds "robotics" and "mit" doesn't find
+// "summit". One or two letters must be the whole word: "ai" is not "air", nor "vc" a word's start.
+const hasForm = (text, form) => text.includes(" " + form + (form.length < 3 ? " " : ""));
+const termWeight = (d, term) => {
+  const doc = searchDoc(d);
+  const field = SEARCH_FIELDS.find(([f]) => term.forms.some(form => hasForm(doc[f], form)));
+  return field ? field[1] : 0;
+};
+// Returns the entries of `list`, best first. `exact` says they match every term. A sentence
+// never will, and a pair of words may not, so then the closest entries come back instead:
+// a rare word counts for more than a common one, and those well behind the best are dropped.
+// `words` says which of the founder's words each entry matched on.
+function searchEntries(query, list = DATA){
+  const terms = searchTerms(query);
+  if(!terms.length) return { list, exact: true, words: {} };
+  const rarity = terms.map(t => { const n = DATA.filter(d => termWeight(d, t)).length; return n ? Math.log(1 + DATA.length / n) : 0; });
+  const scored = list.map(d => {
+    let score = 0, met = 0;
+    const words = [];
+    terms.forEach((t, i) => {
+      const w = termWeight(d, t);
+      if(w){ score += w * rarity[i]; met++; if(w > 1) words.push(t.label); }
+    });
+    return { d, score, met, words };
+  }).filter(x => x.met).sort((a, b) => b.score - a.score || a.d.name.localeCompare(b.d.name));
+  const all = terms.sentence ? [] : scored.filter(x => x.met === terms.length);
+  const found = all.length ? all : scored.filter(x => x.score >= scored[0].score / 2).slice(0, 24);
+  return { list: found.map(x => x.d), exact: all.length > 0, words: Object.fromEntries(found.map(x => [x.d.id, x.words])) };
+}
 
 /* ---------- html escaping (entry text is data, never markup) ---------- */
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -972,6 +1410,7 @@ window.findMeetingPlaces = findMeetingPlaces;
 
 function openDrawer(id){
   const d = byId[id]; if(!d) return;
+  const again = $("drawer").classList.contains("open");
   const col = cColor(d.cat);
   $("drCat").textContent = cLabel(d.cat);
   $("drCat").style.color = cInk(d.cat);
@@ -980,6 +1419,8 @@ function openDrawer(id){
   let html = `<p>${esc(d.desc)}</p>`;
   if(d.why) html += `<div class="dr-why" style="--cc:${col}"><b>Why it matters for founders</b><div>${esc(d.why)}</div></div>`;
   if(applyOpen(d)) html += `<div class="dr-apply">⏳ Applications open — ${d.applyBy==="rolling" ? "rolling" : "apply by " + fmtDeadline(d.applyBy)}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`;
+  else if(applyClosed(d)) html += `<div class="dr-apply dr-closed">⏸ Applications closed · ${esc(d.applyNote)}${d.applyUrl ? ` — <a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">how to apply ↗</a>` : ""}</div>`;
+  else if(takesPitches(d)) html += `<div class="dr-apply dr-pitch">📨 Takes pitches — <a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">how to pitch ↗</a></div>`;
   if(eventHosts[d.id]) html += `<div class="dr-apply dr-event">🎟 Hosting: ${esc(eventHosts[d.id].title)} — <a href="events/" target="_blank" rel="noopener">all events</a></div>`;
   if(d.offers && d.offers.length) html += `<div class="dr-sec">What founders get</div><div class="chips">` +
     d.offers.map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join(" ") + `</div>`;
@@ -998,13 +1439,16 @@ function openDrawer(id){
   const rel = (d.links||[]).filter(x=>byId[x]);
   const backRel = DATA.filter(o=>(o.links||[]).includes(d.id) && !rel.includes(o.id)).map(o=>o.id);
   const allRel = [...rel, ...backRel];
+  // buttons, so the galaxy's connections can be followed from the keyboard too
   if(allRel.length) html += `<div class="dr-sec">Connected to</div><div class="chips">` +
-    allRel.map(x=>{const o=byId[x];return `<span class="chip" onclick="openDrawer('${x}')"><span class="lg-dot" style="color:${cColor(o.cat)};background:${cColor(o.cat)}"></span>${esc(o.name)}</span>`}).join("") + `</div>`;
+    allRel.map(x=>{const o=byId[x];return `<button type="button" class="chip" onclick="openDrawer('${x}')"><span class="lg-dot" style="color:${cColor(o.cat)};background:${cColor(o.cat)}"></span>${esc(o.name)}</button>`}).join("") + `</div>`;
   if(d.lastVerified) html += isStale(d)
     ? `<div class="dr-verified stale">⚠️ Last verified ${fmtMonth(d.lastVerified)} — details may have changed. Spot something off? Use 🚩 Flag below.</div>`
     : `<div class="dr-verified">✓ ${fmtVerified(d.lastVerified)}</div>`;
+  const applyNow = applyOpen(d) && d.applyUrl;
   html += `<div class="dr-actions">
-    <a class="btn btn-pri" href="${esc(d.url)}" target="_blank" rel="noopener">Visit website ↗</a>
+    ${applyNow ? `<a class="btn btn-pri" href="${esc(d.applyUrl)}" target="_blank" rel="noopener">Apply ↗</a>` : ""}
+    <a class="btn ${applyNow ? "btn-sec" : "btn-pri"}" href="${esc(d.url)}" target="_blank" rel="noopener">Visit website ↗</a>
     <button class="btn btn-sec" onclick="goToMap('${d.id}')">Show on map</button>
     <button class="btn btn-sec" onclick="toggleStar('${d.id}');openDrawer('${d.id}')" title="Save to your shortlist">${starSet.has(d.id)?"★ Saved":"☆ Save"}</button>
     <button class="btn btn-sec" onclick="copyLink(this)" title="Copy a shareable link to this entry">🔗 Copy link</button>
@@ -1016,7 +1460,7 @@ function openDrawer(id){
   $("overlay").classList.add("on");
   drawerId = d.id;
   updateURL();
-  dialogOpened($("drawer"));
+  dialogOpened($("drawer"), again);
 }
 window.openDrawer = openDrawer;
 function closeDrawer(){ $("drawer").classList.remove("open"); $("overlay").classList.remove("on"); drawerId = null; updateURL(); dialogClosed(); }
@@ -1032,11 +1476,15 @@ const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select,t
 let focusReturn = null;
 function openDialogEl(){
   if($("drawer").classList.contains("open")) return $("drawer");
-  for(const id of ["compareModal","shortlistModal"]) if($(id).style.display === "flex") return $(id);
+  for(const id of ["askModal","compareModal","shortlistModal"]) if($(id).style.display === "flex") return $(id);
   return null;
 }
-function dialogOpened(el){
-  focusReturn = document.activeElement;
+// `again`: the dialog was already open, and is being redrawn from inside (the drawer's
+// "Connected to" entries and ☆ Save). It keeps its first return point. By now the redraw has
+// removed the button just pressed, so the focus has fallen to <body>; taking that as the
+// return point left focus nowhere when the drawer closed.
+function dialogOpened(el, again){
+  if(!again) focusReturn = document.activeElement;
   const first = el.querySelector(FOCUSABLE);
   (first || el).focus();
 }
@@ -1056,32 +1504,190 @@ document.addEventListener("keydown", e=>{
 // Escape closes whatever is actually on top, not always the drawer.
 document.addEventListener("keydown", e=>{
   if(e.key !== "Escape") return;
-  if($("compareModal").style.display === "flex") closeCompare();
+  if($("askModal").style.display === "flex") closeAsk();
+  else if($("compareModal").style.display === "flex") closeCompare();
   else if($("shortlistModal").style.display === "flex") closeShortlist();
   else closeDrawer();
 });
 
+// The map and the galaxy start most of a screen down the page, so what happens on them can be out
+// of sight. This moves the page, if it has to, to show a stretch of the view on show, from `top` to
+// `bottom`, which are where it is on the screen now. It goes to where the nav reaches the top of
+// the window, with the category row under it, and further if `bottom` needs it, which gives up the
+// category row. It stops before `top` is under the nav. The visual viewport is the part of the
+// window that shows: a phone's on-screen keyboard shortens it and can pan it down the page, and
+// innerHeight sees neither.
+function bringOnScreen(top, bottom, behavior = reduceMotion() ? "auto" : "smooth"){
+  const nav = document.querySelector(".nav").offsetHeight, seen = visualViewport;
+  const most = top - Math.max(nav, seen.offsetTop);   // any further down the page, and the top is covered
+  const least = bottom - seen.offsetTop - seen.height;   // any less, and the bottom is out of sight
+  if(least <= 0 && most >= 0) return;
+  const navPlace = $("view-"+currentView).getBoundingClientRect().top - nav;
+  window.scrollTo({top: scrollY + Math.min(Math.max(least, navPlace), most), behavior});
+}
+
+// A flight ends in the middle of the map, so until 2026-11 the pin could land below the window:
+// after Show on map at 1366 × 650 it was off the screen with 5% of its popup showing, and a search
+// pick was no better. So the page moves as the flight starts. Leaflet keeps a popup inside the
+// map, and one that needs more than half the map pushes its pin down. So what has to show is the
+// map's top down to the lowest place the pin can stop.
+const POPUP_ROOM = 240;   // the tallest popup, its tip, and Leaflet's gap at the map's edge
+const PIN_ROOM = 24;      // the pin, and a little of the map under it
+function bringPinOnScreen(){
+  const box = $("map").getBoundingClientRect();
+  bringOnScreen(box.top, box.top + Math.max(box.height / 2, POPUP_ROOM) + PIN_ROOM);
+}
+
+// Flies the map to a pin and opens its popup when the map gets there. Until 2026-11 Show on map
+// opened it on a 950 ms timer against a 900 ms flight, and when the timer won, the pin was still
+// inside a cluster and no popup appeared. The first moveend isn't the arrival either: a pan that
+// the flight stops ends inside flyTo, and a zoom or a resize can end during it. So only a moveend
+// at the pin counts. The listeners go on before the map moves, because with reduced motion it can
+// arrive before mapGoTo returns. A newer flight replaces this one, and dragging the map takes it
+// over, so a popup can't open later, out of nowhere.
+let pinFlight = null;
+function flyToPin(id){
+  const pin = markers[id], ll = pin.getLatLng();
+  const stop = ()=>{ map.off(pinFlight); pinFlight = null; };
+  if(pinFlight) stop();
+  pinFlight = {
+    moveend(){
+      if(map.getZoom() !== STREET_ZOOM || !map.getBounds().contains(ll)) return;
+      // A pin that was alone and off the screen can still be missing: the cluster group's zoom
+      // animation only brings in what was inside its clusters, and it ignores moveend until it
+      // ends. So it gets another moveend then, which adds the pin and brings this back here.
+      if(!map.hasLayer(pin)) return clusterGroup.once("animationend", ()=>map.fire("moveend"));
+      stop();
+      pin.openPopup();
+    },
+    dragstart: stop,
+  };
+  map.on(pinFlight);
+  bringPinOnScreen();
+  mapGoTo(ll, STREET_ZOOM);
+}
 function goToMap(id){
   closeDrawer();
-  switchView("map");
   const d = byId[id];
-  setTimeout(()=>{
-    mapGoTo([d.lat,d.lng], 15);
-    const m = markers[id];
-    if(m) setTimeout(()=>{
-      // at z15 clustering is disabled, so this resolves immediately; the
-      // helper covers any edge where the marker is still inside a cluster
-      if(clusterGroup && clusterGroup.hasLayer(m)) clusterGroup.zoomToShowLayer(m, ()=>m.openPopup());
-      else m.openPopup();
-    }, 950);
-  }, 120);
+  // asked to see this one on the map, so filters that hide its pin give way
+  if(!mapEntries().list.includes(d)){ readFilters(new URLSearchParams()); filtersChanged(); }
+  // the map is going to the pin, so framing what the filters left would only fight the flight
+  frameOnShow = false;
+  // A tab goes to the top of the page. From the map that would only take the pin away, so the
+  // page stays put.
+  if(currentView !== "map") switchView("map");
+  setTimeout(()=>flyToPin(id), 120);
 }
 window.goToMap = goToMap;
 
 /* ---------- map ---------- */
 let map, markers = {}, mapTiles, clusterGroup, flatGroup, clustered = true;
+const pinOf = new WeakMap();   // a pin's popup → the pin, to give the focus back on close
 try{ clustered = localStorage.getItem("toa-atlas-cluster") !== "off"; }catch(e){}
-const activeCats = new Set(Object.keys(CATS));
+// The pins are the Directory's list before any search, so the two views agree.
+const mapEntries = () => meetNeeds(DATA.filter(passesFilters));
+function drawPins(){
+  if(!map) return;
+  const group = clustered ? clusterGroup : flatGroup, { list, band } = mapEntries();
+  group.clearLayers();
+  const pins = list.map(d => markers[d.id]);
+  if(clustered) group.addLayers(pins); else pins.forEach(m => group.addLayer(m));
+  const on = filtersOn();
+  $("mapCount").textContent = on ? `${list.length} of ${DATA.length} organizations on the map${needsNote(band)}` : "";
+  $("mapNote").classList.toggle("on", on);
+  $("mapNote").querySelector(".filter-clear").hidden = !on;
+}
+// Leaflet's fly animation stalls while the map is scrolled off-screen and leaves the camera
+// part-way, so only animate when the map is actually in front of someone.
+function mapCanAnimate(){
+  const box = map.getContainer().getBoundingClientRect();
+  return box.bottom > 0 && box.top < innerHeight && !reduceMotion();
+}
+// A need or a stage can leave a handful of pins across the state, most of them outside the
+// Boston view, so frame what is left. Categories don't move the map: hiding one takes pins
+// away from a view someone chose. Filters set in the Directory frame on the way back to the map.
+let frameOnShow = false;
+function framePins(){
+  if(!map) return;
+  if(currentView !== "map"){ frameOnShow = true; return; }
+  frameOnShow = false;
+  if(!dirNeeds.size && !dirStage && !dirOpenOnly) return homeMap();
+  const { list } = mapEntries();
+  if(list.length) map.fitBounds(list.map(d => [d.lat, d.lng]), {padding:[50,50], maxZoom:14, animate:mapCanAnimate()});
+}
+// The row of category buttons above the map and the galaxy: one real button per category,
+// so it is operable by keyboard and announces its state. `shown` is the view's set of
+// visible categories; onToggle(k) redraws after category k is shown or hidden.
+function buildCatBar(bar, shown, onToggle){
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "cat-btn"; b.dataset.cat = k;
+    b.setAttribute("aria-pressed", String(shown.has(k)));
+    b.innerHTML = `<span class="lg-dot" style="color:${v.color};background:${v.color}"></span>${esc(v.label)}`;
+    b.addEventListener("click", ()=>{
+      if(shown.has(k)) shown.delete(k); else shown.add(k);
+      b.setAttribute("aria-pressed", String(shown.has(k)));
+      onToggle(k);
+    });
+    bar.appendChild(b);
+  });
+}
+// The search boxes over the map and the galaxy, each a WAI-ARIA combobox: the results are a
+// listbox that the arrow keys move through and Enter picks from, as a click does, and Escape or
+// a click away closes it. Until 2026-11 only a mouse could pick a result. find(q) returns the
+// entries that match the lowercased query (the first eight are listed), pick(id) acts on the one
+// picked, and cleared(), if given, runs when the box is emptied. Returns close(), to shut the list.
+function searchBox(inp, res, prefix, find, pick, cleared){
+  let active = -1;
+  const opts = () => [...res.querySelectorAll('[role="option"][data-id]')];
+  function setActive(i){
+    const o = opts(); active = i;
+    o.forEach((el,k)=>el.setAttribute("aria-selected", String(k===i)));
+    if(o[i]){ inp.setAttribute("aria-activedescendant", o[i].id); o[i].scrollIntoView({block:"nearest"}); }
+    else inp.removeAttribute("aria-activedescendant");
+  }
+  function close(){ res.classList.remove("open"); inp.setAttribute("aria-expanded", "false"); setActive(-1); }
+  function choose(id){ close(); inp.value = byId[id].name; pick(id); }
+  inp.addEventListener("input", ()=>{
+    const q = inp.value.trim().toLowerCase();
+    if(!q){ close(); res.innerHTML=""; if(cleared) cleared(); return; }
+    res.innerHTML = find(q).slice(0,8).map(d=>
+      `<div role="option" id="${prefix}-${d.id}" data-id="${d.id}" aria-selected="false"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</div>`).join("")
+      || `<div role="option" aria-disabled="true" style="color:var(--muted)">No matches</div>`;
+    res.classList.add("open"); inp.setAttribute("aria-expanded", "true"); setActive(-1);
+    res.querySelectorAll("div[data-id]").forEach(el=>{
+      el.addEventListener("click", ()=>choose(el.dataset.id));
+    });
+    listOnScreen(inp, res);
+  });
+  inp.addEventListener("keydown", e=>{
+    const o = opts(), open = res.classList.contains("open");
+    if((e.key==="ArrowDown" || e.key==="ArrowUp") && open && o.length){
+      e.preventDefault();
+      setActive(e.key==="ArrowDown" ? Math.min(active+1, o.length-1) : Math.max(active-1, 0));
+    } else if(e.key==="Enter" && open && o.length){
+      e.preventDefault();
+      choose(o[Math.max(active, 0)].dataset.id);   // Enter with no result chosen takes the first
+    } else if(e.key==="Escape") close();
+  });
+  document.addEventListener("click", e=>{ if(!e.target.closest(".map-search")) close(); });
+  return { close };
+}
+// Each box sits at the top of its canvas, most of a screen down the page, so until 2026-11 the list
+// dropped below the window as someone typed: at 1366 × 650, 11 px of it showed on the map and 56 px
+// on the galaxy. So a list that doesn't fit brings the page to it. That waits for the list, because
+// the focus has nothing to show yet: moving on focus took the page 387 px for a click in the box,
+// and again when a closing popup gave the box the focus back. With the box out of sight the page
+// jumps instead of gliding, because a glide doesn't survive: the browser scrolls to the caret after
+// the input event, which stops one, and after a stall it can start from an old position and drag a
+// finished one back up. A jump leaves it nothing to do. Under the nav counts as out of sight,
+// because scroll-padding-top tells the browser so: its move to the caret stopped the glide there.
+function listOnScreen(inp, res){
+  const box = inp.getBoundingClientRect(), seen = visualViewport;
+  const clear = Math.max(document.querySelector(".nav").offsetHeight, seen.offsetTop);
+  const hidden = box.top < clear || box.bottom > seen.offsetTop + seen.height;
+  bringOnScreen(box.top, res.getBoundingClientRect().bottom, hidden ? "instant" : undefined);
+}
 // OpenFreeMap vector basemap via maplibre-gl-leaflet — keyless, unlimited,
 // commercial use permitted. Leaflet stays the map engine; only the base layer
 // renders through MapLibre GL. Fallback style host if OpenFreeMap ever
@@ -1120,14 +1726,22 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
          .setView(MAP_VIEWS.boston.center, MAP_VIEWS.boston.zoom);
   mapTiles = makeBasemap().addTo(map);
 
+  // Popups get a pane of their own, above everything that floats on the map. Leaflet's popup pane
+  // is inside its map pane, and that pane's z-index of 400 keeps every popup under the search box,
+  // the view switch, the filter note and the map's buttons, at 999 and 1000. Leaflet only keeps a
+  // popup 5 px inside the map, so until 2026-11 most names on a phone were partly hidden (197 of
+  // 198 at 375 × 667), and a tap on × landed on the search box. Padding the popups down instead
+  // pushed pins off a short map once a filter's note showed. This pane is outside the map pane, so
+  // it copies what the map pane does: where it is, and the class that makes a zoom glide.
+  const popupsOver = map.createPane("popupsOver", map.getContainer());
+  map.on("move", ()=>L.DomUtil.setPosition(popupsOver, L.DomUtil.getPosition(map.getPane("mapPane"))));
+  map.on("zoomanim", ()=>popupsOver.classList.add("leaflet-zoom-anim"));
+  map.on("zoomend", ()=>popupsOver.classList.remove("leaflet-zoom-anim"));
+
   function applyMapView(key, animate){
     const v = MAP_VIEWS[key]; if(!v) return;
     mapView = key;
-    // Leaflet's fly animation stalls while the map is scrolled off-screen and leaves the
-    // camera part-way, so only animate when the map is actually in front of someone.
-    const box = map.getContainer().getBoundingClientRect();
-    const onScreen = box.bottom > 0 && box.top < innerHeight;
-    const move = animate && onScreen && !reduceMotion();
+    const move = animate && mapCanAnimate();
     if(v.bounds) map.fitBounds(stateBounds(), {padding:[30,30], animate:move});
     else if(move) map.flyTo(v.center, v.zoom, {duration:.9});
     else map.setView(v.center, v.zoom);
@@ -1140,6 +1754,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
     try{ localStorage.setItem("toa-atlas-mapview", key); }catch(e){}
   }
   window.setMapView = applyMapView;
+  window.homeMap = () => applyMapView(mapView, true);
   document.querySelectorAll(".mv-btn").forEach(b=>
     b.addEventListener("click", ()=>applyMapView(b.dataset.view, true)));
 
@@ -1160,7 +1775,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   // cluster stacked pins at city zoom; street zoom (15+) shows every pin.
   // flatGroup is the unclustered alternative — the ∴ control swaps them.
   clusterGroup = L.markerClusterGroup({
-    showCoverageOnHover:false, maxClusterRadius:46, disableClusteringAtZoom:15,
+    showCoverageOnHover:false, maxClusterRadius:46, disableClusteringAtZoom:STREET_ZOOM,
     spiderfyOnMaxZoom:false,
     iconCreateFunction: c => L.divIcon({className:"",
       html:`<div class="cluster-chip">${c.getChildCount()}</div>`,
@@ -1172,9 +1787,8 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
     if(on === clustered){ return; }
     map.removeLayer(pinGroup());
     clustered = on;
-    const g = pinGroup(); g.clearLayers();
-    DATA.forEach(d=>{ if(activeCats.has(d.cat)) g.addLayer(markers[d.id]); });
-    map.addLayer(g);
+    drawPins();
+    map.addLayer(pinGroup());
     try{ localStorage.setItem("toa-atlas-cluster", on ? "on" : "off"); }catch(e){}
     document.querySelectorAll(".map-cluster-toggle").forEach(b=>{
       b.classList.toggle("off", !on);
@@ -1198,6 +1812,15 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   };
   clusterCtl.addTo(map);
 
+  // Pins at the same spot draw on top of each other at street zoom (clustering
+  // stops at z15 and spiderfy is off), so only the top one can be clicked. Each
+  // popup lists the others within COLOCATED_M instead, and every pin keeps its
+  // exact coordinates. tests/helpers/atlas.js's metersBetween is the same
+  // haversine, so the page and the tests agree on which pairs count.
+  const COLOCATED_M = 25;
+  const colocated = Object.fromEntries(DATA.map(d => [d.id,
+    DATA.filter(o => o !== d && metresBetween(d.lat, d.lng, o.lat, o.lng) <= COLOCATED_M)]));
+
   DATA.forEach(d=>{
     const col = cColor(d.cat);
     const icon = L.divIcon({className:"", html:
@@ -1208,60 +1831,57 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
       `<div class="pop-name">${esc(d.name)}</div>`+
       `<div class="pop-cat" style="color:${cInk(d.cat)}">${cLabel(d.cat)}</div>`+
       `<div class="pop-desc">${esc(d.desc.length>140 ? d.desc.slice(0,140)+"…" : d.desc)}</div>`+
-      `<span class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</span>`,
-      {maxWidth:260});
-    pinGroup().addLayer(m);
+      (colocated[d.id].length ? `<div class="pop-colocated">Also here: ${colocated[d.id].map(o =>
+        `<a href="?entry=${o.id}" onclick="openDrawer('${o.id}');return false">${esc(o.name)}</a>`).join(", ")}</div>` : "")+
+      `<button type="button" class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</button>`,
+      {maxWidth:260, pane:"popupsOver"});
+    pinOf.set(m.getPopup(), m);
     markers[d.id] = m;
   });
+  drawPins();
   map.addLayer(pinGroup());
+
+  // A pin's popup takes the focus when it opens, so the keyboard reaches "Full details →".
+  // Leaflet puts popups after every pin in the tab order, and a search pick leaves the focus in
+  // the search box, so until 2026-11 the button was out of a keyboard's reach. Closing the
+  // popup, or Escape inside it, gives the focus back: to where it was, or to the pin when that
+  // place has been hidden (Show on map comes from a drawer over another view).
+  let popupFrom = null;
+  map.on("popupopen", e=>{
+    const btn = e.popup.getElement().querySelector(".pop-btn");
+    if(!btn) return;
+    popupFrom = document.activeElement;
+    btn.focus({preventScroll:true});
+  });
+  map.on("popupclose", e=>{
+    const from = popupFrom, el = e.popup.getElement(), now = document.activeElement;
+    popupFrom = null;
+    if(now !== document.body && !(el && el.contains(now))) return;   // the focus has moved on
+    const pin = pinOf.get(e.popup), back = from && from !== document.body && from.offsetParent ? from : pin && pin.getElement();
+    if(back) back.focus({preventScroll:true});
+  });
+  map.getContainer().addEventListener("keydown", e=>{
+    if(e.key === "Escape" && e.target.closest(".leaflet-popup")) map.closePopup();
+  });
 
   // apply the remembered preset now the pins are on the map (no animation on load)
   applyMapView(mapView, false);
+  if(dirNeeds.size || dirStage || dirOpenOnly) framePins();
 
-  // legend
-  const lg = $("mapLegend");
-  Object.entries(CATS).forEach(([k,v])=>{
-    // a real button, so the legend is operable by keyboard and announces its state
-    const div = document.createElement("button");
-    div.type = "button"; div.className = "lg-item"; div.dataset.cat = k;
-    div.setAttribute("aria-pressed", "true");
-    div.innerHTML = `<span class="lg-dot" style="color:${v.color};background:${v.color}"></span>${v.label}`;
-    div.addEventListener("click", ()=>{
-      if(activeCats.has(k)) activeCats.delete(k); else activeCats.add(k);
-      div.classList.toggle("off", !activeCats.has(k));
-      div.setAttribute("aria-pressed", String(activeCats.has(k)));
-      DATA.forEach(d=>{
-        if(d.cat!==k) return;
-        if(activeCats.has(k)) pinGroup().addLayer(markers[d.id]); else pinGroup().removeLayer(markers[d.id]);
-      });
-    });
-    lg.appendChild(div);
-  });
+  // categories
+  buildCatBar($("mapCatBar"), activeCats, ()=>filtersChanged());
+  // The category row is filled in after Leaflet has measured the map, and it wraps to a
+  // second line on narrower screens, so tell Leaflet whenever the map's box changes size.
+  new ResizeObserver(()=>{ if(currentView==="map") map.invalidateSize(); }).observe(map.getContainer());
 
-  // search
-  const inp = $("mapSearch"), res = $("mapResults");
-  inp.addEventListener("input", ()=>{
-    const q = inp.value.trim().toLowerCase();
-    if(!q){ res.classList.remove("open"); res.innerHTML=""; return; }
-    const hits = DATA.filter(d =>
-      d.name.toLowerCase().includes(q) ||
-      (d.tags||[]).some(t=>t.toLowerCase().includes(q)) ||
-      d.desc.toLowerCase().includes(q) ||
-      cLabel(d.cat).toLowerCase().includes(q)
-    ).slice(0,8);
-    res.innerHTML = hits.map(d=>
-      `<div data-id="${d.id}"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</div>`).join("")
-      || `<div style="color:var(--muted)">No matches</div>`;
-    res.classList.add("open");
-    res.querySelectorAll("div[data-id]").forEach(el=>{
-      el.addEventListener("click", ()=>{
-        res.classList.remove("open"); inp.value = byId[el.dataset.id].name;
-        mapGoTo([byId[el.dataset.id].lat, byId[el.dataset.id].lng], 15);
-        setTimeout(()=>markers[el.dataset.id].openPopup(), 950);
-      });
+  // search: a pick flies the map to the pin and opens its popup
+  searchBox($("mapSearch"), $("mapResults"), "mapr",
+    q => searchEntries(q).list,
+    id => {
+      // the filters may be hiding this pin, and a hidden pin has no popup to open
+      if(!mapEntries().list.includes(byId[id])) return openDrawer(id);
+      flyToPin(id);
     });
-  });
-  document.addEventListener("click", e=>{ if(!e.target.closest(".map-search")) res.classList.remove("open"); });
 })();
 
 /* ---------- galaxy ---------- */
@@ -1270,6 +1890,17 @@ let gxNodes = [], gxEdges = [], gxStars = [], gxW=0, gxH=0, gxDPR=1;
 let gxAdj = [], gxCats = new Set(Object.keys(CATS)), gxLocked = null;
 let gxScale=1, gxOX=0, gxOY=0, gxHover=null, gxDrag=null, gxPanning=false, gxLastX=0, gxLastY=0;
 let gxEnergy = 1;
+// The camera fits the whole galaxy to the canvas, and keeps it fitted while the layout settles,
+// until someone pans or zooms; ⌖ hands it back. Until 2026-11 it opened at the layout's own
+// size, of which a phone showed the middle third, with category labels cut off at both sides.
+let gxAuto = true;
+const GX_MIN_SCALE = 0.15, GX_MAX_SCALE = 4;
+let gxKbd = null;                     // the node whose entry in the keyboard list has focus
+let gxTipNode = null, gxTipHow = "";  // a tooltip pinned to a node by a tap ("touch") or the keys ("keys")
+let gxTipW = 0, gxTipH = 0;
+let gxPointer = "mouse", gxDownX = 0, gxDownY = 0;
+let gxLabelBoxes = [];                // the labels drawn in the last frame, in canvas pixels
+let gxById = {};
 
 (function initGalaxy(){
   const catKeys = Object.keys(CATS);
@@ -1286,6 +1917,7 @@ let gxEnergy = 1;
       x:h.x+(Math.random()-0.5)*160, y:h.y+(Math.random()-0.5)*160, vx:0, vy:0, r:5.5});
   });
   const idx = Object.fromEntries(gxNodes.map((n,i)=>[n.id,i]));
+  gxById = Object.fromEntries(gxNodes.map(n=>[n.id,n]));
   // edges: entity->hub (weak) and explicit links (strong)
   DATA.forEach(d=>{
     gxEdges.push({a:idx[d.id], b:idx["hub:"+d.cat], k:0.004, len:110, soft:true});
@@ -1300,20 +1932,9 @@ let gxEnergy = 1;
     gxNodes[e.a].deg=(gxNodes[e.a].deg||0)+1; gxNodes[e.b].deg=(gxNodes[e.b].deg||0)+1;
   }});
   gxNodes.forEach(n=>{ if(!n.hub) n.r = 5.5 + Math.min(n.deg||0, 8)*0.8; });
-  // category legend (same behavior as the map legend)
-  const lg = $("gxLegend");
-  Object.entries(CATS).forEach(([k,v])=>{
-    const div = document.createElement("button");
-    div.type = "button"; div.className = "lg-item"; div.dataset.cat = k;
-    div.setAttribute("aria-pressed", "true");
-    div.innerHTML = `<span class="lg-dot" style="color:${v.color};background:${v.color}"></span>${v.label}`;
-    div.addEventListener("click", ()=>{
-      if(gxCats.has(k)) gxCats.delete(k); else gxCats.add(k);
-      div.classList.toggle("off", !gxCats.has(k));
-      div.setAttribute("aria-pressed", String(gxCats.has(k)));
-    });
-    lg.appendChild(div);
-  });
+  // categories (the draw loop reads gxCats every frame, so a toggle needs no redraw call;
+  // the keyboard list drops a hidden category's entries)
+  buildCatBar($("gxCatBar"), gxCats, ()=>gxTreeSync());
   // starfield
   for(let i=0;i<160;i++) gxStars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.3+0.3, p:Math.random()*Math.PI*2});
 })();
@@ -1323,10 +1944,56 @@ function gxResize(){
   gxDPR = window.devicePixelRatio||1;
   gxW = wrap.clientWidth; gxH = wrap.clientHeight;
   gxCanvas.width = gxW*gxDPR; gxCanvas.height = gxH*gxDPR;
+  gxFollowFit(true);
 }
 window.addEventListener("resize", ()=>{ if(currentView==="galaxy") gxResize(); });
 
 function gxKick(){ gxEnergy = 1; }
+
+/* fitting the galaxy to its canvas */
+// A canvas narrower than this is a phone's: hub labels drop their "& …" half and shrink a size.
+const gxNarrow = () => gxW < 560;
+const gxHubPx = () => gxNarrow() ? 11.5 : 13;
+const gxHubFont = () => `700 ${gxHubPx()}px Red Hat Display, Segoe UI, sans-serif`;
+const gxHubText = n => gxNarrow() ? n.name.split(" & ")[0] : n.name;
+const gxTextWidths = new Map();
+function gxTextW(text, font){
+  const k = font + "|" + text;
+  if(!gxTextWidths.has(k)){ gxCtx.font = font; gxTextWidths.set(k, gxCtx.measureText(text).width); }
+  return gxTextWidths.get(k);
+}
+// widths measured before the web font arrived are the fallback font's
+if(document.fonts) document.fonts.addEventListener("loadingdone", ()=>gxTextWidths.clear());
+
+// The scale and offset that fit every node, and each hub's label, inside the canvas: below
+// the search box, and above the hint where a phone puts it at the foot. Never larger than the
+// layout's own size, so a big screen shows the galaxy as before.
+function gxFitView(){
+  let x0=Infinity, x1=-Infinity, y0=Infinity, y1=-Infinity;
+  gxNodes.forEach(n=>{ x0=Math.min(x0,n.x); x1=Math.max(x1,n.x); y0=Math.min(y0,n.y); y1=Math.max(y1,n.y); });
+  const mx=(x0+x1)/2, my=(y0+y1)/2, top=64, bottom=gxNarrow() ? 56 : 12;
+  const halfW = gxW/2-12, halfH = (gxH-top-bottom)/2, font = gxHubFont(), px = gxHubPx();
+  let s = 1;
+  const fit = (room, dist) => { if(dist > 0 && room > 0) s = Math.min(s, room/dist); };
+  gxNodes.forEach(n=>{
+    const dx = Math.abs(n.x-mx), glow = n.r*1.5;
+    fit(halfW, dx+glow);
+    fit(halfH, n.y-my+glow);
+    if(n.hub){
+      fit(halfW - gxTextW(gxHubText(n), font)/2, dx);   // a hub's label is centred on it
+      fit(halfH - px, my-n.y+n.r+10);                  // ... and sits above it
+    } else fit(halfH, my-n.y+glow);
+  });
+  s = Math.max(s, GX_MIN_SCALE);
+  return {s, ox:-mx*s, oy:(top-bottom)/2-my*s};
+}
+// Move the camera to the fitted view: at once on entering the view or resizing it, and
+// otherwise a step each frame, so it follows the layout as it settles. Not during a drag.
+function gxFollowFit(snap){
+  if(!gxAuto || gxDrag || !gxW || !gxH) return;
+  const f = gxFitView(), k = snap || reduceMotion() ? 1 : 0.12;
+  gxScale += (f.s-gxScale)*k; gxOX += (f.ox-gxOX)*k; gxOY += (f.oy-gxOY)*k;
+}
 
 function gxStep(){
   // physics
@@ -1356,6 +2023,11 @@ function gxStep(){
   gxNodes.forEach(n=>{
     if(n===gxDrag) { n.vx=0; n.vy=0; return; }
     n.vx*=0.86; n.vy*=0.86;
+    // Two nodes that start almost on top of each other repel hard enough to throw one far
+    // out for a second or two. A fixed camera never showed it, but the fitted one zoomed out
+    // to keep it in view, so no node moves further than this in one step.
+    const v = Math.hypot(n.vx, n.vy);
+    if(v > 24){ n.vx *= 24/v; n.vy *= 24/v; }
     n.x+=n.vx*gxEnergy; n.y+=n.vy*gxEnergy;
   });
   if(gxEnergy>0.18) gxEnergy*=0.999;
@@ -1376,10 +2048,11 @@ function gxDraw(t){
   const cx = gxW/2+gxOX, cy = gxH/2+gxOY;
   ctx.save();
   ctx.translate(cx,cy); ctx.scale(gxScale,gxScale);
-  // hover focus: an entity highlights itself + its linked neighborhood;
+  // focus: an entity highlights itself + its linked neighborhood;
   // a hub highlights its whole category
   let focus = null;
-  const fNode = gxHover || gxLocked;   // search locks a focus; hover overrides it
+  const fNode = gxKbd || gxHover || gxLocked;   // the keys, then hover, then a search or a tap
+  const hlNode = gxKbd || gxHover || gxTipNode;  // drawn larger, its label placed first
   if(fNode){
     focus = new Set();
     const hi = gxNodes.indexOf(fNode);
@@ -1398,12 +2071,13 @@ function gxDraw(t){
     ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
   });
   ctx.globalAlpha = 1;
-  // nodes
+  // nodes; their labels are collected here and placed afterwards, in canvas pixels
+  const labels = [];
   gxNodes.forEach((n,i)=>{
     if(!gxCats.has(n.cat)) return;
     const inFocus = !focus || focus.has(i);
     const col = cColor(n.cat);
-    const hl = n===gxHover;
+    const hl = n===hlNode;
     const r = n.r*(hl?1.4:1);
     const grd = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*3);
     grd.addColorStop(0, col); grd.addColorStop(1, "transparent");
@@ -1411,22 +2085,48 @@ function gxDraw(t){
     ctx.beginPath(); ctx.arc(n.x,n.y,r*3,0,Math.PI*2); ctx.fill();
     ctx.globalAlpha = inFocus ? 1 : 0.15; ctx.fillStyle = col;
     ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2); ctx.fill();
+    // a ring round the node the keys or a tap picked: the keyboard list is never drawn
+    if(hl && n!==gxHover){
+      ctx.globalAlpha = 1; ctx.strokeStyle = "#ffc600"; ctx.lineWidth = 2.5/gxScale;
+      ctx.beginPath(); ctx.arc(n.x,n.y,r+5/gxScale,0,Math.PI*2); ctx.stroke();
+    }
     if(n.hub){
-      ctx.globalAlpha = inFocus ? 1 : 0.25;
-      ctx.fillStyle="rgba(230,236,255,.92)";
-      ctx.font = `700 ${13/gxScale}px Red Hat Display, Segoe UI, sans-serif`;
-      ctx.textAlign="center";
-      ctx.fillText(n.name, n.x, n.y - (r+10)/1);
+      labels.push({n, r, px:gxHubPx(), prio: hl ? 0 : inFocus ? 1 : 3, alpha: inFocus ? 1 : 0.25,
+        text:gxHubText(n), font:gxHubFont(), color:"rgba(230,236,255,.92)", lift:(r+10)*gxScale});
     } else if(hl || (focus ? inFocus : gxScale>1.35)){
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = hl ? "#fff" : "rgba(200,212,255,.8)";
-      ctx.font = `${hl?600:400} ${11/gxScale}px Red Hat Display, Segoe UI, sans-serif`;
-      ctx.textAlign="center";
-      ctx.fillText(n.name, n.x, n.y - r - 6/gxScale);
+      labels.push({n, r, px:11, prio: hl ? 0 : 2, alpha:1, text:n.name,
+        font:`${hl?600:400} 11px Red Hat Display, Segoe UI, sans-serif`,
+        color: hl ? "#fff" : "rgba(200,212,255,.8)", lift:r*gxScale+6});
     }
     ctx.globalAlpha = 1;
   });
   ctx.restore();
+  gxDrawLabels(labels, cx, cy);
+}
+
+// Labels go on in order of importance: the picked node's, the hubs', the traced neighbours'
+// (best connected first), then dimmed hubs'. Each sits above its node, or below it if that
+// spot is taken, and inside the canvas. One with room in neither spot is left off, so a
+// crowded galaxy (a phone, a zoomed-in cluster) shows fewer labels, not a pile of them.
+function gxDrawLabels(labels, cx, cy){
+  const ctx = gxCtx, placed = [];
+  labels.sort((a,b)=> a.prio-b.prio || (b.n.deg||0)-(a.n.deg||0));
+  ctx.textAlign = "center";
+  labels.forEach(L=>{
+    const w = gxTextW(L.text, L.font), sx = cx+L.n.x*gxScale, sy = cy+L.n.y*gxScale;
+    const x = Math.min(Math.max(sx, w/2+4), gxW-w/2-4);
+    for(const y0 of [sy-L.lift, sy+L.r*gxScale+4+L.px*0.8]){
+      const y = Math.min(Math.max(y0, L.px+2), gxH-L.px*0.3-4);
+      const box = {text:L.text, x0:x-w/2-2, y0:y-L.px*0.85-2, x1:x+w/2+2, y1:y+L.px*0.3+2};
+      if(L.prio && placed.some(b=>b.x0<box.x1 && box.x0<b.x1 && b.y0<box.y1 && box.y0<b.y1)) continue;
+      placed.push(box);
+      ctx.globalAlpha = L.alpha; ctx.fillStyle = L.color; ctx.font = L.font;
+      ctx.fillText(L.text, x, y);
+      break;
+    }
+  });
+  ctx.globalAlpha = 1;
+  gxLabelBoxes = placed;
 }
 
 let gxSettleFrames = 0;
@@ -1437,62 +2137,116 @@ function gxLoop(t){
     // holding the clock still.
     const calm = reduceMotion();
     if(!calm || gxSettleFrames < 300){ gxStep(); gxSettleFrames++; }
+    gxFollowFit();
     gxDraw(calm ? 0 : (t||0));
+    gxPinTip();
   }
   requestAnimationFrame(gxLoop);
 }
 requestAnimationFrame(gxLoop);
 
-function gxNodeAt(px,py){
+// the node within `slop` pixels of a canvas point: a finger gets more slop than a mouse
+function gxNodeAt(px,py,slop=8){
   const cx = gxW/2+gxOX, cy = gxH/2+gxOY;
   const x = (px-cx)/gxScale, y = (py-cy)/gxScale;
   let best=null, bd=Infinity;
   gxNodes.forEach(n=>{
     if(!gxCats.has(n.cat)) return;
-    const d=(n.x-x)**2+(n.y-y)**2, rr=(n.r+8/gxScale)**2;
+    const d=(n.x-x)**2+(n.y-y)**2, rr=(n.r+slop/gxScale)**2;
     if(d<rr && d<bd){best=n;bd=d;}
   });
   return best;
 }
-gxCanvas.addEventListener("mousemove", e=>{
+
+// A tooltip pinned to a node, for a tap or the keys: it moves with the node and stays inside
+// the canvas. The mouse's tooltip follows the pointer instead.
+function gxTipHTML(n){
+  if(n.hub){
+    const k = DATA.filter(d=>d.cat===n.cat).length;
+    return `<b>${esc(n.name)}</b><em>${k} organization${k===1?"":"s"}</em>`;
+  }
+  const k = gxAdj[gxNodes.indexOf(n)].size;
+  return `<b>${esc(n.name)}</b><span style="color:${cColor(n.cat)}">${cLabel(n.cat)}</span>` +
+    `<em>${k ? `${k} connection${k===1?"":"s"}` : "No connections"}</em>` +
+    (gxTipHow==="touch" ? `<em>Tap again for details</em>` : "");
+}
+function gxShowTip(n, how){
+  gxTipNode = n; gxTipHow = how;
+  gxTip.innerHTML = gxTipHTML(n); gxTip.style.display = "block";
+  gxTipW = gxTip.offsetWidth; gxTipH = gxTip.offsetHeight;
+  gxPinTip();
+}
+function gxHideTip(){ gxTipNode = null; gxTipHow = ""; gxTip.style.display = "none"; }
+function gxPinTip(){
+  const n = gxTipNode; if(!n) return;
+  const sx = gxW/2+gxOX+n.x*gxScale, sy = gxH/2+gxOY+n.y*gxScale;
+  let x = sx+14, y = sy+12;
+  if(x+gxTipW > gxW-8) x = Math.max(8, sx-14-gxTipW);
+  if(y+gxTipH > gxH-8) y = Math.max(8, sy-12-gxTipH);
+  gxTip.style.left = x+"px"; gxTip.style.top = y+"px";
+}
+
+// A mouse hovers, drags and clicks. A finger pans and pinches in the touch handlers further
+// down, and its tap arrives as a click, which gxTap() handles.
+gxCanvas.addEventListener("pointermove", e=>{
+  if(e.pointerType!=="mouse") return;
   const rect = gxCanvas.getBoundingClientRect();
   const px=e.clientX-rect.left, py=e.clientY-rect.top;
   if(gxDrag){
     const cx=gxW/2+gxOX, cy=gxH/2+gxOY;
     gxDrag.x=(px-cx)/gxScale; gxDrag.y=(py-cy)/gxScale; gxKick(); return;
   }
-  if(gxPanning){ gxOX+=px-gxLastX; gxOY+=py-gxLastY; gxLastX=px; gxLastY=py; return; }
+  if(gxPanning){
+    if(Math.hypot(e.clientX-gxDownX, e.clientY-gxDownY) < 4) return;   // a click's jitter is no pan
+    gxAuto=false; gxOX+=px-gxLastX; gxOY+=py-gxLastY; gxLastX=px; gxLastY=py; return;
+  }
   gxHover = gxNodeAt(px,py);
   gxCanvas.style.cursor = gxHover ? "pointer" : "grab";
+  if(gxTipNode) return;   // a tooltip the keys or a tap pinned stays where it is
   if(gxHover){
     gxTip.style.display="block";
     gxTip.style.left=(px+16)+"px"; gxTip.style.top=(py+10)+"px";
     gxTip.innerHTML = `<b>${esc(gxHover.name)}</b><span style="color:${cColor(gxHover.cat)}">${cLabel(gxHover.cat)}</span>`;
   } else gxTip.style.display="none";
 });
-gxCanvas.addEventListener("mousedown", e=>{
+gxCanvas.addEventListener("pointerdown", e=>{
+  gxPointer = e.pointerType; gxDownX = e.clientX; gxDownY = e.clientY;
+  if(e.pointerType!=="mouse") return;
   const rect=gxCanvas.getBoundingClientRect();
   const px=e.clientX-rect.left, py=e.clientY-rect.top;
   const n = gxNodeAt(px,py);
   if(n){ gxDrag=n; } else { gxPanning=true; gxLastX=px; gxLastY=py; }
 });
-window.addEventListener("mouseup", e=>{
-  if(gxDrag && gxHover===gxDrag && !gxDrag.hub){
-    // click (no movement check kept simple): open if mouse still over node
-  }
+window.addEventListener("pointerup", e=>{
+  if(e.pointerType!=="mouse") return;
   gxDrag=null; gxPanning=false;
 });
 gxCanvas.addEventListener("click", e=>{
+  // the end of a drag is not a click: until 2026-11, dragging a node opened its drawer
+  if(Math.hypot(e.clientX-gxDownX, e.clientY-gxDownY) > 6) return;
   const rect=gxCanvas.getBoundingClientRect();
-  const n = gxNodeAt(e.clientX-rect.left, e.clientY-rect.top);
+  const px=e.clientX-rect.left, py=e.clientY-rect.top;
+  if(gxPointer!=="mouse"){ gxTap(gxNodeAt(px,py,16)); return; }
+  const n = gxNodeAt(px,py);
   if(n && !n.hub) openDrawer(n.id);
   else if(!n && gxLocked){ gxLocked = null; $("gxSearch").value = ""; }  // click empty space clears the search focus
 });
+// A finger has no hover, so its first tap does what hovering does: it traces the node's
+// connections and pins its name beside it. The second tap opens it. A tap on a hub lights its
+// category, and one on empty space clears the choice. Until 2026-11 a tap opened the drawer
+// straight away, so on a phone there was no way to trace a node's connections.
+function gxTap(n){
+  if(n && n===gxLocked && !n.hub){ openDrawer(n.id); return; }
+  if(!n || n===gxLocked){ gxLocked = null; $("gxSearch").value = ""; gxHideTip(); return; }
+  gxLocked = n; $("gxSearch").value = ""; gxShowTip(n, "touch");
+}
 
-/* galaxy re-center: default zoom + origin, focus and search cleared */
+/* galaxy re-center: the fitted view again, focus and search cleared */
 function gxHome(){
-  gxScale = 1; gxOX = 0; gxOY = 0;
+  gxAuto = true; gxFollowFit(true);
   gxLocked = null; $("gxSearch").value = ""; $("gxResults").classList.remove("open");
+  $("gxSearch").setAttribute("aria-expanded", "false");
+  gxHideTip();
   gxEnergy = Math.max(gxEnergy, 0.3);
 }
 window.gxHome = gxHome;
@@ -1501,181 +2255,354 @@ window.gxHome = gxHome;
 function gxFocusOn(id){
   const n = gxNodes.find(x=>x.id===id);
   if(!n) return;
-  gxLocked = n;
+  gxLocked = n; gxAuto = false;
   gxScale = Math.max(gxScale, 1.5);
   gxOX = -n.x*gxScale; gxOY = -n.y*gxScale;
   gxEnergy = Math.max(gxEnergy, 0.3);
+  gxTreeCurrent(id);   // so the keyboard list carries on from the organization the search found
 }
 (function initGxSearch(){
-  const inp = $("gxSearch"), res = $("gxResults");
-  inp.addEventListener("input", ()=>{
-    const q = inp.value.trim().toLowerCase();
-    if(!q){ res.classList.remove("open"); res.innerHTML=""; gxLocked = null; return; }
-    const hits = DATA.filter(d =>
-      d.name.toLowerCase().includes(q) || (d.tags||[]).some(t=>t.toLowerCase().includes(q))
-    ).slice(0,8);
-    res.innerHTML = hits.map(d=>
-      `<div data-id="${d.id}"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</div>`).join("")
-      || `<div style="color:var(--muted)">No matches</div>`;
-    res.classList.add("open");
-    res.querySelectorAll("div[data-id]").forEach(el=>{
-      el.addEventListener("click", ()=>{
-        res.classList.remove("open"); inp.value = byId[el.dataset.id].name;
-        gxFocusOn(el.dataset.id);
-      });
-    });
-  });
+  const inp = $("gxSearch");
+  const search = searchBox(inp, $("gxResults"), "gxr",
+    q => searchEntries(q).list,
+    gxFocusOn, ()=>{ gxLocked = null; });
   document.addEventListener("keydown", e=>{
-    if(e.key==="Escape" && gxLocked){ gxLocked = null; inp.value = ""; res.classList.remove("open"); }
+    if(e.key==="Escape" && gxLocked){ gxLocked = null; inp.value = ""; search.close(); if(gxTipHow==="touch") gxHideTip(); }
   });
 })();
 gxCanvas.addEventListener("wheel", e=>{
   e.preventDefault();
   const f = e.deltaY<0 ? 1.12 : 0.89;
-  gxScale = Math.min(4, Math.max(0.45, gxScale*f));
+  gxAuto = false;
+  gxScale = Math.min(GX_MAX_SCALE, Math.max(GX_MIN_SCALE, gxScale*f));
 }, {passive:false});
+// Over the map and the galaxy the wheel scrolls the page; ⌘ or Ctrl + wheel zooms. A trackpad
+// pinch arrives as Ctrl + wheel, so it zooms too, and on the map so do +/−, double-click and
+// a two-finger pinch. Both views fill a screen, so until 2026-11 every wheel turn over them
+// zoomed, and nothing below them (the footer, the credits link) could be scrolled to.
+const ZOOM_KEY = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl";
+document.querySelectorAll(".zoom-key").forEach(s => s.textContent = ZOOM_KEY);
+function wheelScrollsPage(wrap, canvas){
+  const hint = wrap.querySelector(".zoom-hint");
+  let hide;
+  // Capture phase, so this runs before the map's or the galaxy's own wheel handler. Stopping
+  // the event here means that handler never sees it, and the browser scrolls the page.
+  wrap.addEventListener("wheel", e=>{
+    if(e.ctrlKey || e.metaKey || !canvas.contains(e.target)) return;
+    e.stopPropagation();
+    // centre the hint in the part of the canvas that is on screen, below the sticky nav,
+    // or it sits below the window while the page is still scrolled near the top
+    const box = wrap.getBoundingClientRect();
+    const top = Math.max(box.top, document.querySelector(".nav").getBoundingClientRect().bottom);
+    hint.style.top = ((top + Math.min(box.bottom, innerHeight)) / 2 - box.top) + "px";
+    hint.classList.add("show");
+    clearTimeout(hide); hide = setTimeout(()=>hint.classList.remove("show"), 1400);
+  }, {capture:true, passive:true});
+}
+wheelScrollsPage(document.querySelector(".map-wrap"), $("map"));
+wheelScrollsPage(gxCanvas.parentElement, gxCanvas);
 // touch
-let touchDist=0;
+let touchDist=0, touchX0=0, touchY0=0, touchPanned=false;
 gxCanvas.addEventListener("touchstart", e=>{
-  if(e.touches.length===1){ gxPanning=true; gxLastX=e.touches[0].clientX; gxLastY=e.touches[0].clientY; }
+  if(e.touches.length===1){
+    gxPanning=true; touchPanned=false;
+    gxLastX=touchX0=e.touches[0].clientX; gxLastY=touchY0=e.touches[0].clientY;
+  }
   if(e.touches.length===2){ touchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); }
 },{passive:true});
 gxCanvas.addEventListener("touchmove", e=>{
   if(e.touches.length===1 && gxPanning){
-    gxOX+=e.touches[0].clientX-gxLastX; gxOY+=e.touches[0].clientY-gxLastY;
-    gxLastX=e.touches[0].clientX; gxLastY=e.touches[0].clientY;
+    const t = e.touches[0];
+    if(!touchPanned && Math.hypot(t.clientX-touchX0, t.clientY-touchY0) < 8) return;   // still a tap
+    touchPanned=true; gxAuto=false;
+    gxOX+=t.clientX-gxLastX; gxOY+=t.clientY-gxLastY;
+    gxLastX=t.clientX; gxLastY=t.clientY;
   }
   if(e.touches.length===2){
     const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-    gxScale=Math.min(4,Math.max(0.45,gxScale*(d/touchDist))); touchDist=d;
+    gxAuto=false;
+    gxScale=Math.min(GX_MAX_SCALE,Math.max(GX_MIN_SCALE,gxScale*(d/touchDist))); touchDist=d;
   }
 },{passive:true});
 gxCanvas.addEventListener("touchend", ()=>{ gxPanning=false; });
 
+/* galaxy by keyboard: every organization, grouped by category, in a tree that screen readers
+   read and the arrow keys move through (the WAI-ARIA tree view). The tree itself is never
+   drawn. The canvas shows its focus instead: a ring, the node's connections traced, and its
+   tooltip pinned. Until 2026-11 only a mouse could reach a node. */
+function gxTreeItems(){
+  return [...$("gxTree").querySelectorAll('[role="treeitem"]')].filter(el=>!el.closest("[hidden]"));
+}
+function gxTreeExpand(el, open){
+  el.setAttribute("aria-expanded", String(open));
+  el.querySelector('[role="group"]').hidden = !open;
+}
+// make `id`'s entry the one Tab lands on, opening its category if it is closed
+function gxTreeCurrent(id){
+  const tree = $("gxTree"), el = tree.querySelector(`[data-node="${CSS.escape(id)}"]`);
+  if(!el) return;
+  const cat = el.parentElement.closest('[role="treeitem"]');
+  if(cat) gxTreeExpand(cat, true);
+  tree.querySelectorAll('[tabindex="0"]').forEach(x=>x.tabIndex = -1);
+  el.tabIndex = 0;
+}
+// a category hidden with its button leaves the tree too, and Tab moves off it if it was there
+function gxTreeSync(){
+  $("gxTree").querySelectorAll("[aria-expanded]").forEach(el=>{ el.hidden = !gxCats.has(el.dataset.node.slice(4)); });
+  const items = gxTreeItems();
+  if(items.length && !items.some(el=>el.tabIndex===0)) gxTreeCurrent(items[0].dataset.node);
+}
+// keep the node the keys moved to on screen; the fitted view already shows every node
+function gxKeepInView(n){
+  if(gxAuto) return;
+  const sx = gxW/2+gxOX+n.x*gxScale, sy = gxH/2+gxOY+n.y*gxScale, m = 40;
+  if(sx<m || sx>gxW-m || sy<m || sy>gxH-m){ gxOX = -n.x*gxScale; gxOY = -n.y*gxScale; }
+}
+(function initGxTree(){
+  const tree = $("gxTree"), wrap = gxCanvas.parentElement;
+  const plural = (k, one) => `${k} ${one}${k===1?"":"s"}`;
+  tree.innerHTML = Object.keys(CATS).map(k=>{
+    const orgs = DATA.filter(d=>d.cat===k).sort((a,b)=>a.name.localeCompare(b.name));
+    if(!orgs.length) return "";
+    return `<div role="treeitem" data-node="hub:${k}" aria-expanded="false" aria-labelledby="gxt-${k}" tabindex="-1">` +
+      `<span id="gxt-${k}">${esc(cLabel(k))}, ${plural(orgs.length, "organization")}</span><div role="group" hidden>` +
+      orgs.map(d=>{
+        const c = gxAdj[gxNodes.indexOf(gxById[d.id])].size;
+        return `<div role="treeitem" data-node="${d.id}" tabindex="-1">${esc(d.name)}, ${c ? plural(c, "connection") : "no connections"}</div>`;
+      }).join("") + `</div></div>`;
+  }).join("");
+  const first = tree.querySelector('[role="treeitem"]');
+  if(first) first.tabIndex = 0;
+  const name = el => (el.querySelector(":scope > span") || el).textContent.trim().toLowerCase();
+  tree.addEventListener("keydown", e=>{
+    const el = e.target.closest('[role="treeitem"]');
+    if(!el || e.altKey || e.ctrlKey || e.metaKey) return;
+    const items = gxTreeItems(), i = items.indexOf(el);
+    const isCat = el.hasAttribute("aria-expanded"), open = el.getAttribute("aria-expanded")==="true";
+    let to = null;
+    if(e.key==="ArrowDown") to = items[i+1];
+    else if(e.key==="ArrowUp") to = items[i-1];
+    else if(e.key==="Home") to = items[0];
+    else if(e.key==="End") to = items[items.length-1];
+    else if(e.key==="ArrowRight"){ if(isCat){ if(open) to = items[i+1]; else gxTreeExpand(el, true); } }
+    else if(e.key==="ArrowLeft"){
+      if(!isCat) to = el.parentElement.closest('[role="treeitem"]');
+      else if(open) gxTreeExpand(el, false);
+    }
+    else if(e.key==="Enter" || e.key===" "){ if(isCat) gxTreeExpand(el, !open); else openDrawer(el.dataset.node); }
+    else if(e.key.length===1 && e.key.trim()){
+      // type a letter to jump to the next entry that starts with it
+      const k = e.key.toLowerCase();
+      to = [...items.slice(i+1), ...items.slice(0, i)].find(x=>name(x).startsWith(k));
+      if(!to) return;
+    }
+    else return;
+    e.preventDefault();
+    if(to){ gxTreeCurrent(to.dataset.node); to.focus(); }
+  });
+  tree.addEventListener("focusin", e=>{
+    const el = e.target.closest('[role="treeitem"]'), n = el && gxById[el.dataset.node];
+    if(!n) return;
+    gxKbd = n; wrap.classList.add("kbd");
+    gxShowTip(n, "keys");
+    gxKeepInView(n);
+  });
+  tree.addEventListener("focusout", e=>{
+    if(tree.contains(e.relatedTarget)) return;
+    gxKbd = null; wrap.classList.remove("kbd");
+    if(gxTipHow==="keys") gxHideTip();
+  });
+})();
+
 /* ---------- journey ---------- */
 let jrStage = 1;
+// Hand-written routes through a stage, from data/pathways.yml. They add to the Journey and
+// nothing depends on them, so the page reads the file on its own, after the atlas has loaded:
+// a missing file, or a deploy that has sent the page but not yet the data, leaves the stages
+// as they always were. validate.js checks the file, the way it checks credits.yml.
+let PATHWAYS = [];
+// The pathway someone chose or linked to. "" means the stage's first one, and leaves the link alone.
+let jrPathway = new URLSearchParams(location.search).get("pathway") || "";
+// The stages are buttons that say which one is chosen (aria-pressed), so the keyboard can pick
+// one too: until 2026-11 they were divs that took only a click, and the keyboard could see
+// only stage 1. Redrawing them removes the button just pressed, so its focus moves to the new one.
 function renderStepper(){
-  $("stepper").innerHTML = STAGES.map(s=>
-    `<div class="step ${s.n===jrStage?'active':''}" data-n="${s.n}">
-      <div class="step-num">${s.n===jrStage?s.icon:s.n}</div>
-      <div class="step-title">${s.t}</div>
-      <div class="step-sub">${s.s}</div>
-    </div>`).join("");
-  $("stepper").querySelectorAll(".step").forEach(el=>
-    el.addEventListener("click", ()=>{ jrStage=+el.dataset.n; renderStepper(); renderJourney(); }));
+  const st = $("stepper"), hadFocus = st.contains(document.activeElement);
+  st.innerHTML = STAGES.map(s=>
+    `<button type="button" class="step ${s.n===jrStage?'active':''}" data-n="${s.n}" aria-pressed="${s.n===jrStage}">
+      <span class="step-num">${s.n===jrStage?s.icon:s.n}</span>
+      <span class="step-title">${s.t}</span>
+      <span class="step-sub">${s.s}</span>
+    </button>`).join("");
+  st.querySelectorAll(".step").forEach(el=>
+    el.addEventListener("click", ()=>{ jrStage=+el.dataset.n; jrPathway=""; renderStepper(); renderJourney(); updateURL(); }));
+  if(hadFocus) st.querySelector(`.step[data-n="${jrStage}"]`).focus();
+}
+// One organization in a step: its own reason, and the same status and date the drawer shows, so
+// a pathway never restates a fact that lives in the entry.
+function pathwayOrg(d){
+  const status = applyOpen(d)
+    ? `<div class="pw-status">⏳ ${d.applyBy==="rolling" ? "Open" : "Apply by " + esc(fmtDeadline(d.applyBy))}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`
+    : applyClosed(d) ? `<div class="pw-status closed">⏸ Closed · ${esc(d.applyNote)}</div>`
+    : takesPitches(d) ? `<div class="pw-status pitch">📨 Takes pitches</div>` : "";
+  const verified = !d.lastVerified ? "" : isStale(d) ? `⚠️ Last verified ${fmtMonth(d.lastVerified)}` : fmtVerified(d.lastVerified);
+  return `<li class="pw-org">
+    <button type="button" class="pw-name" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</button>
+    ${status}<p>${esc(d.why || d.desc)}</p>${verified ? `<div class="pw-verified">${verified}</div>` : ""}
+  </li>`;
+}
+// A step can point at the Directory instead of naming a few organizations when many fit it,
+// so a pathway never has to pick three funds out of forty.
+function pathwayMore(more, stage){
+  const params = new URLSearchParams();
+  if(more.cat) params.set("cat", more.cat);
+  if(more.need) params.set("need", more.need);
+  params.set("stage", stage);
+  const n = DATA.filter(d=>(d.stages||[]).includes(stage) && (!more.cat || d.cat===more.cat)
+    && (!more.need || (d.offers||[]).includes(more.need))).length;
+  return `<a class="pw-more" href="?${params}#directory">See all ${n} in the Directory →</a>`;
+}
+function pathwayHtml(s){
+  const paths = PATHWAYS.filter(p=>p.stage===s.n);
+  if(!paths.length) return "";
+  const path = paths.find(p=>p.id===jrPathway) || paths[0];
+  // validate.js stops a build on an unknown id, so a miss here means a copy of the atlas has
+  // removed an entry. Its step keeps whatever still resolves, and a step left with nothing goes.
+  const steps = path.steps.map(step=>{
+    const orgs = (step.entries||[]).map(id=>byId[id]).filter(Boolean).sort(byClosing);
+    if(!orgs.length && !step.more) return "";
+    return `<li class="pw-step"><h5>${esc(step.do)}</h5><p class="pw-why">${esc(step.why)}</p>` +
+      (orgs.length ? `<ul class="pw-orgs">${orgs.map(pathwayOrg).join("")}</ul>` : "") +
+      (step.more ? pathwayMore(step.more, s.n) : "") + `</li>`;
+  }).join("");
+  return `<section class="pw" aria-labelledby="pwAsk"><h4 class="pw-ask" id="pwAsk">Which sounds like you?</h4>
+    <div class="pw-picks" role="group" aria-labelledby="pwAsk">${paths.map(p=>
+      `<button type="button" class="pw-pick" data-pathway="${esc(p.id)}" aria-pressed="${p===path}">${esc(p.title)}</button>`).join("")}</div>
+    <p class="pw-lead">${esc(path.lead)}</p><ol class="pw-steps">${steps}</ol>
+    <p class="pw-note">A step is a kind of option, not a ranking: organizations in it are listed by closing date, then by name. Nobody pays to appear here. None of these sound like you? <a href="?ask=1#journey" onclick="openAsk();return false">Ask your own AI</a>.</p></section>`;
 }
 function renderJourney(){
   const s = STAGES.find(x=>x.n===jrStage);
   const ents = DATA.filter(d=>(d.stages||[]).includes(jrStage));
   const groups = {};
   ents.forEach(d=>{ (groups[d.cat]=groups[d.cat]||[]).push(d); });
-  let html = `<h3>${s.icon} ${s.t} — ${s.s}</h3><div class="jr-desc">${s.desc}</div>`;
+  let html = `<h3>${s.icon} ${s.t} — ${s.s}</h3><div class="jr-desc">${s.desc}</div>` + pathwayHtml(s);
   html += `<div class="jr-tips">` + s.tips.map(([b,t])=>`<div class="jr-tip"><b>${b}</b>${t}</div>`).join("") + `</div>`;
+  html += `<h4 class="jr-all">All ${ents.length} organizations at this stage</h4>`;
   const order = ["community","space","accel","university","student","event","angel","vc","gov","corporate","startup"];
+  // buttons, so the keyboard can open them too: until 2026-11 they were spans that took only a click
   order.filter(c=>groups[c]).forEach(c=>{
-    html += `<div class="jr-group"><h4 style="color:${cColor(c)}">${cLabel(c)}</h4><div class="chips">` +
+    html += `<div class="jr-group"><h4 style="color:${cInk(c)}">${cLabel(c)}</h4><div class="chips">` +
       groups[c].sort((a,b)=>a.name.localeCompare(b.name)).map(d=>
-        `<span class="chip" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(c)};background:${cColor(c)}"></span>${esc(d.name)}</span>`).join("") +
+        `<button type="button" class="chip" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(c)};background:${cColor(c)}"></span>${esc(d.name)}</button>`).join("") +
       `</div></div>`;
   });
   $("jrPanel").innerHTML = html;
+  // Redrawing removes the button just pressed, so the focus moves to the new one.
+  $("jrPanel").querySelectorAll(".pw-pick").forEach(el=>el.addEventListener("click", ()=>{
+    jrPathway = el.dataset.pathway; renderJourney(); updateURL();
+    $("jrPanel").querySelector(`.pw-pick[aria-pressed="true"]`).focus();
+  }));
 }
 renderStepper(); renderJourney();
+fetch("data/pathways.yml")
+  .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+  .then(text=>{
+    PATHWAYS = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA }) || [];
+    const linked = PATHWAYS.find(p=>p.id===jrPathway);
+    if(linked){ jrStage = linked.stage; renderStepper(); } else jrPathway = "";
+    renderJourney();
+  })
+  .catch(err=>console.warn("No pathways, so the Journey shows its stages alone:", err));
 
 /* ---------- directory ---------- */
-const dirCats = new Set(Object.keys(CATS));
-const dirNeeds = new Set();   // soft needs — values from the `offers` vocabulary
-let dirOpenOnly = false;      // ⏳ hard constraint: is this org accepting applications?
 (function initDirectory(){
-  // "I need…" chips — filter by what an org gives founders, plus open applications
-  const nc = $("needChips");
-  const lab = document.createElement("span");
-  lab.className = "need-label"; lab.textContent = "I need:";
-  nc.appendChild(lab);
+  // "I need…" chips — filter by what an org gives founders, plus open applications.
+  // The map has the same row, and the two show one state.
   const needs = Object.entries(OFFERS_META).map(([k,m])=>[k, `${m.icon} ${m.label}`])
     .concat([["open","⏳ Open to apply now"]]);
-  needs.forEach(([key, label])=>{
-    const el = document.createElement("button");
-    el.className = "need-chip"; el.type = "button"; el.textContent = label;
-    el.setAttribute("aria-pressed","false");
-    el.addEventListener("click", ()=>{
-      let on;
-      if(key === "open") on = (dirOpenOnly = !dirOpenOnly);
-      else { dirNeeds.has(key) ? dirNeeds.delete(key) : dirNeeds.add(key); on = dirNeeds.has(key); }
-      el.classList.toggle("on", on);
-      el.setAttribute("aria-pressed", String(on));
-      renderCards();
+  [$("needChips"), $("mapNeeds")].forEach(row=>{
+    const lab = document.createElement("span");
+    lab.className = "need-label"; lab.textContent = "I need:";
+    row.appendChild(lab);
+    needs.forEach(([key, label])=>{
+      const el = document.createElement("button");
+      el.className = "need-chip"; el.type = "button"; el.textContent = label; el.dataset.need = key;
+      el.addEventListener("click", ()=>{
+        if(key === "open") dirOpenOnly = !dirOpenOnly;
+        else if(dirNeeds.has(key)) dirNeeds.delete(key);
+        else dirNeeds.add(key);
+        filtersChanged();
+        framePins();
+      });
+      row.appendChild(el);
     });
-    nc.appendChild(el);
   });
-  // stage options
-  STAGES.forEach(s=>{
-    const o=document.createElement("option"); o.value=s.n; o.textContent=`${s.icon} Stage ${s.n}: ${s.t}`;
-    $("dirStage").appendChild(o);
+  // stage options, for the map's list and the Directory's
+  document.querySelectorAll(".stage-select").forEach(sel=>{
+    STAGES.forEach(s=>{
+      const o=document.createElement("option"); o.value=s.n; o.textContent=`${s.icon} Stage ${s.n}: ${s.t}`;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", ()=>{ dirStage = sel.value; filtersChanged(); framePins(); });
   });
-  // category chips
-  const cc=$("catChips");
+  // category chips: buttons that say whether their category is shown (aria-pressed), as the
+  // "I need…" chips do. Until 2026-11 they were spans that took only a click.
+  const cc=$("catChips"), allCats=Object.keys(CATS);
   Object.entries(CATS).forEach(([k,v])=>{
-    const el=document.createElement("span");
-    el.className="cat-chip on"; el.style.color=v.color; el.dataset.cat=k;
+    const el=document.createElement("button");
+    // the label in the category's ink, which darkens in light mode; the dot keeps the bright colour
+    el.type="button"; el.className="cat-chip"; el.style.color=cInk(k); el.dataset.cat=k;
     el.innerHTML=`<span class="lg-dot" style="background:${v.color};color:${v.color}"></span>${v.label}`;
     el.addEventListener("click",()=>{
       // if all on, clicking isolates; else toggle
-      if(dirCats.size===Object.keys(CATS).length){ dirCats.clear(); dirCats.add(k); }
-      else if(dirCats.has(k)){ dirCats.delete(k); if(!dirCats.size) Object.keys(CATS).forEach(x=>dirCats.add(x)); }
-      else dirCats.add(k);
-      cc.querySelectorAll(".cat-chip").forEach(c=>c.classList.toggle("on", dirCats.has(c.dataset.cat)));
-      renderCards();
+      if(activeCats.size===allCats.length){ activeCats.clear(); activeCats.add(k); }
+      else if(activeCats.has(k)){ activeCats.delete(k); if(!activeCats.size) allCats.forEach(x=>activeCats.add(x)); }
+      else activeCats.add(k);
+      filtersChanged();
     });
     cc.appendChild(el);
   });
+  const sort = new URLSearchParams(location.search).get("sort");
+  if(sort === "cat" || sort === "new" || sort === "deadline") $("dirSort").value = sort;
+  syncFilters();
   // debounced because #dirCount is a live region — an undebounced handler would
   // queue one screen-reader announcement per keystroke
   let dirSearchT = 0;
   $("dirSearch").addEventListener("input", ()=>{ clearTimeout(dirSearchT); dirSearchT = setTimeout(renderCards, 220); });
-  $("dirStage").addEventListener("change", renderCards);
-  $("dirSort").addEventListener("change", renderCards);
+  $("dirSort").addEventListener("change", filtersChanged);
+  // The headline figures open the Directory with that set showing. They are real links, so one
+  // can be opened in a new tab; a plain click stays on this page.
+  $("stats").addEventListener("click", e=>{
+    const a = e.target.closest("a.stat");
+    if(!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    readFilters(new URLSearchParams(a.search));
+    $("dirSearch").value = "";
+    filtersChanged();
+    framePins();
+    switchView("directory");
+    $("view-directory").scrollIntoView();
+  });
 })();
 function renderCards(){
-  const q=$("dirSearch").value.trim().toLowerCase();
-  const st=$("dirStage").value;
-  let list = DATA.filter(d=>dirCats.has(d.cat));
-  if(st) list = list.filter(d=>(d.stages||[]).includes(+st));
-  // ⏳ gates the list; it is a fact about the org, not a need it satisfies, so it
-  // must never become a term in need matching (or, later, in need scoring).
-  if(dirOpenOnly) list = list.filter(applyOpen);
-  if(q) list = list.filter(d=>
-    d.name.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q) ||
-    (d.why||"").toLowerCase().includes(q) ||
-    (d.tags||[]).some(t=>t.toLowerCase().includes(q)) ||
-    d.loc.toLowerCase().includes(q) || cLabel(d.cat).toLowerCase().includes(q));
-  // Needs run last, against whatever the hard filters left, and they relax instead
-  // of dead-ending: show the entries meeting the most selected needs that anything
-  // here meets. 97 of 171 orgs offer exactly one thing, so demanding all of three
-  // returned nothing in 40 of 56 combinations — an empty page while a good answer
-  // sat one band below. The band is constant across the result set, so the sort the
-  // reader chose still means what it says.
-  let band = 0;
-  if(dirNeeds.size){
-    const needs = [...dirNeeds];
-    const met = d => needs.reduce((n,x)=>n + ((d.offers||[]).includes(x) ? 1 : 0), 0);
-    band = list.reduce((hi,d)=>Math.max(hi, met(d)), 0);
-    // Relax, but never all the way down to "meets any one of these" — with two or
-    // more chips that band is not an answer, it is the whole directory wearing a
-    // filter (funding+talent would return 130 of 171). Measured: this floor leaves
-    // 3- and 4-chip results untouched and cuts the 2-chip worst case from 130 to 22.
-    // Below the floor we show nothing, which is the honest report that no org here
-    // does both — the very thing the founder was asking.
-    if(needs.length > 1 && band < 2) band = 0;
-    list = band ? list.filter(d=>met(d) === band) : [];
-  }
-  const relaxed = dirNeeds.size > 1 && band > 0 && band < dirNeeds.size;
+  const q=$("dirSearch").value.trim();
+  let list = DATA.filter(passesFilters);
+  const found = q ? searchEntries(q, list) : null;
+  if(found) list = found.list;
+  const { list: meeting, band } = meetNeeds(list);
+  list = meeting;
+  const relaxed = needsRelaxed(band), closest = found && !found.exact;
+  // A search comes back best first, so the first sort says so while there is one.
   const sort=$("dirSort").value;
-  list.sort((a,b)=> sort==="cat" ? (a.cat===b.cat ? a.name.localeCompare(b.name) : a.cat.localeCompare(b.cat))
-                  : sort==="new" ? ((b.added||"").localeCompare(a.added||"") || a.name.localeCompare(b.name))
-                                 : a.name.localeCompare(b.name));
-  $("dirCount").textContent = `${list.length} of ${DATA.length} organizations`
-    + (relaxed ? ` · none offer all ${dirNeeds.size} — these meet ${band}` : "");
+  $("dirSort").options[0].textContent = q ? "Sort: Best match" : "Sort: A → Z";
+  if(sort==="cat") list.sort((a,b)=> a.cat===b.cat ? a.name.localeCompare(b.name) : a.cat.localeCompare(b.cat));
+  else if(sort==="new") list.sort((a,b)=> (b.added||"").localeCompare(a.added||"") || a.name.localeCompare(b.name));
+  else if(sort==="deadline") list.sort(byClosing);
+  else if(!q) list.sort((a,b)=> a.name.localeCompare(b.name));
+  $("dirCount").textContent = `${list.length} of ${DATA.length} organizations` + needsNote(band)
+    + (closest && list.length ? " · none match every word, closest first" : "");
+  document.querySelector(".dir-count-row .filter-clear").hidden = !(q || filtersOn());
   $("cards").innerHTML = list.map(d=>{
     const col=cColor(d.cat);
     const canCompare = d.cat==="vc" || d.cat==="accel" || d.cat==="angel";
@@ -1690,9 +2617,9 @@ function renderCards(){
       <div class="card-tools">${canCompare?`<button class="card-tool cmp ${cmpSet.has(d.id)?'on':''}" title="Compare" aria-pressed="${cmpSet.has(d.id)}" aria-label="Add ${esc(d.name)} to comparison" onclick="event.stopPropagation();toggleCompare('${d.id}')">⚖</button>`:""}<button class="card-tool star ${starSet.has(d.id)?'on':''}" title="Save to shortlist" aria-pressed="${starSet.has(d.id)}" aria-label="Save ${esc(d.name)} to your shortlist" onclick="event.stopPropagation();toggleStar('${d.id}')">${starSet.has(d.id)?"★":"☆"}</button></div>
       <div class="c-cat" style="color:${cInk(d.cat)}">${cLabel(d.cat)} · ${esc(d.loc.split(",")[0])}</div>
       <p>${esc(d.desc.length>150 ? d.desc.slice(0,150)+"…" : d.desc)}</p>
-      <div class="c-meta">${relaxed ? (d.offers||[]).filter(o=>dirNeeds.has(o)).map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join("") : ""}${isNew(d)?`<span class="tag new-tag">✨ New</span>`:""}${eventHosts[d.id]?`<span class="tag event-tag" title="${esc(eventHosts[d.id].title)}">🎟 event this week</span>`:""}${d.applyBy && d.applyBy!=="rolling" && applyOpen(d) ? `<span class="tag apply-tag">⏳ Apply by ${esc(fmtDeadline(d.applyBy))}</span>`:""}${isStale(d)?`<span class="tag stale-tag" title="Last verified ${fmtMonth(d.lastVerified)}">⚠ not recently verified</span>`:""}${d.badge?`<span class="badge">${esc(d.badge)}</span>`:""}${(d.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+      <div class="c-meta">${closest ? (found.words[d.id]||[]).slice(0,3).map(w=>`<span class="tag match-tag">${esc(w)}</span>`).join("") : ""}${relaxed ? (d.offers||[]).filter(o=>dirNeeds.has(o)).map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join("") : ""}${isNew(d)?`<span class="tag new-tag">✨ New</span>`:""}${eventHosts[d.id]?`<span class="tag event-tag" title="${esc(eventHosts[d.id].title)}">🎟 event this week</span>`:""}${d.applyBy && d.applyBy!=="rolling" && applyOpen(d) ? `<span class="tag apply-tag">⏳ Apply by ${esc(fmtDeadline(d.applyBy))}</span>`:""}${isStale(d)?`<span class="tag stale-tag" title="Last verified ${fmtMonth(d.lastVerified)}">⚠ not recently verified</span>`:""}${d.badge?`<span class="badge">${esc(d.badge)}</span>`:""}${(d.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
     </div>`;
-  }).join("") || `<div style="color:var(--muted)">No matches — try clearing filters, or <a href="#" onclick="suggestEntry();return false" style="color:#ffc600">suggest a new entry</a>.</div>`;
+  }).join("") || `<div style="color:var(--muted)">No matches — try fewer words or clearing the filters, or <a href="#" onclick="suggestEntry();return false" style="color:#ffc600">suggest a new entry</a>.</div>`;
 }
 renderCards();
 
@@ -1704,8 +2631,11 @@ function updateURL(){
   // link lost its list the first time the recipient opened a drawer or switched views.
   const u = new URL(location.href);
   if(drawerId) u.searchParams.set("entry", drawerId); else u.searchParams.delete("entry");
+  writeFilters(u.searchParams);
+  if(currentView === "journey" && jrPathway) u.searchParams.set("pathway", jrPathway); else u.searchParams.delete("pathway");
+  u.searchParams.delete("ask");   // ?ask=1 opens the dialog once; it isn't a state to keep
   u.hash = currentView !== "map" ? currentView : "";
-  try{ history.replaceState(null, "", u.pathname + u.search + u.hash); }catch(e){}
+  try{ history.replaceState(null, "", u.pathname + u.search.replace(/%2C/g, ",") + u.hash); }catch(e){}
 }
 function copyLink(btn){
   if(!navigator.clipboard) return;
@@ -1783,7 +2713,10 @@ function openCompare(){
     ["", list.map(d=>`<b>${esc(d.name)}</b><br><span style="color:${cInk(d.cat)}">${cLabel(d.cat)}</span>`)],
     ["Location", list.map(d=>esc(d.loc))],
     ["What you get", list.map(d=>(d.offers||[]).map(o=>OFFERS_META[o]?.icon+" "+OFFERS_META[o]?.label).join("<br>")||"—")],
-    ["Applications", list.map(d=>applyOpen(d) ? (d.applyBy==="rolling"?"Open — rolling":"Open — by "+esc(fmtDeadline(d.applyBy))) : "—")],
+    ["Applications", list.map(d=>applyOpen(d) ? (d.applyBy==="rolling"?"Open — rolling":"Open — by "+esc(fmtDeadline(d.applyBy)))
+      + (d.applyUrl ? `<br><a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">Apply ↗</a>` : "")
+      : applyClosed(d) ? "Closed · "+esc(d.applyNote)
+      : takesPitches(d) ? `Takes pitches<br><a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">How to pitch ↗</a>` : "—")],
     ...factLabels.map(l=>[esc(l), list.map(d=>cell(d,l))]),
     ["Stages", list.map(d=>(d.stages||[]).map(n=>STAGES.find(s=>s.n===n)?.t).join(", ")||"—")],
     ["", list.map(d=>`<a href="#" onclick="closeCompare();openDrawer('${d.id}');return false">Full entry →</a>`)],
@@ -1797,9 +2730,14 @@ function closeCompare(){ $("compareModal").style.display="none"; dialogClosed();
 window.toggleCompare=toggleCompare; window.openCompare=openCompare; window.closeCompare=closeCompare;
 
 /* stickiness init: saved stars, shared ?list= URLs, the new-this-month banner */
+// toa-atlas-newbanner holds how far someone has read: a month, or an update's date. "2026-11"
+// sorts before "2026-11-05", so one comparison covers both, and a value from before updates
+// existed still shows the newest one once.
+let newestUpdate = "";
 function dismissNewBanner(){
   $("newBanner").style.display="none";
-  try{ localStorage.setItem("toa-atlas-newbanner", localYM(new Date())); }catch(e){}
+  const readTo = [localYM(new Date()), newestUpdate].sort().pop();
+  try{ localStorage.setItem("toa-atlas-newbanner", readTo); }catch(e){}
 }
 window.dismissNewBanner = dismissNewBanner;
 (function initStickiness(){
@@ -1812,11 +2750,83 @@ window.dismissNewBanner = dismissNewBanner;
   const month = localYM(new Date());
   const fresh = DATA.filter(d=>d.added===month).length;
   let seen = null; try{ seen = localStorage.getItem("toa-atlas-newbanner"); }catch(e){}
-  if(fresh >= 2 && seen !== month && !lp){
+  if(fresh >= 2 && (seen||"") < month && !lp){
     $("newBannerText").textContent = `✨ ${fresh} organizations added this month — `;
     $("newBanner").style.display = "";
   }
 })();
+// The newest line in data/updates.yml, shown once to someone who has been here before. A first
+// visit gets the tour instead, when all of it is new. The page reads the file on its own, the
+// way it reads the pathways: without it, the banner goes back to counting new organizations.
+fetch("data/updates.yml")
+  .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+  .then(text=>{
+    const latest = [...(jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA }) || [])].sort((a,b)=>b.date.localeCompare(a.date))[0];
+    if(!latest) return;
+    newestUpdate = latest.date;
+    let seen = null, visited = null;
+    try{ seen = localStorage.getItem("toa-atlas-newbanner"); visited = localStorage.getItem("toa-atlas-tour"); }catch(e){}
+    if(visited && (seen||"") < latest.date && !new URLSearchParams(location.search).get("list")){
+      $("newBannerText").textContent = `✨ New: ${latest.title} — `;
+      $("newBanner").style.display = "";
+    }
+  })
+  .catch(err=>console.warn("No updates list, so the banner only counts new organizations:", err));
+
+/* ---------- ask your own AI ---------- */
+// The atlas runs no model. This writes a prompt for the assistant someone already uses, pointed
+// at atlas-ai.txt, which scripts/export-ai.js builds at deploy. The rules are here, in words the
+// founder reads and pastes themselves, and not in that file: a careful assistant is right to
+// distrust instructions it finds inside something it fetched. Nothing typed here goes into the
+// address, into storage, or over the network. It leaves this page only if someone pastes it.
+// MAINTAINING.md says what to check before changing the wording.
+function askPrompt(){
+  const file = new URL("atlas-ai.txt", location.href.split(/[?#]/)[0]).href;
+  const today = new Date().toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
+  const situation = $("askSituation").value.trim() || "[Describe your stage, what you're building, where you are, and what you need.]";
+  return `Help me find what I need in Massachusetts' AI ecosystem, using the Mass AI Atlas.
+
+Read this file first: ${file}
+If I attached a copy, read that instead. If you can only get part of it, or a summary, tell me and ask me to attach it. It ends with the line "End of file". Don't answer from memory.
+
+Today is ${today}.
+
+When you answer:
+- Recommend only organizations in the file, and link each one to its atlas page.
+- Put them in the order I should approach them, and say why each one fits my situation.
+- Give each one's catch, its application status, and the month it was last verified. Compare any deadline with today's date.
+- Use only what the file says. If it doesn't say, tell me you don't know and point me to the organization's own site.
+- If a pathway in the file fits my situation, start from it.
+- If nothing fits well, say so rather than stretching a match.
+- Don't call anything the best, and don't favor an organization because of who sponsors or runs the atlas.
+
+My situation: ${situation}`;
+}
+function renderAsk(){ $("askPrompt").textContent = askPrompt(); }
+function openAsk(){
+  // a sentence already typed into the Directory's search is a good start on the situation
+  if(!$("askSituation").value) $("askSituation").value = $("dirSearch").value.trim();
+  renderAsk();
+  $("askModal").style.display = "flex";
+  dialogOpened($("askModal"));
+  $("askSituation").focus();
+}
+function closeAsk(){ $("askModal").style.display = "none"; updateURL(); dialogClosed(); }
+function copyAskPrompt(btn){
+  const label = btn.dataset.label || (btn.dataset.label = btn.textContent);
+  // Without clipboard access, show the prompt selected, so a keystroke copies it.
+  const byHand = ()=>{
+    $("askRules").open = true;
+    const range = document.createRange(); range.selectNodeContents($("askPrompt"));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    btn.textContent = "Press Ctrl+C or ⌘C";
+  };
+  if(!navigator.clipboard) return byHand();
+  navigator.clipboard.writeText(askPrompt()).then(()=>{
+    btn.textContent = "✓ Copied"; setTimeout(()=>{ btn.textContent = label; }, 1500);
+  }, byHand);
+}
+if(new URLSearchParams(location.search).get("ask") === "1") openAsk();
 
 /* ---------- guided tour (first visit, or via the nav link) ---------- */
 const TOUR = [
@@ -1825,13 +2835,13 @@ const TOUR = [
     text:`${DATA.length} verified organizations — VCs, labs, accelerators, spaces and communities — in four views: the Map, the Galaxy of connections, a stage-by-stage Founder Journey, and a searchable Directory.` },
   { view:"map", sel:"#mapSearch",
     title:"The Map",
-    text:"Search anything, toggle categories in the legend, and click any colored pin for details. Top right switches between the Boston area and the whole Commonwealth; ⌖ re-frames the view you picked and ∴ groups or un-groups nearby pins." },
+    text:"Search anything, filter by category, by what you need, or by stage in the rows above the map, and click any colored pin for details. Top right switches between the Boston area and the whole Commonwealth; ⌖ re-frames the view you picked and ∴ groups or un-groups nearby pins." },
   { view:"directory", sel:"#catChips",
     title:"The Directory",
-    text:"Full-text search plus category and founder-stage filters — the fastest way to answer “who can help me right now?”" },
-  { view:"journey", sel:"#stepper",
+    text:"Search in your own words, or filter by category, need, and founder stage — the fastest way to answer “who can help me right now?” ⏳ Open to apply now and Sort: Closing soon show what closes next. Filters carry over to the map, and the page's link keeps them." },
+  { view:"journey", sel:".pw-picks", alt:"#stepper",
     title:"Founder Journey",
-    text:"Pick your stage — Spark, Validate, Build, Fund or Scale — and see the resources curated for exactly that moment." },
+    text:"Pick your stage — Spark, Validate, Build, Fund or Scale — then the pathway that sounds like you, for an ordered list of what to do next and why." },
   { view:"map", sel:"#suggestBtn",
     title:"Help it stay alive",
     text:"Every entry shows when we last verified it, and 🔗 copies a shareable link. Know an org we're missing? Suggest it here — a maintainer reviews every submission." },
@@ -1853,7 +2863,7 @@ function nextTourStep(){
   document.querySelectorAll(".tour-spot").forEach(el=>el.classList.remove("tour-spot"));
   if(s.view && currentView !== s.view) switchView(s.view);
   setTimeout(()=>{
-    const t = document.querySelector(s.sel);
+    const t = document.querySelector(s.sel) || (s.alt && document.querySelector(s.alt));
     if(t){ t.classList.add("tour-spot"); t.scrollIntoView({block:"center", behavior: reduceMotion() ? "auto" : "smooth"}); }
     $("tourTitle").textContent = s.title;
     $("tourText").textContent = s.text;

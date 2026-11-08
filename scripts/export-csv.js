@@ -48,6 +48,8 @@ const COLUMNS = [
   ["last_verified",  d => d.lastVerified || ""],        // "YYYY-MM" month last confirmed
   ["offers",         d => (d.offers || []).join("; ")], // what founders get (controlled vocab)
   ["apply_by",       d => d.applyBy || ""],             // "rolling" or "YYYY-MM-DD" deadline
+  ["apply_note",     d => d.applyNote || ""],
+  ["apply_url",      d => d.applyUrl || ""],            // the application page, when it isn't `url`
 ];
 
 // --- Build the CSV ---

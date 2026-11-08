@@ -113,7 +113,7 @@ the tables in Appendix A do this for you:
   GitHub file view, press **`/`** or `Ctrl/Cmd-F` and search the id).
 
 `offers` is **required** and needs at least one value — an entry without it is invisible to
-the Directory's "I need…" filter, so validation rejects it. Add a `badge:` line only if
+the "I need…" filter, so validation rejects it. Add a `badge:` line only if
 there's something to flag (an empty value is an error). `links` is optional — see
 Appendix A. For `added` **and** `lastVerified`, put **today's month** as
 `YYYY-MM` (e.g. `2026-08`) — the entry joins the atlas now, and you just verified
@@ -210,26 +210,49 @@ Once it's green and approved, click **Merge pull request** → **Confirm merge**
 Prefer **"Squash and merge"** if offered (it keeps history tidy — one clean entry per
 contribution).
 
+If the work came from someone outside the core team, credit them in `data/credits.yml`, in
+the same pull request or the next one: a new entry, or a new link on theirs. Use their GitHub
+handle. Add a real name, LinkedIn link, or photo only once they have said yes.
+
+If a visitor would notice the change, add a line to `data/updates.yml` for the
+[What's new page](#whats-new). New organizations don't need one: the page lists them on its own.
+
 ➡️ Now publish it → [Part 3](#part-3--publish-to-the-live-site).
 
 ---
 
 ## Part 3 — Publish to the live site
 
-**Publishing is automatic.** When a change to `index.html` or `data/` lands on
-`main` (i.e. when you merge a PR), a GitHub Action
+**Publishing is automatic.** When a change to `index.html`, `atlas-data.js`, `data/`,
+`map-style-dark.json`, `events/`, `credits/` or `updates/` lands on `main` (i.e. when you merge a PR), a GitHub Action
 re-checks the data and copies the files to the web server. Within about a minute
 the public atlas at **the-open-accelerator.com/ecosystem** shows the change, and a
 summary lands in the TOA Slack channel (what deployed, which entries are new or
-updated — or a 🚨 alert if the deploy failed, in which case the live site is simply
-unchanged).
+updated). If the deploy fails, is cancelled or hits its time limit, a 🚨 alert lands
+there instead; see below for what a failed deploy leaves live.
 
 So: **merging IS publishing.** There is no step 3 anymore.
 
 If the deploy ever fails (red ✗ on the "Deploy to TOA site" action, or the 🚨 Slack
-message): open the failed run from the Actions tab to see why, and know the live site
-still serves the previous version — nothing half-deploys. A deploy can also be
-triggered by hand from the **Actions tab → Deploy to TOA site → Run workflow**.
+message), open the failed run from the Actions tab and see which step failed. A run that
+stopped before its **Rsync atlas** step uploaded nothing, so the live site still serves
+the previous version. A failure inside **Rsync atlas** can leave the site half updated:
+that step copies the files with several `rsync` commands, one after another, and
+whatever it copied before the failure is already live. The 🚨 message says which of the
+two happened. Fix the cause, then deploy again
+from the **Actions tab → Deploy to TOA site → Run workflow**, which copies all the files
+again from the current `main`. Don't use **Re-run jobs** on the failed run instead: a re-run
+deploys that run's own commit, so if a newer deploy has finished since, it puts older files
+back on the live site. **Run workflow** also triggers a deploy by hand at any time.
+
+**A Sunday check warns before a deploy fails.** Every Sunday afternoon the **Weekly server
+check** workflow does what a deploy does, as a dry run that copies nothing. If the server
+doesn't answer, or answers but refuses the deploy key, a 🚨 lands in the same Slack channel and
+says which. A server that stops answering usually has a new address: update the `DEPLOY_HOST`
+secret under **Settings → Secrets and variables → Actions**. Then run the check again from
+**Actions → Weekly server check → Run workflow**, and if a deploy failed in the meantime, use
+**Run workflow** on **Deploy to TOA site** as above. Monday's events refresh uses the same
+secrets, so fix it before Monday morning.
 
 Manual fallback (only if GitHub Actions is unavailable), from a computer with the
 repo checked out and SSH access to the server:
@@ -252,6 +275,12 @@ org is real, active, and the entry's facts are right.
 > and the entries longest without a check — your queue for the month. The same
 > report is in the action's job summary, or run it yourself:
 > `node scripts/linkcheck.js` and `node scripts/stale.js --cycle 12`.
+>
+> The link list also names hosts that **refuse bots**. Open each one in a real browser
+> before assuming it is fine: in November 2026 one of them had become a gambling site,
+> and a bot only ever saw its wall. A **parked domain** (for sale, or an expired site)
+> answers like a healthy one, so the checker reads the start of each page and reports
+> those as broken.
 
 To keep those honest, do a small sweep about once a month:
 
@@ -262,12 +291,98 @@ To keep those honest, do a small sweep about once a month:
    all still right.
 3. Bump `lastVerified` to the current month for each one you checked, and put them all
    in **one PR**.
+4. If a change you made affects a [pathway](#founder-pathways), read that pathway again.
+   An organization can close, move, or stop fitting its step.
 
 `--cycle 12` sizes that list from the dataset, so it keeps pace as the atlas grows:
-every entry comes round within a year without anyone re-tuning a number. At 197
+every entry comes round within a year without anyone re-tuning a number. At 198
 entries that is **17 re-checks a month, about half an hour**. A fixed `--queue`
 quietly stops covering everything as soon as entries outrun it — at 13 a month it
 would now take **15 months** to come round, against a 12-month threshold.
+
+---
+
+## Founder pathways
+
+`data/pathways.yml` holds the hand-written routes at the top of each stage in the Founder
+Journey. A filter answers "what exists?" A pathway answers "what do I do first, and why?",
+so it's advice from the people who keep the atlas. These rules keep it advice a founder can
+trust:
+
+- **A step is a kind of option.** List every entry that fits it, or link to the Directory
+  with `more` when too many do. Don't pick 3 funds out of 46. If you can't say what puts an
+  organization in a step, it doesn't belong there.
+- **The order of the steps is the advice.** `lead` says why they come in that order, and each
+  step's `why` says why it comes where it does. Inside a step the page sorts by closing date,
+  then by name, so nobody's position is a judgment.
+- **Facts stay in the entry.** The page shows each organization's own `why`, its application
+  status, and the month it was verified. A step's `why` doesn't repeat them, so a correction
+  happens in one place.
+- **Say what it costs.** Write what a founder gets and what they give up, without selling.
+- **Nobody pays or partners their way in, and nobody is kept out.** Sponsoring TOA buys
+  nothing here. TOA and the sponsors face the same test as everyone else: an organization is
+  in a step because it fits the step, its card states the catch, and the page sorts it the
+  same way.
+
+`node scripts/validate.js` stops on an entry that doesn't exist, and warns when an entry isn't
+listed at its pathway's stage. To remove an entry, take it out of any pathway first.
+
+A link can open a pathway directly: `?pathway=build-compute#journey`. Changing an `id` breaks
+links people have shared, so keep it once a pathway is live.
+
+Pathways are optional. If you copied this template for another region, write your own, or set
+the file to `[]` and the Journey shows its stages alone.
+
+---
+
+## What's new
+
+`data/updates.yml` feeds the What's new page at `/ecosystem/updates/`, and the banner that shows
+a returning visitor the newest line once. It's a short hand-written list, not a changelog: most
+merged work is invisible to a visitor, and listing it would bury what they can use.
+
+- **Add a line when a visitor would notice the change,** in the same pull request. For an
+  outside contribution, a maintainer adds it at merge. Leave out fixes and work behind the scenes.
+- **Say what a visitor can now do,** in one or two plain sentences.
+- **Give a `try` link when there's a place to see it,** such as `?pathway=build-compute#journey`.
+  `node scripts/validate.js` stops if it names a pathway or an entry that doesn't exist.
+- **Skip new organizations.** The page lists them by month from each entry's `added` field. The
+  first month in the data is where the record starts, so it isn't shown as new.
+
+When two lines share a date, the banner shows the one written first. The page's dates make a
+quiet stretch visible, so a gap means nothing shipped that a visitor would notice, or someone
+forgot. If you copied this template, replace the list or set the file to `[]`.
+
+---
+
+## Ask your own AI
+
+The atlas runs no model. **Ask your own AI**, in the Directory and under each pathway, writes a
+prompt for the assistant someone already uses, and `scripts/export-ai.js` builds the file that
+prompt points at, `atlas-ai.txt`, on every deploy.
+
+- **The rules live in the prompt, not the file.** The prompt is `askPrompt()` in `index.html`.
+  A founder can read it, and pastes it in themselves. A careful assistant is right to distrust
+  instructions it finds inside something it fetched, so `atlas-ai.txt` stays data only. A test
+  checks that.
+- **Nothing typed leaves the page.** What someone types goes into the prompt and nowhere else:
+  not the address, not storage, not the network. Don't add links that open a named assistant
+  with the prompt filled in. They would put a founder's words in a URL, and favor one vendor.
+- **Organizations go A to Z,** so a position depends on nothing but a name.
+- **The file's last line is "End of file".** Web tools can cut a long page without saying so, and
+  a file cut at M would quietly lose everything after it. Keep that line, and the prompt's line
+  that asks for it.
+- **Attaching beats fetching.** On 2026-11-05, one web tool stopped about three-quarters of the
+  way through the file and passed on a smaller model's summary, not the text. Both models we tried
+  noticed, but their answers lost detail and links. So the dialog recommends attaching the file,
+  and the prompt asks the assistant to speak up if it gets only part of the file or a summary.
+  Don't shrink the file to fit one tool: that would cut the catches, and an assistant would still
+  get a summary.
+
+Before you change the prompt, try it on more than one model, with the file attached and with only
+the live URL. Include a question it should refuse to rank ("which accelerator is best?"), one the
+atlas can't answer, and a fact the file doesn't hold. Check that every link resolves, that it says
+what it doesn't know, and that TOA and the sponsors get the same treatment as everyone else.
 
 ---
 
@@ -292,8 +407,9 @@ Every entry has these fields. ⭐ = required.
 | `stages` |  | Which founder stages it serves — **numbers**, see table below. | `[1, 3]` |
 | `links` |  | `id`s of related entries (draws lines in the Galaxy view). Optional. | `[csail, engine]` |
 | `offers` | ⭐ | What founders **get**, 1–6 of: `funding` (invests) · `grants` (equity-free money) · `space` · `compute` · `mentorship` · `community` · `talent` · `customers` (pilots/buyers). **Tag everything the org materially provides to an early-stage founder, not just its headline offering** — an accelerator that gives space, mentoring and a check should carry all three, or the "I need…" filter matches on less than the truth. Powers that filter; the suggestion form asks it as a required multi-select, and the validator errors if it is missing. | `[funding, mentorship]` |
-| `applyBy` |  | `rolling`, or the **current application deadline** as `'YYYY-MM-DD'`. Shows "Applications open" in the app; past dates auto-hide and the robot warns so you clear or roll them. Only for orgs with a real application (accelerators, grants, programs). | `'2026-10-15'` |
-| `applyNote` |  | Short label next to the deadline, max 40 chars. | `Fall 2026 cohort` |
+| `applyBy` |  | `rolling`, or the **current application deadline** as `'YYYY-MM-DD'`. Shows "Applications open" in the app; past dates auto-hide and the robot warns so you clear or roll them. Only for orgs with a real application (accelerators, grants, programs, and funders whose own page calls it an application). `rolling` means the org's own page says it takes applications now; a program with set windows isn't rolling. If an org has a rolling door and a dated program, use the date while it's open, then set `rolling` again. | `'2026-10-15'` |
+| `applyNote` |  | Short label next to the deadline, max 40 chars. With no `applyBy`, it shows as "Applications closed" plus the note, so use it for a program between windows, and say when it reopens if the org has said. Don't use it alone on a funder that simply has no application. | `Fall 2026 cohort` |
+| `applyUrl` |  | The application page, when it isn't the homepage. Shows as an **Apply** button while applications are open, and a "how to apply" link while they're closed. On a VC or angel group with neither `applyBy` nor `applyNote`, it shows as **Takes pitches** with a "how to pitch" link. Use that when the funder's own page offers founders seeking funding a route that isn't an application: a pitch form, an address for decks, or a contact form with a funding option. A general contact page doesn't count, so leave that entry blank. The monthly link check covers it. | `https://example.org/apply` |
 | `facts` |  | Optional "at a glance" table, 1–6 `[label, value]` rows. Labels must be one of: Check size, Stage, Terms, Equity, Board seat, Program length, Cohort size, Focus. Facts rot — only add ones you'd bet on, and re-check them at `lastVerified` time. | `[[Check size, $500K–$2M]]` |
 | `added` |  | The month (`YYYY-MM`) the entry **joined the atlas** — set it once to the current month and never change it. Powers the "✨ New" chips, the new-this-month banner, and the "Recently added" sort. | `2026-08` |
 | `lastVerified` |  | The month (`YYYY-MM`) a maintainer last **confirmed the org is real, active, and the facts are right** — set it when you actually checked the org, not merely when you edited the entry. New entry → today's month. The robot only warns if it's missing, but always set it. | `2026-08` |
@@ -424,6 +540,10 @@ pattern …`. Common ones:
 | `must NOT have additional properties "…"` | A field name is misspelled (e.g. `lastverified`) or isn't one of the fields in Appendix A. |
 | `must be string` | A field was left empty (e.g. `badge:` with nothing after it). Fill it in or delete the line. |
 | `links to unknown entry` | A value in `links` doesn't match any `id`. Fix the spelling or remove it. |
+| `[updates.yml] … links to unknown pathway` (or `entry`) | A `try` link names a pathway or an entry that doesn't exist. Fix the link, or remove it if the feature moved. |
+| `[updates.yml] … in the future` | Check the date. Use the day the change goes live. |
+| `[pathways.yml] … unknown entry` | A step in `data/pathways.yml` names an `id` that doesn't exist. Fix the spelling, or take it out of the step if the entry was removed. |
+| `[pathways.yml] … isn't listed at stage` (a ⚠ warning, not a failure) | A pathway and the entry disagree about the stage. Add the stage to the entry's `stages`, or move the entry out of that pathway. |
 | `missing lastVerified` (a ⚠ warning, not a failure) | Add the month you last confirmed this entry: `lastVerified: YYYY-MM`. |
 | `/lastVerified: must match pattern` | Fix the format: four-digit year, hyphen, two-digit month — e.g. `2026-08`. |
 | `lastVerified … is in the future` | Check the date — it can't be later than the current month. |
@@ -448,14 +568,19 @@ the reasoning is open rather than a silent judgment.
 | **Lux Capital** | Listed until October 2026, then removed: its own contact page says New York and Silicon Valley, and no Massachusetts office could be found. It backs Massachusetts companies, but so do dozens of out-of-state funds; a pin implies a presence. |
 | **Y Combinator (Boston alumni)** | Listed until October 2026, then removed. Not an organisation with a Massachusetts presence but a category of founders: its `loc` read "Remote / SF (Boston-based founders)" and its `url` was a filtered list of YC companies rather than a front door. YC alumni belong in the atlas as their own entries — several already are. |
 | **Fennec Design Studio** | Self-submitted via the entry form, October 2026 (#48). Real, Grafton MA, and candid about its own method — but a paid consultancy, with packages priced from $17,000 for a two-to-three-week engagement. Out under the vendor rule, same as NineTwoThree. It also does not claim to be an AI organisation: it describes AI as speeding up synthesis rather than replacing judgment, and bills itself as workflow and systems consulting. Its founder perk for Open Accelerator companies belongs in the perks marketplace, not the atlas — see #51. |
+| **Crunchr** | Submitted through the entry form by someone at the company, November 2026 (#124). Real, with a US office in Boston since 2023, now at 1 Lincoln St, and not a vendor to founders: it sells to companies with 1,000+ employees. But it is headquartered in Amsterdam, the public evidence puts sales and customer success in Boston, and it calls itself a people analytics company, with AI as a product feature. The form's "Mentorship" was an informal offer to share lessons, with no program behind it. Revisit if it builds an AI engineering team here or starts a founder program. |
 
 The rules those add up to:
 
 - **A pin implies a presence.** An investor or company with no Massachusetts office
   does not get one, however active it is here.
+- **A sales office is a presence, not a home.** Companies are listed for what they
+  add here: they are based in Massachusetts, or they have research or engineering
+  teams here. A US sales or customer office of a company built elsewhere does not
+  qualify.
 - **AI has to be the org's own claim**, not an inference from one programme listing.
 - **The atlas lists what a founder can get, not who sells to them.** Agencies,
-  consultancies and vendors are out as a class.
+  consultancies and other vendors that sell to founders are out as a class.
 - **Being real and useful is not enough** — it also has to be AI-relevant and
   Massachusetts-based. Say so plainly when declining; a contributor who gets a
   reason can argue with it.

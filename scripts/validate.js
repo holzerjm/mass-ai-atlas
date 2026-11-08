@@ -62,6 +62,9 @@ for (const d of DATA) {
     if (!validStages.has(s)) err(id, `invalid stage ${s} (valid: ${[...validStages].join(", ")})`);
   if (d.applyBy !== undefined && d.applyBy !== "rolling" && d.applyBy < TODAY)
     warn.push(`  ⚠ [${id}] applyBy ${d.applyBy} has passed — set the next deadline or remove it`);
+  // On a funder, applyUrl alone means "takes pitches". Anywhere else, the page shows nothing for it.
+  if (d.applyUrl && !d.applyBy && !d.applyNote && d.cat !== "vc" && d.cat !== "angel")
+    warn.push(`  ⚠ [${id}] applyUrl never shows without applyBy or applyNote — add one or remove it`);
   if (d.added === undefined)
     warn.push(`  ⚠ [${id}] missing added — the month the entry joined the atlas ("YYYY-MM")`);
   else if (d.added > THIS_MONTH)
@@ -77,6 +80,100 @@ for (const d of DATA) {
 for (const d of DATA)
   for (const l of d.links || [])
     if (!ids.has(l)) err(d.id, `links to unknown entry "${l}"`);
+
+// data/credits.yml feeds the credits page (credits/index.html), not the atlas, so
+// atlas-data.js never loads it. Check it here: its schema, then one entry per
+// person and no date in the future. CORE_SCHEMA keeps dates as strings, as the
+// atlas loader does.
+{
+  const fs = require("fs"), path = require("path"), yaml = require("js-yaml"), Ajv = require("ajv");
+  const { DATA_DIR } = require("./load-data");
+  const cerr = msg => errors.push(`  ✗ [credits.yml] ${msg}`);
+  try {
+    const read = f => yaml.load(fs.readFileSync(path.join(DATA_DIR, f), "utf8"), { schema: yaml.CORE_SCHEMA, filename: f });
+    const schema = read("credits.schema.yml"), credits = read("credits.yml");
+    const ajv = new Ajv({ allErrors: true });
+    if (!ajv.validate(schema, credits)) {
+      for (const e of ajv.errors) cerr(`${e.instancePath || "/"} ${e.message}`);
+    } else {
+      const seen = new Set();
+      for (const m of credits.mapmakers) {
+        if (seen.has(m.github.toLowerCase())) cerr(`${m.github} is listed more than once`);
+        seen.add(m.github.toLowerCase());
+        if (m.since > TODAY) cerr(`${m.github}: since ${m.since} is in the future`);
+      }
+      for (const ms of credits.milestones)
+        if (ms.date > TODAY) cerr(`milestone "${ms.title}" is dated ${ms.date}, in the future`);
+    }
+  } catch (e) { cerr(e.message); }   // a YAML syntax error names the line and column
+}
+
+// data/pathways.yml feeds the Founder Journey. The page reads it on its own and works
+// without it, so atlas-data.js never loads it, and it is checked here the way credits.yml
+// is: its schema, then what a schema can't see, which is every reference to another file.
+// An unknown entry stops the build, so removing an entry can't quietly hollow out a pathway.
+{
+  const fs = require("fs"), path = require("path"), yaml = require("js-yaml"), Ajv = require("ajv");
+  const { DATA_DIR } = require("./load-data");
+  const perr = msg => errors.push(`  ✗ [pathways.yml] ${msg}`);
+  try {
+    const read = f => yaml.load(fs.readFileSync(path.join(DATA_DIR, f), "utf8"), { schema: yaml.CORE_SCHEMA, filename: f });
+    const schema = read("pathways.schema.yml"), pathways = read("pathways.yml");
+    const offers = new Set(read("entities.schema.yml").items.properties.offers.items.enum);
+    const ajv = new Ajv({ allErrors: true });
+    if (!ajv.validate(schema, pathways)) {
+      for (const e of ajv.errors) perr(`${e.instancePath || "/"} ${e.message}`);
+    } else {
+      const seen = new Set(), byId = new Map(DATA.map(d => [d.id, d]));
+      for (const p of pathways) {
+        if (seen.has(p.id)) perr(`duplicate id "${p.id}"`);
+        seen.add(p.id);
+        if (!validStages.has(p.stage)) perr(`${p.id}: invalid stage ${p.stage} (valid: ${[...validStages].join(", ")})`);
+        const used = new Set();
+        p.steps.forEach((s, i) => {
+          const at = `${p.id}, step ${i + 1}`;
+          for (const id of s.entries || []) {
+            const d = byId.get(id);
+            if (!d) { perr(`${at}: unknown entry "${id}"`); continue; }
+            if (used.has(id)) perr(`${at}: "${id}" is already in an earlier step`);
+            used.add(id);
+            if (!(d.stages || []).includes(p.stage))
+              warn.push(`  ⚠ [pathways.yml] ${at}: "${id}" isn't listed at stage ${p.stage}, so its entry and this pathway disagree`);
+          }
+          if (s.more && s.more.cat && !Object.hasOwn(CATS, s.more.cat)) perr(`${at}: unknown category "${s.more.cat}"`);
+          if (s.more && s.more.need && !offers.has(s.more.need)) perr(`${at}: unknown need "${s.more.need}"`);
+        });
+      }
+    }
+  } catch (e) { perr(e.message); }   // a YAML syntax error names the line and column
+}
+
+// data/updates.yml feeds the updates page and the banner on the atlas page, and like the two
+// files above it is checked here, not in the browser. A `try` link that names a pathway or an
+// entry has to resolve, so renaming one can't leave a dead "Try it" on the page.
+{
+  const fs = require("fs"), path = require("path"), yaml = require("js-yaml"), Ajv = require("ajv");
+  const { DATA_DIR } = require("./load-data");
+  const uerr = msg => errors.push(`  ✗ [updates.yml] ${msg}`);
+  try {
+    const read = f => yaml.load(fs.readFileSync(path.join(DATA_DIR, f), "utf8"), { schema: yaml.CORE_SCHEMA, filename: f });
+    const schema = read("updates.schema.yml"), updates = read("updates.yml");
+    const ajv = new Ajv({ allErrors: true });
+    if (!ajv.validate(schema, updates)) {
+      for (const e of ajv.errors) uerr(`${e.instancePath || "/"} ${e.message}`);
+    } else {
+      const pathways = new Set(read("pathways.yml").map(p => p.id)), seen = new Set();
+      for (const u of updates) {
+        if (u.date > TODAY) uerr(`"${u.title}" is dated ${u.date}, in the future`);
+        if (seen.has(u.title)) uerr(`"${u.title}" is listed twice`);
+        seen.add(u.title);
+        const q = new URLSearchParams((u.try || "").split("#")[0].split("?")[1] || "");
+        if (q.get("pathway") && !pathways.has(q.get("pathway"))) uerr(`"${u.title}" links to unknown pathway "${q.get("pathway")}"`);
+        if (q.get("entry") && !ids.has(q.get("entry"))) uerr(`"${u.title}" links to unknown entry "${q.get("entry")}"`);
+      }
+    }
+  } catch (e) { uerr(e.message); }   // a YAML syntax error names the line and column
+}
 
 if (warn.length) console.log("Warnings:\n" + warn.join("\n") + "\n");
 if (errors.length) {

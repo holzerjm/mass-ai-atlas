@@ -1,0 +1,71 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: pathways.schema.yml
+title: Mass AI Atlas founder pathways
+description: >
+  Hand-written routes through a stage of the Founder Journey. Read by index.html and
+  scripts/export-json.js, and checked by scripts/validate.js, which also resolves every
+  entry id. An empty list is valid: the Journey then shows its stages as it always did.
+  MAINTAINING.md has the rules for writing one.
+type: array
+definitions:
+  text:
+    type: string
+    minLength: 1
+    pattern: '^[^<>]*$'
+items:
+  type: object
+  required: [id, stage, title, lead, steps]
+  additionalProperties: false
+  properties:
+    id:
+      description: stable lowercase id, used in links (?pathway=build-compute)
+      type: string
+      pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+      maxLength: 40
+    stage:
+      description: the stage this pathway belongs to (its `n` in stages.yml)
+      type: integer
+      minimum: 1
+    title:
+      description: the founder's situation in their own words, shown on the button
+      allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 44 }]
+    lead:
+      description: one sentence on why the steps come in this order
+      allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 170 }]
+    steps:
+      type: array
+      minItems: 2
+      maxItems: 4
+      items:
+        type: object
+        required: [do, why]
+        additionalProperties: false
+        anyOf: [{ required: [entries] }, { required: [more] }]
+        properties:
+          do:
+            description: what to do at this step, as an instruction
+            allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 56 }]
+          why:
+            description: why this comes here in the order. Facts about an organization belong in its entry
+            allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 210 }]
+          entries:
+            description: >
+              the ids of the entries that fit this step. The page lists them by closing date,
+              then by name, so the order written here means nothing
+            type: array
+            minItems: 1
+            maxItems: 8
+            uniqueItems: true
+            items: { type: string, minLength: 1 }
+          more:
+            description: a link to the Directory, filtered to this pathway's stage and to these values
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+              cat:
+                description: a category key from categories.yml
+                type: string
+              need:
+                description: a word from the `offers` vocabulary in entities.schema.yml
+                type: string

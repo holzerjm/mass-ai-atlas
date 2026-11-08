@@ -48,9 +48,18 @@ older versions to patch.
 Worth knowing before you report, so you can tell a real finding from an intended
 behavior:
 
-- **There is no backend and no accounts.** No server-side code, no database, no login, no
-  user data collected, no analytics. Everything a visitor does stays in their browser, in
-  five `localStorage` keys.
+- **There is no backend and no accounts.** No server-side code, no database, and no login, and
+  the atlas's own code collects nothing about visitors. What a visitor does on the page stays
+  in their browser, in 6 `localStorage` keys, all starting with `toa-atlas-`.
+- **Cloudflare counts page views.** Cloudflare serves the site and adds its Web Analytics script
+  to each page, outside this repository. The script reports the page's address, without its
+  query string, along with load timings, and it sets no cookies.
+- **The URL carries filters and ids, never what someone typed.** Filter values are checked
+  against the atlas's fixed lists and anything else is ignored. Text typed into a search box
+  stays out of the URL, so links and logs don't carry a founder's own words.
+- **Ask your own AI sends nothing.** The atlas runs no model. What someone types goes into a
+  prompt on the page, and stays out of the URL, storage, and the network. It leaves only if they
+  copy it and paste it into their own assistant, whose own terms then apply.
 - **No secret reaches the browser.** The deploy credentials and Slack webhooks are GitHub
   Actions secrets, used only inside CI.
 - **Untrusted input is gated by a human.** The suggestion bot runs only on the `bot:draft`
@@ -63,8 +72,13 @@ behavior:
   value cannot escape its field.
 - **Text fields reject angle brackets** at the schema level, and the generated share pages
   escape their output again.
-- **The data is validated twice**: in CI before it ships, and again in the visitor's
-  browser before anything is drawn.
+- **The atlas data is validated twice**: in CI before it ships, and again in the visitor's
+  browser before anything is drawn. The credits page's data, `data/credits.yml`, is checked
+  in CI only. The page inserts every value as text, never as HTML, and accepts only
+  `https:` links. The Founder Journey's `data/pathways.yml` is also checked in CI only. The
+  page escapes every value, and shows an organization only if its id resolves to an entry.
+  `data/updates.yml` is checked in CI only too. Its page inserts every value as text and
+  accepts only links inside the atlas.
 
 ## What is not a security issue
 

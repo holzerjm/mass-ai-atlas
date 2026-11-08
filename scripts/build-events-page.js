@@ -35,9 +35,11 @@ const mobileNav = between("<!-- Mobile Nav Overlay -->", "</div>");
 // The atlas page fills #footCount from the dataset at runtime. This page ships no
 // such script, so any number lifted into it can only go stale — it read "101
 // organizations" for months. Baking the real count in at build time (as this did)
-// only moved the problem: nothing in CI re-runs this generator, so the number was
-// correct once and then frozen. Drop the clause instead; the atlas page still
-// shows a live count, and scripts/lint-copy.js keeps a literal from creeping back.
+// only moved the problem: the number froze at whatever the last run saw, and now
+// that validate.yml re-runs this generator on every pull request, a baked count
+// would fail that check on every data change. Drop the clause instead; the atlas
+// page still shows a live count, and scripts/lint-copy.js keeps a literal from
+// creeping back.
 const footerRaw = between('<footer class="footer">', "</footer>");
 const COUNT_CLAUSE = /\s*·\s*<span id="footCount"[^>]*>[^<]*<\/span>\s*organizations across Massachusetts\./;
 const withoutCount = footerRaw.replace(COUNT_CLAUSE, ".");
@@ -45,17 +47,47 @@ if (withoutCount === footerRaw) throw new Error("footer: the #footCount clause w
 // Same reasoning for the curation month. The atlas page fills #footCurated from the
 // newest lastVerified in the data; this page has no script, so a month lifted into
 // it could only rot — it said "Curated June 2026" into October. Drop the clause
-// rather than bake in a date nothing regenerates.
+// rather than bake in a date the page cannot keep current.
 const CURATED_CLAUSE = /\s*·\s*Curated\s*<span id="footCurated"[^>]*>[^<]*<\/span>/;
-const footer = withoutCount.replace(CURATED_CLAUSE, "");
-if (footer === withoutCount) throw new Error("footer: the #footCurated clause was not found in index.html — the events page would ship a curation date it cannot keep current");
+const withoutCurated = withoutCount.replace(CURATED_CLAUSE, "");
+if (withoutCurated === withoutCount) throw new Error("footer: the #footCurated clause was not found in index.html — the events page would ship a curation date it cannot keep current");
+// The footer's "Suggest an entry" link calls suggestEntry(), which the atlas page defines and
+// this page does not, so here a click did nothing but throw a ReferenceError. Point it at the
+// suggestion form instead. issueUrl() reads GH_REPO, so a copy's link opens its own repository's
+// form. tests/events.spec.js checks the link.
+const SUGGEST_LINK = '<a href="#" onclick="suggestEntry();return false">';
+const withSuggestForm = withoutCurated.replace(SUGGEST_LINK, `<a href="${issueUrl("suggest-entry.yml")}" target="_blank" rel="noopener">`);
+if (withSuggestForm === withoutCurated) throw new Error("footer: the Suggest an entry link was not found in index.html, so the events page could ship a link to suggestEntry(), which it does not define");
+// The footer's link to the repository is written into index.html, and the atlas page points it
+// at GH_REPO when its script runs. This page does not run that script, so point it here from the
+// same GH_REPO, or a copy's events page links to the repository it was copied from.
+// tests/events.spec.js checks this with a different GH_REPO.
+const REPO_LINK = /<a id="footGhLink" href="[^"]*"/;
+if (!REPO_LINK.test(withSuggestForm)) throw new Error("footer: the GitHub link (#footGhLink) was not found in index.html, so a copy's events page could link to the repository it was copied from");
+const withRepoLink = withSuggestForm.replace(REPO_LINK, `<a id="footGhLink" href="https://github.com/${GH_REPO}"`);
+// The footer's links to the credits and updates pages are relative to the atlas page. This
+// page sits one folder down, at events/, so the same hrefs would point at events/credits/.
+// Point them up a level. tests/credits.spec.js and tests/updates.spec.js check that both
+// footers reach those pages.
+const footer = withRepoLink.replace('href="credits/"', 'href="../credits/"').replace('href="updates/"', 'href="../updates/"');
 const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color:var(--gold);text-decoration:none}");
+// The footer band has to stay dark in both themes: its partner marks are white artwork (the
+// reverse Red Hat wordmark, and IBM's logo inverted by `.partners img.ibm`). index.html keeps it
+// dark in light mode with rules up in its theme block, outside the slice above, so they never came
+// across and the marks sat on this page's near-white ground. Nor could they come across as they
+// are: they re-assert the atlas's dark palette, and this page's light --gold (#b45309) reads 3.93:1
+// on a dark ground. So the page writes its own dark palette once, for :root and for that footer.
+const DARK = `--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
+    --muted:#9aa1ab;--faint:#848c97;--gold:#ffc600;--red:#ff5c45;--ok:#4ade80`;
 // chrome script: from toggleMobileMenu's containing <script> to the updateLogos sync call
 const scriptStart = src.lastIndexOf("<script>", src.indexOf("function toggleMobileMenu"));
 const scriptEnd = src.indexOf("</script>", src.indexOf("updateLogos(document.documentElement.classList.contains"));
 const chromeJs = src.slice(scriptStart, scriptEnd + "</script>".length)
   .replace("if(typeof setMapTiles==='function')setMapTiles();", "");
 
+// The page's own content is its <main> (class "wrap"), between the site header (banner) and the
+// atlas's footer (contentinfo). Until 2026-11 it was a <div>, so the page had no main landmark
+// and its content sat outside every landmark.
 const page = `<!doctype html>
 <!-- GENERATED FILE — do not edit by hand. Rebuild with: node scripts/build-events-page.js (see docs/events-guide.md) -->
 <html lang="en" class="dark">
@@ -76,8 +108,7 @@ ${tailwind}<script>
 ${twConfig}
 ${bootstrap}
 <style>
-  :root{--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
-    --muted:#9aa1ab;--faint:#848c97;--gold:#ffc600;--red:#ff5c45;--ok:#4ade80}
+  :root{${DARK}}
   html:not(.dark){--bg:#faf9f7;--panel:#ffffff;--panel2:#f3f1ee;--line:#e2ddd6;--text:#1c1a17;
     --muted:#5d574e;--faint:#6b6255;--gold:#b45309;--red:#cc0000;--ok:#15803d}
   /* light --red is darkened from brand #ee0000, which reads 4.31:1 on this ground */
@@ -125,6 +156,8 @@ ${bootstrap}
   .contrib a:hover{text-decoration:underline}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 ${footerCss}
+  /* the footer band stays dark in light mode too: its partner marks are white artwork */
+  html:not(.dark) .footer{${DARK};background:var(--bg)}
     /* Make inline links distinguishable without relying on colour alone. */
   #add p a,
   .footer-inner a,
@@ -139,7 +172,7 @@ ${footerCss}
 <body>
 ${header}</header>
 ${mobileNav}
-<div class="wrap">
+<main class="wrap">
   <p class="eyebrow">The Open Accelerator · Mass AI Atlas</p>
   <h1>Boston AI Events</h1>
   <p class="stand">Every AI community event we can find across Greater Boston for the next
@@ -168,7 +201,7 @@ ${mobileNav}
     Luma's Boston AI feed, and <a style="color:var(--faint)" href="https://boston.aitinkerers.org/">AI Tinkerers Boston</a> ·
     aggregation approach builds on <a style="color:var(--faint)" href="https://github.com/nkpng2k/startup-event-scraper">nkpng2k's startup-event-scraper</a> (Apache-2.0)
   </p>
-</div>
+</main>
 ${footer}</footer>
 <script>
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")

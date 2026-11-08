@@ -156,6 +156,7 @@
   why: A fast-growing AI program in the geographic center of Boston's student population.
   tags: [education, research]
   stages: [1]
+  links: [iaifi]
   offers: [talent]
   added: 2026-06
   lastVerified: 2026-09
@@ -350,9 +351,12 @@
   desc: Microsoft's Cambridge R&D center — and one of the most generous event venues in the ecosystem.
   why: Hosts the Boston Generative AI Meetup and dozens of community events; Microsoft for Startups credits flow through here.
   tags: [events]
-  stages: [1, 5]
+  stages: [1, 3, 5]
   links: [genai-meetup]
   offers: [community, compute, talent]
+  applyBy: rolling
+  applyNote: Microsoft for Startups credits
+  applyUrl: https://www.microsoft.com/en-us/startups
   added: 2026-06
   lastVerified: 2026-08
 - id: google
@@ -365,8 +369,11 @@
   desc: Google's multi-building Kendall Square campus, with significant AI/ML engineering teams.
   why: Google for Startups programs, cloud credits, and a deep local hiring pool of alumni.
   tags: [infrastructure]
-  stages: [5]
+  stages: [3, 5]
   offers: [compute, talent]
+  applyBy: rolling
+  applyNote: Google for Startups Cloud credits
+  applyUrl: https://cloud.google.com/startup
   added: 2026-06
   lastVerified: 2026-09
 - id: meta-cam
@@ -393,8 +400,11 @@
   desc: Amazon's Seaport offices at 111 Harbor Way house Alexa, Devices, AWS and Amazon Pharmacy teams, with interior fit-out underway since 2026 on the adjacent One Boston Wharf Road tower. Amazon Robotics operates separately in North Reading and Westborough.
   why: AWS Activate credits and a large pool of applied-ML engineers.
   tags: [infrastructure, robotics]
-  stages: [5]
+  stages: [3, 5]
   offers: [compute, talent]
+  applyBy: rolling
+  applyNote: AWS Activate credits
+  applyUrl: https://aws.amazon.com/startups/credits/
   added: 2026-06
   lastVerified: 2026-10
 - id: rai
@@ -459,13 +469,13 @@
   added: 2026-06
   lastVerified: 2026-10
 - id: salesforce-bos
-  name: Salesforce (Cambridge)
+  name: Salesforce (Boston)
   cat: corporate
-  loc: 955 Massachusetts Ave, Cambridge
-  lat: 42.3691
-  lng: -71.1099
+  loc: 500 Boylston St, Boston
+  lat: 42.3504
+  lng: -71.074
   url: https://salesforce.com
-  desc: CRM and enterprise AI vendor. Salesforce lists a Cambridge office at 955 Massachusetts Avenue, alongside Boston and Burlington locations. Its AI platform is now branded Agentforce, with Einstein covering the embedded predictive-AI layer.
+  desc: CRM and enterprise AI vendor. Salesforce lists offices at 500 Boylston Street in Boston and 5 Wall Street in Burlington. Its AI platform is now branded Agentforce, with Einstein covering the embedded predictive-AI layer.
   why: An enterprise platform many AI startups build on or sell through.
   tags: [enterprise, infrastructure]
   stages: [5]
@@ -719,36 +729,34 @@
 - id: kensho
   name: Kensho
   cat: startup
-  loc: Harvard Sq, Cambridge
-  approx: true
-  lat: 42.3736
-  lng: -71.119
+  loc: 44 Brattle St, Cambridge
+  lat: 42.3738
+  lng: -71.1224
   url: https://kensho.com
   badge: $550M exit
-  desc: AI for financial intelligence; acquired by S&P Global for ~$550M — then its founders went on to start Suno.
+  desc: AI for financial intelligence; acquired by S&P Global for ~$550M in 2018 — and Kensho alumni went on to found Suno.
   why: A case study in Boston's founder-recycling flywheel.
   tags: [fintech]
   stages: []
   links: [suno, gv, fprime, gc, xfund]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: tamr
   name: Tamr
   cat: startup
-  loc: Cambridge
-  approx: true
-  lat: 42.365
-  lng: -71.08
+  loc: 66 Church St, Cambridge
+  lat: 42.374
+  lng: -71.121
   url: https://www.tamr.com
-  desc: AI-native data mastering, co-founded by database legend Michael Stonebraker out of MIT CSAIL.
+  desc: AI-native master data management, co-founded by database legend Michael Stonebraker out of MIT CSAIL. Raised $21M in growth equity led by Boston's Volition Capital in October 2026.
   why: Classic CSAIL-to-company playbook.
   tags: [ML, MIT spinout]
   stages: []
   links: [csail, gv]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: pathai
   name: PathAI
   cat: startup
@@ -764,23 +772,23 @@
   links: [gc]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: generate
   name: Generate:Biomedicines
   cat: startup
-  loc: Somerville
-  approx: true
-  lat: 42.39
-  lng: -71.083
+  loc: 101 South St, Somerville
+  lat: 42.3748
+  lng: -71.0911
   url: https://generatebiomedicines.com
-  desc: Generative AI for protein therapeutics, created by Flagship Pioneering.
+  badge: 'NASDAQ: GENB'
+  desc: Generative AI for protein therapeutics, created by Flagship Pioneering. Went public on Nasdaq (GENB) in February 2026 with a $400M IPO; its lead candidate, GB-0895, is in Phase 3 trials.
   why: Where generative AI and Boston biotech collide at scale.
   tags: [biotech, generative AI]
   stages: []
   links: [flagship, nvidia-bos]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: lila
   name: Lila Sciences
   cat: startup
@@ -796,7 +804,7 @@
   links: [flagship, nvidia-bos]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: realtime
   name: Realtime Robotics
   cat: startup
@@ -815,10 +823,9 @@
 - id: righthand
   name: RightHand Robotics
   cat: startup
-  loc: Somerville
-  approx: true
-  lat: 42.387
-  lng: -71.099
+  loc: 237 Washington St, Somerville
+  lat: 42.3799
+  lng: -71.0936
   url: https://www.righthandrobotics.com
   desc: AI-driven robotic picking for e-commerce fulfillment, with Harvard/MIT research roots.
   why: Warehouse AI born from Boston lab benches.
@@ -827,14 +834,13 @@
   links: [matrix, gv, fprime]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: pickle
   name: Pickle Robot
   cat: startup
-  loc: Charlestown, Boston
-  approx: true
-  lat: 42.378
-  lng: -71.065
+  loc: 465 Medford St, Charlestown
+  lat: 42.3848
+  lng: -71.068
   url: https://www.picklerobot.com
   desc: Robots that unload trucks — physical AI for the supply chain.
   why: Embodied-AI startup thriving outside the Kendall bubble.
@@ -843,7 +849,7 @@
   links: [hyperplane]
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: concertai
   name: ConcertAI
   cat: startup
@@ -858,7 +864,7 @@
   stages: []
   offers: [talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: code-metal
   name: Code Metal
   cat: startup
@@ -1192,7 +1198,7 @@
   links: []
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: epipelagic
   name: Epipelagic Ventures
   cat: vc
@@ -1207,23 +1213,23 @@
   links: []
   offers: [funding, mentorship]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: nextview
   name: NextView Ventures
   cat: vc
-  loc: Boston, Seaport
-  approx: true
-  lat: 42.3519
-  lng: -71.0444
+  loc: 22 Boston Wharf Rd, Seaport
+  lat: 42.3504
+  lng: -71.047
   url: https://nextview.vc
-  desc: Seed-stage fund focused on 'redesigning the everyday economy' — backing founders using software and AI to solve mass-market problems.
-  why: 'Boston-native since 2010. Writes $500K–$2M checks at seed. Notable exit: Hatch acquired by Yelp for $300M (2026).'
-  facts: [[Stage, Seed], [Check size, $500K–$2M], [Focus, Everyday economy — software and AI]]
+  desc: Pre-seed and seed fund that leads rounds for pre-traction companies using AI and software to tackle mass-market human problems.
+  why: 'Boston-native since 2010; leads most of its rounds and usually takes a board or observer seat. Notable exit: Hatch acquired by Yelp for $300M (2026).'
+  facts: [[Stage, Pre-seed and seed], [Check size, $250K–$4M initial investment], [Focus, AI and software for mass-market human problems]]
   tags: [seed, consumer]
   stages: [3, 4]
   offers: [funding]
+  applyUrl: https://nextview.vc/#contactmodal
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: rough-draft
   name: GC Venture Fellowship (fka Rough Draft Ventures)
   cat: vc
@@ -1239,14 +1245,17 @@
   stages: [1, 2, 3]
   links: [gc]
   offers: [funding]
+  applyBy: rolling
+  applyNote: Student-run companies
+  applyUrl: https://airtable.com/appslPddN0o2Hymcu/shrykFVbaFXmZvpBG
   added: 2026-06
   lastVerified: 2026-08
 - id: matrix
   name: Matrix (fka Matrix Partners)
   cat: vc
-  loc: Bay Colony, Waltham
-  lat: 42.3895
-  lng: -71.2265
+  loc: 101 Main St, Cambridge
+  lat: 42.3622
+  lng: -71.0813
   url: https://matrix.vc/
   desc: Early-stage VC with deep Boston roots — among the region's most established firms for seed and Series A.
   why: Led early rounds in HubSpot, Ocient, CloudBees. Strong thesis in SaaS, infrastructure, and applied AI.
@@ -1263,14 +1272,15 @@
   lat: 42.3625
   lng: -71.0843
   url: https://www.ibm.com/ventures
-  desc: IBM's strategic investment arm — invests in AI, hybrid cloud, quantum, and enterprise tech startups.
+  desc: IBM's strategic investment arm — backs early-stage AI and quantum startups solving enterprise problems, from infrastructure to applications.
   why: Co-sponsor of The Open Accelerator. Strategic investor that brings enterprise distribution, not just capital. Particularly valuable for startups selling to regulated industries.
   tags: [strategic, enterprise, infrastructure]
   stages: [4, 5]
   links: [toa]
   offers: [funding, customers]
+  applyUrl: https://forms.monday.com/forms/1b11eac6857d1c54702eee60a70d271b?r=use1
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: gc
   name: General Catalyst
   cat: vc
@@ -1286,7 +1296,7 @@
   links: [lila]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: glasswing
   name: Glasswing Ventures
   cat: vc
@@ -1306,26 +1316,26 @@
 - id: pillar
   name: Pillar VC
   cat: vc
-  loc: Fort Point, Boston
+  loc: Back Bay, Boston
   approx: true
-  lat: 42.349
-  lng: -71.048
+  lat: 42.3515
+  lng: -71.079
   url: https://www.pillar.vc
-  desc: Founder-friendly seed firm; runs free programs for PhD founders (Pillar Frequency) across AI and bio.
+  desc: Founder-friendly pre-seed and seed firm that partners at inception with technical founders across AI and bio.
   why: Among the most accessible institutional seed money for first-time technical founders.
-  facts: [[Stage, Seed], [Focus, AI and bio], [Terms, Free PhD-founder program (Frequency)]]
+  facts: [[Stage, Pre-seed and seed], [Focus, AI and bio]]
   tags: [seed, founders]
   stages: [2, 4]
   offers: [funding, mentorship]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: hyperplane
   name: Hyperplane
   cat: vc
-  loc: Fort Point, Boston
+  loc: Back Bay, Boston
   approx: true
-  lat: 42.35
-  lng: -71.047
+  lat: 42.3513
+  lng: -71.0772
   url: https://www.hyperplane.vc
   desc: Seed fund backing machine-intelligence companies since before it was cool.
   why: Technical partners who actually read your model card.
@@ -1333,7 +1343,7 @@
   stages: [4]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: flybridge
   name: Flybridge
   cat: vc
@@ -1344,26 +1354,27 @@
   url: https://www.flybridge.com
   desc: Seed firm with an explicit AI-first thesis and long Boston history.
   why: Publishes practical AI-startup playbooks; strong community programs.
+  facts: [[Stage, Pre-seed and seed], [Check size, 'Up to $250K pre-seed (Next Wave); $1M–$3M seed']]
   tags: [seed, AI-native]
   stages: [4]
   offers: [funding, community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: underscore
   name: Underscore VC
   cat: vc
-  loc: Downtown Boston
-  approx: true
-  lat: 42.358
-  lng: -71.057
+  loc: 131 Oliver St, Boston
+  lat: 42.3552
+  lng: -71.0525
   url: https://underscore.vc
   desc: Boston seed firm with a community-driven model (Core) connecting founders to operators.
   why: Their operator network doubles as a free advisory bench.
   tags: [seed, enterprise]
   stages: [2, 4]
   offers: [funding, mentorship, community]
+  applyUrl: https://underscore.vc/faqs/
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: fc
   name: Founder Collective
   cat: vc
@@ -1372,13 +1383,13 @@
   lat: 42.3744
   lng: -71.12
   url: https://www.foundercollective.com
-  desc: Seed fund built by founders, famously aligned with keeping founders in control.
+  desc: Seed and pre-seed fund built by founders. It keeps its funds below $100M to stay aligned with them.
   why: Backed Uber, Coupang — and writes great essays on capital efficiency.
   tags: [seed, founders]
   stages: [4]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: battery
   name: Battery Ventures
   cat: vc
@@ -1389,17 +1400,16 @@
   desc: Global multi-stage firm headquartered on Fan Pier with active AI/infra practice.
   why: Growth capital without leaving the Seaport.
   tags: [multi-stage, infrastructure]
-  stages: [5]
+  stages: [4, 5]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: bessemer
   name: Bessemer Venture Partners (Boston)
   cat: vc
-  loc: Back Bay, Boston
-  approx: true
-  lat: 42.3496
-  lng: -71.076
+  loc: 100 Worcester St, Wellesley
+  lat: 42.3161
+  lng: -71.2386
   url: https://www.bvp.com
   desc: One of the oldest VC firms in the world, with a significant Boston presence and AI roadmaps.
   why: Their public 'State of AI' roadmaps tell you exactly what they want to fund.
@@ -1407,7 +1417,7 @@
   stages: [4, 5]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: flagship
   name: Flagship Pioneering
   cat: vc
@@ -1423,7 +1433,7 @@
   links: [generate, lila]
   offers: [funding, mentorship]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: atlas
   name: Atlas Venture
   cat: vc
@@ -1431,28 +1441,27 @@
   lat: 42.3633
   lng: -71.093
   url: https://www.atlasventure.com
-  desc: Premier early-stage biotech VC increasingly backing AI-enabled drug discovery.
-  why: 'The bridge between Boston''s two superpowers: AI and biotech.'
+  desc: Seed-led biotech venture firm that builds drug companies from its own incubator. A partner writes that all of its drug discovery companies use some AI.
+  why: Its LifeSciVC blog shows how a biotech seed investor weighs AI claims in drug discovery.
   tags: [biotech, seed]
   stages: [4]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: polaris
   name: Polaris Partners
   cat: vc
-  loc: Seaport, Boston
-  approx: true
-  lat: 42.353
-  lng: -71.045
+  loc: One Marina Park Dr, Seaport
+  lat: 42.3532
+  lng: -71.0453
   url: https://www.polarispartners.com
-  desc: Long-standing Boston firm investing across healthcare and technology.
+  desc: Long-standing Boston firm investing in healthcare and biotech. An affiliate, Polaris Growth Fund, backs founder-owned software companies.
   why: Decades of pattern recognition on Boston founders.
   tags: [healthcare]
   stages: [4, 5]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: engine-v
   name: Engine Ventures
   cat: vc
@@ -1467,8 +1476,11 @@
   stages: [4, 5]
   links: [engine]
   offers: [funding]
+  applyBy: rolling
+  applyNote: Tough Tech founders
+  applyUrl: https://engineventures.com/connect
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: e14
   name: E14 Fund
   cat: vc
@@ -1483,6 +1495,9 @@
   stages: [4]
   links: [medialab]
   offers: [funding]
+  applyBy: rolling
+  applyNote: Startups with key MIT contributors
+  applyUrl: https://www.e14.vc/apply
   added: 2026-06
   lastVerified: 2026-08
 - id: converge
@@ -1502,19 +1517,18 @@
 - id: accomplice
   name: Accomplice
   cat: vc
-  loc: Cambridge
-  approx: true
-  lat: 42.3736
-  lng: -71.121
+  loc: 56 Wareham St, Boston
+  lat: 42.3391
+  lng: -71.0674
   url: https://www.accomplice.co
-  desc: Community-driven seed firm (Boston roots of Atlas Venture's tech practice); behind BOSS and other ecosystem efforts.
+  desc: Venture firm and family office (Boston roots of Atlas Venture's tech practice); behind Spearhead, BOSS and other ecosystem efforts. Its 2022 fund was reported as its last.
   why: Long history of seeding Boston's startup community itself.
   tags: [seed]
   stages: [4]
   links: [recfut]
-  offers: [funding, community]
+  offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: '406'
   name: .406 Ventures
   cat: vc
@@ -1522,21 +1536,21 @@
   lat: 42.354189399999996
   lng: -71.0513553
   url: https://www.406ventures.com
-  desc: Early-stage firm strong in cybersecurity, healthcare IT and data/AI.
+  desc: Early-stage firm strong in cybersecurity, healthcare and data/AI.
   why: 'Security-AI founders: they wrote the local playbook.'
-  facts: [[Stage, Early-stage], [Focus, 'Cybersecurity, healthcare IT, data/AI']]
+  facts: [[Stage, Early-stage], [Focus, 'Cybersecurity, healthcare, data/AI']]
   tags: [security, seed]
   stages: [4]
   offers: [funding]
+  applyUrl: https://www.406ventures.com/contact/
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: material
   name: Material Impact
   cat: vc
-  loc: Boston
-  approx: true
-  lat: 42.3556
-  lng: -71.056
+  loc: 131 Dartmouth St, Boston
+  lat: 42.347
+  lng: -71.0754
   url: https://www.materialimpact.com
   desc: Deep-tech fund turning material science and embodied-AI breakthroughs into companies.
   why: For AI that ships with atoms, not just bits.
@@ -1544,7 +1558,7 @@
   stages: [4]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: massventures
   name: MassVentures
   cat: vc
@@ -1559,6 +1573,9 @@
   stages: [3, 4]
   links: [aihub]
   offers: [grants, funding, mentorship]
+  applyBy: rolling
+  applyNote: START grants reopen Feb 1, 2027
+  applyUrl: https://www.mass-ventures.com/mv-capital
   added: 2026-06
   lastVerified: 2026-10
 - id: foundersedge
@@ -1575,6 +1592,7 @@
   tags: [pre-seed, enterprise, AI-native]
   stages: [2, 4]
   offers: [funding, mentorship, community]
+  applyUrl: https://www.foundersedge.com/apply
   added: 2026-08
   lastVerified: 2026-08
 - id: milemark
@@ -1637,6 +1655,7 @@
   tags: [applied AI, seed]
   stages: [4]
   offers: [funding]
+  applyUrl: https://innospark.vc/contact/
   added: 2026-08
   lastVerified: 2026-08
 - id: first-star
@@ -1669,6 +1688,7 @@
   stages: [3, 4]
   links: [liquid]
   offers: [funding, compute, space]
+  applyUrl: https://www.linkventures.com/contact
   added: 2026-08
   lastVerified: 2026-08
 - id: hubspot-v
@@ -1714,6 +1734,7 @@
   tags: [multi-stage, infrastructure]
   stages: [4, 5]
   offers: [funding, mentorship]
+  applyUrl: https://baincapitalventures.com/contact/
   added: 2026-08
   lastVerified: 2026-08
 - id: gv
@@ -1790,6 +1811,7 @@
   tags: [industrial]
   stages: [4, 5]
   offers: [funding, customers, mentorship]
+  applyUrl: https://suffolktech.com/#connect
   added: 2026-08
   lastVerified: 2026-08
 - id: january
@@ -1806,6 +1828,7 @@
   tags: [pre-seed, diverse founders]
   stages: [4]
   offers: [funding]
+  applyUrl: https://www.january.ventures/contact-us
   added: 2026-08
   lastVerified: 2026-08
 - id: companyon
@@ -1821,6 +1844,7 @@
   tags: [seed, enterprise]
   stages: [4]
   offers: [funding, mentorship]
+  applyUrl: https://companyon.vc/contact/
   added: 2026-08
   lastVerified: 2026-08
 - id: xfund
@@ -1835,6 +1859,7 @@
   tags: [MIT spinout, seed]
   stages: [4]
   offers: [funding]
+  applyUrl: https://www.xfund.com/pitch
   added: 2026-08
   lastVerified: 2026-08
 - id: boston-seed
@@ -1850,6 +1875,7 @@
   tags: [pre-seed, seed]
   stages: [4]
   offers: [funding]
+  applyUrl: https://bostonseed.com/#book-consultation
   added: 2026-08
   lastVerified: 2026-08
 - id: fprime
@@ -1895,8 +1921,11 @@
   facts: [[Check size, $10K–$100K; up to $1M match], [Terms, SAFEs; match needs qualifying term sheet], [Focus, MIT-alumni founders only]]
   tags: [MIT, pre-seed]
   stages: [4]
+  links: [gc, glasswing, pillar, polaris, underscore]
   offers: [funding]
   applyBy: rolling
+  applyNote: MIT founders
+  applyUrl: https://forms.fillout.com/t/hWZqg8F4jpus
   added: 2026-08
   lastVerified: 2026-08
 - id: bosch-v
@@ -1921,18 +1950,21 @@
 - id: bha
   name: Boston Harbor Angels
   cat: angel
-  loc: Boston (meets downtown)
+  loc: Boston
   approx: true
   lat: 42.3565
   lng: -71.055
   url: https://www.bostonharborangels.com
-  desc: One of Boston's most active angel groups, investing across tech and life sciences.
+  desc: Boston angel group investing since 2004 across tech and life sciences.
   why: Monthly pitch meetings — a classic first-check source.
   tags: [events]
   stages: [2, 4]
   offers: [funding]
+  applyBy: rolling
+  applyNote: $400 fee if invited to present
+  applyUrl: https://bostonharborangels.com/entrepreneurs/
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: hub-angels
   name: Hub Angels
   cat: angel
@@ -1941,13 +1973,13 @@
   lat: 42.3545
   lng: -71.06
   url: https://www.hubangels.com
-  desc: Long-running Boston angel fund investing in early-stage tech.
+  desc: Long-running Boston angel fund investing in early-stage tech. Takes companies by referral only.
   why: Fund structure means faster, cleaner closes than loose syndicates.
   tags: [seed]
   stages: [4]
   offers: [funding]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: mit-angels
   name: MIT Alumni Angels of Boston
   cat: angel
@@ -1961,6 +1993,9 @@
   tags: [MIT]
   stages: [4]
   offers: [funding, community]
+  applyBy: rolling
+  applyNote: Prefers MIT-affiliated startups
+  applyUrl: https://www.mitalumniangels.com/apply-now
   added: 2026-06
   lastVerified: 2026-08
 - id: tie
@@ -1976,6 +2011,8 @@
   tags: [seed, founders]
   stages: [2, 4]
   offers: [funding, mentorship, community]
+  applyNote: Deadline set for each Investor Forum
+  applyUrl: https://www.tieboston.org/angels
   added: 2026-06
   lastVerified: 2026-08
 - id: walnut
@@ -1996,18 +2033,21 @@
 - id: launchpad
   name: LaunchPad Venture Group
   cat: angel
-  loc: Newton
+  loc: Boston area (forums meet downtown)
   approx: true
-  lat: 42.337
-  lng: -71.2092
+  lat: 42.3558
+  lng: -71.0556
   url: https://launchpadventuregroup.com
-  desc: One of the largest angel groups in the Northeast.
-  why: Syndicates with other groups — one yes can multiply.
+  desc: One of the most active angel groups in New England, with 175+ members.
+  why: A monthly forum for rounds of $500K–$2M, plus a casual Catalyst pitch event as an on-ramp.
   tags: [seed]
   stages: [4]
   offers: [funding]
+  applyBy: rolling
+  applyNote: New England science or tech startups
+  applyUrl: https://www.launchpadventuregroup.com/prescreen
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: hbsaa
   name: HBS Alumni Angels of Boston
   cat: angel
@@ -2029,40 +2069,40 @@
   name: MIT delta v
   cat: accel
   loc: 1 Amherst St, Cambridge (Trust Center)
-  lat: 42.3601
-  lng: -71.0852
+  lat: 42.3612
+  lng: -71.0848
   url: https://entrepreneurship.mit.edu/accelerator/
-  desc: 'MIT''s summer venture accelerator: up to $20K equity-free plus living stipends, ending in a famous September Demo Day.'
+  desc: 'MIT''s summer venture accelerator: up to $75K in equity-free funding, ending in a famous September Demo Day.'
   why: The single best on-ramp for MIT student founders. Zero dilution.
-  facts: [[Check size, Up to $20K plus living stipend], [Equity, 0% — equity-free], [Program length, Summer; Demo Day in September], [Focus, MIT student founders]]
+  facts: [[Check size, Up to $75K equity-free], [Equity, 0% — equity-free], [Program length, Summer; Demo Day in September], [Focus, MIT student founders]]
   tags: [equity-free, students]
   stages: [3, 4]
   links: [trust, deltav-demo]
-  offers: [grants, mentorship]
+  offers: [grants, mentorship, space]
+  applyNote: 2026 window ran March 1–April 1
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: trust
   name: Martin Trust Center for MIT Entrepreneurship
   cat: accel
   loc: 1 Amherst St, Cambridge
-  lat: 42.3604
+  lat: 42.3612
   lng: -71.0848
   url: https://entrepreneurship.mit.edu
-  desc: 'MIT''s entrepreneurship home: courses, coaching, maker funds and the machinery behind delta v.'
-  why: Open-door entrepreneurship help if you're MIT-connected; their 'Disciplined Entrepreneurship' method is free for everyone.
+  desc: 'MIT''s entrepreneurship home: courses, coaching and the machinery behind delta v.'
+  why: Open-door entrepreneurship help if you're an MIT student; their 'Disciplined Entrepreneurship' lessons are open to everyone on the DIY MTC site.
   tags: [education]
   stages: [1, 2]
   links: [deltav]
-  offers: [mentorship, grants]
+  offers: [mentorship, grants, space]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: vms
   name: MIT Venture Mentoring Service
   cat: accel
-  loc: Cambridge (MIT campus)
-  approx: true
-  lat: 42.3612
-  lng: -71.092
+  loc: 292 Main St, Cambridge (MIT E38)
+  lat: 42.362
+  lng: -71.0858
   url: https://vms.mit.edu
   desc: Free, team-based mentoring from vetted entrepreneurs and executives for MIT-affiliated ventures. No equity, ever.
   why: Arguably the most underrated free resource in the ecosystem.
@@ -2070,8 +2110,10 @@
   stages: [2]
   offers: [mentorship]
   applyBy: rolling
+  applyNote: MIT community in Greater Boston
+  applyUrl: https://vms.mit.edu/application
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: ilab
   name: Harvard Innovation Labs
   cat: accel
@@ -2085,8 +2127,9 @@
   stages: [2, 3, 4]
   links: [kempner]
   offers: [mentorship, space, grants]
-  applyBy: rolling
-  applyNote: Student membership open year-round
+  applyBy: '2026-12-08'
+  applyNote: President's Innovation Challenge
+  applyUrl: https://innovationlabs.harvard.edu/presidents-innovation-challenge
   added: 2026-06
   lastVerified: 2026-09
 - id: engine
@@ -2103,8 +2146,9 @@
   links: [engine-v]
   offers: [space, mentorship, community, grants]
   applyBy: rolling
+  applyNote: 'Residency. Blueprint next: Spring 2027'
+  applyUrl: https://engine.xyz/landing/apply-for-residency
   facts: [[Equity, None; residency is fee-based], [Terms, 'Month-to-month, no minimum term'], [Program length, 'Blueprint: 8 weeks, mostly virtual, free'], [Focus, Applied AI & ML plus 14 tough-tech fields]]
-  applyNote: 'Blueprint: Fall and Spring cohorts'
   added: 2026-06
   lastVerified: 2026-10
 - id: techstars
@@ -2123,41 +2167,47 @@
   offers: [funding, mentorship]
   applyBy: '2026-11-18'
   applyNote: Class starts Mar 2027
+  applyUrl: https://www.techstars.com/accelerators/boston
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: masschallenge
   name: MassChallenge
   cat: accel
-  loc: Seaport, Boston
+  loc: Seaport, Boston (moving to the Fenway)
   approx: true
   lat: 42.3496
   lng: -71.044
   url: https://masschallenge.org
-  desc: Zero-equity global accelerator headquartered in Boston, awarding up to $1M in non-dilutive prizes per cohort.
-  why: Free money and a massive partner network. Apply every year you're eligible.
-  facts: [[Equity, 0% — zero-equity], [Terms, Up to $1M non-dilutive prizes per cohort]]
+  desc: Zero-equity accelerator headquartered in Boston. Its challenge programs match startups with corporate partners for pilots, and some programs carry prizes.
+  why: Pilots with big partners and a massive network, at no equity. Read the challenge statements before you apply.
+  facts: [[Equity, 0% — zero-equity], [Terms, Partner pilots; prizes in some programs]]
   tags: [equity-free]
   stages: [3, 4]
-  offers: [grants, mentorship, community]
+  offers: [customers, grants, mentorship, community]
+  applyBy: '2026-11-09'
+  applyNote: 2026–2027 Challenge programs
+  applyUrl: https://masschallenge.org/2026-2027-challenge-cycle/
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: massrobotics
   name: MassRobotics
   cat: accel
   loc: 12 Channel St, Seaport
-  lat: 42.345
-  lng: -71.0454
+  lat: 42.3455
+  lng: -71.0368
   url: https://www.massrobotics.org
   desc: 'The world''s largest independent robotics innovation hub: shared labs, test space and corporate partners for robotics & physical-AI startups.'
   why: Embodied-AI founders get equipment, space and intros that nowhere else in the US concentrates this densely.
-  facts: [[Equity, 0% — nonprofit innovation hub], [Focus, Robotics and physical AI], [Terms, 'Shared labs, test space, corp partners']]
+  facts: [[Equity, 0% — nonprofit innovation hub], [Focus, Robotics and physical AI], [Terms, 'Paid monthly residency; shared labs, test space']]
   tags: [robotics, lab space]
   stages: [3]
   links: [masstech, nvidia-bos, amazon-sea]
   offers: [space, customers, community]
   applyBy: rolling
+  applyNote: Resident startups
+  applyUrl: https://www.massrobotics.org/startups/resident-application/
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: greentown
   name: Greentown Labs
   cat: accel
@@ -2173,6 +2223,7 @@
   links: [masscec]
   offers: [space, community]
   applyBy: rolling
+  applyUrl: https://greentown.org/apply-now
   added: 2026-06
   lastVerified: 2026-09
 - id: toa
@@ -2183,28 +2234,33 @@
   lng: -71.0502
   url: https://the-open-accelerator.com
   desc: Boston's open-source AI innovation hub — an initiative between the MA AI Hub, Red Hat and IBM Ventures, launched at Boston Tech Week 2026. Runs a founder residency (workspace, mentorship, GPU access), a community membership program, and a hands-on hackathon series.
-  why: 'Purpose-built to close the enterprise-readiness gap: open-source architecture guidance, enterprise networks, and Google for Startups Cloud resources — designed for exactly the founders this atlas serves.'
+  why: 'A free 16-week residency, no equity taken, built to close the enterprise-readiness gap: two mentors, GPU access and Google Cloud resources, a security and compliance review against what enterprise buyers ask, and structured conversations with real buyers. For teams past a working prototype and before repeatable revenue, who can be in Fort Point 4 days a week and commit to Massachusetts for a year; up to 12 per cycle. Its community program runs hackathons and events for everyone else. TOA also maintains this atlas.'
   facts: [[Focus, 'Open-source AI, enterprise readiness'], [Terms, 'Residency: workspace, mentors, GPU access']]
   tags: [incubator, open source, hackathons]
   stages: [1, 2, 3, 4, 5]
   links: [aihub, sundai, techweek]
   offers: [space, mentorship, compute, community]
+  applyNote: Cycle 2 begins Feb 1, 2027
+  applyUrl: https://the-open-accelerator.com/residency/
   added: 2026-06
   lastVerified: 2026-10
 - id: ssc
   name: SSC Venture Partners
   cat: accel
-  loc: Boston College, Chestnut Hill
+  loc: Boston area (serves the BC community)
+  approx: true
   lat: 42.3355
   lng: -71.1685
-  url: https://www.sscvp.com
+  url: https://sscventurepartners.com
   desc: Accelerator + fund for the Boston College founder community.
-  why: BC's answer to delta v — equity-free summer program plus alumni capital.
+  why: BC alumni's answer to delta v — a 12-week summer accelerator with a $20K SAFE, plus alumni capital.
   tags: [students, BC]
   stages: [3, 4]
-  offers: [funding, mentorship, grants, community]
+  offers: [funding, mentorship, community]
+  applyNote: 2026 deadline was April 30
+  applyUrl: https://sscventurepartners.com/ssc-2026-summer-accelerator/
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: idea-neu
   name: IDEA (Northeastern)
   cat: accel
@@ -2238,6 +2294,8 @@
   links: [cic, ai-biohub]
   offers: [funding, mentorship]
   applyBy: rolling
+  applyNote: NYC AI Nexus Spring 2027 cohort
+  applyUrl: https://www.c10labs.com/apply
   added: 2026-06
   lastVerified: 2026-08
 - id: founder-institute
@@ -2254,39 +2312,44 @@
   tags: [pre-seed]
   stages: [1, 2]
   offers: [mentorship, community]
-  applyBy: rolling
+  applyBy: '2026-11-10'
+  applyNote: Boston cohort starts Nov 16
+  applyUrl: https://fi.co/boston
   added: 2026-06
   lastVerified: 2026-10
 - id: learnlaunch
   name: LearnLaunch Accelerator
   cat: accel
-  loc: Boston, Back Bay
-  approx: true
-  lat: 42.3489
-  lng: -71.0785
+  loc: 55 Court St, Boston
+  lat: 42.3593
+  lng: -71.0591
   url: https://learnlaunch.com
   desc: EdTech-focused accelerator supporting startups building AI-powered tools for education and workforce development.
   why: The definitive EdTech accelerator in the Northeast. Strong connections to K-12 districts, higher ed institutions, and workforce development organizations.
   tags: [education]
   stages: [3, 4]
-  offers: [mentorship, customers]
+  offers: [funding, mentorship, customers]
+  applyNote: 2027 applications not open yet
+  applyUrl: https://learnlaunch.com/program/
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: pharmstars
   name: PharmStars
   cat: accel
-  loc: Boston
+  loc: Newton
   approx: true
-  lat: 42.3554
-  lng: -71.053
+  lat: 42.33
+  lng: -71.1949
   url: https://pharmstars.com
   desc: Digital health accelerator creating direct pathways between AI/health startups and pharmaceutical companies.
   why: 'Unique value prop: accelerates startups by providing warm intros to pharma buyers, not just mentorship. Critical for AI-health founders in the Boston biotech ecosystem.'
+  facts: [[Check size, $100K SAFE on graduation], [Terms, '$35K tuition; balance payable from the SAFE'], [Program length, 10 weeks]]
   tags: [healthcare, biotech]
   stages: [3, 4]
-  offers: [customers, mentorship]
+  offers: [funding, customers, mentorship]
+  applyNote: Fall 2026 window ended July 12
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: ai-biohub
   name: AI BioHub (LabCentral × C10 Labs)
   cat: accel
@@ -2315,8 +2378,9 @@
   facts: [[Cohort size, Up to 10 a year (12 in 2024-25); 10 in 2026-27], [Program length, Full-year memberships; cohort starts in fall], [Equity, 'No fee; award is memberships, not investment'], [Terms, 'Free Chamber + WorcLab membership, SCORE mentor'], [Focus, 'Innovative, scalable ideas; all ages; generalist'], [Stage, Pre-launch to early revenue]]
   tags: [equity-free, coworking, incubator, founders]
   stages: [2, 3]
-  links: []
+  links: [worclab]
   offers: [space, mentorship, community]
+  applyNote: 2026–27 cohort already selected
   added: 2026-10
   lastVerified: 2026-10
 - id: auxilium
@@ -2333,6 +2397,7 @@
   stages: [2, 3, 4]
   links: []
   offers: [funding, space, mentorship, community]
+  applyNote: By invitation only
   added: 2026-10
   lastVerified: 2026-10
 - id: venturewell
@@ -2352,6 +2417,7 @@
   offers: [grants, mentorship, community]
   applyBy: '2026-12-01'
   applyNote: Aspire Medtech; E-Team Nov 9–Jan 25
+  applyUrl: https://venturewell.org/aspire-medtech/
   added: 2026-10
   lastVerified: 2026-10
 
@@ -2359,18 +2425,18 @@
 - id: cic
   name: CIC Cambridge
   cat: space
-  loc: 1 Broadway, Kendall Sq
+  loc: 1 Broadway & 245 Main St, Kendall Sq
   lat: 42.3629
   lng: -71.0838
   url: https://cic.com
-  desc: The original innovation campus — flexible offices and labs that have housed thousands of startups since 1999.
+  desc: The original innovation campus — flexible offices and coworking that have housed thousands of startups since 1999.
   why: The default first office for a funded Boston startup; the building itself is a networking event.
   tags: [coworking]
   stages: [3]
   links: [vcafe, c10]
   offers: [space, community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: vcafe
   name: Venture Café Cambridge
   cat: space
@@ -2385,7 +2451,7 @@
   links: [cic, techweek]
   offers: [community, mentorship]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: venturelane
   name: The Venture Lane
   cat: space
@@ -2523,7 +2589,7 @@
   links: [nerd, c10]
   offers: [community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: genai-meetup
   name: Boston Generative AI Meetup
   cat: community
@@ -2585,7 +2651,7 @@
   links: [nerd]
   offers: [community, talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: sundai
   name: Sundai Club
   cat: community
@@ -2594,14 +2660,14 @@
   lat: 42.3601
   lng: -71.087
   url: https://www.sundai.club
-  desc: MIT-born club that ships a new AI project every Sunday — students and professionals hacking side by side.
+  desc: MIT- and Harvard-born club that ships a new AI project every Sunday — students and professionals hacking side by side.
   why: The fastest way to find a technical cofounder may be to build with one on a Sunday.
   tags: [hackathons, events]
   stages: [1, 3]
   links: [csail, medialab, c10]
   offers: [community, talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: startupboston
   name: Startup Boston
   cat: community
@@ -2617,7 +2683,7 @@
   links: [cic]
   offers: [community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: build617
   name: BUILD617
   cat: community
@@ -2632,8 +2698,26 @@
   links: []
   offers: [community, space, mentorship]
   applyBy: rolling
+  applyNote: Joins a waitlist first
+  applyUrl: https://docs.google.com/forms/d/e/1FAIpQLSfaxBdjFE7jA3mdPsbCjJhsPPN6E5AqUvPgUtVrwnMrEAcnJg/viewform
   added: 2026-10
   lastVerified: 2026-10
+- id: cbai
+  name: Cambridge Boston Alignment Initiative (CBAI)
+  cat: community
+  loc: Cambridge
+  approx: true
+  lat: 42.3715
+  lng: -71.1125
+  url: https://www.cbai.ai
+  desc: Cambridge-based nonprofit, founded in 2022, working to reduce risks from advanced AI. Runs fully funded AI safety research fellowships and CAMBRIA, a free three-week technical bootcamp, and is the fiscal sponsor of the Harvard and MIT student AI safety teams.
+  why: Trains AI safety researchers in Cambridge, which makes it a talent pool and community for founders working on evaluations, interpretability or alignment.
+  tags: [AI safety, research]
+  stages: [1]
+  links: [hcsai, maia]
+  offers: [community, talent]
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- STUDENT GROUPS ----------
 - id: aimit
@@ -2659,7 +2743,7 @@
   lat: 42.361
   lng: -71.083
   url: https://sloangroups.mit.edu/aiml/home/
-  desc: Sloan's AI club, organizer of the annual MIT Sloan AI & ML Conference.
+  desc: Sloan's AI club, a co-presenter of the MIT Sloan Tech Summit.
   why: MBA talent that speaks both model and market.
   tags: [MIT, students]
   stages: [1]
@@ -2670,26 +2754,25 @@
 - id: maia
   name: MIT AI Alignment
   cat: student
-  loc: MIT, Cambridge
-  approx: true
-  lat: 42.3598
-  lng: -71.0902
-  url: https://www.mitalignment.org
+  loc: 245 Main St, Cambridge
+  lat: 42.3625
+  lng: -71.0847
+  url: https://mitaialignment.org/
   desc: Student group focused on AI safety research and field-building.
   why: Boston's hub for safety-minded AI talent.
   tags: [AI safety, research]
   stages: [1]
   offers: [community, talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: hcsai
-  name: Harvard AI Safety Student Team (AISST)
+  name: Harvard AI Safety Team (AIST)
   cat: student
   loc: Harvard, Cambridge
   approx: true
   lat: 42.377
   lng: -71.1167
-  url: https://aisst.ai/
+  url: https://aisafetyteam.org/
   desc: Harvard's AI safety student research community.
   why: Rigorous student researchers thinking about AI's hardest problems.
   tags: [AI safety, Harvard]
@@ -2726,7 +2809,8 @@
   tags: [Harvard, ML]
   stages: [1]
   offers: [community, talent]
-  applyBy: rolling
+  applyNote: Fellowship runs in the fall
+  applyUrl: https://www.humic.ai/fellowship
   added: 2026-08
   lastVerified: 2026-08
 - id: husai
@@ -2759,6 +2843,7 @@
   links: [tufts]
   offers: [community, talent]
   applyBy: rolling
+  applyUrl: https://docs.google.com/forms/d/e/1FAIpQLScniwaQY_Pm2TV0PGsYy1tbEGwMSkF6NEaybXsttJcqckj5EQ/viewform
   added: 2026-08
   lastVerified: 2026-08
 - id: mit-sandbox
@@ -2774,7 +2859,8 @@
   stages: [1, 2, 4]
   links: [sbxi]
   offers: [grants, mentorship, community]
-  applyBy: rolling
+  applyNote: 'Cycles: fall, spring, and summer'
+  applyUrl: https://sandbox.mit.edu/applynow
   added: 2026-08
   lastVerified: 2026-08
 - id: harvard-ventures
@@ -2818,7 +2904,8 @@
   tags: [Babson, co-living]
   stages: [1, 2]
   offers: [community, talent]
-  applyBy: rolling
+  applyNote: Opens at the start of each semester
+  applyUrl: https://www.etower.org/join-etower
   added: 2026-08
   lastVerified: 2026-08
 - id: buai
@@ -2841,13 +2928,13 @@
 - id: aiweek
   name: Boston AI Week
   cat: event
-  loc: Statewide · Sept 16–Oct 28, 2026
+  loc: Statewide · Sept 16–Oct 28, 2027
   lat: 42.3554
   lng: -71.0603
   url: https://aiweek.boston
-  badge: 232+ events
+  badge: 252 events in 2026
   approx: true
-  desc: Statewide AI festival built from independently hosted events — talks, workshops, demo nights and hackathons — with Boston's Seaport as the hub neighborhood. The 2026 run is Sept 16 to Oct 28, with a core week Sept 24 to Oct 2. Free to attend, and most individual events are free. The 2025 edition drew 15,000+ participants to 125+ events.
+  desc: Statewide AI festival built from independently hosted events — talks, workshops, demo nights and hackathons — with Boston's Seaport as the hub neighborhood. The 2027 run is Sept 16 to Oct 28, with a core week Sept 24 to Oct 1. Free to attend, and most individual events are free. In 2026, 193 organizations ran 252 events, and 23 countries took part.
   why: The week the whole Massachusetts AI ecosystem is in one place — plan launches, hiring and investor meetings around it. Any Massachusetts host can list an event on the official calendar for free, approved on a rolling basis, so you can run your own demo night inside the program.
   tags: [events, hackathons, founders]
   stages: [1, 2, 4, 5]
@@ -2855,14 +2942,15 @@
   offers: [community]
   applyBy: rolling
   applyNote: 'Host an event: free listing, rolling'
+  applyUrl: https://aiweek.boston/join
   added: 2026-06
   lastVerified: 2026-10
 - id: odsc
-  name: ODSC East / AiX Summit
+  name: ODSC AI East
   cat: event
-  loc: Hynes Convention Center, Boston
-  lat: 42.3477
-  lng: -71.0858
+  loc: Boston Convention & Exhibition Center
+  lat: 42.3456
+  lng: -71.0463
   url: https://odsc.ai/east/
   desc: One of the world's largest applied data science & AI conferences, held in Boston every spring.
   why: Thousands of practitioners in town — recruiting and learning in one badge.
@@ -2870,13 +2958,13 @@
   stages: [1, 5]
   offers: [community, talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: hackmit
   name: HackMIT
   cat: event
-  loc: MIT, Cambridge
-  lat: 42.359
-  lng: -71.0938
+  loc: Johnson Athletic Center, MIT
+  lat: 42.3586
+  lng: -71.0966
   url: https://hackmit.org
   desc: MIT's flagship student hackathon, every fall.
   why: 1,000+ of the best student builders in the world, in one gym, for one weekend.
@@ -2884,7 +2972,7 @@
   stages: [3]
   offers: [community, talent]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: hackharvard
   name: HackHarvard
   cat: event
@@ -2900,21 +2988,20 @@
   added: 2026-06
   lastVerified: 2026-08
 - id: sloan-conf
-  name: MIT Sloan AI & ML Conference
+  name: MIT Sloan Tech Summit
   cat: event
-  loc: MIT Sloan, Cambridge
-  approx: true
-  lat: 42.3612
-  lng: -71.0833
-  url: https://www.aimlconference.com
-  desc: Student-run conference connecting AI research, business and policy each spring.
+  loc: MIT Media Lab, Cambridge
+  lat: 42.3604
+  lng: -71.0873
+  url: https://www.mitsloantechsummit.com/
+  desc: Student-led conference on AI and technology, presented by MIT Sloan's AI, product management and technology clubs. The 2027 edition is March 5 at the MIT Media Lab.
   why: Dense one-day download of where AI-meets-business is heading.
   tags: [events, MIT]
   stages: [1, 5]
   links: [sloanai]
   offers: [community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: imagination
   name: Imagination in Action
   cat: event
@@ -2929,7 +3016,7 @@
   links: [medialab]
   offers: [community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: deltav-demo
   name: delta v Demo Day
   cat: event
@@ -2937,29 +3024,29 @@
   lat: 42.3583
   lng: -71.0946
   url: https://entrepreneurship.mit.edu/accelerator/
-  desc: The September showcase where MIT's delta v cohort launches to a packed house of investors.
+  desc: The September showcase where MIT's delta v cohort launches to a packed house of students, supporters and investors.
   why: See what's next a year early — and meet the cohort before everyone else does.
   tags: [events]
   stages: [4]
   links: [deltav]
   offers: [community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 - id: techweek
   name: Boston Tech Week (a16z)
   cat: event
-  loc: Citywide · May
+  loc: Citywide · late April–early May
   approx: true
   lat: 42.354
   lng: -71.055
   url: https://www.tech-week.com
-  desc: The a16z-organized decentralized tech week hit Boston in 2026 — hundreds of community-hosted events.
+  desc: The a16z-organized decentralized tech week hit Boston in 2026 — hundreds of community-hosted events. The 2027 edition runs April 26–May 2.
   why: A second 'whole ecosystem in one week' moment each spring.
   tags: [events]
   stages: [1, 4]
   offers: [community]
   added: 2026-06
-  lastVerified: 2026-06
+  lastVerified: 2026-11
 
 # ---------- GOVERNMENT & POLICY ----------
 - id: mass-ai-coalition
@@ -2973,12 +3060,13 @@
   desc: 'Private-sector coalition of Massachusetts AI founders, operators, investors and students, launched February 2026. Not an incubator or accelerator: it runs a free founder coworking space donated by Wayfair, a resource pack of compute credits and warm intros, a customer-pilot program with member companies, and a year-round event calendar.'
   why: 'If you are committed to building in Massachusetts, the Founder Starter Pack is the concrete ask: a free desk, GPU and cloud credits and warm intros, with no equity or fees. The pilot program pitches startups to member companies as first paying customers; quarterly Founder Rooms put founders in front of pledged angels.'
   tags: [founders, events, equity-free, coworking]
-  stages: [1, 3, 4, 5]
+  stages: [1, 2, 3, 4, 5]
   links: [aihub, sundai, engine]
   offers: [community, space, compute, customers]
-  facts: [[Terms, 'No equity, no fees; pack sent within 7 days'], [Focus, AI founders building in Massachusetts]]
   applyBy: rolling
   applyNote: Founder Starter Pack applications
+  applyUrl: https://massaicoalition.com/founders/#apply
+  facts: [[Terms, 'No equity, no fees; pack sent within 7 days'], [Focus, AI founders building in Massachusetts]]
   added: 2026-06
   lastVerified: 2026-10
 - id: masstech
@@ -3006,14 +3094,15 @@
   url: https://aihub.masstech.org
   badge: $100M initiative
   desc: State AI office inside the MassTech Collaborative, announced Dec 2024 with $100M under the Mass Leads Act. Runs the Applied AI Models Innovation Challenge, the Data Commons Collaborative, the $31M AI Compute Resources cluster at MGHPCC and no-cost Google AI training for state residents; co-sponsors The Open Accelerator with IBM and Red Hat.
-  why: Compute access is a rolling request to aihub@masstech.org, and the Hub's Google AI training is free to any Massachusetts resident. Innovation Challenge grants need a college, university or nonprofit lead, so a startup gets in as a named partner or subcontractor on someone else's bid.
+  why: Startups can request compute through the Hub's Data Commons intake form, and the Hub's Google AI training is free to any Massachusetts resident. Innovation Challenge grants need a college, university or nonprofit lead, so a startup gets in as a named partner or subcontractor on someone else's bid.
   tags: [policy, equity-free]
   stages: [1, 3, 4]
   links: [mghpcc, toa, massventures, masstech, google]
   offers: [grants, compute]
-  facts: [[Focus, 'Compute, data commons, applied-AI grants'], [Check size, 'Challenge: up to $1M per project'], [Terms, Lead applicant must be a nonprofit or university]]
   applyBy: rolling
-  applyNote: 'Compute: email aihub@masstech.org'
+  applyNote: 'Compute: Data Commons intake form'
+  applyUrl: https://aihub.masstech.org/AIHub-FAQs
+  facts: [[Focus, 'Compute, data commons, applied-AI grants'], [Check size, 'Challenge: up to $1M per project'], [Terms, Lead applicant must be a nonprofit or university]]
   added: 2026-06
   lastVerified: 2026-10
 - id: mghpcc
@@ -3025,7 +3114,7 @@
   url: https://mghpcc.org
   badge: $31M compute
   desc: 'The Massachusetts Green High Performance Computing Center in Holyoke, a nonprofit facility shared by six research universities. Home to the AI Compute Resource (AICR): hundreds of NVIDIA B200 and RTX GPUs funded by a $31M state grant the members are matching, now in use by universities, startups and research organizations across Massachusetts.'
-  why: 'State-funded GPU capacity: the AI Hub says at least 40% of AICR compute time is set aside for startups and partner institutions, not just the member universities. No public application yet — register interest with the Massachusetts AI Hub and ask about startup allocations.'
+  why: 'State-funded GPU capacity: the AI Hub says at least 40% of AICR compute time is set aside for startups and partner institutions, not just the member universities. Access runs through the Massachusetts AI Hub''s Data Commons intake form, and use cases are prioritized for economic growth, innovation and public good.'
   tags: [infrastructure, research]
   stages: [3]
   links: [aihub, masstech]
@@ -3044,6 +3133,8 @@
   tags: [climate]
   stages: [2, 4]
   offers: [grants, customers, funding]
+  applyNote: 'InnovateMass: next round Spring 2027'
+  applyUrl: https://www.masscec.com/program/innovatemass
   added: 2026-08
   lastVerified: 2026-10
 - id: mlsc
@@ -3087,7 +3178,8 @@
   stages: [2, 4]
   links: [masstech]
   offers: [grants, customers]
-  applyBy: rolling
+  applyNote: Rural grant notice coming soon
+  applyUrl: https://mehi.masstech.org/rural-digital-health-sandbox
   added: 2026-08
   lastVerified: 2026-08
 - id: diu
@@ -3103,7 +3195,9 @@
   tags: [defense]
   stages: [4, 5]
   offers: [customers]
-  applyBy: rolling
+  applyBy: '2026-11-30'
+  applyNote: 'Open call: SWAP-USV Sprint 2'
+  applyUrl: https://www.diu.mil/work-with-us/open-solicitations
   added: 2026-08
   lastVerified: 2026-08
 - id: masscybercenter
@@ -3122,5 +3216,6 @@
   offers: [grants, community]
   applyBy: rolling
   applyNote: Cyber Resilient MA grant (SOC services)
+  applyUrl: https://masscybercenter.org/resilient-ma
   added: 2026-10
   lastVerified: 2026-10

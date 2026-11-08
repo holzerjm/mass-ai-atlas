@@ -94,6 +94,9 @@ tailwind.config = {
 .toa-links a{color:var(--gold);text-decoration:none;font-weight:600}
 .toa-links a:hover{text-decoration:underline}
 .footer a{color:var(--gold);text-decoration:none}
+  /* the footer band stays dark in light mode too: its partner marks are white artwork */
+  html:not(.dark) .footer{--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
+    --muted:#9aa1ab;--faint:#848c97;--gold:#ffc600;--red:#ff5c45;--ok:#4ade80;background:var(--bg)}
     /* Make inline links distinguishable without relying on colour alone. */
   #add p a,
   .footer-inner a,
@@ -112,7 +115,7 @@ tailwind.config = {
     <a href="https://the-open-accelerator.com/" class="flex items-center gap-3 z-50">
       <img id="header-logo" src="https://the-open-accelerator.com/images/toa-white.png" alt="The Open Accelerator" class="h-10 w-auto">
     </a>
-    <nav class="hidden lg:flex items-center gap-5">
+    <nav class="hidden lg:flex items-center gap-5" aria-label="The Open Accelerator">
       <a href="https://the-open-accelerator.com/about-why.html" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">About<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
       <a href="https://the-open-accelerator.com/residency/" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">Residency<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
       <a href="https://the-open-accelerator.com/community/" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">Community<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
@@ -133,13 +136,13 @@ tailwind.config = {
         <svg class="w-5 h-5 hidden dark:block text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         <svg class="w-5 h-5 block dark:hidden text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-gray-800 dark:text-white focus:outline-none" aria-label="Open Menu" aria-expanded="false" id="mobile-menu-btn">&#9776;</button>
+      <button onclick="toggleMobileMenu()" class="lg:hidden text-2xl text-gray-800 dark:text-white bg-transparent border-0 focus:outline-none" aria-label="Open Menu" aria-expanded="false" id="mobile-menu-btn">&#9776;</button>
     </div>
   </div>
 </header></header>
 <!-- Mobile Nav Overlay -->
 <div id="mobile-nav" class="fixed inset-0 bg-white/95 dark:bg-dark-bg/95 z-[3000] flex flex-col items-center justify-center gap-6 transform translate-x-full transition-transform duration-300 lg:hidden backdrop-blur-sm">
-  <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-4xl text-gray-800 dark:text-white" aria-label="Close Menu">&times;</button>
+  <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-4xl text-gray-800 dark:text-white bg-transparent border-0" aria-label="Close Menu">&times;</button>
   <a href="https://the-open-accelerator.com/about-why.html" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">About</a>
   <a href="https://the-open-accelerator.com/residency/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Residency</a>
   <a href="https://the-open-accelerator.com/community/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Community</a>
@@ -152,7 +155,7 @@ tailwind.config = {
   <a href="https://the-open-accelerator.com/#connect" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Connect</a>
   <a href="https://the-open-accelerator.com/TOAhack/" onclick="toggleMobileMenu()" class="text-2xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">Help us</a>
 </div>
-<div class="wrap">
+<main class="wrap">
   <p class="eyebrow">The Open Accelerator · Mass AI Atlas</p>
   <h1>Boston AI Events</h1>
   <p class="stand">Every AI community event we can find across Greater Boston for the next
@@ -181,7 +184,7 @@ tailwind.config = {
     Luma's Boston AI feed, and <a style="color:var(--faint)" href="https://boston.aitinkerers.org/">AI Tinkerers Boston</a> ·
     aggregation approach builds on <a style="color:var(--faint)" href="https://github.com/nkpng2k/startup-event-scraper">nkpng2k's startup-event-scraper</a> (Apache-2.0)
   </p>
-</div>
+</main>
 <footer class="footer">
   <div class="footer-inner">
     <div class="partners">
@@ -192,7 +195,8 @@ tailwind.config = {
     </div>
     <b>Mass AI Atlas</b> · A project of <a href="https://the-open-accelerator.com" target="_blank" rel="noopener">The Open Accelerator</a>.<br>
     Some pin locations are approximate (nearest neighborhood) and community groups move between venues — always check the official site before visiting.<br>
-    Know something we missed? <a href="#" onclick="suggestEntry();return false">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a href="https://github.com/holzerjm/mass-ai-atlas" target="_blank" rel="noopener">GitHub</a>.
+    Know something we missed? <a href="https://github.com/holzerjm/mass-ai-atlas/issues/new?template=suggest-entry.yml" target="_blank" rel="noopener">Suggest an entry</a>, or flag any entry from its detail panel — community contributions are reviewed openly on <a id="footGhLink" href="https://github.com/holzerjm/mass-ai-atlas" target="_blank" rel="noopener">GitHub</a>.<br>
+    Meet the <a href="../credits/">mapmakers</a> whose work is in the atlas, or see <a href="../updates/">what's new</a>.
   </div>
 </footer></footer>
 <script>

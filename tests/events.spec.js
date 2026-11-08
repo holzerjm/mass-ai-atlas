@@ -3,7 +3,9 @@
    helpers/atlas.js) because the real one is regenerated weekly and not in git. */
 const { test, expect, DATA, byId, eventsFixture, ROOT } = require("./helpers/atlas");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
+const { execFileSync } = require("child_process");
 
 test("the events page loads and lists upcoming events", async ({ page }) => {
   const feed = eventsFixture();
@@ -52,6 +54,53 @@ test("the events page footer claims no curation date", async ({ page }) => {
   await expect(page.locator("footer")).not.toHaveText(/Curated/i);
 });
 
+// The footer band carries white partner artwork, so it has to stay dark in light mode as well.
+// The atlas does that with rules outside the footer block this page's generator copies, so this
+// page once showed both marks on its near-white ground. Compared across themes rather than with
+// a colour value: a palette change can't break it, a light footer can.
+test("the events page footer stays dark in light theme", async ({ page }) => {
+  const look = () => page.evaluate(() => {
+    const ground = (el) => {
+      for (; el; el = el.parentElement) {
+        const bg = getComputedStyle(el).backgroundColor;
+        if (bg !== "rgba(0, 0, 0, 0)") return bg;
+      }
+      return null;
+    };
+    const footer = document.querySelector("footer.footer");
+    return {
+      page: ground(document.body),
+      footer: ground(footer),
+      text: getComputedStyle(footer).color,
+      link: getComputedStyle(footer.querySelector("a")).color,
+    };
+  });
+  await page.goto("./events/");
+  const dark = await look();
+  await page.evaluate(() => localStorage.setItem("toa-atlas-theme", "light"));
+  await page.reload();
+  await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
+  const light = await look();
+  expect(light.page, "the light theme should change the page's own ground").not.toBe(dark.page);
+  expect({ footer: light.footer, text: light.text, link: light.link })
+    .toEqual({ footer: dark.footer, text: dark.text, link: dark.link });
+});
+
+// The footer comes from index.html, where its "Suggest an entry" link calls suggestEntry().
+// This page never defines that function, so the link did nothing but throw a ReferenceError,
+// and the error guard never saw it because no test clicked it. scripts/build-events-page.js
+// now points the link at the suggestion form, on the repository GH_REPO names.
+test("the events page footer's Suggest an entry link opens the suggestion form", async ({ page }) => {
+  const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  const repo = (html.match(/^const GH_REPO = "([^"]+)"/m) || [])[1];
+  expect(repo, "index.html must define `const GH_REPO`").toBeTruthy();
+
+  await page.goto("./events/");
+  const link = page.locator("footer.footer a", { hasText: "Suggest an entry" });
+  await expect(link).toHaveAttribute("href", `https://github.com/${repo}/issues/new?template=suggest-entry.yml`);
+  await expect(link).not.toHaveAttribute("onclick");
+});
+
 // Contract: a copy of this repository must not file issues on the repository it
 // was copied FROM. index.html's `const GH_REPO` is the single place that decides,
 // and scripts/build-events-page.js reads it. Until 2026-10-23 this page hardcoded
@@ -67,4 +116,26 @@ test("the events page contribution links follow index.html's GH_REPO", async ({ 
   const links = await page.locator('a[href*="/issues/new"]').evaluateAll((els) => els.map((e) => e.href));
   expect(links.length, "the events page should offer at least one contribution link").toBeGreaterThan(0);
   for (const href of links) expect(href).toContain(`github.com/${repo}/issues/new`);
+});
+
+// The same contract for the footer's link to the repository, which index.html writes into its
+// HTML and points at GH_REPO only when the atlas script runs. This page runs no such script, so
+// scripts/build-events-page.js sets it. Until 2026-11 a copy's events footer linked to the
+// original repository. Running the generator on index.html with another GH_REPO guards the
+// wiring, not the value.
+test("the events page footer's GitHub link follows index.html's GH_REPO", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "atlas-events-"));
+  try {
+    for (const dir of ["scripts", "events"]) fs.mkdirSync(path.join(tmp, dir));
+    fs.copyFileSync(path.join(ROOT, "scripts", "build-events-page.js"), path.join(tmp, "scripts", "build-events-page.js"));
+    const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+    const copy = html.replace(/^const GH_REPO = "[^"]+"/m, 'const GH_REPO = "example-org/atlas-copy"');
+    expect(copy, "index.html must define `const GH_REPO`").not.toBe(html);
+    fs.writeFileSync(path.join(tmp, "index.html"), copy);
+    execFileSync(process.execPath, [path.join(tmp, "scripts", "build-events-page.js")], { stdio: "pipe" });
+    const page = fs.readFileSync(path.join(tmp, "events", "index.html"), "utf8");
+    expect(page).toContain('<a id="footGhLink" href="https://github.com/example-org/atlas-copy"');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });

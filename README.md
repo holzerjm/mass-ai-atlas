@@ -10,24 +10,30 @@ The living map of Massachusetts' AI ecosystem — built by the community for the
 [The Open Accelerator](https://the-open-accelerator.com) (an initiative between the
 MA AI Hub, Red Hat & IBM).
 
-[![A 19-second tour: searching the Map over the Boston area, an entry's drawer with the places to meet nearby, the whole-Commonwealth view, the Galaxy of connections, the Founder Journey, and the Directory filtered to equity-free money](docs/demo.gif)](https://the-open-accelerator.com/ecosystem/)
+[![A 25-second tour: searching the Map over the Boston area, an entry's drawer with the places to meet nearby, the Map filtered to what a founder needs, the Galaxy of connections, the Founder Journey, and the Directory answering a founder's sentence](docs/demo.gif)](https://the-open-accelerator.com/ecosystem/)
 
 **Four ways to explore the Massachusetts AI ecosystem:**
 
 - 🗺️ **Map** — every VC, lab, accelerator and community pinned across Massachusetts
 - ✨ **Galaxy** — an animated network of how the ecosystem connects (spinouts, funds, hosts)
-- 🧭 **Founder Journey** — resources curated by stage, from first spark to scale
-- 📇 **Directory** — full-text search with category and stage filters
+- 🧭 **Founder Journey** — from first spark to scale: hand-written pathways, with an ordered list of what to do next and why
+- 📇 **Directory** — search in your own words, with category, need, and stage filters
+
+The [What's new page](https://the-open-accelerator.com/ecosystem/updates/) lists recent features,
+with a link to try each one, and new organizations by month. **Ask your own AI** writes a prompt
+for the assistant you already use, so it can answer from the atlas's data. The atlas runs no AI itself.
 
 Each entry's drawer says what the organization offers founders, shows when a maintainer
 last verified it, and under **places to meet** lists the cafés, quick bites and quieter
 spots within a five-minute walk.
 Every entry and view is linkable — `?entry=csail` opens straight to an organization,
-`#galaxy` to a view (there's a 🔗 Copy link button in each entry's drawer).
+`#galaxy` to a view (there's a 🔗 Copy link button in each entry's drawer). Filters are
+linkable too: `?need=compute&stage=3` opens the map and the Directory with them set.
 
 > **Building on this as a template?** Start with [HACKATHON.md](HACKATHON.md): setup, the
 > architecture on one page, where to extend it, and what to change because it is still
-> pointed at The Open Accelerator.
+> pointed at The Open Accelerator. Starting an atlas for another state or region? See
+> [docs/your-region.md](docs/your-region.md).
 
 ## Run it
 
@@ -49,7 +55,7 @@ The maintenance scripts (`scripts/`) need Node 20+ and the two npm dependencies
 ## Deploy
 
 **Merging is publishing.** A GitHub Action deploys `index.html`, `atlas-data.js`,
-`data/` and the map style to [the live site](https://the-open-accelerator.com/ecosystem/) on every
+`data/`, the map style, the events page, the credits page and the updates page to [the live site](https://the-open-accelerator.com/ecosystem/) on every
 merge to `main` that touches them — it re-validates the data first, then rsyncs to
 the server and posts a summary to the TOA Slack. (Not GitHub Pages.)
 
@@ -64,7 +70,8 @@ relative `data/` fetches resolve.
 
 **If the repo ever moves (or you host your own copy):** set `GH_REPO` in
 `index.html` (search for `const GH_REPO`) to your `org/repo` so the in-app
-**Suggest** and **Flag** buttons point at the right issue forms.
+**Suggest** and **Flag** buttons point at the right issue forms, and the GitHub links in the
+nav and footer point at your repository.
 
 ## Contribute
 
@@ -75,7 +82,8 @@ The atlas is community-maintained:
 - **🚩 Flag an entry** — [report something outdated or miscategorized](../../issues/new?template=flag-entry.yml)
   (or use the Flag button on any entry inside the atlas)
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the entry schema and review process.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the entry schema, how to fix something in the
+code, and the review process.
 Every PR is automatically validated by CI, and a maintainer can
 hand your suggestion to the **atlas bot**, which drafts it as a pull request
 (geocoded and validated) for human review — nothing publishes without a maintainer
@@ -91,7 +99,12 @@ index.html                        the app — one file of HTML/CSS/vanilla JS (L
                                   MapLibre GL, Tailwind & web fonts via CDN; TOA-branded)
 data/entities.yml                 the dataset — this is what you edit
 data/categories.yml, stages.yml   the categories and founder stages
-data/*.schema.yml                 JSON Schemas for the three data files
+data/pathways.yml                 hand-written routes through the Founder Journey
+data/credits.yml                  who has contributed, and the milestones (consent rules inside)
+data/updates.yml                  what a visitor would notice, for the What's new page
+data/*.schema.yml                 JSON Schemas for the data files
+credits/index.html                the credits page, which reads data/credits.yml
+updates/index.html                What's new, which reads data/updates.yml and data/entities.yml
 atlas-data.js                     shared loader: parses data/*.yml + validates against
                                   the schemas (used by index.html and scripts/)
 package.json                      npm deps for the scripts (js-yaml, Ajv) — `npm ci`
@@ -101,6 +114,7 @@ scripts/load-data.js              Node wrapper around atlas-data.js — scripts 
 test/data-refactor-equivalence.test.js  one-time check that data/ matches the old data.js
 scripts/stale.js                  freshness report — entries longest unverified
 scripts/export-csv.js             export the dataset to a spreadsheet-friendly CSV
+scripts/export-ai.js              export a compact text file for a founder's own AI assistant
 scripts/issue-to-entry.js         the suggestion bot's form parser / entry builder
 scripts/fetch-events.js           events aggregator — feeds /ecosystem/events/ weekly
 scripts/build-events-page.js      assembles events/index.html (generated — see docs/)
@@ -111,7 +125,11 @@ scripts/sync-to-site.sh           manual deploy fallback (CI normally deploys on
 .github/workflows/deploy.yml      auto-deploy to the live site + Slack notification
 .github/workflows/suggest-to-pr.yml  the suggestion bot (maintainer-gated, drafts PRs)
 .github/workflows/weekly-events.yml  Monday 7am ET events refresh + Slack post
+.github/workflows/e2e.yml         browser tests on every pull request and push to main
+.github/workflows/monthly-health.yml  monthly link check + re-check queue, posted to Slack
+.github/workflows/server-check.yml  Sunday check that a deploy can still reach the server
 docs/events-guide.md              how the events page & weekly refresh work
+docs/your-region.md               starting an atlas for another state or region
 CONTRIBUTING.md                   entry schema & contributor workflow
 MAINTAINING.md                    maintainer guide — turn issues & PRs into data/entities.yml
 PROJECT_STATE.md                  architecture, decisions & backlog (start here if new)
@@ -120,11 +138,13 @@ PROJECT_STATE.md                  architecture, decisions & backlog (start here 
 ## The data
 
 The atlas is also an **open dataset** — the only maintained, human-verified dataset of
-Massachusetts' AI ecosystem. Two machine-readable endpoints regenerate on every
+Massachusetts' AI ecosystem. Three machine-readable endpoints regenerate on every
 deploy:
 
 - **JSON** — <https://the-open-accelerator.com/ecosystem/atlas.json> — a versioned
   envelope (`schema: 1`) with all entries, categories, stages and per-category counts
+- **For AI assistants** — <https://the-open-accelerator.com/ecosystem/atlas-ai.txt> — every
+  organization and pathway as compact plain text, for the Ask your own AI prompt
 - **CSV** — <https://the-open-accelerator.com/ecosystem/atlas.csv> — one row per
   organization, ready for Google Sheets (*File → Import*) or Excel (*Data → From
   Text/CSV*)
@@ -132,7 +152,8 @@ deploy:
 Columns/fields include name, category, location, lat/lng, website, description, tags,
 founder stages and the month a maintainer last verified the entry.
 
-To regenerate locally: `node scripts/export-json.js` and `node scripts/export-csv.js`.
+To regenerate locally: `node scripts/export-json.js`, `node scripts/export-csv.js`, and
+`node scripts/export-ai.js`.
 
 **Methodology:** every entry is checked by a human against the organization's own
 website plus an independent source before it ships, and re-verified on a rolling

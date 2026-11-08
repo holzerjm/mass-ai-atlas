@@ -28,10 +28,10 @@ detail. The design brief was: *same domain, far more engaging and useful.*
 
 | View | What it does |
 |------|--------------|
-| 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; legend doubles as category toggles |
-| ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (170 cited edges across 114 entries as of 2026-10-11). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, legend toggles, and a search box that centers + locks any org's neighborhood. Drag/zoom/click |
-| 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows curated tips plus every entry whose `stages` includes that number |
-| 📇 **Directory** | Card grid, full-text search, category chips, stage filter, sort |
+| 🗺️ **Map** | Leaflet dark-tile map, one pin per org, colour-coded by category; searchable; rows of category toggles and "I need…" and stage filters above it. The wheel scrolls the page; ⌘ or Ctrl + wheel zooms |
+| ✨ **Galaxy** | Canvas force-directed graph — category hubs plus entity nodes, edges from `links` (179 cited edges across 129 entries as of 2026-11-04). Degree-weighted nodes, hover traces an org's constellation, hub hover lights its category, a row of category toggles above it, and a search box that centers + locks any org's neighborhood. Drag/zoom/click. It opens fitted to its canvas, phones included; on a touch screen the first tap traces a node and the second opens it; the keyboard reaches every node through a tree of organizations by category, and the search's results take the arrow keys |
+| 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows hand-written pathways, curated tips, and every entry whose `stages` includes that number |
+| 📇 **Directory** | Card grid, word-by-word search, category chips, need and stage filters, sort. The map and the Directory share one set of filters, kept in the address (`?need=`, `?stage=`, `?open=`, `?cat=`, `?sort=`) |
 
 A detail **drawer** is shared by all views: description, "why it matters for founders",
 tags, stages, connected entries, website link, "show on map", **places to meet** (cafés,
@@ -46,11 +46,13 @@ Deliberately **buildless** — it must survive being copied into a static site a
 edited by non-developers.
 
 ```
-index.html          ~158KB  the entire app: HTML + CSS + vanilla JS in one file
+index.html          ~210KB  the entire app: HTML + CSS + vanilla JS in one file
 atlas-data.js               shared loader: parses data/*.yml, validates against the schemas
 data/entities.yml           DATA — the only file most contributors touch
 data/categories.yml         CATS
 data/stages.yml             STAGES
+data/pathways.yml           PATHWAYS — read by the page on its own, after the atlas loads
+data/updates.yml            what's new — read by updates/index.html and the page's banner
 data/*.schema.yml           JSON Schema (draft-07) for each data file
 ```
 
@@ -86,7 +88,9 @@ data/*.schema.yml           JSON Schema (draft-07) for each data file
 Three data sets, each a YAML file with a JSON Schema beside it: `CATS` in
 `categories.yml` (11 categories → label + colour), `STAGES` in `stages.yml` (5 founder
 stages with tips), and `DATA` in `entities.yml` (the list of entries, grouped under
-`# ---------- CATEGORY ----------` comment banners). One entry:
+`# ---------- CATEGORY ----------` comment banners). `PATHWAYS` in `pathways.yml` is a fourth,
+optional set: the page reads it after the atlas loads and works without it, and it is checked
+by `validate.js` in CI rather than in the browser. One entry:
 
 ```yaml
 - id: acme-ai
@@ -117,7 +121,7 @@ neighbourhood-level · `lastVerified` is the month a maintainer last **actually 
 the org (validator warns if missing, errors if malformed; drawer shows "✓ Verified …",
 entries >12 months old get a stale marker). **Since 2026-08-30 ("decision tool" fields):**
 `offers` — 1-6 of a controlled 8-value vocabulary (funding · grants · space · compute ·
-mentorship · community · talent · customers) powering the Directory's "I need…" filter;
+mentorship · community · talent · customers) powering the "I need…" filter;
 `applyBy` — `"rolling"` or a `"YYYY-MM-DD"` deadline (past dates auto-hide in the app,
 validator warns until cleared/rolled); `applyNote` — short cohort label; `facts` — an
 optional 1-6-row [label, value] "at a glance" table (whitelisted labels). Tags are a
@@ -128,8 +132,8 @@ stamps it automatically). Powers the "✨ New" chips, the once-a-month new-orgs 
 and the Directory's "Recently added" sort. Validator warns if missing, errors if
 malformed or future. Full reference: `CONTRIBUTING.md`; enforced by `data/entities.schema.yml` + `scripts/validate.js`.
 
-**Current composition (197 entries, 2026-10-11):** vc 48 · startup 35 · accel 20 ·
-university 19 · corporate 19 · student 13 · space 10 · gov 9 · community 9 · event 8 ·
+**Current composition (198 entries, 2026-11-04):** vc 48 · startup 35 · accel 20 ·
+university 19 · corporate 19 · student 13 · space 10 · community 10 · gov 9 · event 8 ·
 angel 7.
 (Startup bar raised 15 → 28 on 2026-09-01: a 20-candidate research list was independently
 verified by a 4-agent workflow — 13 passed, 4 held, 1 skipped for NYC HQ, 2 were dupes.)
@@ -207,6 +211,7 @@ opens a **draft PR** with a review checklist. It never publishes (merge does tha
 | `scripts/fetch-events.js` | Builds `events.json` (gitignored) for **/ecosystem/events/** — Boston AI events, next 10 days, from Luma calendar ICS feeds (`events-sources.json`), Luma's discover API (best-effort, undocumented), AI Tinkerers (`llms-full.txt` + JSON-LD, per their agents.md), and `events-manual.json`. Runs Mondays 7am ET via `weekly-events.yml`, started by a cron on the origin server (`scripts/trigger-weekly-events.sh`, fine-grained token on `toa-forge`) because GitHub's scheduler delivered this repo's crons hours late or not at all; GitHub crons remain as Mon/Tue/Wed fallbacks behind a Monday-anchored idempotent gate (a run does the work only if it is past 7am Eastern on the latest Monday and the live `events.json` was not regenerated since; a manual run passes `force=true` to skip it); a sanity check refuses to ship a broken refresh (most sources failed), a Verify step fails the run if the live file does not show it, and a Slack rejection is red, not silent; the workflow then rsyncs the JSON and posts to the Scouts Slack (`SLACK_SCOUTS_WEBHOOK_URL`). The static page `events/index.html` deploys with the atlas; suggestions arrive via `suggest-event.yml` (label `event-suggestion`). Builds on nkpng2k/startup-event-scraper (Apache-2.0, credited). Full maintainer guide: `docs/events-guide.md`. |
 | `scripts/build-events-page.js` | Assembles `events/index.html` (a **generated file** — never hand-edit it) by lifting the TOA header/mobile-nav/footer/theme-toggle chrome verbatim from the atlas's `index.html` and wrapping it around the events page content. Re-run after changing either the shared chrome or the events layout. |
 | `scripts/export-csv.js` | Dataset → `atlas.csv` for Sheets/Excel. Output is gitignored. |
+| `scripts/export-ai.js` | Dataset and pathways → `atlas-ai.txt`, compact plain text for the Ask your own AI prompt. Data only: the rules live in the prompt in `index.html`. Output is gitignored. |
 | `scripts/export-json.js` | Dataset → `atlas.json` (versioned envelope). Both exports regenerate at deploy and are served publicly at `/ecosystem/atlas.{json,csv}` under **CC BY 4.0**. |
 | `scripts/sync-to-site.sh` | Copies `index.html` + `atlas-data.js` + `data/*.yml` into the TOA site tree. |
 
@@ -215,10 +220,16 @@ opens a **draft PR** with a review checklist. It never publishes (merge does tha
 ## 4. Deployment
 
 **Automatic since 2026-08-29** — merging to `main` is publishing.
-`.github/workflows/deploy.yml` fires on pushes touching `index.html`/`atlas-data.js`/`data/`
-(plus manual `workflow_dispatch` runs): it re-validates `data/`, rsyncs the page, loader
-and data files to the origin server, and posts a summary (new/updated entry names, count, links) to
-the TOA Slack — or a failure alert; a failed deploy leaves the live site unchanged.
+`.github/workflows/deploy.yml` fires on pushes touching `index.html`, `atlas-data.js`, `data/`,
+`map-style-dark.json`, `events/`, `credits/` or `updates/` (plus manual `workflow_dispatch` runs): it re-validates
+`data/`, rebuilds the exports, share pages, sitemap and events page, rsyncs them with the page,
+loader, map style, data files, credits page and updates page to the origin server, and posts a summary (new/updated entry
+names, count, links) to the TOA Slack, or a failure alert, which also covers a run that is
+cancelled or hits its time limit. A run that fails before its
+`Rsync atlas` step leaves the live site unchanged. One that fails inside it can leave the site
+half updated: the step's `rsync` commands run one after another, and the files they copied
+before the failure are already live. The failure alert says which of the two happened; the
+next successful run (a manual `workflow_dispatch` will do) uploads the full set again.
 
 Plumbing (all in repo secrets, Settings → Secrets → Actions): `DEPLOY_SSH_KEY` is a
 dedicated ed25519 key whose `authorized_keys` line on the server is
@@ -230,6 +241,12 @@ dedicated ed25519 key whose `authorized_keys` line on the server is
 
 Manual fallback: `./scripts/sync-to-site.sh <dest>` from a local checkout with SSH
 access. The atlas is **not** on GitHub Pages.
+
+**A weekly check since 2026-11:** `.github/workflows/server-check.yml` runs every Sunday at
+18:17 UTC (and on demand). It runs `ssh-keyscan` against `DEPLOY_HOST`, then the deploy's own
+rsync with `-n`, so it changes nothing, and posts a 🚨 to `SLACK_WEBHOOK_URL` if either fails.
+It exists because on 2026-11-06 the server's address changed without notice and deploys failed
+for about 18 hours. The rrsync restriction means it can't read the server's disk use.
 
 **The site-wide deploy must never touch `/ecosystem/`.** The rest of
 the-open-accelerator.com deploys separately via Eleventy from
@@ -263,27 +280,29 @@ GitHub Pages copy exists.
 
 ## 6. Status & known gaps
 
-**Done:** four views · 197 verified entries · TOA branding · GitHub contribution loop ·
+**Done:** four views · nearly 200 verified entries · TOA branding · GitHub contribution loop ·
 CI validation + live count shield · `validate` as a required status check on `main` ·
 auto-deploy on merge + Slack notifications · suggestion bot
 (issue → draft PR) · maintainer docs · CSV export · `lastVerified` freshness field + stale
 report · shareable deep links (`?entry=` / `#view`) · HTML-escaped rendering · MIT licence ·
 OpenFreeMap vector basemap (repo-owned dark style) · guided tour · Galaxy search + focus ·
+Galaxy on phones (fitted to the screen, tap to trace) and by keyboard (#45, #47) ·
 monthly health rails (link-check + verification rota → Slack) · events page (`/events/`,
 weekly Luma/AI-Tinkerers fetch) · founder stickiness: ★ shortlist (localStorage +
 `?list=` share links + print), ⚖ compare (up to 3 funders side-by-side), ✨ new-this-month
 (banner, chips, "Recently added" sort), 🎟 event ribbons on cards/drawer via `events.json` ·
-live at `/ecosystem/`.
+word-by-word search that takes a founder's sentence, and filters shared by the map and the
+Directory · live at `/ecosystem/`.
 
 **Open items / ideas, roughly by value:**
 
-1. **Accessibility pass** — keyboard navigation for the Galaxy canvas, focus states,
-   `prefers-reduced-motion` for the animated views, contrast audit.
-2. **Mobile polish** — the Galaxy view is cramped on small screens.
-3. **Self-hosted assets** — vendoring Leaflet/Tailwind/fonts/logo would remove CDN
+1. **Accessibility pass** — focus states, `prefers-reduced-motion` for the animated
+   views. (Shipped in 2026-11: the Galaxy's keyboard navigation, #47, and the light theme's
+   contrast, which the axe gate now checks on every page in both themes.)
+2. **Self-hosted assets** — vendoring Leaflet/Tailwind/fonts/logo would remove CDN
    dependence and fix the `file://` experience. (Beyond the TOA logo, the favicon and
    `og:image` are also hot-linked — from the-open-accelerator.com and people.redhat.com.)
-4. **Tailwind Play CDN** prints a console warning about production use; if it ever
+3. **Tailwind Play CDN** prints a console warning about production use; if it ever
    matters, precompile or drop it (most styling is hand-written CSS anyway).
 
 *(Resolved 2026-08-28: README/CONTRIBUTING described a GitHub Pages deploy path that was

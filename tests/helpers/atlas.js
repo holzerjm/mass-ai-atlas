@@ -26,13 +26,6 @@ const ATLAS = loadAtlas();
 const { DATA } = ATLAS;
 const byId = Object.fromEntries(DATA.map(d => [d.id, d]));
 
-// Contract 1 (Part A brief): affiliation value → the label the drawer shows.
-const AFFILIATION_LABELS = {
-  "publisher": "Atlas publisher",
-  "sponsor": "Atlas sponsor",
-  "sponsor-affiliated": "Sponsor-affiliated",
-};
-
 function metersBetween(a, b){
   const R = 6371000, rad = x => x * Math.PI / 180;
   const dLat = rad(b.lat - a.lat), dLng = rad(b.lng - a.lng);
@@ -67,14 +60,20 @@ const test = base.test.extend({
   // plain URL). Off by default: the tour switches views and covers the page
   // 1.4 s after load, which would race every other assertion.
   firstVisit: [false, { option: true }],
+  // true = a visitor who hasn't read the newest update, so the banner can appear. Off by
+  // default: it arrives after load and moves the page down, which would race other assertions.
+  newBanner: [false, { option: true }],
   // "fixture" | "missing" — what the page gets when it asks for events.json.
   eventsFeed: ["fixture", { option: true }],
   // Same-origin URLs a test deliberately makes fail (regexes).
   expectedHttpErrors: [[], { option: true }],
 
-  page: async ({ page, firstVisit, eventsFeed, expectedHttpErrors, baseURL }, use, testInfo) => {
+  page: async ({ page, firstVisit, newBanner, eventsFeed, expectedHttpErrors, baseURL }, use, testInfo) => {
     if(!firstVisit){
       await page.addInitScript(() => { try{ localStorage.setItem("toa-atlas-tour", "done"); }catch(e){} });
+    }
+    if(!newBanner){
+      await page.addInitScript(() => { try{ localStorage.setItem("toa-atlas-newbanner", "9999"); }catch(e){} });
     }
     await page.route("**/events.json*", route => eventsFeed === "missing"
       ? route.fulfill({ status: 404, contentType: "text/plain", body: "File not found" })
@@ -123,4 +122,4 @@ async function waitForApp(page){
   await page.waitForFunction(n => typeof markers === "object" && Object.keys(markers).length === n, DATA.length);
 }
 
-module.exports = { test, expect: base.expect, ROOT, ATLAS, DATA, byId, AFFILIATION_LABELS, metersBetween, eventsFixture, waitForApp };
+module.exports = { test, expect: base.expect, ROOT, ATLAS, DATA, byId, metersBetween, eventsFixture, waitForApp };

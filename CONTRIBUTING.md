@@ -1,6 +1,7 @@
 # Contributing to the Mass AI Atlas
 
-Thanks for keeping Massachusetts' AI map alive. Two ways to contribute, pick your comfort level:
+Thanks for keeping Massachusetts' AI map alive. There are two ways to fix the data,
+depending on your comfort with Git, and a third for fixing the code.
 
 Taking part means following our [code of conduct](CODE_OF_CONDUCT.md). Found a security
 problem rather than a wrong entry? See [SECURITY.md](SECURITY.md) — do not open a public
@@ -18,8 +19,14 @@ A maintainer reviews each issue and turns accepted suggestions into pull request
 
 All data lives in YAML files under [`data/`](data/): the entries in
 [`data/entities.yml`](data/entities.yml) (one list item per organization), plus
-[`categories.yml`](data/categories.yml) and [`stages.yml`](data/stages.yml). Each file
-has a JSON Schema next to it (`*.schema.yml`) that defines every field and its rules.
+[`categories.yml`](data/categories.yml), [`stages.yml`](data/stages.yml), and
+[`pathways.yml`](data/pathways.yml), the hand-written routes in the Founder Journey. Each file
+has a JSON Schema next to it (`*.schema.yml`) that defines every field and its rules. The
+rules for writing a pathway are in [`MAINTAINING.md`](MAINTAINING.md#founder-pathways).
+
+If your change is something a visitor would notice, add a line to
+[`data/updates.yml`](data/updates.yml) for the What's new page, or a maintainer will at merge.
+New organizations don't need one: the page lists them on its own.
 
 ### Adding an entry
 
@@ -56,7 +63,11 @@ An annotated example:
                                     # talent | customers (powers the "I need…" filter)
   applyBy: '2026-10-15'             # optional: rolling, or the current application
                                     # deadline — past dates auto-hide in the app
-  applyNote: Fall 2026 cohort       # optional, max 40 chars, shown next to the deadline
+  applyNote: Fall 2026 cohort       # optional, max 40 chars, shown next to the deadline,
+                                    # or on its own while applications are closed
+  applyUrl: https://example.org/apply  # optional: the application page, if it isn't `url`.
+                                    # On a VC or angel group with no applyBy or applyNote,
+                                    # its page for pitches, shown as "Takes pitches"
   facts: [[Check size, $500K–$2M],
           [Equity, 6%]]             # optional "at a glance" table, 1-6 rows; labels:
                                     # Check size | Stage | Terms | Equity | Board seat |
@@ -83,10 +94,70 @@ Text containing `: ` or ` #`, or starting with a quote or bracket, must be quote
 Entries flagged as shut down, relocated out of the region, or persistently
 unverifiable. When in doubt we mark things clearly rather than delete silently.
 
+## 3. Fixing something in the code
+
+Use this path for a change outside `data/`, such as an issue labelled
+[`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+`index.html` is the whole app: one file of HTML, CSS and plain JavaScript that reads
+`data/*.yml` as it loads. There is no build step, and the
+[house rules](HACKATHON.md#house-rules-worth-keeping) say why a change can't add one.
+
+1. **Claim the issue.** Comment on it, so two people don't fix the same thing.
+2. **Set up.** Fork and clone the repo. You need Node 20+ and Python 3.
+
+   ```bash
+   npm ci                            # once: the scripts' and tests' dependencies
+   npx playwright install chromium   # once: the browser the tests drive
+   python3 -m http.server            # then open http://localhost:8000
+   ```
+
+   Serve the folder rather than opening `index.html` from `file://`: browsers block a
+   `file://` page from reading its data.
+3. **Make the change, and measure it yourself.** An issue says what is wrong and how to
+   check it, but whoever wrote it looked once. For anything visual, check both themes, with
+   the switch in the site header, and a phone-width window.
+4. **Update what depends on your change.**
+   - **The events page.** It is generated: `scripts/build-events-page.js` builds
+     `events/index.html` from its own template plus the Tailwind setup, site header, mobile
+     menu, footer and theme code it copies from `index.html`. If you changed either file,
+     run `node scripts/build-events-page.js` and commit any change it makes. Never edit
+     `events/index.html` by hand. If the script stops with `start not found`, your change
+     removed a marker it copies from, so update the script to match.
+   - **The loader's version.** `index.html` loads `atlas-data.js` at an address that
+     carries a short hash of the file, so browsers and Cloudflare fetch a changed loader
+     at once instead of serving a cached copy. If you changed `atlas-data.js`, run
+     `node scripts/loader-version.js --write` and commit `index.html` with it.
+   - **The tests.** If a test fails because you changed on purpose what it checks, update
+     the test in the same pull request and say why. If you fixed an issue on the
+     accessibility allowlist, `KNOWN_SERIOUS` in `tests/a11y.spec.js`, delete its entry. The
+     HTML report, `npx playwright show-report`, marks it "allowlist entry unused".
+   - **The deploy list.** The deploy publishes only the files and folders that
+     [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) names. If you add a file
+     the live site needs, add it to that upload list and to the `paths:` filter.
+5. **Run what CI runs.**
+
+   ```bash
+   node scripts/validate.js && node scripts/lint-copy.js && npm run test:e2e
+   ```
+
+   CI also rebuilds the events page and checks the loader's version, and fails if
+   either is out of date. If a browser test
+   fails, read the failure before you re-run it:
+   [`docs/testing.md`](docs/testing.md#telling-a-flake-from-a-failure) explains how to tell
+   a flake from a real failure.
+6. **Open the pull request.** Say what you changed and how you checked it, with screenshots
+   for anything visual, and link the issue with a closing keyword such as `Closes #123`. If
+   `main` moves on before it's merged, merge `main` into your branch and run the checks
+   again ([here's why](HACKATHON.md#before-you-call-it-done)).
+
 ## Review process
 
 - CI (`scripts/validate.js`) must pass: the JSON Schemas in `data/` (field types,
   MA coordinates, https links, …) plus unique ids, valid category, resolvable connections
+- The browser tests run on every pull request too. They don't block a merge, but a code
+  change is expected to pass them
+- On your first pull request, the checks wait until a maintainer approves them, so "no
+  checks reported" means waiting, not failing
 - One maintainer approval merges, and **merging is publishing**: a GitHub Action
   re-checks the data and updates the live site within about a minute
   (see [MAINTAINING.md](MAINTAINING.md), Part 3)
@@ -94,6 +165,9 @@ unverifiable. When in doubt we mark things clearly rather than delete silently.
   it, or resolving a flag) — it records when someone actually checked the org, not
   merely when the entry was last edited
 - Flags with a source link get fast-tracked
+- When your contribution merges, you're credited on the atlas's credits page, from
+  `data/credits.yml`, by your GitHub handle. Say in your pull request if you'd also like
+  your real name, LinkedIn link, or photo shown
 
 ## Maintainers
 

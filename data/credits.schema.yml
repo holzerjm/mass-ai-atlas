@@ -1,0 +1,101 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: credits.schema.yml
+title: Mass AI Atlas credits
+description: >
+  The people outside the core team whose work is in the atlas, and the milestones of how it got
+  here. Read by credits/index.html and checked by scripts/validate.js. A GitHub handle and the
+  person's public pull requests and issues are public already, so they are all an entry needs.
+  `name`, `photo`, and `linkedin` are shown only with that person's consent.
+type: object
+required: [contributing, corrections, mapmakers, milestones]
+additionalProperties: false
+definitions:
+  text:
+    type: string
+    minLength: 1
+    pattern: '^[^<>]*$'
+  link:
+    type: object
+    required: [label, url]
+    additionalProperties: false
+    properties:
+      label:
+        description: link text, such as "PR #62"
+        type: string
+        minLength: 1
+        maxLength: 24
+        pattern: '^[^<>]*$'
+      url:
+        type: string
+        pattern: '^https://github\.com/'
+  date:
+    description: YYYY-MM-DD
+    type: string
+    pattern: '^\d{4}-\d{2}-\d{2}$'
+properties:
+  contributing:
+    description: where someone learns how to contribute
+    type: string
+    pattern: '^https://'
+  corrections:
+    description: where someone asks to change or remove their credit
+    type: string
+    pattern: '^https://'
+  mapmakers:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      required: [github, since, kinds, story, links]
+      additionalProperties: false
+      properties:
+        github:
+          description: GitHub handle, without the @
+          type: string
+          pattern: '^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$'
+        name:
+          description: real name, only with the person's consent
+          allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 60 }]
+        photo:
+          description: true shows the GitHub avatar, only with the person's consent
+          type: boolean
+        linkedin:
+          description: LinkedIn profile, only with the person's consent
+          type: string
+          pattern: '^https://(www\.)?linkedin\.com/in/[A-Za-z0-9%_-]+/?$'
+        team:
+          description: a hackathon team or similar group
+          allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 40 }]
+        since:
+          description: the date of their first contribution
+          $ref: '#/definitions/date'
+        kinds:
+          description: what kind of work it was
+          type: array
+          minItems: 1
+          maxItems: 4
+          uniqueItems: true
+          items:
+            enum: [code, data, accessibility, tests, research, events, docs]
+        story:
+          description: one or two plain sentences on what they did and why it mattered
+          allOf: [{ $ref: '#/definitions/text' }, { type: string, minLength: 20, maxLength: 220 }]
+        links:
+          type: array
+          minItems: 1
+          maxItems: 4
+          items: { $ref: '#/definitions/link' }
+  milestones:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      required: [date, title, text]
+      additionalProperties: false
+      properties:
+        date: { $ref: '#/definitions/date' }
+        title:
+          allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 60 }]
+        text:
+          allOf: [{ $ref: '#/definitions/text' }, { type: string, maxLength: 240 }]
+        link: { $ref: '#/definitions/link' }

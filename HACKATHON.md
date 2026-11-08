@@ -42,7 +42,8 @@ and the suggestion bot never sees them.
 **The repository your page points at.** It rewrites `GH_REPO` in `index.html` and
 regenerates `events/index.html` to match. Skip this and the ➕ Suggest an entry button,
 every entry's 🚩 flag, and the events page's ➕ Add your event link all open issues on
-**this** repository rather than yours — silently, because the page works either way.
+**this** repository rather than yours, and the GitHub links in the nav and footer lead here
+too — silently, because the page works either way.
 Commit both files. (`--keep-repo` opts out, and says what it is leaving behind.)
 
 It is idempotent; running it twice is harmless. The rest of what to change in your own copy
@@ -55,7 +56,7 @@ is deliberate, and it is why you can read the whole thing in an afternoon.
 
 When someone opens the page:
 
-1. The browser loads `index.html` — one hand-written file, HTML + CSS + vanilla JS, ~160 KB.
+1. The browser loads `index.html` — one hand-written file, HTML + CSS + vanilla JS, ~205 KB.
 2. It fetches six files from `data/`: three data files and their three JSON Schemas.
 3. `atlas-data.js` parses the YAML and validates every file **in the browser**.
 4. On failure the page shows a banner. On success the data becomes globals and the app runs.
@@ -66,12 +67,12 @@ build artifact in between.
 
 | Piece | What it is |
 |---|---|
-| `index.html` | the entire application, 1,900 lines |
-| `data/entities.yml` | the organizations, plus `categories.yml` (11) and `stages.yml` (5) |
+| `index.html` | the entire application, about 2,700 lines |
+| `data/entities.yml` | the organizations, plus `categories.yml` (11), `stages.yml` (5), and the Journey's `pathways.yml` |
 | `data/*.schema.yml` | JSON Schema for each — these are a safety control, not just a type check |
 | `atlas-data.js` | the shared loader, used by the page and by every script |
 | `scripts/` | validate, exports, link check, freshness rota, the events pipeline |
-| `tests/` | about 30 Playwright tests over the four views, deep links, shortlist, events, accessibility |
+| `tests/` | more than 100 Playwright tests over the four views, deep links, search, filters, the Galaxy on phones, keyboard use, the shortlist, events, credits, and accessibility in both themes |
 
 Map stack: Leaflet 1.9.4 with a MapLibre GL 5.24.0 vector basemap from OpenFreeMap (keyless),
 markercluster 1.5.3. All from CDNs — there is nothing to bundle.
@@ -89,7 +90,9 @@ a fifth means a section, a tab, and adding its name to the list in the on-load d
 
 **Filter differently.** `offers` is the interesting field: every entry declares 1–6 of
 `funding, grants, space, compute, mentorship, community, talent, customers`. That is what powers
-"I need…" — filtering by what an organization *gives* rather than what it is called.
+"I need…" — filtering by what an organization *gives* rather than what it is called. The map
+and the Directory share one set of filters, and `readFilters()` and `writeFilters()` keep them in
+the address. To teach the search a founder's word, add it to `SEARCH_SAME`.
 
 **Add a data source.** The events pipeline is the worked example: `events-sources.json` lists
 calendars, `scripts/fetch-events.js` pulls and screens them, `scripts/build-events-page.js`
@@ -106,10 +109,11 @@ it, read the published dataset instead of scraping:
 ## Make it yours
 
 This template is a working copy of a live site, so some of it points back at The Open
-Accelerator. Change these before you go far:
+Accelerator. Change these before you go far. If you're starting an atlas for another
+region, [docs/your-region.md](docs/your-region.md) also lists what's specific to Massachusetts.
 
-- **The workflows that touch TOA infrastructure** — `deploy`, `weekly-events`, `monthly-health`
-  and the suggestion bot — are guarded with `if: github.repository == 'holzerjm/mass-ai-atlas'`.
+- **The workflows that touch TOA infrastructure** — `deploy`, `weekly-events`, `monthly-health`,
+  `server-check` and the suggestion bot — are guarded with `if: github.repository == 'holzerjm/mass-ai-atlas'`.
   They will skip in your copy rather than fail. Delete them, or replace the guard with your own
   repo and supply your own secrets. **`validate` is deliberately not guarded** — you want it.
 - **`SECURITY.md`** uses relative GitHub links, so its advisory and issue routes already
@@ -117,13 +121,18 @@ Accelerator. Change these before you go far:
   enable private vulnerability reporting under **Settings → Code security**, or the
   primary route has nothing behind it.
 - **`CODE_OF_CONDUCT.md`** names `conduct@the-open-accelerator.com`. Change it.
+- **`data/credits.yml`** credits the people who built the atlas upstream, and its links point
+  at the upstream repository. Keep them credited, and add your own contributors below them.
+- **`data/pathways.yml` and `data/updates.yml`** describe the upstream atlas. Write your own,
+  or set either file to `[]`: the Founder Journey and the What's new page work without them.
 - **Run `scripts/setup-labels.sh <owner/repo>` first.** Labels do **not** come with a
   template copy, and GitHub *silently* drops a label an issue form asks for when it does
   not exist — so the suggest and flag forms would quietly arrive unlabelled, and the
   suggestion bot (which only runs on `bot:draft`) would never fire. The script is
   idempotent; run it once after creating your repo.
 - **Branding** — the header, footer and logo are TOA's. The `GH_REPO` constant in the app
-  script builds the "Suggest an entry" link; point it at your repo.
+  script builds the "Suggest an entry" link and the GitHub links in the nav and footer; point
+  it at your repo.
 
 ## The licence matters here
 
@@ -181,9 +190,18 @@ in it.
 node scripts/validate.js && node scripts/lint-copy.js && npm run test:e2e
 ```
 
-If a browser test fails, re-run it with `--workers=1` before believing it. Every spec renders a
-WebGL basemap, and under parallel workers a test can fail for lack of frames rather than a real
-defect. Retries are off on purpose so flakes stay visible.
+If a browser test fails, read the failure before you re-run it:
+
+- **The page says "Sorry — the atlas data failed to load".** The test lists any request for a
+  file in this repository that failed, and the trace in `npx playwright show-report` has the
+  page's console. Start from those rather than a re-run: a missing or broken data file fails the
+  same way every time. [`docs/testing.md`](docs/testing.md#telling-a-flake-from-a-failure) lists
+  the causes.
+- **Anything else**: re-run it with `--workers=1` before believing it. Every spec renders a WebGL
+  basemap, and under parallel workers a test can fail for lack of frames rather than a real
+  defect.
+
+Retries are off on purpose so flakes stay visible.
 
 Green checks only prove your change works against the commit you branched from. If `main` has
 moved on, merge it into your branch and run the suite again before you trust them. One fix here

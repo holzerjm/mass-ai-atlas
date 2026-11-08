@@ -7,7 +7,7 @@ on:
   pull_request:
   push:
     branches: [main]
-    paths: ["data/**", "scripts/**", "atlas-data.js", "package.json", "package-lock.json"]
+    paths: ["data/**", "scripts/**", "atlas-data.js", "package.json", "package-lock.json", "index.html", "events/**"]
 
 jobs:
   validate:
@@ -20,11 +20,30 @@ jobs:
       - run: npm ci
       - name: Validate data/ against the schemas
         run: node scripts/validate.js
-      # Dependency-free, so it runs even before npm ci. Catches a count typed into
-      # prose, which is how the footer came to claim 101 organizations for months
-      # while the atlas listed 171.
+      # Needs no npm packages, though here it runs after npm ci. Catches a count or a
+      # curation month typed into prose, which is how the footer came to claim 101
+      # organizations for months while the atlas listed 171.
       - name: Copy lint (no hand-typed organization counts)
         run: node scripts/lint-copy.js
+      # events/index.html is generated from index.html by
+      # scripts/build-events-page.js, and nothing else rebuilds it, so a change to
+      # index.html's chrome used to leave the committed page silently stale (its
+      # footer claimed 101 organizations for months). Rebuild it here and fail if
+      # that changes the file. A generator that can no longer run, because an
+      # index.html change removed a piece it lifts, fails here too.
+      - name: Events page matches its generator
+        run: |
+          node scripts/build-events-page.js
+          git diff --exit-code -- events/index.html || {
+            echo "::error file=events/index.html::events/index.html is out of date with index.html. Run node scripts/build-events-page.js and commit the result."
+            exit 1
+          }
+      # index.html loads atlas-data.js?v=<a short hash of the file>. Cloudflare and
+      # browsers cache .js files for hours, so a loader changed at an unchanged
+      # address could reach visitors as the old cached copy, next to a new
+      # index.html. Fail if the version in index.html no longer matches the file.
+      - name: Loader version matches atlas-data.js
+        run: node scripts/loader-version.js
       - name: Freshness report (informational, never fails the build)
         continue-on-error: true
         run: node scripts/stale.js >> "$GITHUB_STEP_SUMMARY"

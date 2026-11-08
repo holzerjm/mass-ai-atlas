@@ -11,7 +11,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const { CATS, STAGES, DATA } = require("./load-data").loadData();
+const { loadData, loadPathways } = require("./load-data");
+const { CATS, STAGES, DATA } = loadData();
 
 const counts = {};
 for (const d of DATA) counts[d.cat] = (counts[d.cat] || 0) + 1;
@@ -28,6 +29,7 @@ const out = {
   counts,
   cats: CATS,
   stages: STAGES,
+  pathways: loadPathways(),
   data: DATA,
 };
 

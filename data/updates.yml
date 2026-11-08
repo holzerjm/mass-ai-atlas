@@ -1,0 +1,68 @@
+# Mass AI Atlas — what's new: the short list on the updates page, newest first.
+# Schema: updates.schema.yml · Validate: node scripts/validate.js · Rules: MAINTAINING.md
+#
+# Add a line when a change is something a visitor would notice, in the same pull request.
+# Leave out fixes and work behind the scenes: this is not a changelog. New organizations don't
+# go here either: the page lists them by month from each entry's `added` field.
+#
+# Write what a visitor can now do, and give a `try` link when there's a place to see it.
+# When two lines share a date, the first one written is the one the banner shows.
+#
+# A copy of this template should replace this list, or set it to [].
+
+- date: 2026-11-07
+  title: The view tabs stay at the top
+  text: The Map, Galaxy, Founder Journey, and Directory tabs now stay at the top of the window however far you scroll, so you can switch views from anywhere. In a short window, such as a phone on its side, they take one row.
+  try: '#directory'
+
+- date: 2026-11-05
+  title: How to reach funders
+  text: See how to get in front of VCs and angel groups, when their own site says. Some take applications and others take pitches, and each entry links to the right page.
+  try: '?entry=xfund#directory'
+
+- date: 2026-11-05
+  title: Ask your own AI
+  text: Copy a prompt into the AI assistant you already use, and it answers from the atlas's own data, with a link to each organization. The atlas runs no AI itself, and what you type stays in your browser until you paste it.
+  try: '?ask=1#directory'
+
+- date: 2026-11-05
+  title: Founder pathways
+  text: Each stage of the Founder Journey now asks which situation sounds like you, then gives an ordered list of what to do next, with the reason for each step.
+  try: '?pathway=build-compute#journey'
+
+- date: 2026-11-05
+  title: A page for what's new
+  text: This page lists what changed and links to each feature, and new organizations appear here by month. The quick tour now covers application deadlines and pathways too.
+
+- date: 2026-11-04
+  title: Deadlines and apply links
+  text: Entries now show what's open, what's closed, and when to come back, with an Apply button. The Directory can sort by what closes next.
+  try: '?open=1&sort=deadline#directory'
+
+- date: 2026-11-04
+  title: Search in your own words
+  text: Search now takes a founder's own words, including whole sentences. Filters work on the map as well as the Directory, and the page's link keeps them, so a filtered view can be shared.
+  try: '#directory'
+
+- date: 2026-11-04
+  title: New connections in the Galaxy
+  text: Team TBTT surveyed organizations' own pages for connections the atlas was missing. That added 7 links, each backed by a sentence on the organization's page.
+  try: '#galaxy'
+
+- date: 2026-11-03
+  title: The Galaxy on phones, and every view by keyboard
+  text: The Galaxy now fits a phone screen, and the map, the Galaxy, the Journey, and the Directory all work by keyboard.
+  try: '#galaxy'
+
+- date: 2026-11-03
+  title: An easier light theme
+  text: Text and links in the light theme are now easier to read, and every view is checked for contrast in both themes.
+
+- date: 2026-11-02
+  title: Meet the mapmakers
+  text: A new page credits the people outside the core team whose code, data, tests, and research are in the atlas.
+  try: 'credits/'
+
+- date: 2026-11-01
+  title: “Also here” on the map
+  text: When organizations share a spot on the map, the pin's popup now lists them all, so none stays hidden at street zoom. The finding came from Team CommonSpace at Chart the Common Wealth.

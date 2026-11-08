@@ -42,7 +42,7 @@ const KEEP = argv.includes("--keep");
 const W = 1200, H = 750;
 // A dense vector basemap defeats GIF's inter-frame compression — nearly every
 // frame differs — so length, not quality settings, is what drives file size.
-// 8 fps x ~17 s x 760px lands around 5 MB, matching what the README had before.
+// 8 fps x ~25 s x 760px lands around 4.5 MB, under the 5 MB the README had before.
 const FPS = 8, WIDTH = 760, COLORS = 64;
 
 const CURSOR_CSS = `
@@ -151,11 +151,22 @@ const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ["ignore", "pipe", "p
     await page.waitForTimeout(2300);
   });
   await step("close drawer",  () => click("#drClose", { settle: 550 }));
-  await step("commonwealth",  async () => { await pin(); await click('button:has-text("Whole Commonwealth")', { settle: 2500 }); });
+  // A need filters the pins, and the map frames what it leaves, well beyond the Boston view.
+  await step("need on map",   async () => {
+    await pin();
+    await click('#mapNeeds button:has-text("Compute")', { settle: 2600 });
+    await click("#mapNote .filter-clear", { settle: 600 });
+  });
   // Each view is shorter than the map, so the scroll clamps back up: re-pin after.
   for (const [name, sel, hold] of [["galaxy", "Galaxy", 1900], ["journey", "Founder Journey", 1700], ["directory", "Directory", 600]])
     await step(name, async () => { await pin(); await click(`.tab:has-text("${sel}")`, { settle: 600 }); await pin(); await page.waitForTimeout(hold); });
-  await step("need filter",   () => click('#needChips button:has-text("Equity-free money")', { settle: 2000, block: "center" }));
+  // A founder's sentence, in their words: the page says these are the closest entries.
+  await step("sentence",      async () => {
+    await click("#dirSearch", { settle: 250 });
+    await page.type("#dirSearch", "We need GPU time and a lab bench for our robots", { delay: 34 });
+    await page.waitForFunction(() => /closest first/.test(document.getElementById("dirCount")?.textContent || ""), { timeout: 5000 });
+    await page.waitForTimeout(2300);
+  });
 
   await page.waitForTimeout(800);
   await ctx.close();
@@ -182,8 +193,8 @@ const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ["ignore", "pipe", "p
   };
   const sel = [
     beat("frame map", 0.2, 0.2), beat("search", 0.1, 1.0), beat("places to meet", 0.1, 0.6),
-    beat("commonwealth", 1.2, 0.2), beat("galaxy", 1.5, 1.3), beat("journey", 2.3, 1.9),
-    beat("directory", 1.6, 0.0),
+    beat("need on map", 1.6, 1.6), beat("galaxy", 1.5, 1.3), beat("journey", 2.3, 1.9),
+    beat("directory", 1.6, 0.0), beat("sentence", 0.5, 0.0),
   ].join("+");
   const vf = `select='${sel}',setpts=N/(25*TB),fps=${FPS},scale=${WIDTH}:-2:flags=lanczos`;
 

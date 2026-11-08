@@ -1,0 +1,216 @@
+<!doctype html>
+<!-- The credits page. It reads ../data/credits.yml at load, the same way index.html
+     reads data/*.yml, so crediting someone is a change to that file, not to this one.
+     Hand-written, not generated. -->
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapmakers · Mass AI Atlas</title>
+<meta name="description" content="The people outside the core team whose code, data, tests, and research are in the Mass AI Atlas, and the milestones of how it got here.">
+<link rel="canonical" href="https://the-open-accelerator.com/ecosystem/credits/">
+<meta property="og:title" content="Meet the mapmakers of the Mass AI Atlas">
+<meta property="og:description" content="The people outside the core team whose work is in the Mass AI Atlas, and how it got here.">
+<meta property="og:url" content="https://the-open-accelerator.com/ecosystem/credits/">
+<link rel="icon" href="https://the-open-accelerator.com/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Red+Hat+Display:wght@500;700;900&family=Red+Hat+Text:wght@400;500&family=Red+Hat+Mono:wght@400;500&display=swap">
+<script>(function(){try{if(localStorage.getItem('toa-atlas-theme')==='light'){document.documentElement.classList.remove('dark');}}catch(e){}})();</script>
+<style>
+  /* The events page's palette, already scanned for contrast in both themes. */
+  :root{--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
+    --muted:#9aa1ab;--gold:#ffc600;--on-gold:#0d0f12}
+  html:not(.dark){--bg:#faf9f7;--panel:#ffffff;--panel2:#f3f1ee;--line:#e2ddd6;--text:#1c1a17;
+    --muted:#5d574e;--gold:#b45309;--on-gold:#ffffff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 "Red Hat Text",system-ui,-apple-system,"Segoe UI",sans-serif}
+  a{color:var(--gold);text-decoration:underline;text-underline-offset:2px}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+  .bar{border-bottom:1px solid var(--line)}
+  .bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;padding-bottom:12px}
+  .home{font:700 15px "Red Hat Display",sans-serif;color:var(--text);text-decoration:none}
+  .home:hover{color:var(--gold)}
+  .theme{font:500 14px "Red Hat Text",sans-serif;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .theme:hover{border-color:var(--gold)}
+  .hero{padding:44px 0 8px}
+  .eyebrow{font:500 12px "Red Hat Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}
+  h1{font:900 clamp(2.2rem,5.4vw,3.7rem)/1.05 "Red Hat Display",sans-serif;margin:0 0 16px;text-wrap:balance}
+  .brush{font-family:"Caveat Brush","Red Hat Display",cursive;font-weight:400;color:var(--gold);font-size:1.12em}
+  .lede{max-width:62ch;color:var(--muted);font-size:1.08rem;margin:0 0 14px}
+  .stat{margin:0;color:var(--muted)}
+  .stat strong{font:900 1.5rem "Red Hat Display",sans-serif;color:var(--text)}
+  .filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:30px 0 6px}
+  .filters .label{color:var(--muted);font-size:14px;margin-right:4px}
+  .chip{font:500 14px "Red Hat Text",sans-serif;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer}
+  .chip .n{color:var(--muted);margin-left:5px}
+  .chip:hover{border-color:var(--gold)}
+  .chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
+  .chip[aria-pressed="true"] .n{color:var(--on-gold)}
+  .showing{color:var(--muted);font-size:14px;margin:6px 0 16px;min-height:1.5em}
+  .cards{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s}
+  .card:hover{border-color:var(--gold)}
+  .card[hidden]{display:none}
+  .who{display:flex;align-items:center;gap:12px}
+  .avatar{flex:none;width:46px;height:46px;border-radius:50%;border:2px solid var(--gold);background:var(--panel2);color:var(--text);display:grid;place-items:center;font:700 16px "Red Hat Display",sans-serif;object-fit:cover}
+  .handle{font:700 16px "Red Hat Display",sans-serif;color:var(--text);text-decoration:none;word-break:break-word}
+  .handle:hover{color:var(--gold);text-decoration:underline}
+  .name,.team{display:block;color:var(--muted);font-size:13.5px}
+  .story{margin:0;font-size:15px}
+  .kinds{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:0}
+  .kind{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+  .links{margin:0;font-size:14px}
+  .since{margin:auto 0 0;font:400 12.5px "Red Hat Mono",monospace;color:var(--muted)}
+  .error{color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:22px}
+  h2{font:700 1.6rem "Red Hat Display",sans-serif;margin:0 0 6px}
+  .history{margin:56px 0 0}
+  .history .sub{color:var(--muted);margin:0 0 22px}
+  .timeline{list-style:none;margin:0;padding:0 0 0 26px;border-left:2px solid var(--line)}
+  .timeline li{position:relative;margin:0 0 24px}
+  .timeline li::before{content:"";position:absolute;left:-33px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px var(--bg)}
+  .timeline time{font:400 12.5px "Red Hat Mono",monospace;color:var(--muted)}
+  .timeline h3{font:700 1.08rem "Red Hat Display",sans-serif;margin:2px 0 4px}
+  .timeline p{margin:0;max-width:66ch}
+  .about{margin:48px 0 0;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);max-width:70ch}
+  .about p{margin:0 0 10px}
+  .foot{margin:40px 0 0;padding:20px 0 32px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="home" href="../">← Mass AI Atlas</a>
+    <button class="theme" type="button" onclick="toggleTheme()" aria-label="Toggle light/dark theme">Light / dark</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" aria-labelledby="title">
+    <p class="eyebrow">Credits</p>
+    <h1 id="title">Meet the <span class="brush">mapmakers</span></h1>
+    <p class="lede">The Mass AI Atlas is curated by The Open Accelerator and built in the open. These are the people outside the core team whose code, data, tests, and research are in it.</p>
+    <p class="stat"><strong id="mmCount" data-computed>—</strong> mapmakers so far. <a id="becomeOne" href="#">Become one</a>.</p>
+  </section>
+
+  <div class="filters" role="group" aria-label="Filter by kind of work" id="filters"></div>
+  <p class="showing" id="showing" aria-live="polite"></p>
+  <ul class="cards" id="cards"></ul>
+
+  <section class="history" aria-labelledby="historyTitle">
+    <h2 id="historyTitle">How the atlas got here</h2>
+    <p class="sub">Milestones from the community and the project. For recent changes, see <a href="../updates/">what's new</a>.</p>
+    <ol class="timeline" id="timeline"></ol>
+  </section>
+
+  <section class="about" aria-label="About these credits">
+    <p>Credit here is for individual work. Sponsors are thanked on the atlas page, and credit here can't be bought.</p>
+    <p>Everyone is listed by their public GitHub handle. A real name, photo, or LinkedIn link appears only with that person's consent. To change or remove your credit, <a id="corrections" href="#">open an issue</a>.</p>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap"><a href="../">Mass AI Atlas</a> · A project of <a href="https://the-open-accelerator.com">The Open Accelerator</a> · Dataset CC BY 4.0, code MIT</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4.3.2/dist/js-yaml.min.js"></script>
+<script>
+function toggleTheme(){
+  const nowLight = document.documentElement.classList.toggle("dark") === false;
+  try{ localStorage.setItem("toa-atlas-theme", nowLight ? "light" : "dark"); }catch(e){}
+}
+
+const KINDS = {
+  code: { label: "Code", icon: "💻" }, data: { label: "Data", icon: "🗂️" },
+  accessibility: { label: "Accessibility", icon: "♿" }, tests: { label: "Tests", icon: "🧪" },
+  research: { label: "Research", icon: "🔎" }, events: { label: "Events", icon: "📅" },
+  docs: { label: "Docs", icon: "📝" },
+};
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const $ = id => document.getElementById(id);
+
+// Build every node with textContent, never innerHTML: the YAML is checked in CI,
+// and this keeps it safe even if something slipped past.
+function el(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === undefined || v === null || v === false) continue;
+    if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+  }
+  for (const k of kids) if (k) n.append(k);
+  return n;
+}
+const safeUrl = u => /^https:\/\//.test(u || "") ? u : "#";
+// "2026-10-30" -> "Oct 30, 2026", or "October 2026" for a month. Split by hand, so no
+// time zone can move a date to the day before.
+function fmt(iso, month){
+  const [y, m, d] = iso.split("-").map(Number);
+  return month ? `${MONTHS[m - 1]} ${y}` : `${MONTHS[m - 1].slice(0, 3)} ${d}, ${y}`;
+}
+function initials(handle){
+  const words = handle.replace(/([a-z])([A-Z])/g, "$1 $2").match(/[A-Za-z]+/g) || [handle];
+  return (words.length > 1 ? words[0][0] + words[1][0] : words[0].slice(0, 2)).toUpperCase();
+}
+function joinLinks(links){
+  const p = el("p", { class: "links" });
+  links.forEach((l, i) => { if (i) p.append(" · "); p.append(el("a", { href: safeUrl(l.url), text: l.label })); });
+  return p;
+}
+
+function card(m){
+  const avatar = m.photo
+    ? el("img", { class: "avatar", src: `https://github.com/${encodeURIComponent(m.github)}.png?size=96`, alt: "", width: 46, height: 46, loading: "lazy" })
+    : el("span", { class: "avatar", "aria-hidden": "true", text: initials(m.github) });
+  const who = el("div", { class: "who" }, avatar, el("div", {},
+    el("a", { class: "handle", href: `https://github.com/${encodeURIComponent(m.github)}`, text: "@" + m.github }),
+    m.name ? el("span", { class: "name", text: m.name }) : null,
+    m.team ? el("span", { class: "team", text: "Team " + m.team }) : null));
+  const kinds = el("ul", { class: "kinds", "aria-label": "Kinds of work" },
+    ...m.kinds.map(k => el("li", { class: "kind" }, el("span", { "aria-hidden": "true", text: ((KINDS[k] || {}).icon || "") + " " }), (KINDS[k] || { label: k }).label)));
+  return el("li", { class: "card", "data-github": m.github, "data-kinds": m.kinds.join(" ") },
+    who, el("p", { class: "story", text: m.story }), kinds,
+    joinLinks(m.linkedin ? [...m.links, { label: "LinkedIn", url: m.linkedin }] : m.links),
+    el("p", { class: "since" }, "Since ", el("time", { datetime: m.since, text: fmt(m.since, true) })));
+}
+
+function filterTo(kind, all){
+  const cards = [...$("cards").children];
+  let shown = 0;
+  for (const c of cards) { c.hidden = kind !== "all" && !c.dataset.kinds.split(" ").includes(kind); if (!c.hidden) shown++; }
+  for (const b of $("filters").querySelectorAll(".chip")) b.setAttribute("aria-pressed", String(b.dataset.kind === kind));
+  $("showing").textContent = kind === "all" ? `Showing all ${all} mapmakers.` : `Showing ${shown} of ${all}: ${KINDS[kind].label}.`;
+}
+
+function render(credits){
+  const people = [...credits.mapmakers].sort((a, b) => a.since.localeCompare(b.since) || a.github.localeCompare(b.github));
+  $("mmCount").textContent = people.length;
+  $("becomeOne").href = safeUrl(credits.contributing);
+  $("corrections").href = safeUrl(credits.corrections);
+  $("cards").replaceChildren(...people.map(card));
+
+  const counts = {};
+  people.forEach(m => m.kinds.forEach(k => counts[k] = (counts[k] || 0) + 1));
+  const chip = (kind, label, n) => el("button", { class: "chip", type: "button", "data-kind": kind, "aria-pressed": "false" }, label, el("span", { class: "n", text: String(n) }));
+  const chips = [chip("all", "All", people.length), ...Object.keys(KINDS).filter(k => counts[k]).map(k => chip(k, KINDS[k].label, counts[k]))];
+  chips.forEach(b => b.addEventListener("click", () => filterTo(b.dataset.kind, people.length)));
+  $("filters").replaceChildren(el("span", { class: "label", text: "Show" }), ...chips);
+  filterTo("all", people.length);
+
+  const milestones = [...credits.milestones].sort((a, b) => a.date.localeCompare(b.date));
+  $("timeline").replaceChildren(...milestones.map(ms => el("li", {},
+    el("time", { datetime: ms.date, text: fmt(ms.date) }),
+    el("h3", { text: ms.title }),
+    el("p", { text: ms.text }),
+    ms.link ? el("p", { class: "links" }, el("a", { href: safeUrl(ms.link.url), text: ms.link.label })) : null)));
+}
+
+fetch("../data/credits.yml", { cache: "no-cache" })
+  .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+  .then(t => render(jsyaml.load(t, { schema: jsyaml.CORE_SCHEMA })))
+  .catch(() => {
+    $("cards").replaceChildren(el("li", { class: "error", text: "Sorry, the credits failed to load. Reload the page, or read data/credits.yml on GitHub." }));
+  });
+</script>
+</body>
+</html>

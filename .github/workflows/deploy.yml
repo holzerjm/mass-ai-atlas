@@ -1,6 +1,6 @@
-# Hands-off deploys — rsync the atlas to the web server on every merge to
-# main that touches index.html or data/, so accepted community PRs go
-# live automatically. Can also be run manually from the Actions tab
+# Hands-off deploys: rsync the atlas to the web server on every merge to main
+# that matches the paths filter below, so accepted community PRs go live
+# automatically. Can also be run manually from the Actions tab
 # (workflow_dispatch), e.g. to test the pipeline.
 #
 # Repository secrets (Settings → Secrets and variables → Actions):
@@ -23,8 +23,18 @@ name: Deploy to TOA site
 on:
   push:
     branches: [main]
-    paths: ["index.html", "atlas-data.js", "data/**", "map-style-dark.json", "events/**"]
+    paths: ["index.html", "atlas-data.js", "data/**", "map-style-dark.json", "events/**", "credits/**", "updates/**"]
   workflow_dispatch:
+
+# One deploy at a time. Without this, two quick merges start two runs that upload
+# side by side, and whichever copies a file last decides what is live, even with
+# the older commit. cancel-in-progress stays false so no upload stops halfway.
+# GitHub keeps one waiting run per group: a newer run replaces a waiting one,
+# which loses no change (it deploys a later main) but leaves the replaced push's
+# commits out of the Slack summary.
+concurrency:
+  group: deploy-atlas
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -36,6 +46,7 @@ jobs:
     # job stops running here too. It is the only place the slug is hardcoded.
     if: github.repository == 'holzerjm/mass-ai-atlas'
     runs-on: ubuntu-latest
+    timeout-minutes: 15          # a hung ssh/rsync must not hold the deploy-atlas group for hours
     steps:
       - uses: actions/checkout@v5
         with:
@@ -46,12 +57,20 @@ jobs:
       - run: npm ci
       - name: Validate data/ before shipping
         run: node scripts/validate.js
-      - name: Generate public dataset (atlas.json + atlas.csv)
+      - name: Generate public dataset (atlas.json + atlas.csv + atlas-ai.txt)
         run: |
           node scripts/export-json.js
           node scripts/export-csv.js
+          node scripts/export-ai.js
       - name: Build entry share pages + sitemap
         run: node scripts/build-pages.js
+      # events/index.html is generated from index.html's chrome. validate.yml
+      # fails a pull request whose committed copy has drifted; rebuilding it here
+      # also covers two merges that are each fine alone but stale together, so the
+      # deployed events page always matches the deployed index.html. If the
+      # generator throws, the deploy stops here, before anything is uploaded.
+      - name: Build the events page from index.html
+        run: node scripts/build-events-page.js
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
@@ -59,8 +78,9 @@ jobs:
           chmod 600 ~/.ssh/id_deploy
           ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
       - name: Rsync atlas
+        id: rsync
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_deploy" index.html atlas-data.js map-style-dark.json atlas.json atlas.csv site-pages/sitemap.xml \
+          rsync -avz -e "ssh -i ~/.ssh/id_deploy" index.html atlas-data.js map-style-dark.json atlas.json atlas.csv atlas-ai.txt site-pages/sitemap.xml \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/"
           # the page fetches data/*.yml (data + schemas) at load time
           rsync -avz -e "ssh -i ~/.ssh/id_deploy" data/ \
@@ -71,6 +91,12 @@ jobs:
           # entries' share pages clean up without touching anything else
           rsync -avz --delete -e "ssh -i ~/.ssh/id_deploy" site-pages/e/ \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/e/"
+          # the credits and updates pages. Their data, data/credits.yml and data/updates.yml,
+          # went up with data/ above. Last, so a failure here leaves every other file in place.
+          rsync -avz -e "ssh -i ~/.ssh/id_deploy" credits/ \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/credits/"
+          rsync -avz -e "ssh -i ~/.ssh/id_deploy" updates/ \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/updates/"
 
       - name: Notify Slack (deployed)
         if: success()
@@ -141,20 +167,48 @@ jobs:
             }' \
           | curl -sS -X POST -H 'Content-type: application/json' -d @- "$SLACK_WEBHOOK_URL"
 
+      # cancelled() as well as failure(): GitHub cancels a job that hits
+      # timeout-minutes, and one stopped by hand, so failure() alone would post
+      # nothing for either. A waiting run that a newer one replaces never starts,
+      # so it posts nothing.
       - name: Notify Slack (deploy failed)
-        if: failure()
+        if: failure() || cancelled()
         continue-on-error: true
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RSYNC_OUTCOME: ${{ steps.rsync.outcome }}
+          JOB_STATUS: ${{ job.status }}
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && { echo "SLACK_WEBHOOK_URL not set — skipping"; exit 0; }
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/workflows/deploy.yml"
           SUBJECT=$(git log -1 --pretty=%s 2>/dev/null || echo "unknown commit")
-          jq -n --arg subject "$SUBJECT" --arg run "$RUN_URL" '
+          # What is live depends on how far Rsync atlas got. Its rsync commands run
+          # one after another, so "failure" (or "cancelled") means it stopped partway
+          # and whatever it had copied is already live; "success" means every file
+          # went up before the run stopped; anything else ("skipped") means
+          # nothing was uploaded.
+          case "$RSYNC_OUTCOME" in
+            failure|cancelled)
+              STATE="The upload stopped partway, so the live site may be *half updated*."
+              # Not "re-run": a re-run deploys the failed run's own commit, which puts
+              # older files back if a newer deploy has landed since. Run workflow
+              # deploys the current main.
+              NEXT=", then use *Run workflow* on <${WORKFLOW_URL}|Deploy to TOA site> to upload every file from the current \`main\`" ;;
+            success)
+              STATE="Every file was uploaded before the run stopped."
+              NEXT="" ;;
+            *)
+              STATE="The live site is *unchanged*."
+              NEXT="" ;;
+          esac
+          WHY=""
+          if [ "$JOB_STATUS" = "cancelled" ]; then WHY="The run was cancelled or hit its time limit. "; fi
+          jq -n --arg subject "$SUBJECT" --arg run "$RUN_URL" --arg why "$WHY" --arg state "$STATE" --arg next "$NEXT" '
             {text: "🚨 Mass AI Atlas deploy FAILED",
              blocks: [
                {type:"header", text:{type:"plain_text", text:"🚨 Atlas deploy failed", emoji:true}},
                {type:"section", text:{type:"mrkdwn",
-                 text:("`" + $subject + "`\nThe live site is *unchanged*. <" + $run + "|View the failed run> to see what broke.")}}
+                 text:("`" + $subject + "`\n" + $why + $state + " <" + $run + "|View the failed run> to see what broke" + $next + ".")}}
              ]}' \
           | curl -sS -X POST -H 'Content-type: application/json' -d @- "$SLACK_WEBHOOK_URL"

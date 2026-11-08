@@ -7,6 +7,7 @@
 # local claude config
 .claude/
 atlas.json
+atlas-ai.txt
 site-pages/
 /e/
 events.json
