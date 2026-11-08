@@ -441,14 +441,24 @@ change to promote it.
 **The WebKit jobs report only.** They run the same tests in WebKit, the engine Safari is
 built on, at the same 1280x720 and 1x pixels as Chromium. Leave them out of the required
 checks even if the Chromium ones are promoted: this is Playwright's own WebKit build on
-Linux, not Safari, so a failure only there is a lead to check in a real Safari. Two test
-details differ by engine: the copy-button test grants only `clipboard-read` in WebKit,
-which lets a click write to the clipboard and has no `clipboard-write` permission, and
-the error guard also ignores WebKit's wording for a request cancelled by navigation.
+Linux, not Safari, so a failure only there is a lead to check in a real Safari. The
+first WebKit runs (2026-11-08) found nothing wrong with the atlas, and four test details
+came out of them:
+
+- The copy-button test grants only `clipboard-read` in WebKit, which lets a click write to
+  the clipboard and has no `clipboard-write` permission.
+- The error guard also ignores WebKit's wording for a request cancelled by navigation.
+- The popup check hit-tests only inside the visual viewport. In a phone-sized window,
+  Playwright's WebKit paints the page's 10 px scrollbar over the window's right edge, where
+  an iPhone shows only an overlay, and `elementFromPoint` finds nothing under it. A popup
+  part that leaves the window still fails.
+- The search-popup test measures every popup with Leaflet's 200 ms fade turned off. WebKit
+  on CI was still removing the faded ones when the test went on, and its locator matched
+  them all.
 
 **Each Browser tests job has 25 minutes.** Each runs half the tests in one browser, about
-5 minutes' worth in Chromium, and Playwright's image already holds both browsers, so no
-setup step installs them.
+5 minutes' worth in Chromium and 6 to 9 in WebKit, and Playwright's image already holds
+both browsers, so no setup step installs them.
 Until 2026-11 one did, and on some runners it took 8 to 10 minutes. A job that hits the
 limit is cancelled, which is neither a pass nor a failure: count the `✓` lines in its log
 to see how far it got, and add one browser's two counts for its whole suite.

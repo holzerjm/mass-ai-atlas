@@ -29,12 +29,19 @@ const hiddenParts = page => page.evaluate(places => {
   const pan = map.panBy, nav = document.querySelector(".nav").offsetHeight, hidden = [];
   map.panBy = (offset, options) => pan.call(map, offset, { ...options, animate: false });
   const lines = el => { const text = document.createRange(); text.selectNodeContents(el); return [...text.getClientRects()]; };
+  // A hit test reaches only what the visual viewport shows. In a phone-sized window, Playwright's
+  // WebKit paints the page's 10 px scrollbar over the window's right edge, where an iPhone shows
+  // only an overlay, and elementFromPoint finds nothing under it. So points outside the visual
+  // viewport aren't tested for cover, and a part that leaves the window counts as hidden by itself.
+  const seen = visualViewport;
   const points = box => {
     const all = [];
     for(const y of [box.top + 2, box.top + box.height / 2, box.bottom - 2])
-      for(let x = box.left + 1; x < box.right; x += 5) all.push([x, y]);
+      for(let x = box.left + 1; x < box.right; x += 5)
+        if(x >= seen.offsetLeft && x < seen.offsetLeft + seen.width && y >= seen.offsetTop && y < seen.offsetTop + seen.height) all.push([x, y]);
     return all;
   };
+  const offWindow = box => box.left < 0 || box.top < 0 || box.right > innerWidth || box.bottom > innerHeight;
   setClustered(false);
   for(const d of mapEntries().list) for(const [x, y] of places){
     const pin = markers[d.id], ll = pin.getLatLng(), size = map.getSize();
@@ -49,7 +56,8 @@ const hiddenParts = page => page.evaluate(places => {
       close: [popup.querySelector(".leaflet-popup-close-button").getBoundingClientRect()],
     };
     for(const [part, boxes] of Object.entries(parts)){
-      const over = boxes.flatMap(points).map(([x, y]) => document.elementFromPoint(x, y)).find(at => !popup.contains(at));
+      const over = boxes.some(offWindow) ? null
+        : boxes.flatMap(points).map(([x, y]) => document.elementFromPoint(x, y)).find(at => !popup.contains(at));
       if(over !== undefined) hidden.push(`${d.id} at ${x}, ${y}: ${part} under ${over ? over.className || over.tagName : "the window's edge"}`);
     }
     map.closePopup();
