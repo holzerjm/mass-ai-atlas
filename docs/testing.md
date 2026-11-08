@@ -446,7 +446,7 @@ change to promote it.
 built on, at the same 1280x720 and 1x pixels as Chromium. Leave them out of the required
 checks even if the Chromium ones are promoted: this is Playwright's own WebKit build on
 Linux, not Safari, so a failure only there is a lead to check in a real Safari. The
-first WebKit runs (2026-11-08) found nothing wrong with the atlas, and four test details
+first WebKit runs (2026-11-08) found nothing wrong with the atlas, and five test details
 came out of them:
 
 - The copy-button test grants only `clipboard-read` in WebKit, which lets a click write to
@@ -456,6 +456,9 @@ came out of them:
   Playwright's WebKit paints the page's 10 px scrollbar over the window's right edge, where
   an iPhone shows only an overlay, and `elementFromPoint` finds nothing under it. A popup
   part that leaves the window still fails.
+- The site menu's check measures to the same visible edge. With the atlas's 10 px scrollbar
+  inside a 390 px window, WebKit's closed menu sits at 380, still out of sight. The events
+  page has no custom scrollbar, so its menu sits at 390 in both browsers.
 - The search-popup test measures every popup with Leaflet's 200 ms fade turned off. WebKit
   on CI was still removing the faded ones when the test went on, and its locator matched
   them all.
