@@ -96,7 +96,7 @@ merge.
 
 ```
 index.html                        the app — one file of HTML/CSS/vanilla JS (Leaflet +
-                                  MapLibre GL, Tailwind & web fonts via CDN; TOA-branded)
+                                  MapLibre GL & web fonts via CDN; TOA-branded)
 data/entities.yml                 the dataset — this is what you edit
 data/categories.yml, stages.yml   the categories and founder stages
 data/pathways.yml                 hand-written routes through the Founder Journey

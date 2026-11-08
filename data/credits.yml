@@ -148,6 +148,14 @@ mapmakers:
       - { label: "PR #125", url: "https://github.com/holzerjm/mass-ai-atlas/pull/125" }
       - { label: "PR #127", url: "https://github.com/holzerjm/mass-ai-atlas/pull/127" }
 
+  - github: LAIBA-FrontendDev
+    since: 2026-10-31
+    kinds: [code]
+    story: "Took the atlas off the Tailwind Play CDN, which built the site header's CSS in every visitor's browser and warned that it isn't meant for production. That CSS now ships with the page."
+    links:
+      - { label: "PR #78", url: "https://github.com/holzerjm/mass-ai-atlas/pull/78" }
+      - { label: "Issue #46", url: "https://github.com/holzerjm/mass-ai-atlas/issues/46" }
+
 milestones:
   - date: 2026-06-15
     title: "The first outside suggestions"

@@ -65,7 +65,7 @@ data/*.schema.yml           JSON Schema (draft-07) for each data file
   through `scripts/load-data.js`. **Relative paths matter**: the page must be served at a
   directory URL (`/ecosystem/`), not `/ecosystem`.
 - External runtime deps, all CDN: Leaflet 1.9.4 + MapLibre GL 5.24 + maplibre-gl-leaflet
-  (map), Tailwind Play CDN, Google Fonts (Red Hat Display), plus the TOA logo hot-linked
+  (map), Google Fonts (Red Hat Display), plus the TOA logo hot-linked
   from `the-open-accelerator.com`.
 - **Map basemap (since 2026-08-30): OpenFreeMap vector tiles** — keyless, unlimited,
   commercial use permitted — rendered through MapLibre GL via the `maplibre-gl-leaflet`
@@ -299,11 +299,12 @@ Directory · live at `/ecosystem/`.
 1. **Accessibility pass** — focus states, `prefers-reduced-motion` for the animated
    views. (Shipped in 2026-11: the Galaxy's keyboard navigation, #47, and the light theme's
    contrast, which the axe gate now checks on every page in both themes.)
-2. **Self-hosted assets** — vendoring Leaflet/Tailwind/fonts/logo would remove CDN
+2. **Self-hosted assets** — vendoring Leaflet/fonts/logo would remove CDN
    dependence and fix the `file://` experience. (Beyond the TOA logo, the favicon and
    `og:image` are also hot-linked — from the-open-accelerator.com and people.redhat.com.)
-3. **Tailwind Play CDN** prints a console warning about production use; if it ever
-   matters, precompile or drop it (most styling is hand-written CSS anyway).
+3. **Tailwind Play CDN** — (Resolved 2026-11: the site chrome's utility rules, the only
+   Tailwind the page used, are written out in `index.html` exactly as the CDN built them, so
+   the page no longer loads it or prints its console warning about production use.)
 
 *(Resolved 2026-08-28: README/CONTRIBUTING described a GitHub Pages deploy path that was
 never how this ships — both now describe the real sync-to-site flow. `lastVerified`

@@ -55,7 +55,7 @@ real work is the research behind each entry, and the care to keep it current.
 | `index.html`, the copy | The page's name, title, description, and help text name Massachusetts and Boston. Search the file for both. |
 | Your site's address | `BASE` in `scripts/build-pages.js`, `SITE` in `scripts/export-ai.js`, `website` in `scripts/export-json.js`, the links in `scripts/build-events-page.js`, the default in `tests/deploy/verify-live.js`, and the canonical and `og:url` links at the top of `index.html`. |
 | `events-sources.json` | The calendars behind the events page are Boston's. Swap in your region's, or leave the events page out. |
-| The header, footer and logo | They are The Open Accelerator's site design. Use your own. |
+| The header, footer and logo | They are The Open Accelerator's site design, styled by the `TOA SITE CHROME CSS` block at the end of `index.html`'s `<head>`. Use your own. |
 
 The categories in `data/categories.yml` and the founder stages in `data/stages.yml` aren't
 specific to Massachusetts, so most regions can keep them.

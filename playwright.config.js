@@ -20,8 +20,8 @@ module.exports = defineConfig({
   expect: { timeout: 10_000 },
   fullyParallel: true,
   forbidOnly: CI,
-  // Retries only in CI, where the page's CDN scripts (Leaflet, MapLibre,
-  // Tailwind) and map tiles come over a shared runner network. Locally a flaky
+  // Retries only in CI, where the page's CDN scripts (Leaflet, MapLibre) and
+  // map tiles come over a shared runner network. Locally a flaky
   // test should be seen, not retried away.
   retries: CI ? 2 : 0,
   // Every page renders a WebGL basemap and animates the Galaxy canvas. At the

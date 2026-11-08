@@ -14,24 +14,6 @@
 <link rel="icon" href="https://the-open-accelerator.com/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;700;900&family=Red+Hat+Text:ital,wght@0,400;0,500;1,400&family=Red+Hat+Mono:wght@400;500&display=swap">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  corePlugins: { preflight: false },
-  theme: {
-    fontFamily: { sans: ['"Red Hat Display"', 'sans-serif'] },
-    extend: {
-      colors: {
-        gold: { DEFAULT: '#FFC600', light: '#FFD54F', dark: '#C79100' },
-        redhat: '#EE0000',
-        ibm: '#0F62FE',
-        dark: { bg: '#0A0A0F', card: '#12121A', accent: '#1E1E2A' }
-      }
-    }
-  }
-}
-</script>
 <script>(function(){try{if(localStorage.getItem('toa-atlas-theme')==='light'){document.documentElement.classList.remove('dark');}}catch(e){}})();</script>
 <style>
   :root{--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
@@ -40,8 +22,8 @@ tailwind.config = {
     --muted:#5d574e;--faint:#6b6255;--gold:#b45309;--red:#cc0000;--ok:#15803d}
   /* light --red is darkened from brand #ee0000, which reads 4.31:1 on this ground */
   *{margin:0;padding:0;box-sizing:border-box}
-  /* Tailwind preflight is off (matching the atlas): restore the border base
-     its utilities rely on, and the link reset for the ported chrome. */
+  /* No CSS reset (matching the atlas): restore the border base the chrome's
+     utilities rely on, and the link reset for the ported chrome. */
   *,::before,::after{border-width:0;border-style:solid}
   #site-header a,#mobile-nav a{text-decoration:none}
   body{background:var(--bg);color:var(--text);font-family:"Red Hat Text",-apple-system,sans-serif;
@@ -107,6 +89,177 @@ tailwind.config = {
   }
   @media (max-width:520px){h1{font-size:29px}.ev{flex-direction:column;gap:4px}.ev .time{min-width:0}}
 </style>
+<!-- ============ TOA SITE CHROME CSS ============ -->
+<!-- The utility classes that the TOA site header, mobile menu and footer use, written out.
+     Until 2026-11 the Tailwind Play CDN (cdn.tailwindcss.com) built these rules in each
+     visitor's browser and warned in the console that it isn't meant for production. These are
+     the 98 rules it built for the atlas page, plus the two blocks of defaults they read,
+     unchanged: Tailwind CSS v3.4.17 (MIT License, https://tailwindcss.com) with the TOA site's
+     config, which had dark mode by class, preflight off, and the brand colours gold #FFC600 and
+     dark bg #0A0A0F / card #12121A. Only the line breaks are new.
+     - It sits at the end of <head>, where the CDN put its rules, so it still follows the
+       page's own CSS when the two tie.
+     - scripts/build-events-page.js copies it, marker to marker, into events/index.html.
+     - A class added to the chrome needs its rule here, in Tailwind's order: the defaults, plain
+       utilities, then hover:, focus:, group-hover: and dark:, then md: and lg:.
+       tests/chrome.spec.js names any class in the chrome that has no rule. -->
+<style>
+*, ::before, ::after {
+  --tw-border-spacing-x: 0;--tw-border-spacing-y: 0;--tw-translate-x: 0;--tw-translate-y: 0;--tw-rotate: 0;
+  --tw-skew-x: 0;--tw-skew-y: 0;--tw-scale-x: 1;--tw-scale-y: 1;--tw-pan-x:  ;--tw-pan-y:  ;
+  --tw-pinch-zoom:  ;--tw-scroll-snap-strictness: proximity;--tw-gradient-from-position:  ;
+  --tw-gradient-via-position:  ;--tw-gradient-to-position:  ;--tw-ordinal:  ;--tw-slashed-zero:  ;
+  --tw-numeric-figure:  ;--tw-numeric-spacing:  ;--tw-numeric-fraction:  ;--tw-ring-inset:  ;
+  --tw-ring-offset-width: 0px;--tw-ring-offset-color: #fff;--tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;--tw-ring-shadow: 0 0 #0000;--tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;--tw-blur:  ;--tw-brightness:  ;--tw-contrast:  ;--tw-grayscale:  ;
+  --tw-hue-rotate:  ;--tw-invert:  ;--tw-saturate:  ;--tw-sepia:  ;--tw-drop-shadow:  ;
+  --tw-backdrop-blur:  ;--tw-backdrop-brightness:  ;--tw-backdrop-contrast:  ;--tw-backdrop-grayscale:  ;
+  --tw-backdrop-hue-rotate:  ;--tw-backdrop-invert:  ;--tw-backdrop-opacity:  ;--tw-backdrop-saturate:  ;
+  --tw-backdrop-sepia:  ;--tw-contain-size:  ;--tw-contain-layout:  ;--tw-contain-paint:  ;
+  --tw-contain-style:  ;}
+::backdrop {
+  --tw-border-spacing-x: 0;--tw-border-spacing-y: 0;--tw-translate-x: 0;--tw-translate-y: 0;--tw-rotate: 0;
+  --tw-skew-x: 0;--tw-skew-y: 0;--tw-scale-x: 1;--tw-scale-y: 1;--tw-pan-x:  ;--tw-pan-y:  ;
+  --tw-pinch-zoom:  ;--tw-scroll-snap-strictness: proximity;--tw-gradient-from-position:  ;
+  --tw-gradient-via-position:  ;--tw-gradient-to-position:  ;--tw-ordinal:  ;--tw-slashed-zero:  ;
+  --tw-numeric-figure:  ;--tw-numeric-spacing:  ;--tw-numeric-fraction:  ;--tw-ring-inset:  ;
+  --tw-ring-offset-width: 0px;--tw-ring-offset-color: #fff;--tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;--tw-ring-shadow: 0 0 #0000;--tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;--tw-blur:  ;--tw-brightness:  ;--tw-contrast:  ;--tw-grayscale:  ;
+  --tw-hue-rotate:  ;--tw-invert:  ;--tw-saturate:  ;--tw-sepia:  ;--tw-drop-shadow:  ;
+  --tw-backdrop-blur:  ;--tw-backdrop-brightness:  ;--tw-backdrop-contrast:  ;--tw-backdrop-grayscale:  ;
+  --tw-backdrop-hue-rotate:  ;--tw-backdrop-invert:  ;--tw-backdrop-opacity:  ;--tw-backdrop-saturate:  ;
+  --tw-backdrop-sepia:  ;--tw-contain-size:  ;--tw-contain-layout:  ;--tw-contain-paint:  ;
+  --tw-contain-style:  ;}
+.sr-only {
+  position: absolute;width: 1px;height: 1px;padding: 0;margin: -1px;overflow: hidden;clip: rect(0, 0, 0, 0);
+  white-space: nowrap;border-width: 0;}
+.fixed {position: fixed}
+.absolute {position: absolute}
+.relative {position: relative}
+.inset-0 {inset: 0px}
+.bottom-0 {bottom: 0px}
+.left-0 {left: 0px}
+.right-6 {right: 1.5rem}
+.top-6 {top: 1.5rem}
+.z-10 {z-index: 10}
+.z-50 {z-index: 50}
+.z-\[3000\] {z-index: 3000}
+.mx-auto {margin-left: auto;margin-right: auto}
+.mb-2 {margin-bottom: 0.5rem}
+.mb-8 {margin-bottom: 2rem}
+.block {display: block}
+.flex {display: flex}
+.hidden {display: none}
+.h-0\.5 {height: 0.125rem}
+.h-10 {height: 2.5rem}
+.h-5 {height: 1.25rem}
+.h-6 {height: 1.5rem}
+.h-8 {height: 2rem}
+.w-0 {width: 0px}
+.w-5 {width: 1.25rem}
+.w-6 {width: 1.5rem}
+.w-auto {width: auto}
+.max-w-7xl {max-width: 80rem}
+.translate-x-full {
+  --tw-translate-x: 100%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));}
+.transform {
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));}
+.flex-col {flex-direction: column}
+.flex-wrap {flex-wrap: wrap}
+.items-center {align-items: center}
+.justify-center {justify-content: center}
+.justify-between {justify-content: space-between}
+.gap-3 {gap: 0.75rem}
+.gap-4 {gap: 1rem}
+.gap-5 {gap: 1.25rem}
+.gap-6 {gap: 1.5rem}
+.gap-x-8 {column-gap: 2rem}
+.gap-y-3 {row-gap: 0.75rem}
+.scroll-smooth {scroll-behavior: smooth}
+.rounded-full {border-radius: 9999px}
+.border {border-width: 1px}
+.border-0 {border-width: 0px}
+.border-b {border-bottom-width: 1px}
+.border-t {border-top-width: 1px}
+.border-gray-200 {--tw-border-opacity: 1;border-color: rgb(229 231 235 / var(--tw-border-opacity, 1))}
+.border-white\/10 {border-color: rgb(255 255 255 / 0.1)}
+.border-white\/5 {border-color: rgb(255 255 255 / 0.05)}
+.bg-gold {--tw-bg-opacity: 1;background-color: rgb(255 198 0 / var(--tw-bg-opacity, 1))}
+.bg-gray-100 {--tw-bg-opacity: 1;background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1))}
+.bg-transparent {background-color: transparent}
+.bg-white\/90 {background-color: rgb(255 255 255 / 0.9)}
+.bg-white\/95 {background-color: rgb(255 255 255 / 0.95)}
+.p-2 {padding: 0.5rem}
+.px-4 {padding-left: 1rem;padding-right: 1rem}
+.py-16 {padding-top: 4rem;padding-bottom: 4rem}
+.py-4 {padding-top: 1rem;padding-bottom: 1rem}
+.pt-8 {padding-top: 2rem}
+.text-left {text-align: left}
+.text-center {text-align: center}
+.text-2xl {font-size: 1.5rem;line-height: 2rem}
+.text-4xl {font-size: 2.25rem;line-height: 2.5rem}
+.text-sm {font-size: 0.875rem;line-height: 1.25rem}
+.text-xs {font-size: 0.75rem;line-height: 1rem}
+.font-bold {font-weight: 700}
+.font-medium {font-weight: 500}
+.text-\[\#0a66c2\] {--tw-text-opacity: 1;color: rgb(10 102 194 / var(--tw-text-opacity, 1))}
+.text-gray-500 {--tw-text-opacity: 1;color: rgb(107 114 128 / var(--tw-text-opacity, 1))}
+.text-gray-600 {--tw-text-opacity: 1;color: rgb(75 85 99 / var(--tw-text-opacity, 1))}
+.text-gray-800 {--tw-text-opacity: 1;color: rgb(31 41 55 / var(--tw-text-opacity, 1))}
+.text-gray-900 {--tw-text-opacity: 1;color: rgb(17 24 39 / var(--tw-text-opacity, 1))}
+.text-white {--tw-text-opacity: 1;color: rgb(255 255 255 / var(--tw-text-opacity, 1))}
+.backdrop-blur-md {
+  --tw-backdrop-blur: blur(12px);
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);}
+.backdrop-blur-sm {
+  --tw-backdrop-blur: blur(4px);
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);}
+.transition-all {
+  transition-property: all;transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;}
+.transition-colors {
+  transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);transition-duration: 150ms;}
+.transition-opacity {
+  transition-property: opacity;transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;}
+.transition-transform {
+  transition-property: transform;transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;}
+.duration-300 {transition-duration: 300ms}
+.hover\:border-gold:hover {--tw-border-opacity: 1;border-color: rgb(255 198 0 / var(--tw-border-opacity, 1))}
+.hover\:text-black:hover {--tw-text-opacity: 1;color: rgb(0 0 0 / var(--tw-text-opacity, 1))}
+.hover\:text-gold:hover {--tw-text-opacity: 1;color: rgb(255 198 0 / var(--tw-text-opacity, 1))}
+.hover\:opacity-80:hover {opacity: 0.8}
+.focus\:outline-none:focus {outline: 2px solid transparent;outline-offset: 2px}
+.group:hover .group-hover\:w-full {width: 100%}
+.dark\:block:is(.dark *) {display: block}
+.dark\:hidden:is(.dark *) {display: none}
+.dark\:border-gray-800:is(.dark *) {
+  --tw-border-opacity: 1;border-color: rgb(31 41 55 / var(--tw-border-opacity, 1));}
+.dark\:border-white\/10:is(.dark *) {border-color: rgb(255 255 255 / 0.1)}
+.dark\:bg-dark-bg\/95:is(.dark *) {background-color: rgb(10 10 15 / 0.95)}
+.dark\:bg-dark-card:is(.dark *) {--tw-bg-opacity: 1;background-color: rgb(18 18 26 / var(--tw-bg-opacity, 1))}
+.dark\:text-gray-300:is(.dark *) {--tw-text-opacity: 1;color: rgb(209 213 219 / var(--tw-text-opacity, 1))}
+.dark\:text-white:is(.dark *) {--tw-text-opacity: 1;color: rgb(255 255 255 / var(--tw-text-opacity, 1))}
+.dark\:hover\:text-white:hover:is(.dark *) {
+  --tw-text-opacity: 1;color: rgb(255 255 255 / var(--tw-text-opacity, 1));}
+@media (min-width: 768px) {
+  .md\:px-8 {padding-left: 2rem;padding-right: 2rem}
+}
+@media (min-width: 1024px) {
+  .lg\:flex {display: flex}
+  .lg\:hidden {display: none}
+}
+</style>
+<!-- ============ END TOA SITE CHROME CSS ============ -->
 </head>
 <body>
 <!-- ============ STANDARD TOA SITE HEADER ============ -->

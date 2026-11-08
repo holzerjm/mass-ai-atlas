@@ -26,9 +26,9 @@ function between(startMark, endMark, from = 0) {
   return src.slice(a, b + endMark.length);
 }
 
-const tailwind = between('<script src="https://cdn.tailwindcss.com"></script>', "</script>\n<script>") // CDN tag up to config open
-  .replace(/<script>$/, "");
-const twConfig = between("tailwind.config = {", "</script>");
+// The chrome's CSS: the utility rules its header, mobile menu and footer use, marker to marker.
+// Until 2026-11 this copied the Tailwind Play CDN's <script> tag and config instead.
+const chromeCss = between("<!-- ============ TOA SITE CHROME CSS ============ -->", "<!-- ============ END TOA SITE CHROME CSS ============ -->");
 const bootstrap = between("<script>(function(){try{if(localStorage.getItem('toa-atlas-theme')", "</script>");
 const header = between("<!-- ============ STANDARD TOA SITE HEADER ============ -->", "</header>");
 const mobileNav = between("<!-- Mobile Nav Overlay -->", "</div>");
@@ -104,8 +104,6 @@ const page = `<!doctype html>
 <link rel="icon" href="https://the-open-accelerator.com/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;700;900&family=Red+Hat+Text:ital,wght@0,400;0,500;1,400&family=Red+Hat+Mono:wght@400;500&display=swap">
-${tailwind}<script>
-${twConfig}
 ${bootstrap}
 <style>
   :root{${DARK}}
@@ -113,8 +111,8 @@ ${bootstrap}
     --muted:#5d574e;--faint:#6b6255;--gold:#b45309;--red:#cc0000;--ok:#15803d}
   /* light --red is darkened from brand #ee0000, which reads 4.31:1 on this ground */
   *{margin:0;padding:0;box-sizing:border-box}
-  /* Tailwind preflight is off (matching the atlas): restore the border base
-     its utilities rely on, and the link reset for the ported chrome. */
+  /* No CSS reset (matching the atlas): restore the border base the chrome's
+     utilities rely on, and the link reset for the ported chrome. */
   *,::before,::after{border-width:0;border-style:solid}
   #site-header a,#mobile-nav a{text-decoration:none}
   body{background:var(--bg);color:var(--text);font-family:"Red Hat Text",-apple-system,sans-serif;
@@ -168,6 +166,7 @@ ${footerCss}
   }
   @media (max-width:520px){h1{font-size:29px}.ev{flex-direction:column;gap:4px}.ev .time{min-width:0}}
 </style>
+${chromeCss}
 </head>
 <body>
 ${header}</header>
