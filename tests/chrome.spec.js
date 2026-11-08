@@ -69,12 +69,16 @@ for(const [name, url] of PAGES){
       await expect(page.locator("#mobile-menu-btn")).toBeVisible();
       await expect(page.locator("#site-header")).toHaveCSS("padding-left", "16px");
       const menuLeft = () => page.locator("#mobile-nav").evaluate(el => el.getBoundingClientRect().left);
-      expect(await menuLeft(), "the closed menu sits off the right edge").toBeGreaterThanOrEqual(390);
+      // Closed, the menu sits just past the visible area's right edge. That's the window's edge in
+      // Chromium, and 10 px in from it in Playwright's WebKit, which draws the atlas's 10 px
+      // scrollbar inside the window (see the WebKit jobs in docs/testing.md).
+      const edge = await page.evaluate(() => visualViewport.offsetLeft + visualViewport.width);
+      expect(await menuLeft(), "the closed menu sits off the right edge").toBeGreaterThanOrEqual(edge);
       await page.locator("#mobile-menu-btn").click();
       await expect.poll(menuLeft).toBe(0);
       await expect(page.locator("#mobile-nav")).toHaveCSS("position", "fixed");
       await page.getByRole("button", { name: "Close Menu" }).click();
-      await expect.poll(menuLeft).toBeGreaterThanOrEqual(390);
+      await expect.poll(menuLeft).toBeGreaterThanOrEqual(edge);
     });
 
     test("the header follows the theme", async ({ page }) => {
