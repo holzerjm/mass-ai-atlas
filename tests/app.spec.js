@@ -243,10 +243,10 @@ test.describe("on the first screen", () => {
     };
     await expect(page.locator("#mapCatBar .cat-btn")).toHaveCount(cats);
     await onFirstScreen("#mapCatBar");
-    const credits = page.locator(".tagline a", { hasText: "mapmakers" });
-    await onFirstScreen('.tagline a[href="credits/"]');
+    const credits = page.locator(".hero-links a", { hasText: "mapmakers" });
+    await onFirstScreen('.hero-links a[href="credits/"]');
     expect(await credits.evaluate(a => new URL(a.href).pathname)).toMatch(/\/credits\/$/);
-    await onFirstScreen('.tagline a[href="updates/"]');
+    await onFirstScreen('.hero-links a[href="updates/"]');
 
     await page.locator('.tab[data-view="galaxy"]').click();
     await expect(page.locator("#gxCatBar .cat-btn")).toHaveCount(cats);
