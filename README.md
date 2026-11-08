@@ -32,7 +32,8 @@ linkable too: `?need=compute&stage=3` opens the map and the Directory with them 
 
 > **Building on this as a template?** Start with [HACKATHON.md](HACKATHON.md): setup, the
 > architecture on one page, where to extend it, and what to change because it is still
-> pointed at The Open Accelerator.
+> pointed at The Open Accelerator. Starting an atlas for another state or region? See
+> [docs/your-region.md](docs/your-region.md).
 
 ## Run it
 
@@ -128,6 +129,7 @@ scripts/sync-to-site.sh           manual deploy fallback (CI normally deploys on
 .github/workflows/monthly-health.yml  monthly link check + re-check queue, posted to Slack
 .github/workflows/server-check.yml  Sunday check that a deploy can still reach the server
 docs/events-guide.md              how the events page & weekly refresh work
+docs/your-region.md               starting an atlas for another state or region
 CONTRIBUTING.md                   entry schema & contributor workflow
 MAINTAINING.md                    maintainer guide — turn issues & PRs into data/entities.yml
 PROJECT_STATE.md                  architecture, decisions & backlog (start here if new)
