@@ -118,8 +118,8 @@ Use this path for a change outside `data/`, such as an issue labelled
    the switch in the site header, and a phone-width window.
 4. **Update what depends on your change.**
    - **The events page.** It is generated: `scripts/build-events-page.js` builds
-     `events/index.html` from its own template plus the Tailwind setup, site header, mobile
-     menu, footer and theme code it copies from `index.html`. If you changed either file,
+     `events/index.html` from its own template plus the site header, mobile menu, footer,
+     their CSS and the theme code it copies from `index.html`. If you changed either file,
      run `node scripts/build-events-page.js` and commit any change it makes. Never edit
      `events/index.html` by hand. If the script stops with `start not found`, your change
      removed a marker it copies from, so update the script to match.
