@@ -38,17 +38,13 @@ module.exports = defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    // What `python3 -m http.server` runs, with a longer accept queue. The default
-    // backlog of 5 overflowed on macOS when parallel browsers each fetched every
-    // data/*.yml at once: Chrome got ERR_CONNECTION_RESET and the page said "the
-    // atlas data failed to load" (2026-11-01). 128 is macOS's default ceiling.
-    // ROOT goes in as an argument, so no path can break the Python source.
-    command:
-      `python3 -c "import functools, http.server, sys; ` +
-      `http.server.ThreadingHTTPServer.request_queue_size = 128; ` +
-      `http.server.test(ServerClass=http.server.ThreadingHTTPServer, port=${PORT}, bind='127.0.0.1', ` +
-      `HandlerClass=functools.partial(http.server.SimpleHTTPRequestHandler, directory=sys.argv[1]))" ` +
-      `"${ROOT}"`,
+    // A small Node static server (tests/server.js) with a long accept queue. Until
+    // 2026-11 this was `python3 -m http.server` with a queue raised to 128, because its
+    // default of 5 overflowed on macOS when parallel browsers each fetched every
+    // data/*.yml at once: Chrome got ERR_CONNECTION_RESET and the page said "the atlas
+    // data failed to load" (2026-11-01). Node keeps CI free of Python, so the tests can
+    // run in Playwright's own image. ROOT goes in as an argument, quoted for spaces.
+    command: `node "${path.join(__dirname, "tests", "server.js")}" ${PORT} "${ROOT}"`,
     url: `http://127.0.0.1:${PORT}/`,
     // Never silently reuse: a leftover server on this port could be serving a
     // different tree (another checkout, or the baseline export).
