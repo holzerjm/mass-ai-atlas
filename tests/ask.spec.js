@@ -73,8 +73,11 @@ test("a search already typed in the Directory starts the situation", async ({ pa
   expect(await prompt(page)).toContain("My situation: we need gpu time for a robotics startup");
 });
 
-test("the copy button copies the prompt as shown", async ({ page, context, baseURL }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: new URL(baseURL).origin });
+test("the copy button copies the prompt as shown", async ({ page, context, baseURL, browserName }) => {
+  // Reading the prompt back needs "clipboard-read". Chromium also needs "clipboard-write";
+  // WebKit lets a click write without it, and Playwright's WebKit rejects that permission.
+  const permissions = browserName === "webkit" ? ["clipboard-read"] : ["clipboard-read", "clipboard-write"];
+  await context.grantPermissions(permissions, { origin: new URL(baseURL).origin });
   await openFromDirectory(page);
   await page.locator("#askSituation").fill("two of us in Worcester");
   await page.locator("#askCopy").click();

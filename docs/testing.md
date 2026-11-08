@@ -5,7 +5,8 @@ Two checks, both added in v2.0 Part A (2026-09-30):
 1. **A Playwright + axe smoke suite** (`tests/`) that loads the real page in
    Chromium and checks the things founders rely on: shared links land where they
    point, every view shows, the counts are real, nothing throws, and there are
-   no critical accessibility failures. It runs in CI on every pull request.
+   no critical accessibility failures. It runs in CI on every pull request, and
+   there it also runs in WebKit, the engine Safari is built on, to report only.
 2. **A post-deploy check** (`tests/deploy/verify-live.js`) that confirms the
    live site is serving exactly the files in your checkout. You run it by hand,
    with `npm run verify:live`: no workflow runs it, `deploy.yml` included.
@@ -20,7 +21,8 @@ is deployed, and nobody editing `data/entities.yml` needs to install anything.
 > deliberately **not** a required check while there is no history on GitHub runners — see
 > the note below. Promote it by adding both of its checks, `e2e (1 of 2)` and
 > `e2e (2 of 2)`, to the required status checks of the `main` ruleset; nothing in the
-> workflow changes.
+> workflow changes. The same tests also run in WebKit, as `webkit, report only (1 of 2)`
+> and `(2 of 2)`; those stay out of the required checks either way (see the CI section).
 
 > **A note on workers.** Every spec renders a WebGL basemap and the Galaxy canvas, so
 > the suite is sensitive to how many browsers run at once. The config uses 4 locally
@@ -65,6 +67,8 @@ npx playwright test -g "#galaxy"              # tests whose title matches
 npx playwright test --headed                  # watch it drive a real window
 npx playwright test --ui                      # step through, with DOM snapshots
 npx playwright show-report                    # the HTML report of the last run
+npx playwright install webkit                 # once, for the line below
+ATLAS_BROWSER=webkit npm run test:e2e         # the same tests in WebKit, Safari's engine
 ```
 
 The suite starts its own server on port **8101** (set `ATLAS_PORT` to change it)
@@ -428,17 +432,26 @@ there either.
 | Workflow | Job | What it does |
 |---|---|---|
 | Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit `index.html`); then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
-| Browser tests | `e2e (1 of 2)`, `e2e (2 of 2)` | Two jobs at once, each running half the suite with `npm run test:e2e -- --shard=N/2`, inside Playwright's image (`mcr.microsoft.com/playwright`, Chromium and its system libraries built in, its tag kept equal to `@playwright/test`'s version); on failure each uploads `playwright-report/` as **playwright-report-1** or **-2**, kept 7 days |
+| Browser tests | `e2e (1 of 2)`, `e2e (2 of 2)`, `webkit, report only (1 of 2)`, `webkit, report only (2 of 2)` | Four jobs at once: each browser runs half the suite per job with `npm run test:e2e -- --shard=N/2`, with `ATLAS_BROWSER` set to `chromium` or `webkit`, inside Playwright's image (`mcr.microsoft.com/playwright`, both browsers and their system libraries built in, its tag kept equal to `@playwright/test`'s version); on failure each uploads `playwright-report/` as **playwright-report-1** or **-2**, or **playwright-report-webkit-1** or **-2**, kept 7 days |
 
 **Only `validate` is a required status check** on `main`. Browser tests runs and reports
 but gates nothing, on purpose — the comment at the top of `e2e.yml` says why, and what to
 change to promote it.
 
-**Each Browser tests job has 25 minutes.** Each runs half the tests, about 5 minutes'
-worth, and Playwright's image already holds the browser, so no setup step installs it.
+**The WebKit jobs report only.** They run the same tests in WebKit, the engine Safari is
+built on, at the same 1280x720 and 1x pixels as Chromium. Leave them out of the required
+checks even if the Chromium ones are promoted: this is Playwright's own WebKit build on
+Linux, not Safari, so a failure only there is a lead to check in a real Safari. Two test
+details differ by engine: the copy-button test grants only `clipboard-read` in WebKit,
+which lets a click write to the clipboard and has no `clipboard-write` permission, and
+the error guard also ignores WebKit's wording for a request cancelled by navigation.
+
+**Each Browser tests job has 25 minutes.** Each runs half the tests in one browser, about
+5 minutes' worth in Chromium, and Playwright's image already holds both browsers, so no
+setup step installs them.
 Until 2026-11 one did, and on some runners it took 8 to 10 minutes. A job that hits the
 limit is cancelled, which is neither a pass nor a failure: count the `✓` lines in its log
-to see how far it got, and add the two jobs' counts for the whole suite.
+to see how far it got, and add one browser's two counts for its whole suite.
 
 CI retries a failed test twice (`retries: CI ? 2 : 0`). Locally it does not, so a flake
 stays visible while you work.

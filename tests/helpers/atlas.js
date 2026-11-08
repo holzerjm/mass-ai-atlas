@@ -98,8 +98,9 @@ const test = base.test.extend({
     });
     page.on("requestfailed", req => {
       const why = (req.failure() || {}).errorText || "failed";
-      // navigation away from a page cancels its in-flight requests; not a fault
-      if(/ERR_ABORTED|NS_BINDING_ABORTED/.test(why)) return;
+      // navigation away from a page cancels its in-flight requests; not a fault.
+      // Chromium says net::ERR_ABORTED, Firefox NS_BINDING_ABORTED, WebKit "cancelled".
+      if(/ERR_ABORTED|NS_BINDING_ABORTED|cancell?ed/.test(why)) return;
       const line = `${why} ${req.url()}`;
       if(req.url().startsWith(origin)) { if(!expected(req.url())) ownFailures.push(line); }
       else thirdParty.push(line);
