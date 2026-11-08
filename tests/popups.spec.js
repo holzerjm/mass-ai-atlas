@@ -186,12 +186,18 @@ test.describe("on a phone", () => {
     await waitForApp(page);
     const { id, name } = await page.evaluate(() => {
       setClustered(false);
+      // Leaflet fades a closed popup out for 200 ms before it removes it. After all of them in a
+      // row, WebKit on CI was still removing 130 to 170 when the search's popup opened, so the
+      // locator below found them all. Measured without the fade, each one goes as it closes.
+      const fade = map._fadeAnimated;
+      map._fadeAnimated = false;
       const height = d => {
         markers[d.id].openPopup();
         return markers[d.id].getPopup().getElement().offsetHeight;
       };
       const tallest = DATA.map(d => [height(d), d]).sort((a, b) => b[0] - a[0])[0][1];
       map.closePopup();
+      map._fadeAnimated = fade;
       return { id: tallest.id, name: tallest.name };
     });
     await page.locator("#mapSearch").fill(name);
