@@ -107,8 +107,13 @@ html:not(.dark) .map-results{background:rgba(255,255,255,.97)}
 .brand h1 span{background:linear-gradient(90deg,#ffd54f,#ffc600);-webkit-background-clip:text;background-clip:text;color:transparent}
 .eyebrow{margin-top:12px;font-size:12px;text-transform:uppercase;letter-spacing:1.6px;color:var(--gold-ink);font-weight:700}
 .tagline{margin-top:8px;color:var(--muted);font-size:14.5px;max-width:900px;line-height:1.55}
-.tagline a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
-.hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+/* The credits and what's new links, beside the buttons rather than at the end of a sentence, so
+   they're seen. A line of their own in the tagline would push the map's search box below a
+   1366 x 650 window's first screen. */
+.hero-links{display:flex;flex-wrap:wrap;gap:4px 20px;padding-left:8px;font-size:14.5px;font-weight:700}
+.hero-links a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:3px}
+.hero-links a::after{content:"→";content:"→" / "";display:inline-block;margin-left:6px}
 .stats{display:flex;gap:26px;margin-top:18px;flex-wrap:wrap}
 a.stat{display:block;color:inherit;text-decoration:none}
 a.stat span{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
@@ -127,8 +132,10 @@ a.stat:hover span{color:var(--text);text-decoration-color:currentColor}
 .tab.suggest{border:1px solid rgba(255,198,0,.45);color:var(--gold-ink)}
 .tab.suggest:hover{background:rgba(255,198,0,.12);color:var(--gold-light)}
 .tab .ico{font-size:15px}
-.nav-spacer{flex:1}
-.nav-hint{font-size:12px;color:var(--muted);padding-right:4px}
+/* Help sits with the views it explains; the contribution actions (and the shortlist's tab) keep together
+   at the right, and when the bar wraps they move to its second row as a group, still on the right. */
+.nav-hint{font-size:12px;color:var(--muted)}
+.nav-contrib{display:flex;align-items:center;gap:6px;margin-left:auto;flex:none}
 .nav-gh{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:8px 12px;border-radius:99px;border:1px solid var(--line);transition:.15s;white-space:nowrap}
 .nav-gh:hover{color:var(--gold);border-color:rgba(255,198,0,.45);background:rgba(255,198,0,.08)}
 .nav-gh svg{width:16px;height:16px;fill:currentColor}
@@ -501,6 +508,7 @@ html:not(.dark) .dr-verified.stale,html:not(.dark) .stale-tag{color:#b45309;bord
   .eyebrow{margin-top:6px;font-size:10px;letter-spacing:.8px}
   .tagline{margin-top:6px;font-size:13.5px;line-height:1.45}
   .tagline .tag-more{display:none}
+  .hero-links{padding-left:0;font-size:13.5px}
   .hero-cta{margin-top:10px;gap:8px}
   .hero-cta .btn{padding:9px 11px;font-size:12px}
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
@@ -842,10 +850,11 @@ browse the <a href="e/">full organization index</a> or use the open dataset
       <h1 id="atlasTitle">Mass <span>AI Atlas</span></h1>
     </div>
     <p class="eyebrow">Presented by The Open Accelerator · an initiative between the MA AI Hub, Red Hat &amp; IBM</p>
-    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br><span class="tag-more">Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br></span>Your contributions make this a valuable resource. Meet the <a href="credits/">mapmakers</a>, or see <a href="updates/">what's new</a>.</p>
+    <p class="tagline">The living map of Massachusetts' AI ecosystem — built by the community for founders and the community.<br><span class="tag-more">Explore the geography, see how it all connects, and follow a guided path from idea to scale.<br></span>Your contributions make this a valuable resource.</p>
     <div class="hero-cta">
       <a class="btn btn-pri" href="https://the-open-accelerator.com/residency/" target="_blank" rel="noopener">Learn about the TOA Residency</a>
       <a class="btn btn-sec" href="https://the-open-accelerator.com/community/" target="_blank" rel="noopener">Join the Community</a>
+      <span class="hero-links"><a href="credits/">Meet the mapmakers</a><a href="updates/">See what's new</a></span>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -857,11 +866,12 @@ browse the <a href="e/">full organization index</a> or use the open dataset
     <button class="tab" data-view="galaxy"><span class="ico">✨</span>Galaxy</button>
     <button class="tab" data-view="journey"><span class="ico">🧭</span>Founder Journey</button>
     <button class="tab" data-view="directory"><span class="ico">📇</span>Directory</button>
-    <div class="nav-spacer"></div>
-    <button class="tab" id="starNav" style="display:none" title="Your saved shortlist" onclick="openShortlist()">★ <span id="starCount">0</span></button>
-    <button class="tab suggest" id="suggestBtn" title="Propose a new organization for the atlas">➕ Suggest an entry</button>
-    <span class="nav-hint">Click any colored icon for details · <a href="#" onclick="startTour();return false" style="color:var(--gold-ink)">Take the quick tour</a></span>
-    <a id="ghLink" class="nav-gh" target="_blank" rel="noopener" title="Contribute on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    <span class="nav-hint">Click any colored dot for details · <a href="#" onclick="startTour();return false" style="color:var(--gold-ink)">Take the quick tour</a></span>
+    <div class="nav-contrib">
+      <button class="tab" id="starNav" style="display:none" title="Your saved shortlist" onclick="openShortlist()">★ <span id="starCount">0</span></button>
+      <button class="tab suggest" id="suggestBtn" title="Propose a new organization for the atlas">➕ Suggest an entry</button>
+      <a id="ghLink" class="nav-gh" target="_blank" rel="noopener" title="Contribute on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    </div>
   </div>
 </nav>
 
