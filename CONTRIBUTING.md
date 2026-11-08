@@ -155,7 +155,8 @@ Use this path for a change outside `data/`, such as an issue labelled
 - CI (`scripts/validate.js`) must pass: the JSON Schemas in `data/` (field types,
   MA coordinates, https links, …) plus unique ids, valid category, resolvable connections
 - The browser tests run on every pull request too. They don't block a merge, but a code
-  change is expected to pass them
+  change is expected to pass them. A failure only in the two `webkit, report only` checks,
+  which run the same tests in Safari's engine, won't hold up your pull request
 - On your first pull request, the checks wait until a maintainer approves them, so "no
   checks reported" means waiting, not failing
 - One maintainer approval merges, and **merging is publishing**: a GitHub Action

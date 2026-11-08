@@ -12,6 +12,19 @@ const PORT = Number(process.env.ATLAS_PORT || 8101);
 // change under test is broken".
 const ROOT = path.resolve(process.env.ATLAS_ROOT || __dirname);
 const CI = !!process.env.CI;
+// The browser the suite drives: Chromium unless ATLAS_BROWSER says otherwise.
+// ATLAS_BROWSER=webkit runs the same tests in WebKit, the engine Safari is built on, as
+// the report-only CI jobs do; locally that needs `npx playwright install webkit` once.
+// Both get the same 1280x720 window at 1x pixels, so a difference between their runs
+// comes from the engine, not the screen.
+const BROWSERS = {
+  chromium: devices["Desktop Chrome"],
+  webkit: { ...devices["Desktop Safari"], deviceScaleFactor: 1 },
+};
+const BROWSER = process.env.ATLAS_BROWSER || "chromium";
+if (!BROWSERS[BROWSER]) {
+  throw new Error(`ATLAS_BROWSER=${BROWSER} is not one of: ${Object.keys(BROWSERS).join(", ")}`);
+}
 
 module.exports = defineConfig({
   testDir: "./tests",
@@ -36,7 +49,7 @@ module.exports = defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [{ name: BROWSER, use: { ...BROWSERS[BROWSER] } }],
   webServer: {
     // A small Node static server (tests/server.js) with a long accept queue. Until
     // 2026-11 this was `python3 -m http.server` with a queue raised to 128, because its
