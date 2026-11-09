@@ -10,7 +10,7 @@ The living map of Massachusetts' AI ecosystem — built by the community for the
 [The Open Accelerator](https://the-open-accelerator.com) (an initiative between the
 MA AI Hub, Red Hat & IBM).
 
-[![A 25-second tour: searching the Map over the Boston area, an entry's drawer with the places to meet nearby, the Map filtered to what a founder needs, the Galaxy of connections, the Founder Journey, and the Directory answering a founder's sentence](docs/demo.gif)](https://the-open-accelerator.com/ecosystem/)
+[![A 23-second tour: searching the Map over the Boston area, an entry's drawer with the places to meet nearby, the Map filtered to what a founder needs, the Galaxy of connections, the Founder Journey, and the Directory answering a founder's sentence](docs/demo.gif)](https://the-open-accelerator.com/ecosystem/)
 
 **Four ways to explore the Massachusetts AI ecosystem:**
 
