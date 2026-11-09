@@ -77,6 +77,9 @@ const footerCss = between("/* ---------- FOOTER ---------- */", ".footer a{color
 // across and the marks sat on this page's near-white ground. Nor could they come across as they
 // are: they re-assert the atlas's dark palette, and this page's light --gold (#b45309) reads 3.93:1
 // on a dark ground. So the page writes its own dark palette once, for :root and for that footer.
+// In this palette and the light one in the page's <style>, --faint must sit closer to --bg than
+// --muted does, at 4.5:1 or more: tests/events.spec.js checks it, since axe passed when #65 swapped
+// the two.
 const DARK = `--bg:#0d0f12;--panel:#16191e;--panel2:#1c2027;--line:#272c35;--text:#e8eaed;
     --muted:#9aa1ab;--faint:#848c97;--gold:#ffc600;--red:#ff5c45;--ok:#4ade80`;
 // chrome script: from toggleMobileMenu's containing <script> to the updateLogos sync call
