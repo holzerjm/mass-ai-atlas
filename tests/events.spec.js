@@ -86,6 +86,62 @@ test("the events page footer stays dark in light theme", async ({ page }) => {
     .toEqual({ footer: dark.footer, text: dark.text, link: dark.link });
 });
 
+// The page has two tiers of secondary text: --muted for the standfirst and each event's time and
+// details, --faint for the "refreshed" line in the top nav and the sources line at the foot. Faint
+// is meant to read a step weaker. #65 swapped the two and #69 put them back, both on 2026-10-30,
+// and no test saw either: both values cleared AA, which is all axe asks. Weaker isn't lighter or
+// darker but closer to the ground (darker on the dark page, lighter on the light one), so this
+// compares each tier's contrast with --bg. Each token is painted on a canvas over --bg, as its text
+// is on the page, so any colour syntax works.
+const luminance = (rgb) => {
+  const [r, g, b] = rgb.map((v) => ((v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a, b) => {
+  const [lighter, darker] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (lighter + 0.05) / (darker + 0.05);
+};
+
+for (const theme of ["dark", "light"]) {
+  test(`the events page's faint text stays a step weaker than its muted text, in ${theme} theme`, async ({ page }) => {
+    // the bootstrap at the top of the page drops html's "dark" class when the stored theme is light
+    if (theme === "light") {
+      await page.addInitScript(() => { try { localStorage.setItem("toa-atlas-theme", "light"); } catch (e) {} });
+    }
+    await page.goto("./events/");
+    if (theme === "light") await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
+    else await expect(page.locator("html")).toHaveClass(/\bdark\b/);
+
+    const tiers = await page.evaluate(() => {
+      const probe = document.body.appendChild(document.createElement("i"));
+      const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+      // the colour one pixel ends up after painting --bg and then the token over it
+      const tier = (token) => {
+        for (const paint of ["--bg", token]) {
+          probe.style.color = `var(${paint})`;
+          ctx.fillStyle = getComputedStyle(probe).color;
+          ctx.fillRect(0, 0, 1, 1);
+        }
+        return {
+          value: getComputedStyle(probe).getPropertyValue(token).trim(),
+          rgb: [...ctx.getImageData(0, 0, 1, 1).data.slice(0, 3)],
+        };
+      };
+      const out = { bg: tier("--bg"), muted: tier("--muted"), faint: tier("--faint") };
+      probe.remove();
+      return out;
+    });
+    for (const token of ["bg", "muted", "faint"]) {
+      expect(tiers[token].value, `the events page should define --${token}`).not.toBe("");
+    }
+    const muted = contrast(tiers.muted.rgb, tiers.bg.rgb), faint = contrast(tiers.faint.rgb, tiers.bg.rgb);
+    const seen = `--faint ${tiers.faint.value} is ${faint.toFixed(2)}:1 and --muted ${tiers.muted.value} ` +
+      `is ${muted.toFixed(2)}:1 on --bg ${tiers.bg.value}`;
+    expect(faint, `faint text should sit closer to the ${theme} ground than muted text: ${seen}`).toBeLessThan(muted);
+    expect(faint, `faint text should still clear WCAG AA's 4.5:1: ${seen}`).toBeGreaterThanOrEqual(4.5);
+  });
+}
+
 // The footer comes from index.html, where its "Suggest an entry" link calls suggestEntry().
 // This page never defines that function, so the link did nothing but throw a ReferenceError,
 // and the error guard never saw it because no test clicked it. scripts/build-events-page.js
