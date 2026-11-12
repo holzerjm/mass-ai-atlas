@@ -224,6 +224,8 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | on a phone, the map and the first card are on the first screen | the header filling a phone's first screen again (the map started 792 px down and the first card 1,428 px down, until 2026-11), or the sticky tabs going back to three rows |
 | | the menu button has no gray box | the browser's default button background returning behind the white menu icon (1.15:1), on the atlas and on the events page, which lifts the header from it |
 | | the hero's button | the hero promising an open application again. It said "Apply" while the residency page said applications had closed |
+| `guard.spec.js` | WebKit's wording for a failed tile-host fetch is tolerated | the error guard failing a test over a blip on OpenFreeMap's server, which WebKit raises as an uncaught error in the page. It failed a WebKit test on 2026-11-09 and again on 2026-11-12, both times with nothing wrong in the atlas. The test throws that error in a page and passes only if the guard lets it through |
+| | the tolerance matches only that wording on that host | the exception swallowing a real error. The same wording for any other host, a look-alike host, other wordings for a failed fetch, the wording inside a longer message, and other errors must all still count |
 | `nav.spec.js` | the tabs stay at the top of the window to the foot of every view, in five window sizes | the bar leaving one window down again. `html,body{height:100%}` made `<body>`, the bar's containing block, one window tall, so until 2026-11 the tabs were on screen for 0 to 5% of the Directory's length, and in an 844 × 390 window they never stuck at all. A tab must be what's really at its spot, so it can be clicked there |
 | | in a short window, the tabs take one row | two rows taking over a quarter of a phone on its side: 107 px of 390, which left the map search's list short and no room for the map under the bar. Windows under 500 px tall take the phone's one row, and on a touch screen the bar and the map must fit the window. A taller window keeps the tabs' icons, so the rule can't spread |
 | | a tab goes straight to the top of the page from the foot of any view | a tab going back to a glide. From the foot of the Directory, the page sat on the footer of the shorter Map for seconds behind the map's work before it set off. From the foot of the Map, scroll anchoring threw it to the foot of the Directory, and it glided up through all 14,000 px. `scrollY` must be 0 as the click returns, so this doesn't depend on how fast the machine is |
@@ -329,6 +331,13 @@ Every spec imports `test` from `tests/helpers/atlas.js`, which adds:
   That tolerance doesn't hide a broken app: if a CDN *script* the page needs
   (Leaflet, MapLibre) fails to load, the app throws `L is not defined` and the
   first rule catches it.
+  One uncaught error counts as a third-party failure too: WebKit's own wording
+  for a failed fetch from the map's tile host, `Fetch API cannot load
+  https://tiles.openfreemap.org/… due to access control checks.` Chromium only
+  logs such a failure, but WebKit raises it in the page, and a blip on that
+  server failed WebKit tests twice in a week (2026-11-09 and 2026-11-12). The
+  guard matches that exact wording on that host only, so any other error still
+  fails.
 - **A fixed events feed.** `events.json` is regenerated weekly and isn't in git,
   so every test gets a small feed dated relative to "now" instead (one event
   hosted by a real atlas entry, one not). A test can ask for
