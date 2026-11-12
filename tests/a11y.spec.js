@@ -97,6 +97,12 @@ const SCANS = [
   // the banner that shows a returning visitor the newest update
   { name: "what's-new banner", url: "./", newBanner: true, include: "#newBanner" },
   { name: "what's-new banner (light theme)", url: "./", newBanner: true, include: "#newBanner", theme: "light" },
+  // 3D Lenses (atlas3d.html), a page of its own with its own panel, legend and entry card
+  { name: "3D Lenses", url: "./atlas3d.html", lenses: true },
+  { name: "3D Lenses (light theme)", url: "./atlas3d.html", lenses: true, theme: "light" },
+  { name: "3D Lenses entry card", url: `./atlas3d.html?entry=${entry.id}`, lenses: true, include: "#card" },
+  { name: "3D Lenses entry card (light theme)", url: `./atlas3d.html?entry=${entry.id}`, lenses: true, include: "#card",
+    theme: "light" },
 ];
 
 // For each flagged node, the `within` selector it falls under, or null. axe's
@@ -135,6 +141,10 @@ for(const scan of SCANS){
         // wait for the cards and the timeline, which render from data/credits.yml
         await expect(page.locator("#cards .card").first()).toBeVisible();
         await expect(page.locator("#timeline li").first()).toBeVisible();
+      } else if(scan.lenses){
+        // atlas3d.html has no Leaflet markers; it says when its map and layers are drawn
+        await page.waitForFunction(() => window.__atlas3d && window.__atlas3d.ready, null, { timeout: 30_000 });
+        if(scan.include) await expect(page.locator(scan.include)).toBeVisible({ timeout: 8000 });
       } else {
         await waitForApp(page);
         if(scan.open) await scan.open(page);

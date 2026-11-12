@@ -93,7 +93,14 @@ elif [[ "$SET_REPO" == "1" ]]; then
   else
     echo "⚠ node not found — run: node scripts/build-events-page.js so the events page follows" >&2
   fi
-  echo "  Commit both files."
+  # atlas3d.html (3D Lenses) builds its "Suggest a fix" links from its own GH_REPO, so it
+  # follows index.html here too.
+  A3D="$(dirname "$0")/../atlas3d.html"
+  if [[ -f "$A3D" ]] && grep -q "^const GH_REPO = \"$CURRENT\"" "$A3D"; then
+    perl -pi -e "s{^const GH_REPO = \"\Q$CURRENT\E\"}{const GH_REPO = \"$REPO\"}" "$A3D"
+    echo "✓ atlas3d.html GH_REPO: $CURRENT -> $REPO"
+  fi
+  echo "  Commit the changed files."
 else
   echo
   echo "⚠ index.html still points at $CURRENT, not $REPO (--keep-repo was given)."

@@ -201,6 +201,15 @@ html:not(.dark) .map-note.on{background:rgba(255,255,255,.94)}
 .mv-btn:hover{color:var(--text);background:rgba(148,163,255,.12)}
 .mv-btn[aria-pressed="true"]{color:#000;background:linear-gradient(90deg,#ffd54f,#ffc600)}
 html:not(.dark) .map-view-switch{background:rgba(255,255,255,.92)}
+/* the way to 3D Lenses (atlas3d.html). It floats in the map's free bottom-left corner rather than
+   joining the nav, whose one row is full at laptop widths: a sixth item wrapped it onto a second
+   row and moved everything under it. */
+.map-3d{position:absolute;z-index:999;left:12px;bottom:24px;display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:rgba(10,15,30,.92);color:var(--text);
+  font-size:12.5px;font-weight:600;line-height:1;text-decoration:none;backdrop-filter:blur(8px);transition:.18s}
+.map-3d:hover{border-color:var(--gold)}
+.map-3d:focus-visible{z-index:1101}
+html:not(.dark) .map-3d{background:rgba(255,255,255,.92)}
 /* The list opens where the re-center button sits, so it goes over the button. Until 2026-11 the
    button hid the first row's dot, and a click there cleared the search instead of picking the row.
    The focus rule above lifts the box only while it has the focus: pressing a row takes the focus
@@ -532,6 +541,8 @@ html:not(.dark) .dr-verified.stale,html:not(.dark) .stale-tag{color:#b45309;bord
   /* the search takes the whole top row on a phone, so the presets drop below it */
   .map-view-switch{top:60px}
   .map-note{top:106px}
+  /* the map attribution wraps across the whole bottom edge on a phone, so the 3D link sits above it */
+  .map-3d{bottom:64px}
   .mv-btn{padding:7px 11px;font-size:12px}
   /* one row of categories that scrolls sideways, rather than five rows above the map,
      and it sits right under the nav, so it still makes the first screen */
@@ -910,6 +921,7 @@ browse the <a href="e/">full organization index</a> or use the open dataset
       <button type="button" class="mv-btn" data-view="boston" aria-pressed="true">Boston area</button>
       <button type="button" class="mv-btn" data-view="state" aria-pressed="false">Whole Commonwealth</button>
     </div>
+    <a class="map-3d" href="atlas3d.html" title="A 3D map that shows how sure the atlas is about each entry, and draws its connections"><span aria-hidden="true">🏙️</span>See it in 3D Lenses</a>
   </div>
 </section>
 
