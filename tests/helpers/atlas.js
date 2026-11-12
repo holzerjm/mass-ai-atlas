@@ -55,6 +55,15 @@ function eventsFixture(){
   };
 }
 
+// WebKit raises a failed cross-origin fetch as an uncaught error in the page, "Fetch API cannot
+// load <url> due to access control checks.", where Chromium only logs a failed request. MapLibre
+// fetches the map's fonts and tiles from OpenFreeMap that way, so a blip on that server failed
+// WebKit tests on 2026-11-09 and 2026-11-12 though nothing in the atlas was wrong. That error is a
+// third-party request failure in other words, so the guard below treats it as one: listed on the
+// report, not failed. It matches only that wording and only that host, so a real error still fails.
+const TILE_FETCH = /^(?:TypeError: )?Fetch API cannot load https:\/\/tiles\.openfreemap\.org\/\S+ due to access control checks\.?$/;
+const isTileFetchError = message => TILE_FETCH.test(String(message || "").trim());
+
 const test = base.test.extend({
   // true = behave like a first-time visitor (the guided tour auto-starts on a
   // plain URL). Off by default: the tour switches views and covers the page
@@ -89,7 +98,10 @@ const test = base.test.extend({
     const origin = new URL(baseURL).origin;
     const pageErrors = [], ownFailures = [], thirdParty = [];
     const expected = url => expectedHttpErrors.some(re => re.test(url));
-    page.on("pageerror", err => pageErrors.push(String(err && err.stack || err)));
+    page.on("pageerror", err => {
+      if(isTileFetchError(err && err.message)) thirdParty.push(`page error: ${err.message}`);
+      else pageErrors.push(String(err && err.stack || err));
+    });
     page.on("response", res => {
       if(res.status() < 400) return;
       const line = `${res.status()} ${res.url()}`;
@@ -123,4 +135,4 @@ async function waitForApp(page){
   await page.waitForFunction(n => typeof markers === "object" && Object.keys(markers).length === n, DATA.length);
 }
 
-module.exports = { test, expect: base.expect, ROOT, ATLAS, DATA, byId, metersBetween, eventsFixture, waitForApp };
+module.exports = { test, expect: base.expect, ROOT, ATLAS, DATA, byId, metersBetween, eventsFixture, waitForApp, isTileFetchError };
