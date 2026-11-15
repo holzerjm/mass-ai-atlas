@@ -1,6 +1,6 @@
 /* Core invariants founders rely on: the page boots, shared links land where
    they point, and each view actually shows. See docs/testing.md. */
-const { test, expect, DATA, ATLAS, metersBetween, waitForApp } = require("./helpers/atlas");
+const { test, expect, DATA, ATLAS, metersBetween, waitForApp, crowdSpot } = require("./helpers/atlas");
 
 const VIEWS = ["map", "galaxy", "journey", "directory"];
 const entry = DATA.find(d => d.id === "csail") || DATA[0];
@@ -218,9 +218,38 @@ test.describe("co-located pins", () => {
     await colocatedText(page, d.id);
     const list = page.locator(".leaflet-popup-content .pop-colocated");
     await expect(list).toBeVisible();
+    await expect(list.locator(".pop-more"), "a list that fits needs no button").toBeHidden();
     await list.getByText(other.name, { exact: true }).click();
     await expect(page.locator("#drawer")).toHaveClass(/\bopen\b/);
     await expect(page.locator("#drName")).toHaveText(other.name);
+  });
+
+  // The longest list in the data is four names. Six made a popup too tall for a phone on its
+  // side, which only CI's fonts showed (2026-11), so the list keeps to three lines whatever is in
+  // it, and the names that don't fit wait behind a button. Seven entries share a spot here.
+  test("a long list keeps to three lines, and a button shows the rest", async ({ page }) => {
+    const crowd = await crowdSpot(page);
+    await page.goto("./");
+    await waitForApp(page);
+    expect(await colocatedText(page, crowd[0].id), "the popup opens").not.toBeNull();
+    const list = page.locator(".leaflet-popup-content .pop-colocated"), more = list.locator(".pop-more");
+    const names = list.locator("a"), total = await names.count();
+    const lines = () => list.evaluate(el => Math.round(el.offsetHeight / parseFloat(getComputedStyle(el).lineHeight)));
+    expect(total).toBeGreaterThanOrEqual(crowd.length - 1);
+    expect(await lines()).toBeLessThanOrEqual(3);
+    const shown = await list.locator("a:visible").count();
+    expect(shown).toBeGreaterThan(0);
+    expect(shown, "some names are put away").toBeLessThan(total);
+    await expect(more).toHaveText(`and ${total - shown} more`);
+
+    await more.click();
+    await expect(list.locator("a:visible")).toHaveCount(total);
+    await expect(more).toBeHidden();
+    await expect(names.nth(shown), "the first name it showed takes the focus").toBeFocused();
+    const last = await names.last().textContent();
+    await names.last().click();
+    await expect(page.locator("#drawer")).toHaveClass(/\bopen\b/);
+    await expect(page.locator("#drName")).toHaveText(last);
   });
 });
 
@@ -748,6 +777,17 @@ test.describe("Show on map", () => {
       await show(page);
       await popupOpens(page, id);
       await onScreen(page, id);
+    });
+
+    // Seven entries at one spot: the list that didn't fit this window with six names (2026-11).
+    test("a pin at a crowded spot and its popup end on screen", async ({ page }) => {
+      const [first] = await crowdSpot(page);
+      await page.goto(`./?entry=${first.id}`);
+      await waitForApp(page);
+      await show(page);
+      await popupOpens(page, first.id);
+      await expect(page.locator(".leaflet-popup-content .pop-more")).toBeVisible();
+      await onScreen(page, first.id);
     });
   });
 });
