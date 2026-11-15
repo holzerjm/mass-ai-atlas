@@ -295,8 +295,8 @@ To keep those honest, do a small sweep about once a month:
    An organization can close, move, or stop fitting its step.
 
 `--cycle 12` sizes that list from the dataset, so it keeps pace as the atlas grows:
-every entry comes round within a year without anyone re-tuning a number. At 199
-entries that is **17 re-checks a month, about half an hour**. A fixed `--queue`
+every entry comes round within a year without anyone re-tuning a number. At 210
+entries that is **18 re-checks a month, about half an hour**. A fixed `--queue`
 quietly stops covering everything as soon as entries outrun it — at 13 a month it
 would now take **15 months** to come round, against a 12-month threshold.
 

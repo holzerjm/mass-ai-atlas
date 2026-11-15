@@ -324,6 +324,38 @@
   offers: [talent]
   added: 2026-10
   lastVerified: 2026-10
+- id: massaitc
+  name: MassAITC
+  cat: university
+  loc: Manning CICS, UMass Amherst
+  approx: true
+  lat: 42.3952
+  lng: -72.5311
+  url: https://massaitc.org
+  desc: The Massachusetts AI and Technology Center for Connected Care in Aging & Alzheimer's Disease, a National Institute on Aging research center spanning UMass Amherst and Massachusetts General Hospital. It funds pilot projects on AI-enhanced technology for older adults, people with Alzheimer's disease and their caregivers, at up to $200,000 over 12 to 24 months.
+  why: A grant for AI in aging and dementia care that a startup can apply for in its own name. The national call lists for-profit companies, small businesses and startups as eligible, and the center asks for industry researchers and academic–industry teams. It is NIH research money with NIH rules, most of it reserved for Alzheimer's and related dementias, and it starts with a letter of intent. For the 2027 round, the letter-of-intent deadline is Nov. 16, 2026, and full proposals are due Jan. 22, 2027.
+  facts: [[Check size, 'Up to $200,000 over 12–24 months'], [Cohort size, '10 to 15 pilots expected for 2027'], [Terms, NIH pilot grant; letter of intent first], [Focus, "AI for aging and Alzheimer's care"]]
+  tags: [healthcare, research, equity-free]
+  stages: [2, 3]
+  links: [cics]
+  offers: [grants]
+  added: 2026-11
+  lastVerified: 2026-11
+- id: bristol-cc
+  name: Bristol Community College
+  cat: university
+  loc: 777 Elsbree St, Fall River
+  lat: 41.7232
+  lng: -71.1221
+  url: https://bristolcc.edu/AI
+  desc: Community college with campuses in Fall River, Attleboro, New Bedford and Taunton, and by its own account the first in Massachusetts to offer an Associate of Applied Science in Artificial Intelligence. The two-year degree and a 28-credit AI Practitioner Certificate are taught fully online and cover machine learning, data analytics, natural language processing, computer vision and AI ethics.
+  why: A source of entry-level AI talent beyond the research universities. Students work on applied business problems, and the certificate is meant for people who already hold a bachelor's degree or have experience in a related field. It is a teaching program, not a research lab, so look here for practitioners and interns rather than model researchers.
+  facts: [[Program length, '2-year degree; 28-credit certificate'], [Focus, 'Applied AI, taught fully online']]
+  tags: [education, applied AI, students]
+  stages: [3]
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- CORPORATE AI LABS ----------
 - id: mit-ibm
@@ -2437,6 +2469,106 @@
   applyUrl: https://venturewell.org/aspire-medtech/
   added: 2026-10
   lastVerified: 2026-10
+- id: lever
+  name: Lever
+  cat: accel
+  loc: 85 Main St, North Adams
+  lat: 42.6992
+  lng: -73.1125
+  url: https://leverinc.org
+  desc: Nonprofit startup accelerator in North Adams, co-founded in 2014. It runs short challenge programs, invests $25,000–$100,000 in post-revenue companies with links to Berkshire County, and produces the statewide Massachusetts Founders Network with MassTech's support. Its first Applied AI B2B Challenge, for early-stage startups that use AI, ended in March 2026 with a $20,000 award.
+  why: The way in for an AI founder in the Berkshires, and open well beyond them. The Applied AI B2B Challenge takes early-stage B2B startups from anywhere in the state through workshops and mentoring to a final pitch, and the Founders Network offers resources and experts wherever you are. Lever's own checks go to companies that already have revenue and a tie to Berkshire County, and no date is posted for the next AI challenge.
+  facts: [[Check size, '$25,000–$100,000'], [Stage, Post-revenue for its investments], [Terms, 'Challenge award of $20,000 in 2026'], [Focus, 'Applied AI, health tech, sustainability']]
+  tags: [applied AI, founders]
+  stages: [2, 4]
+  links: [masstech]
+  offers: [funding, grants, mentorship, space, community]
+  applyNote: Next Applied AI challenge not posted
+  applyUrl: https://leverinc.org/challenges/
+  added: 2026-11
+  lastVerified: 2026-11
+- id: bic
+  name: Berkshire Innovation Center
+  cat: accel
+  loc: 45 Woodlawn Ave, Pittsfield
+  lat: 42.4514
+  lng: -73.2354
+  url: https://www.berkshireinnovationcenter.com
+  desc: Nonprofit innovation center in Pittsfield with prototyping, optics, simulation and wet labs. Its six-month hybrid Founders Accelerator backs early-stage hard-tech startups moving from prototype to product, at no cost and for no equity, and its AI Leadership Group brings business, academic and civic leaders together on applied AI for western Massachusetts.
+  why: For a hardware or deep-tech founder in the Berkshires, a no-cost, no-equity cohort inside a center that has prototyping and test labs. The accelerator works on the founder as much as the product, so expect coaching on judgment and hard decisions rather than a pitch bootcamp. Its AI group is a regional coalition, not a startup program. The current cohort runs to March 2027, and the next application window isn't posted.
+  facts: [[Program length, '6 months, hybrid'], [Equity, None; no cost], [Focus, 'Hard tech, prototype to product']]
+  tags: [equity-free, deep tech, lab space]
+  stages: [2, 3]
+  offers: [mentorship, community]
+  applyNote: Accelerator cohort runs to March 2027
+  applyUrl: https://www.berkshireinnovationcenter.com/accelerator-program
+  added: 2026-11
+  lastVerified: 2026-11
+- id: uml-nvd
+  name: UMass Lowell New Venture Development
+  cat: accel
+  loc: 220 Pawtucket St, Lowell
+  lat: 42.6504
+  lng: -71.3243
+  url: https://www.uml.edu/new-venture-development/
+  desc: UMass Lowell's office for turning university-owned inventions into startups. It coaches teams on commercialization, ran an AI entrepreneurship training series in spring 2026 for the university's faculty, researchers and graduate students, and manages the River Hawk New Venture Fund, a $500,000 seed fund for technology developed at UMass Lowell.
+  why: The door for anyone building on UMass Lowell research. It helps test the market, recruit a management team and reach regional angel groups, and its own fund can invest once there is proof of concept. The fund backs only technology developed in whole or in part at the university, though outside startups that want to work with UMass Lowell can start here too.
+  facts: [[Stage, Pre-seed and seed; proof of concept], [Terms, UMass Lowell technology only], [Focus, 'University spinouts, AI training series']]
+  tags: [research, pre-seed, seed]
+  stages: [2, 4]
+  links: [icorps-ne]
+  offers: [funding, mentorship]
+  added: 2026-11
+  lastVerified: 2026-11
+- id: icorps-ne
+  name: 'NSF I-Corps Hub: New England Region'
+  cat: accel
+  loc: 292 Main St, Cambridge (MIT E38)
+  lat: 42.362
+  lng: -71.0858
+  url: https://neicorps.org
+  desc: NSF-funded partnership of eight New England universities, led by MIT and launched in January 2025, that teaches researchers to test whether their science has a market. Its free three-week Hub Spark Online course runs on Zoom, a follow-on program adds microgrants of up to $1,000, and finishing both can qualify a team for NSF's national I-Corps program and a grant of up to $50,000.
+  why: A cheap first step for a researcher with an AI result and no company yet. Three weeks, at least 12 customer interviews, no fee and no equity, and a route to NSF money for more customer discovery. It is built for scientists and engineers, the grants pay for interviews rather than building, and all three fall 2026 courses filled, so apply early.
+  facts: [[Program length, '3 weeks, online'], [Equity, None; no fee], [Terms, 'Microgrants to $1,000; NSF up to $50,000'], [Focus, STEM research commercialization]]
+  tags: [research, equity-free, MIT]
+  stages: [1, 2]
+  links: [uml-nvd]
+  offers: [grants, mentorship]
+  applyBy: rolling
+  applyNote: Free Hub Spark Online course
+  applyUrl: https://neicorps.org/apply-now/
+  added: 2026-11
+  lastVerified: 2026-11
+- id: deshpande
+  name: MIT Deshpande Center
+  cat: accel
+  loc: 292 Main St, Cambridge (MIT E38)
+  lat: 42.362
+  lng: -71.0858
+  url: https://deshpande.mit.edu
+  desc: MIT's Deshpande Center for Technological Innovation funds research from MIT labs on its way to a startup or a license, in health, climate and energy, AI and tech, and manufacturing. Teams get grant money that isn't tied to equity, a mentor the center calls a Catalyst, and introductions to investors, suppliers and customers.
+  why: If your AI work is still an MIT lab project, this is money to prove it out before there is a company, and reviewers send feedback to every applicant whether or not they fund the project. Only MIT faculty and principal investigators can apply, the grant can't pay the PI's salary, and the page gives no amounts or dates, so ask the center about the current round.
+  facts: [[Equity, None; grants], [Stage, 'MIT lab research, pre-company'], [Terms, MIT principal investigators only], [Focus, 'Health, climate, AI and tech, manufacturing']]
+  tags: [MIT, research, equity-free]
+  stages: [1, 2]
+  offers: [grants, mentorship]
+  added: 2026-11
+  lastVerified: 2026-11
+- id: mit-stex
+  name: MIT Startup Exchange
+  cat: accel
+  loc: 1 Main St, Cambridge
+  lat: 42.3622
+  lng: -71.08
+  url: https://ilpstex.mit.edu/pages/STEX
+  desc: MIT program that connects startups that have an MIT tie with the 200-plus member companies of its Industrial Liaison Program. About 800 startups are in its network. It runs calls for startups on problems the companies pose, one-to-one meetings with corporate leaders, pitch sessions, demo days and workshops.
+  why: A route to enterprise pilots that costs nothing. There is no fee, no equity, no cohort and no deadline, and its own success stories are proofs of concept and pilots with large companies. It is only for startups connected to MIT, it isn't an AI program, and an introduction is all it promises, so the deal is yours to close.
+  facts: [[Equity, None; no fee], [Terms, MIT-connected startups only], [Focus, Partnerships with industry]]
+  tags: [MIT, enterprise]
+  stages: [3, 5]
+  offers: [customers, community]
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- SPACES & HUBS ----------
 - id: cic
@@ -2589,6 +2721,37 @@
   offers: [space, community, mentorship, compute]
   added: 2026-10
   lastVerified: 2026-10
+- id: nerve-center
+  name: UMass Lowell NERVE Center
+  cat: space
+  loc: 110 Canal St, Lowell
+  lat: 42.642
+  lng: -71.3142
+  url: https://www.uml.edu/research/nerve/
+  desc: UMass Lowell's robotics testing, research and training facility, now 10 years old. It evaluates robots, exoskeletons and human-robot interaction on site, in the field or remotely, and its test methods feed ASTM's standards for response robots, automation and exoskeletons.
+  why: Independent test results for a robot before a customer asks for them. Reserve the test courses by the hour and run your own trials, or have NERVE's staff run them, collect the data and record video. It is a paid service, booked through the university's core-facility system or a contract, in the same building as UMass Lowell's Innovation Hub.
+  facts: [[Terms, Paid; hourly or by contract], [Focus, 'Robots, exoskeletons, human-robot interaction']]
+  tags: [robotics, lab space, research]
+  stages: [3]
+  offers: [space]
+  added: 2026-11
+  lastVerified: 2026-11
+- id: practicepoint
+  name: WPI PracticePoint
+  cat: space
+  loc: 50 Prescott St, Worcester
+  lat: 42.275
+  lng: -71.7993
+  url: https://www.wpi.edu/research/centers/practicepoint
+  desc: WPI's healthcare-technology test facility at Gateway Park, with a 3T MRI, a working operating room, an ICU, a physician's office, an apartment and motion capture in one place. Companies use it to test, train on and demonstrate medical devices, including surgical and wearable robots.
+  why: Somewhere to try a medical robot or device in a realistic clinical setting, and to stage a demonstration for investors. It is fee for service, with discounts and packages for startups, and it can connect you to WPI researchers in analytics, cybersecurity and AI. Its focus is medical devices, so it suits AI that ships in hardware more than software alone.
+  facts: [[Terms, Fee for service; startup discounts], [Focus, 'Medical devices, surgical and wearable robots']]
+  tags: [healthcare, robotics, lab space]
+  stages: [3]
+  links: [wpi]
+  offers: [space]
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- COMMUNITIES & MEETUPS ----------
 - id: tinkerers
@@ -2940,6 +3103,21 @@
   stages: [1]
   added: 2026-08
   lastVerified: 2026-08
+- id: massai
+  name: MassAI
+  cat: student
+  loc: UMass Amherst, Amherst
+  approx: true
+  lat: 42.3952
+  lng: -72.5311
+  url: https://umassai.com
+  desc: UMass Amherst's student organization for machine learning and AI. It holds a lecture every Wednesday of the semester, from neural-network basics to agentic coding and AI safety, runs hands-on projects, and asks for no experience.
+  why: The way into UMass Amherst's student AI talent. Its members work in university labs, big tech and seed-stage AI startups, so it is a place to meet a technical co-founder or a first hire in the Pioneer Valley. It is a student club, so reach it through its Discord rather than a recruiting office.
+  tags: [students, ML, events]
+  stages: [1]
+  offers: [community, talent]
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- MAJOR EVENTS ----------
 - id: aiweek
