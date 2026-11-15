@@ -2524,8 +2524,8 @@
   name: 'NSF I-Corps Hub: New England Region'
   cat: accel
   loc: 292 Main St, Cambridge (MIT E38)
-  lat: 42.362
-  lng: -71.0858
+  lat: 42.3623
+  lng: -71.086
   url: https://neicorps.org
   desc: NSF-funded partnership of eight New England universities, led by MIT and launched in January 2025, that teaches researchers to test whether their science has a market. Its free three-week Hub Spark Online course runs on Zoom, a follow-on program adds microgrants of up to $1,000, and finishing both can qualify a team for NSF's national I-Corps program and a grant of up to $50,000.
   why: A cheap first step for a researcher with an AI result and no company yet. Three weeks, at least 12 customer interviews, no fee and no equity, and a route to NSF money for more customer discovery. It is built for scientists and engineers, the grants pay for interviews rather than building, and all three fall 2026 courses filled, so apply early.
@@ -2543,8 +2543,8 @@
   name: MIT Deshpande Center
   cat: accel
   loc: 292 Main St, Cambridge (MIT E38)
-  lat: 42.362
-  lng: -71.0858
+  lat: 42.3623
+  lng: -71.086
   url: https://deshpande.mit.edu
   desc: MIT's Deshpande Center for Technological Innovation funds research from MIT labs on its way to a startup or a license, in health, climate and energy, AI and tech, and manufacturing. Teams get grant money that isn't tied to equity, a mentor the center calls a Catalyst, and introductions to investors, suppliers and customers.
   why: If your AI work is still an MIT lab project, this is money to prove it out before there is a company, and reviewers send feedback to every applicant whether or not they fund the project. Only MIT faculty and principal investigators can apply, the grant can't pay the PI's salary, and the page gives no amounts or dates, so ask the center about the current round.
