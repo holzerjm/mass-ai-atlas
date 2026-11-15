@@ -225,6 +225,8 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | | the menu button has no gray box | the browser's default button background returning behind the white menu icon (1.15:1), on the atlas and on the events page, which lifts the header from it |
 | | the hero's button | the hero promising an open application again. It said "Apply" while the residency page said applications had closed |
 | `guard.spec.js` | WebKit's wording for a failed tile-host fetch is tolerated | the error guard failing a test over a blip on OpenFreeMap's server, which WebKit raises as an uncaught error in the page. It failed a WebKit test on 2026-11-09 and again on 2026-11-12, both times with nothing wrong in the atlas. The test throws that error in a page and passes only if the guard lets it through |
+| | a tile-host request that fails is tolerated, however the engine reports it | the guard handling only an error made up for a test. The test aborts one request to the tile host and fetches it, so each engine reports the failure its own way: Chromium as a failed request, WebKit possibly as an error in the page as well. The test notes on the report whether WebKit raised one |
+| | the error is recognized in the shape Playwright gives it | the guard reading the wrong part of the error again. Playwright cuts WebKit's text at the first colon, so the error's name is `Fetch API cannot load https` and its message only the rest of the address. A check of the message alone let the same failure through on 2026-11-15. The test builds the error that way and checks that it is recognized, and that a look-alike host, another host, and a real error that merely mentions the address in its stack are not |
 | | the tolerance matches only that wording on that host | the exception swallowing a real error. The same wording for any other host, a look-alike host, other wordings for a failed fetch, the wording inside a longer message, and other errors must all still count |
 | `nav.spec.js` | the tabs stay at the top of the window to the foot of every view, in five window sizes | the bar leaving one window down again. `html,body{height:100%}` made `<body>`, the bar's containing block, one window tall, so until 2026-11 the tabs were on screen for 0 to 5% of the Directory's length, and in an 844 × 390 window they never stuck at all. A tab must be what's really at its spot, so it can be clicked there |
 | | in a short window, the tabs take one row | two rows taking over a quarter of a phone on its side: 107 px of 390, which left the map search's list short and no room for the map under the bar. Windows under 500 px tall take the phone's one row, and on a touch screen the bar and the map must fit the window. A taller window keeps the tabs' icons, so the rule can't spread |
@@ -337,7 +339,10 @@ Every spec imports `test` from `tests/helpers/atlas.js`, which adds:
   logs such a failure, but WebKit raises it in the page, and a blip on that
   server failed WebKit tests twice in a week (2026-11-09 and 2026-11-12). The
   guard matches that exact wording on that host only, so any other error still
-  fails.
+  fails. It reads the first line of the error's stack, not only its message:
+  Playwright cuts WebKit's text at the first colon, the one in `https:`, so the
+  message holds just the rest of the address. A check of the message alone
+  missed the same error on 2026-11-15.
 - **A fixed events feed.** `events.json` is regenerated weekly and isn't in git,
   so every test gets a small feed dated relative to "now" instead (one event
   hosted by a real atlas entry, one not). A test can ask for

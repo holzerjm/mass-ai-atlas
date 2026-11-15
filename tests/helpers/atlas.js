@@ -61,8 +61,16 @@ function eventsFixture(){
 // WebKit tests on 2026-11-09 and 2026-11-12 though nothing in the atlas was wrong. That error is a
 // third-party request failure in other words, so the guard below treats it as one: listed on the
 // report, not failed. It matches only that wording and only that host, so a real error still fails.
+//
+// Which text to read matters. Playwright builds WebKit's error from the console text and cuts it
+// at the first colon to get a name and a message. Here that colon is the one in "https:", so the
+// name is "Fetch API cannot load https" and the message only the rest of the address, and a check
+// of `message` never matched: the same test failed again on 2026-11-15. The stack's first line
+// keeps the whole text, so that line is read first, and `message` covers an error a page throws.
 const TILE_FETCH = /^(?:TypeError: )?Fetch API cannot load https:\/\/tiles\.openfreemap\.org\/\S+ due to access control checks\.?$/;
 const isTileFetchError = message => TILE_FETCH.test(String(message || "").trim());
+const firstLine = text => String(text || "").split("\n")[0];
+const isTileFetchPageError = err => !!err && (isTileFetchError(firstLine(err.stack)) || isTileFetchError(err.message));
 
 const test = base.test.extend({
   // true = behave like a first-time visitor (the guided tour auto-starts on a
@@ -99,7 +107,7 @@ const test = base.test.extend({
     const pageErrors = [], ownFailures = [], thirdParty = [];
     const expected = url => expectedHttpErrors.some(re => re.test(url));
     page.on("pageerror", err => {
-      if(isTileFetchError(err && err.message)) thirdParty.push(`page error: ${err.message}`);
+      if(isTileFetchPageError(err)) thirdParty.push(`page error: ${firstLine(err.stack) || err.message}`);
       else pageErrors.push(String(err && err.stack || err));
     });
     page.on("response", res => {
@@ -135,4 +143,4 @@ async function waitForApp(page){
   await page.waitForFunction(n => typeof markers === "object" && Object.keys(markers).length === n, DATA.length);
 }
 
-module.exports = { test, expect: base.expect, ROOT, ATLAS, DATA, byId, metersBetween, eventsFixture, waitForApp, isTileFetchError };
+module.exports = { test, expect: base.expect, ROOT, ATLAS, DATA, byId, metersBetween, eventsFixture, waitForApp, isTileFetchError, isTileFetchPageError };
