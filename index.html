@@ -229,7 +229,7 @@ html:not(.dark) .gx-search .map-results{background:rgba(10,15,30,.97);color:#e6e
 .pop-desc{font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:8px}
 .pop-colocated{font-size:12px;color:var(--muted);line-height:1.45;margin:-2px 0 8px}
 .pop-colocated a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
-/* names that don't fit the list's three lines wait behind this button (alsoHere) */
+/* names that would make a popup too tall wait behind this button (popupHtml) */
 .pop-more{font:inherit;color:var(--gold-ink);background:none;border:0;padding:0;margin:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .pop-btn{display:inline-block;font-size:12px;font-weight:700;color:#000;background:linear-gradient(90deg,#ffd54f,#ffc600);
   padding:6px 12px;border-radius:8px;cursor:pointer;text-decoration:none;border:0;font-family:inherit;line-height:inherit;text-align:inherit}
@@ -1695,12 +1695,19 @@ function holdJump(){
 // after Show on map at 1366 × 650 it was off the screen with 5% of its popup showing, and a search
 // pick was no better. So the page moves as the flight starts. Leaflet keeps a popup inside the
 // map, and one that needs more than half the map pushes its pin down. So what has to show is the
-// map's top down to the lowest place the pin can stop.
-const POPUP_ROOM = 240;   // the tallest popup, its tip, and Leaflet's gap at the map's edge
+// map's top down to the lowest place the pin can stop. That place is known, because a popup's
+// content is never taller than POPUP_FITS: popupHtml puts names away to keep to it, and Leaflet
+// scrolls what is still over (maxHeight). Until 2026-11 the room was a guess of 240 px, and the
+// tallest popup had grown to 238, which left its pin under 2 px on a phone on its side.
+const POPUP_FITS = 212;               // a popup's content at its tallest. The tallest in the data is 208
+const POPUP_OVER = 48;                // what a popup adds to its content: margins and border (30), its tip down to the pin (13), and Leaflet's gap at the map's edge (5)
+const POPUP_ROOM = POPUP_FITS + POPUP_OVER;
 const PIN_ROOM = 24;      // the pin, and a little of the map under it
-function bringPinOnScreen(){
+// `pinStops` is how far down the map the pin can end up: the middle, where a flight leaves it, or
+// under the tallest popup.
+function bringPinOnScreen(pinStops = Math.max($("map").offsetHeight / 2, POPUP_ROOM)){
   const box = $("map").getBoundingClientRect();
-  bringOnScreen(box.top, box.top + Math.max(box.height / 2, POPUP_ROOM) + PIN_ROOM);
+  bringOnScreen(box.top, box.top + pinStops + PIN_ROOM);
 }
 
 // Flies the map to a pin and opens its popup when the map gets there. Until 2026-11 Show on map
@@ -1986,47 +1993,62 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   const colocated = Object.fromEntries(DATA.map(d => [d.id,
     DATA.filter(o => o !== d && metresBetween(d.lat, d.lng, o.lat, o.lng) <= COLOCATED_M)]));
 
-  // A spot that many organizations share makes a long "Also here" list, and Leaflet moves the map
-  // to fit a popup as it opens. With six names the popup was taller than a sideways phone's map, so
-  // the pin was pushed out of the map, the pin group dropped it as off-screen, and the popup shut
-  // (2026-11, seen only on CI's fonts). So the list keeps to ALSO_LINES lines: names that don't fit
-  // are put away, last first, behind a button that says how many. The list is measured, not
-  // counted, in a box as wide as Leaflet makes a popup, so it holds for any font and any length of
-  // name. A popup's content is a function for this reason: Leaflet calls it each time the popup
-  // opens, before it lays the popup out, so every opening starts with a list that fits.
-  const ALSO_LINES = 3, POPUP_WIDTH = 260;
-  let alsoBox = null;
-  function alsoHere(d){
+  // A spot that many organizations share makes a long "Also here" list, and a popup too tall for
+  // the room there is. On a phone on its side the map moved to fit a list of six names, which
+  // pushed the pin out of the map, so the pin group dropped it as off-screen and the popup shut
+  // (2026-11, seen only on CI's fonts). So a popup's content keeps to POPUP_FITS. Names that
+  // would take it over are put away, last first, behind a button that says how many. The first
+  // name always stays. The content is measured, not counted, in a box as wide as Leaflet makes a
+  // popup, so it holds for any font and any length of name or description. What is still too
+  // tall with one name scrolls inside the popup, which is Leaflet's maxHeight. A popup's content
+  // is a function for this reason: Leaflet calls it each time it lays the popup out, before it
+  // moves the map to fit it, so every opening starts with a popup that fits.
+  const POPUP_WIDTH = 260;
+  let fitBox = null, allHere = null;   // allHere is the pin whose button was pressed, until its popup shuts
+  function popupHtml(d){
     const others = colocated[d.id];
-    if(!others.length) return "";
-    const html = shown => `<div class="pop-colocated">Also here: ` + others.map((o, i) =>
-      `<span class="pop-co"${i < shown ? "" : " hidden"}>${i ? ", " : ""}<a href="?entry=${o.id}" onclick="openDrawer('${o.id}');return false">${esc(o.name)}</a></span>`).join("") +
-      (shown < others.length ? ` <button type="button" class="pop-more" onclick="showAllHere(this,'${d.id}')">and ${others.length - shown} more</button>` : "") + `</div>`;
-    if(!alsoBox){
-      alsoBox = L.DomUtil.create("div", "leaflet-popup-content", map.getContainer());
-      // Leaflet sets a popup's content one pixel wider than maxWidth
-      alsoBox.style.cssText = `position:absolute;left:0;top:0;width:${POPUP_WIDTH + 1}px;margin:0;visibility:hidden;pointer-events:none`;
-      alsoBox.setAttribute("aria-hidden", "true");
-    }
+    const html = shown =>
+      `<div class="pop-name">${esc(d.name)}</div>`+
+      `<div class="pop-cat" style="color:${cInk(d.cat)}">${cLabel(d.cat)}</div>`+
+      `<div class="pop-desc">${esc(d.desc.length>140 ? d.desc.slice(0,140)+"…" : d.desc)}</div>`+
+      (others.length ? `<div class="pop-colocated">Also here: ${others.slice(0, shown).map(o =>
+        `<a href="?entry=${o.id}" onclick="openDrawer('${o.id}');return false">${esc(o.name)}</a>`).join(", ")}`+
+        (shown < others.length ? ` <button type="button" class="pop-more" onclick="showAllHere(event,'${d.id}')">and ${others.length - shown} more</button>` : "")+
+        `</div>` : "")+
+      `<button type="button" class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</button>`;
     let shown = others.length;
-    for(;; shown--){
-      alsoBox.innerHTML = html(shown);
-      const list = alsoBox.firstChild;
-      if(shown === 1 || list.offsetHeight <= parseFloat(getComputedStyle(list).lineHeight) * ALSO_LINES + 1) break;
+    if(shown > 1 && allHere !== d.id){
+      if(!fitBox){
+        fitBox = L.DomUtil.create("div", "leaflet-popup-content", map.getContainer());
+        // Leaflet sets a popup's content one pixel wider than maxWidth
+        fitBox.style.cssText = `position:absolute;left:0;top:0;width:${POPUP_WIDTH + 1}px;margin:0;visibility:hidden;pointer-events:none`;
+        fitBox.setAttribute("aria-hidden", "true");
+      }
+      for(;; shown--){
+        fitBox.innerHTML = html(shown);
+        if(shown === 1 || fitBox.offsetHeight <= POPUP_FITS) break;
+      }
+      fitBox.innerHTML = "";
     }
-    alsoBox.innerHTML = "";
     return html(shown);
   }
-  // The button shows the names that were put away. The popup grows upwards from its pin, so the
-  // map makes room for it when it has the height.
-  window.showAllHere = (more, id)=>{
-    const put = [...more.parentNode.querySelectorAll(".pop-co[hidden]")];
-    put.forEach(n => n.hidden = false);
-    more.hidden = true;
-    if(put[0]) put[0].querySelector("a").focus({preventScroll:true});
-    const pin = markers[id], need = pin.getPopup().getElement().offsetHeight + 44;
-    if(map.getSize().y >= need + PIN_ROOM)
-      map.panInside(pin.getLatLng(), {paddingTopLeft:[140, need], paddingBottomRight:[140, PIN_ROOM], animate: !reduceMotion()});
+  // The button shows every name. Someone asked for them, so until it shuts the popup may be as
+  // tall as the map can show with the pin under it, and a list longer than that scrolls inside
+  // the popup. Leaflet lays the popup out again and moves the map to keep the popup in it, which
+  // can push the pin down, so the page moves as it does for a flight. The first of the names it
+  // showed takes the focus, which the button had. The click stops here, because the button is
+  // gone from the popup by the time the map would hear of it, and Leaflet takes a click that
+  // isn't inside a popup for a click on the map, which shuts the popup.
+  window.showAllHere = (e, id) => {
+    e.stopPropagation();
+    const pin = markers[id], pop = pin.getPopup(), names = () => pop.getElement().querySelectorAll(".pop-colocated a");
+    const before = names().length, pinAt = map.latLngToContainerPoint(pin.getLatLng()).y;
+    allHere = id;
+    pop.options.maxHeight = Math.max(POPUP_FITS, map.getSize().y - POPUP_OVER - PIN_ROOM);
+    pop.update();
+    const first = names()[before];
+    if(first) first.focus({preventScroll:true});
+    bringPinOnScreen(Math.max(pinAt, pop.getElement().querySelector(".leaflet-popup-content").offsetHeight + POPUP_OVER));
   };
 
   DATA.forEach(d=>{
@@ -2035,13 +2057,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
       `<div class="pulse-dot" style="width:13px;height:13px;background:${col};color:${col}"></div>`,
       iconSize:[13,13], iconAnchor:[7,7]});
     const m = L.marker([d.lat,d.lng], {icon, title:d.name});
-    m.bindPopup(()=>
-      `<div class="pop-name">${esc(d.name)}</div>`+
-      `<div class="pop-cat" style="color:${cInk(d.cat)}">${cLabel(d.cat)}</div>`+
-      `<div class="pop-desc">${esc(d.desc.length>140 ? d.desc.slice(0,140)+"…" : d.desc)}</div>`+
-      alsoHere(d)+
-      `<button type="button" class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</button>`,
-      {maxWidth:POPUP_WIDTH, pane:"popupsOver"});
+    m.bindPopup(()=>popupHtml(d), {maxWidth:POPUP_WIDTH, maxHeight:POPUP_FITS, pane:"popupsOver"});
     pinOf.set(m.getPopup(), m);
     markers[d.id] = m;
   });
@@ -2062,7 +2078,8 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
   });
   map.on("popupclose", e=>{
     const from = popupFrom, el = e.popup.getElement(), now = document.activeElement;
-    popupFrom = null;
+    popupFrom = allHere = null;
+    e.popup.options.maxHeight = POPUP_FITS;   // the next opening starts with a popup that fits
     if(now !== document.body && !(el && el.contains(now))) return;   // the focus has moved on
     const pin = pinOf.get(e.popup), back = from && from !== document.body && from.offsetParent ? from : pin && pin.getElement();
     if(back) back.focus({preventScroll:true});
@@ -2495,7 +2512,8 @@ function wheelScrollsPage(wrap, canvas){
   // Capture phase, so this runs before the map's or the galaxy's own wheel handler. Stopping
   // the event here means that handler never sees it, and the browser scrolls the page.
   wrap.addEventListener("wheel", e=>{
-    if(e.ctrlKey || e.metaKey || !canvas.contains(e.target)) return;
+    // a popup that scrolls takes the wheel itself, and Leaflet keeps it from the map
+    if(e.ctrlKey || e.metaKey || !canvas.contains(e.target) || e.target.closest(".leaflet-popup-scrolled")) return;
     e.stopPropagation();
     // centre the hint in the part of the canvas that is on screen, below the sticky nav,
     // or it sits below the window while the page is still scrolled near the top
