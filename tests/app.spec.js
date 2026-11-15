@@ -1,6 +1,9 @@
 /* Core invariants founders rely on: the page boots, shared links land where
    they point, and each view actually shows. See docs/testing.md. */
-const { test, expect, DATA, ATLAS, metersBetween, waitForApp, crowdSpot } = require("./helpers/atlas");
+const { test, expect, ROOT, DATA, ATLAS, metersBetween, waitForApp } = require("./helpers/atlas");
+const fs = require("fs");
+const path = require("path");
+const yaml = require("js-yaml");
 
 const VIEWS = ["map", "galaxy", "journey", "directory"];
 const entry = DATA.find(d => d.id === "csail") || DATA[0];
@@ -132,6 +135,21 @@ test("every entry opens a drawer with its name", async ({ page }) => {
   });
   expect(broken).toEqual([]);
 });
+
+// Serves data/entities.yml with `n` entries moved onto one spot, so a test can see what a pin does
+// when many organizations share its place. The real data has no such spot, and the day it had
+// one, it failed a test only in CI. The entries with the longest names go there, since they make
+// the longest list. Returns them, in the order the page lists them.
+async function crowdSpot(page, n = 7){
+  const all = yaml.load(fs.readFileSync(path.join(ROOT, "data", "entities.yml"), "utf8"), { schema: yaml.CORE_SCHEMA });
+  const crowd = new Set(all.slice().sort((x, y) => y.name.length - x.name.length).slice(0, n));
+  const { lat, lng } = [...crowd][0];
+  for(const d of crowd){ d.lat = lat; d.lng = lng; }
+  await page.route("**/data/entities.yml", route => route.fulfill({
+    status: 200, contentType: "application/yaml; charset=utf-8",
+    body: yaml.dump(all, { schema: yaml.CORE_SCHEMA, lineWidth: -1 }) }));
+  return all.filter(d => crowd.has(d));
+}
 
 // Pins at the same spot draw on top of each other at street zoom (clustering
 // stops at z15 and spiderfy is off), so only the top one can be clicked: on
