@@ -1945,6 +1945,23 @@
   offers: [funding, customers]
   added: 2026-08
   lastVerified: 2026-08
+- id: misneach
+  name: Misneach
+  cat: vc
+  loc: 131 Dartmouth St, Boston
+  lat: 42.347
+  lng: -71.0754
+  url: https://misneach.ai
+  desc: Boston "founder propulsion platform" backed by Great Hill Partners co-founder Chris Gaffney, with no outside limited partners. It writes first checks from formation to seed, as a SAFE or equity, and pairs each with an in-house Earned Media Studio and hands-on go-to-market help. AI is the largest group in its portfolio.
+  why: A first check before the story is obvious, from a team that then works on it with you. Its studio builds your pitch narrative and makes the video, podcast and press work, and its operators help with positioning, pricing and enterprise access. Send a short note through the site, and it says every founder hears back within five business days. It doesn't publish a check size.
+  facts: [[Stage, Formation to seed; first checks], [Terms, SAFE or equity; no outside LPs], [Focus, 'AI, robotics, enterprise, consumer']]
+  tags: [pre-seed, seed]
+  stages: [2, 4]
+  links: [locus-robotics]
+  offers: [funding, mentorship]
+  applyUrl: https://misneach.ai/#close
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- ANGEL GROUPS ----------
 - id: bha
