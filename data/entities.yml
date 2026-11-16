@@ -659,6 +659,60 @@
   added: 2026-10
   lastVerified: 2026-10
 
+- id: merl
+  name: Mitsubishi Electric Research Laboratories (MERL)
+  cat: corporate
+  loc: 201 Broadway, Cambridge
+  lat: 42.3661
+  lng: -71.0924
+  url: https://www.merl.com/
+  desc: The North American research organization of Mitsubishi Electric, in Kendall Square. It does basic and applied research in physical simulation and modeling, optimization, control, signal processing and artificial intelligence, and its AI work covers computer vision, speech and audio, and data analytics. It calls itself an open lab that publishes its results and releases software and data.
+  why: A research lab to hire from and to read, not one to sell to. In November 2026 it listed 6 staff openings, among them an agentic-AI postdoc and a robotics team leader, and 35 internships for graduate students. Its work feeds Mitsubishi Electric's own products, and its site shows no way for a startup to partner with it.
+  facts: [[Focus, 'AI, robotics, control, signal processing']]
+  tags: [research, robotics, ML]
+  stages: [5]
+  links: []
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: lincoln-lab
+  name: MIT Lincoln Laboratory
+  cat: corporate
+  loc: 244 Wood St, Lexington
+  lat: 42.4617
+  lng: -71.2648
+  url: https://www.ll.mit.edu/
+  desc: MIT's federally funded research and development center for national security, in Lexington. It builds operational prototypes of advanced technology and transfers them to government and industry. Its Artificial Intelligence Technology and Systems group works on pulling information out of multimedia data, adversarial AI and AI assurance. It says more than 110 companies have come out of it.
+  why: A way into defense work for a small company, and a large technical employer, with 249 open roles in November 2026. Its Small Business Program names four routes, which are partnering on SBIR and STTR proposals, cooperative research agreements, paid use of its test facilities, and Commercial Solutions Openings. It is for US small businesses, the Laboratory says it is selective, and no opportunities were posted when we looked, so register your interests and wait to hear.
+  facts: [[Terms, US small businesses; testing is reimbursable], [Focus, National security R&D and prototypes]]
+  tags: [defense, research, deep tech]
+  stages: [5]
+  links: []
+  offers: [customers, talent]
+  applyNote: No opportunities posted at present
+  applyUrl: https://www.ll.mit.edu/partner-us/small-business-program
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: tri
+  name: Toyota Research Institute
+  cat: corporate
+  loc: Cambridge (near MIT)
+  approx: true
+  lat: 42.3618
+  lng: -71.0885
+  url: https://www.tri.global/
+  desc: Toyota's research institute, headquartered in Los Altos, California, with a robotics lab in Cambridge that it says works closely with nearby MIT. Its research areas include robotics, human-centered AI and automated driving. Its University Research Program runs joint projects with university labs, MIT, Harvard and Northeastern among them, and Walden Robotics spun out of it in January 2026.
+  why: A robot-learning lab to hire from and to watch. Of its 42 open roles in November 2026, 11 were in Cambridge, which were two research scientists, a postdoc and eight internships. It has no program for startups, and its university program is for universities only. Toyota Ventures, which invests in early-stage AI and robotics startups, is a separate organization. Its site prints no Cambridge address, so the pin is approximate.
+  facts: [[Focus, Robot learning and human-centered AI]]
+  tags: [research, robotics, ML]
+  stages: [5]
+  links: [walden-robotics]
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
 # ---------- STARTUPS / AI COMPANIES ----------
 - id: liquid
   name: Liquid AI
@@ -1214,6 +1268,140 @@
   offers: [talent]
   added: 2026-10
   lastVerified: 2026-10
+
+- id: symbotic
+  name: Symbotic
+  cat: startup
+  loc: 200 Research Dr, Wilmington
+  lat: 42.6034
+  lng: -71.158
+  url: https://www.symbotic.com/
+  badge: 22,200+ bots active
+  desc: Warehouse-automation company founded in 2007 and headquartered in Wilmington, public on Nasdaq since 2022. Its AI-powered software orchestrates hundreds of robots in each system to move goods through the supply chain. It reports 22,200+ bots active and more than $1 billion of R&D funded, and in October 2026 Walmart expanded its agreement with an initial commitment of about $6 billion.
+  why: A large robotics engineering team north of Boston. Of its 128 open roles in November 2026, 61 were in Wilmington, among them perception and AI engineers and PhD interns. It runs internships and co-ops, and says it sponsors projects and student groups at universities such as MIT. It has no venture arm or startup program, so treat it as a place to hire from and learn from, not as a customer or investor.
+  tags: [robotics, industrial, enterprise]
+  stages: []
+  links: []
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: motional
+  name: Motional
+  cat: startup
+  loc: Seaport, Boston
+  approx: true
+  lat: 42.351
+  lng: -71.0438
+  url: https://motional.com/
+  desc: Driverless-vehicle company formed in 2020 as a joint venture of Hyundai Motor Group and Aptiv, and majority-owned by Hyundai. It traces its Boston roots to nuTonomy, founded out of MIT in 2013, and builds Level 4 vehicles for ride-hail and delivery. Boston is its global headquarters, Las Vegas its operations hub, where its robotaxis take Uber riders, and much of its engineering is in Pittsburgh.
+  why: A large autonomy and machine-learning team headquartered in the Seaport. Of the first 50 roles on its job board in November 2026, 31 included Boston. It releases driving datasets free for academic use, and has worked with MIT CSAIL on explaining what a driving model decides. It runs no program for founders, and its site prints no current street address, so the pin is approximate.
+  tags: [robotics, ML, MIT spinout]
+  stages: []
+  links: [csail]
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: tutor-intelligence
+  name: Tutor Intelligence
+  cat: startup
+  loc: 80 Coolidge Hill Rd, Watertown
+  lat: 42.3676
+  lng: -71.1526
+  url: https://tutorintelligence.com/
+  badge: $75M Series B
+  desc: Robotics company founded out of MIT CSAIL and incorporated in 2021, headquartered in Watertown, where it also does its research and manufacturing. It trains foundation models for robot manipulation, and builds robots that it puts to work for customers, priced from $14 an hour. Its site announces a $75M Series B led by a16z, after a $34M Series A led by Union Square Ventures.
+  why: A fast-growing physical-AI team just outside Boston. It says it has 160+ people, and 66 of its 80 postings in November 2026 were in Watertown, machine-learning and computer-vision engineers among them. It is also a local example of selling robot labor by the hour instead of selling robots. Its site lists no internships and no partner or startup program.
+  tags: [robotics, MIT spinout, ML]
+  stages: []
+  links: [csail, e14]
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: vecna-robotics
+  name: Vecna Robotics
+  cat: startup
+  loc: 425 Waverley Oaks Rd, Waltham
+  lat: 42.3866
+  lng: -71.2047
+  url: https://www.vecnarobotics.com/
+  desc: Maker of autonomous mobile robots and the orchestration software that directs them, for case picking, cross-docking and dock-to-dock moves in warehouses. It is based in Waltham and describes its platform as cloud-based and AI-driven. In September 2026 it raised $31 million in a round led by Unless, with Drive Capital, Tiger Global, Highland Capital Partners and Tectonic Ventures.
+  why: A Waltham robotics team with logistics customers, GEODIS among them, and a local example of raising growth money for warehouse automation in 2026. Hiring is small, with 4 of its 6 open roles in November 2026 in Waltham. AI gets one sentence on its site, and it offers nothing aimed at founders or students.
+  tags: [robotics, industrial]
+  stages: []
+  links: []
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: sea-machines
+  name: Sea Machines Robotics
+  cat: startup
+  loc: 266 Summer St, Boston
+  lat: 42.3506
+  lng: -71.0509
+  url: https://sea-machines.com/
+  desc: Builds autonomous vessel software and systems for naval and commercial vessels, from its headquarters in Boston. Marine engineer Michael Gordon Johnson started it in 2015. It says it has raised over $30M from investors including Toyota Ventures, Huntington Ingalls, Brunswick and Accomplice. It reports 200+ deliveries worldwide, and in June 2026 it reported sales ten times the same period of 2025.
+  why: A maritime-autonomy team in Boston that says it applies practical AI and machine learning to make ships safer and more efficient. Of its 10 openings in November 2026, 9 were in Boston. It is a local example of an autonomy company that sells to navies and commercial fleets. Nothing on its site is aimed at founders or students.
+  tags: [robotics, defense, ML]
+  stages: []
+  links: [accomplice]
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: cognex
+  name: Cognex
+  cat: startup
+  loc: One Vision Dr, Natick
+  lat: 42.3027
+  lng: -71.3548
+  url: https://www.cognex.com/
+  badge: In Natick since 1981
+  desc: Machine-vision company headquartered in Natick, where it opened its first office in 1981, and public on Nasdaq. Its systems use optics, image sensors and AI software to inspect products, read barcodes and guide robots. It reports about $1 billion in annual revenue and over a million systems sold, and in September 2026 it agreed to buy RealSense for about $500 million.
+  why: The region's long-standing industrial computer-vision company, and a source of people who have shipped vision systems at scale. Buying RealSense takes it into perception for robots. Hiring in Natick was thin in November 2026, at 10 of its 99 openings, mostly in marketing, finance and management. Its careers page mentions no internships, and it has no program for startups.
+  tags: [applied AI, industrial, robotics]
+  stages: []
+  links: []
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: walden-robotics
+  name: Walden Robotics
+  cat: startup
+  loc: Cambridge
+  approx: true
+  lat: 42.3662
+  lng: -71.1045
+  url: https://www.waldenrobotics.com/
+  badge: $300M seed round
+  desc: Physical-AI company that builds and deploys general-purpose robots, spun out of the Toyota Research Institute in January 2026 and led by MIT professor Russ Tedrake. It left stealth in July 2026 with a $300 million seed round at a $1.1 billion valuation, co-led by Toyota and Deviation Capital. It says its robots have worked in production at a Toyota plant since February 2026.
+  why: A new and heavily funded robot-learning lab in Cambridge. Of its 33 open roles in November 2026, 28 named Cambridge, and a job post describes a 50,000 sq ft headquarters there for engineering, fabrication and robot testing. It publishes no street address, so the pin is approximate, and it offers nothing for founders or students yet.
+  tags: [robotics, ML, deep tech]
+  stages: []
+  links: [tri, nextview]
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: merlin-labs
+  name: Merlin
+  cat: startup
+  loc: 100 Causeway St, Boston
+  lat: 42.3652
+  lng: -71.0618
+  url: https://merlinlabs.com/
+  desc: Develops autonomy software for aircraft, which it describes as AI-powered and built to fly from takeoff to touchdown in military and civil programs. Its headquarters is in Boston, with a test facility in Bedford. It is listed on Nasdaq, has a contract with US Special Operations Command with a $105 million ceiling, and ended the third quarter of 2026 with $161.6 million in cash and no debt.
+  why: An aviation-autonomy team headquartered in Boston. Of its 24 open roles in November 2026, 21 named Boston. It is a local example of an autonomy company built on defense contracts and a public listing. It runs no program for founders or students.
+  tags: [defense, ML, deep tech]
+  stages: []
+  links: []
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- VENTURE CAPITAL ----------
 - id: venx
@@ -1992,6 +2180,25 @@
   links: [locus-robotics]
   offers: [funding, mentorship]
   applyUrl: https://misneach.ai/#close
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: volition
+  name: Volition Capital
+  cat: vc
+  loc: 177 Huntington Ave, Boston
+  lat: 42.3448
+  lng: -71.0827
+  url: https://www.volitioncapital.com/
+  badge: $950M Fund VI
+  desc: Boston growth equity firm, founded in 2010, that invests in founder-owned software, internet and consumer companies. It closed Fund VI at $950 million in September 2026, which took its assets under management to over $2.6 billion. AI companies in its portfolio include Tamr, whose $21 million round it led in October 2026, and it tags part of the portfolio as physical AI.
+  why: Money for a company that already sells. It looks for $5 million or more in revenue, growth of 25% or more a year and founders who still own at least 20%, and it favors companies built on customers' money over venture capital. Checks are $5 million to $50 million for a minority stake and a board seat. That is too late for a first round, but its pitch page takes a deck from anyone and promises feedback by email. Submitting one also signs you up for its mailings.
+  facts: [[Check size, $5M–$50M], [Stage, 'Growth; $5M or more in revenue'], [Board seat, 'Yes'], [Focus, 'Software, internet, consumer']]
+  tags: [multi-stage, enterprise, consumer]
+  stages: [5]
+  links: [tamr]
+  offers: [funding]
+  applyUrl: https://www.volitioncapital.com/submit-a-pitch-deck/
   added: 2026-11
   lastVerified: 2026-11
 
@@ -3241,6 +3448,58 @@
   stages: [1, 4]
   offers: [community]
   added: 2026-06
+  lastVerified: 2026-11
+
+- id: robotics-summit
+  name: Robotics Summit & Expo
+  cat: event
+  loc: Hynes Convention Center, Boston · June 2–3, 2027
+  lat: 42.3483
+  lng: -71.0838
+  url: https://www.roboticssummit.com/
+  desc: Two-day technical conference and expo for people who design and build robots, from The Robot Report, with MassRobotics as its strategic partner. The 2027 edition is June 2 to 3 at the Hynes Convention Center. Artificial intelligence is one of its six conference tracks. The 2026 edition included a Physical AI Showcase and a MassRobotics showcase of healthcare robotics startups.
+  why: Robotics engineers, suppliers and buyers in one hall for two days, so a robotics founder can meet customers, recruit and see the competition. Speakers attend free with two guests, and the call for 2027 presentations is open with no deadline printed. Prices and registration for 2027 are not posted yet. In 2026 a conference pass ran from $795 to $1,195, and an expo-only pass from $125.
+  tags: [events, robotics, industrial]
+  stages: [3, 5]
+  links: [massrobotics]
+  offers: [community, talent]
+  applyBy: rolling
+  applyNote: 'Speak: 2027 call open, no deadline'
+  applyUrl: https://www.roboticssummit.com/call-for-presentations/
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: emtech-ai
+  name: EmTech AI
+  cat: event
+  loc: MIT Media Lab, Cambridge · May 11–13, 2027
+  lat: 42.3606
+  lng: -71.0873
+  url: https://event.technologyreview.com/emtech-ai-2027/
+  desc: MIT Technology Review's conference on AI for business leaders, which it calls MIT's longest-running AI business conference. The 2027 edition is May 11 to 13 at the MIT Media Lab and online, with the theme The Reality Test. An in-person pass is $2,895 until Jan. 15, 2027 and rises in steps to $3,495, and the livestream is $945 to $995.
+  why: A room of enterprise AI buyers and executives on the MIT campus. Startups get 25% off, which brings the early in-person pass to $2,171.25, and the site does not say who counts as a startup. It says its attendees are director level and above, there is no startup showcase or pitch slot, and the 2027 speakers are not yet announced. Go to meet buyers, not to be discovered.
+  facts: [[Terms, '25% off for startups; scholarships by form']]
+  tags: [events, enterprise, MIT]
+  stages: [5]
+  links: [medialab]
+  offers: [community, customers]
+  added: 2026-11
+  lastVerified: 2026-11
+
+- id: qcon-ai-boston
+  name: QCon AI Boston
+  cat: event
+  loc: BU George Sherman Union, Boston · July 8–9, 2027
+  lat: 42.3506
+  lng: -71.1101
+  url: https://boston.qcon.ai/
+  desc: Two-day conference on AI engineering in production, for senior engineers, architects and engineering leaders, where the speakers run the systems they talk about. The 2027 edition is July 8 to 9 at Boston University's George Sherman Union. Program areas include agent runtime design, context engineering, evals and agent security. A ticket is $1,095 until Jan. 12, 2027 and rises in steps to $1,695.
+  why: Useful if you build AI systems and want to hear how larger teams run them, or want to meet senior engineers you might hire. There is no startup or founder rate and no pitch slot. Speakers are usually invited, though it takes proposals. It is one stop of a touring series from C4Media, which says it is located in Canada, and it is not affiliated with Boston University.
+  tags: [events, infrastructure, enterprise]
+  stages: [3, 5]
+  links: []
+  offers: [community, talent]
+  added: 2026-11
   lastVerified: 2026-11
 
 # ---------- GOVERNMENT & POLICY ----------

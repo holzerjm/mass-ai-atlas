@@ -178,7 +178,7 @@
       entries: [bosch-v, hubspot-v, ibm-ventures, suffolk-tech]
     - do: Start on government and defense early
       why: These buyers work on their own calendars and have their own rules of entry, so read each entry before you contact them.
-      entries: [diu, draper-laboratory]
+      entries: [diu, draper-laboratory, lincoln-lab]
     - do: Sell through a platform your customers use
       why: Selling through a platform can reach buyers you couldn't get to alone, but you depend on its rules.
       entries: [oracle-bos, salesforce-bos]
