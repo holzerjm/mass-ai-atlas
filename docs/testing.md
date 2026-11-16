@@ -27,9 +27,10 @@ is deployed, and nobody editing `data/entities.yml` needs to install anything.
 > **A note on workers.** Every spec renders a WebGL basemap and the Galaxy canvas, so
 > the suite is sensitive to how many browsers run at once. The config uses 4 locally
 > and 2 in CI. On a machine with less GPU headroom those still contend and a spec can
-> fail for lack of frames rather than a real defect — `axe: galaxy view` is the usual
-> casualty. If a run fails where a serial run passes, re-run with `--workers=1` before
-> believing it. Retries are deliberately off locally so flakes stay visible. A serial
+> fail for lack of frames rather than a real defect. If a run fails where a serial run
+> passes, re-run with `--workers=1` before believing it. Until 2026-11 `axe: galaxy view`
+> was listed here as the usual casualty. That one was the test's own doing: see
+> [the accessibility gate](#the-accessibility-gate-axe). Retries are deliberately off locally so flakes stay visible. A serial
 > re-run only settles frames: when the page says "the atlas data failed to load", read
 > the failure first (see [Telling a flake from a failure](#telling-a-flake-from-a-failure)).
 
@@ -105,7 +106,9 @@ A page showing **"Sorry — the atlas data failed to load"** never got its data,
 | no failed request, and "third-party request failed (tolerated)" for js-yaml or Ajv | the page could not load the library that reads its data. That is the network: re-run |
 
 Anything else that fails under parallel workers but passes at `--workers=1` — most
-often `axe: galaxy view` — is GPU contention, as in the note on workers.
+often a test that waits on the map or the galaxy to draw — is GPU contention, as in the note
+on workers. `axe: galaxy view` failing with `color-contrast` on `button[data-view="map"]`
+was not: until 2026-11 its scan could land inside a fade, and the scans now wait for those.
 
 ---
 
@@ -382,6 +385,19 @@ and closed programs, a shared shortlist,
 the first-visit tour card, the what's-new banner, the Ask your own AI dialog, the events page,
 the credits page and the updates page, each in both the dark and the light theme; and the galaxy's keyboard
 list and search with a category open and results showing, in the dark theme.
+
+**Each scan waits for CSS transitions to end.** A scan that lands inside one measures
+colours nobody is shown. A link to another view (`#galaxy`, `#journey`, `#directory`) takes
+`.active` off the Map tab as the page loads: its background is dark at once, and its text
+fades from black to grey over 180 ms, so part-way through it fails `color-contrast`. A fixed
+300 ms pause outlasted the fade only while the browser kept drawing, and a transition moves
+with the frames. In CI, WebKit's first test is the galaxy scan, on a cold start that draws
+few frames, and it failed its first try on 8 runs of 9 on 2026-11-15 with that one node,
+`button[data-view="map"]`. Chromium did the same under load, which this page put down to
+GPU contention for a month. Slowing the tab's fade to 3 s makes the old scan fail the same
+way on any machine, in the galaxy, journey and directory views. If a scan now times out with
+"CSS transitions still running", the message lists them: something on the page is
+transitioning without end.
 
 The gate was set from what the pristine baseline (main @ 76cf38e) actually
 produced:

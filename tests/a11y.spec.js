@@ -110,6 +110,23 @@ function withinWhich(page, nodes, within){
   }), { sels: nodes.map(n => n.target.length === 1 ? n.target[0] : null), within });
 }
 
+// A scan that lands inside a CSS transition measures colours nobody is shown. A link to another
+// view takes `.active` off the Map tab as the page loads: its background is dark at once, and
+// its text fades from black to grey over 180 ms, so part-way through it fails colour contrast.
+// A fixed 300 ms pause outlasted that fade only while the browser kept drawing. A transition
+// moves with the frames, and a cold start draws few: in CI, WebKit's first test (this scan of
+// the galaxy) failed its first try on 8 runs of 9 on 2026-11-15, and Chromium did the same
+// under load, which read as GPU contention for a month. So each scan waits for the transitions
+// themselves, and if they don't end it says which are left.
+const runningTransitions = page => page.evaluate(() => document.getAnimations()
+  .filter(a => a instanceof CSSTransition)
+  .map(a => {
+    const el = a.effect && a.effect.target;
+    const where = !el ? "?" : el.tagName.toLowerCase() + (el.id ? `#${el.id}` : el.classList.length ? `.${el.classList[0]}` : "");
+    return `${a.transitionProperty} on ${where}`;
+  }));
+const settled = page => expect.poll(() => runningTransitions(page), { message: "CSS transitions still running", timeout: 15000 }).toEqual([]);
+
 function describeViolation(v){
   const nodes = v.nodes.slice(0, 5).map(n => "      " + n.target.join(" ")).join("\n");
   return `  [${v.impact}] ${v.id} — ${v.help} (${v.nodes.length} node${v.nodes.length === 1 ? "" : "s"})\n${nodes}\n      ${v.helpUrl}`;
@@ -141,7 +158,8 @@ for(const scan of SCANS){
         if(scan.include) await expect(page.locator(scan.include)).toBeVisible({ timeout: 8000 });
         if(scan.prepare) await scan.prepare(page);
       }
-      await page.waitForTimeout(300);   // let open/close transitions settle
+      await page.waitForTimeout(300);   // whatever the page starts a moment after it is ready
+      await settled(page);
 
       let builder = new AxeBuilder({ page }).withTags(TAGS);
       if(scan.include) builder = builder.include(scan.include);
