@@ -284,7 +284,7 @@ often `axe: galaxy view` — is GPU contention, as in the note on workers.
 | `chrome.spec.js` | the atlas and the events page load nothing from the Tailwind CDN | the Play CDN coming back, with its console warning that it isn't meant for production. Until 2026-11 it built the site header's, menu's and footer's CSS in each visitor's browser. Those rules are now written out in `index.html` between the `TOA SITE CHROME CSS` markers, and `scripts/build-events-page.js` copies them. Each test in this file runs on both pages |
 | | every class in the header, menu and footer has a rule | a class added to the chrome with nothing behind it. The test names each class with no rule; add its rule to that block, in Tailwind's order. A first attempt at writing the rules out left 54 of the page's 89 utility classes with none |
 | | a laptop gets the nav, and a phone gets a menu that opens and closes | a rule losing its condition. Written as a plain rule, `lg:flex` showed the desktop nav on phones and `lg:hidden` hid the ☰ button, so the menu could never open; `group-hover:` is what grows a link's gold underline |
-| | around 1024 px, where the nav comes in, the header's row holds its links and buttons | the site header making the page wider than the window. The nav comes in at 1024 px, an iPad on its side, and until 2026-11 its row was too narrow there: the logo, the 11 links, the LinkedIn icon and the theme button needed 998 px and the row had 960, so the theme button ended 6 px past the window's edge and the page scrolled sideways, in windows from 1024 to 1029 px wide. The links now sit 12 px apart from 1024 to 1099 px (`gap-3`) and 20 px apart from 1100 px (`min-[1100px]:gap-5`). The test loads each page at 1023, 1024, 1025 and 1100 px and checks that the nav still comes in at 1024 px, that the last button ends inside the row, and that the page is no wider than the window. It reads the row as well as the page because on the events page, whose text is narrower, the theme button ended 29 px past the row without reaching the window's edge. Headless Chromium draws no scrollbar. With the atlas's own 10 px scrollbar drawn, as a desktop browser draws it, the page was 16 px too wide at 1024 px, so the gaps leave room for a scrollbar of up to 17 px |
+| | around 1024 px, where the nav comes in, the header's row holds its links and buttons | the site header making the page wider than the window. The nav comes in at 1024 px, an iPad on its side, and until 2026-11 its row was too narrow there: the logo, the 11 links, the LinkedIn icon and the theme button needed 998 px and the row had 960, so the theme button ended 6 px past the window's edge and the page scrolled sideways, in windows from 1024 to 1029 px wide. The links now sit 12 px apart from 1024 to 1099 px (`gap-3`) and 20 px apart from 1100 px (`min-[1100px]:gap-5`). The test loads each page at 1023, 1024, 1025 and 1100 px and checks that the nav still comes in at 1024 px, that the last button ends inside the row, and that the page is no wider than the window. It reads the row as well as the page because on the events page, whose text is narrower, the theme button ended 29 px past the row without reaching the window's edge. Headless Chromium draws no scrollbar. With the atlas's own 10 px scrollbar drawn, as a desktop browser draws it, the page was 16 px too wide at 1024 px, so the gaps leave room for a scrollbar of up to 17 px. The four widths are the ones the page's media queries see, which in Playwright's WebKit is 10 px less than the atlas's window (see the WebKit jobs under CI) |
 | | the header follows the theme | the same for `dark:`. As a plain rule, `dark:text-gray-300` put light-gray nav text on the light theme's white header |
 | `credits.spec.js` | one card per mapmaker | the credits page drifting from `data/credits.yml`: a missing card, a wrong handle link, a story that doesn't match, or a hand-typed count |
 | | the timeline, oldest first | a milestone going missing or out of order |
@@ -472,7 +472,7 @@ built on, at the same 1280x720 and 1x pixels as Chromium. Leave them out of the 
 checks even if the Chromium ones are promoted: this is Playwright's own WebKit build on
 Linux, not Safari, so a failure only there is a lead to check in a real Safari. The
 first WebKit runs (2026-11-08) found nothing wrong with the atlas, and five test details
-came out of them:
+came out of them. A sixth, the last below, came with the header's row check on 2026-11-16:
 
 - The copy-button test grants only `clipboard-read` in WebKit, which lets a click write to
   the clipboard and has no `clipboard-write` permission.
@@ -487,6 +487,11 @@ came out of them:
 - The search-popup test measures every popup with Leaflet's 200 ms fade turned off. WebKit
   on CI was still removing the faded ones when the test went on, and its locator matched
   them all.
+- The header's row check sizes its windows by what the page's media queries see. Playwright's
+  WebKit takes the atlas's 10 px scrollbar off the window's width before its media queries
+  read it, so the site nav comes in at a 1034 px window there, not at 1024. The test asks
+  the page which width its queries match and opens each window that much wider. On the
+  events page, which has no custom scrollbar, both browsers see the window's own width.
 
 **Each Browser tests job has 25 minutes.** Each runs half the tests in one browser, about
 5 minutes' worth in Chromium and 6 to 9 in WebKit, and Playwright's image already holds

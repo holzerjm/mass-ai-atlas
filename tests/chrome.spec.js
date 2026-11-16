@@ -92,12 +92,24 @@ for(const [name, url] of PAGES){
     // 3 px short of the window's edge, so the page never scrolled there. That's why this reads the
     // row as well as the page.
     test("around 1024 px, where the nav comes in, the header's row holds its links and buttons", async ({ page }) => {
-      const seen = {};
-      for(const width of AROUND_THE_NAV){
-        // A fresh load at each width, as in a visitor's window.
+      // A fresh load at each width, as in a visitor's window.
+      const open = async width => {
         await page.setViewportSize({ width, height: 700 });
         await page.goto(url);
         if(name === "atlas") await waitForApp(page);
+      };
+      // The widths here are the ones the page's media queries see. In Chromium that's the window's.
+      // Playwright's WebKit takes the atlas's own 10 px scrollbar off it first, so its nav comes in
+      // at a 1034 px window, and `bar` makes every window that much wider there.
+      let bar = 0;
+      const seen = {};
+      for(const width of AROUND_THE_NAV){
+        await open(width + bar);
+        const sees = await page.evaluate(win => {
+          for(let w = win; w > win - 50; w--) if(matchMedia(`(width: ${w}px)`).matches) return w;
+          return win;
+        }, width + bar);
+        if(sees !== width){ bar += width - sees; await open(width + bar); }
         seen[width] = await page.evaluate(async () => {
           // The links are as wide as their font makes them, so wait for the page's own.
           await document.fonts.ready;
@@ -109,7 +121,8 @@ for(const [name, url] of PAGES){
           };
         });
       }
-      expect(seen, "at each width: whether the nav shows, and how many px the header's last button ends past its row and the page past the window")
+      expect(seen, "at each width: whether the nav shows, and how many px the header's last button ends past its row and the page past the window"
+        + (bar ? ` (each window was ${bar} px wider, for the scrollbar)` : ""))
         .toEqual(Object.fromEntries(AROUND_THE_NAV.map(width => [width, { nav: width >= 1024, pastTheRow: 0, pastTheWindow: 0 }])));
     });
 
