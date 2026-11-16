@@ -24,11 +24,12 @@ with a link to try each one, and new organizations by month. **Ask your own AI**
 for the assistant you already use, so it can answer from the atlas's data. The atlas runs no AI itself.
 
 Each entry's drawer says what the organization offers founders, shows when a maintainer
-last verified it, and under **places to meet** lists the cafés, quick bites and quieter
-spots within a five-minute walk.
+last verified it and when it was added, and under **places to meet** lists the cafés, quick
+bites and quieter spots within a five-minute walk.
 Every entry and view is linkable — `?entry=csail` opens straight to an organization,
 `#galaxy` to a view (there's a 🔗 Copy link button in each entry's drawer). Filters are
-linkable too: `?need=compute&stage=3` opens the map and the Directory with them set.
+linkable too: `?need=compute&stage=3` opens the map and the Directory with them set, and
+`?added=3` shows what was added in the last three months.
 
 > **Building on this as a template?** Start with [HACKATHON.md](HACKATHON.md): setup, the
 > architecture on one page, where to extend it, and what to change because it is still

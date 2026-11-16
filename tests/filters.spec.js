@@ -6,6 +6,14 @@ const { test, expect, DATA, waitForApp } = require("./helpers/atlas");
 const offering = need => DATA.filter(d => d.offers.includes(need));
 const pins = page => page.evaluate(() => (clustered ? clusterGroup : flatGroup).getLayers().length);
 const need = (page, row, key) => page.locator(`${row} .need-chip[data-need="${key}"]`);
+// The page's rule for "Added", written again here: after the month the record began, and in the
+// last `months` months, counting this one. Local months, as the page uses.
+const FIRST = DATA.map(d => d.added).filter(Boolean).sort()[0];
+const monthBack = back => {
+  const now = new Date(), then = new Date(now.getFullYear(), now.getMonth() - back, 15);
+  return `${then.getFullYear()}-${String(then.getMonth() + 1).padStart(2, "0")}`;
+};
+const addedIn = months => DATA.filter(d => d.added && d.added > FIRST && d.added >= monthBack(months - 1));
 
 test("a filter goes into the address, and a reload keeps it", async ({ page }) => {
   await page.goto("./#directory");
@@ -24,26 +32,69 @@ test("a filter goes into the address, and a reload keeps it", async ({ page }) =
 // Each kind of filter, from a link someone sent, with the page's other parameters beside them.
 test("a shared link sets every filter, and an entry opens over them", async ({ page }) => {
   const id = offering("compute").find(d => d.cat === "gov").id;
-  await page.goto(`./?need=compute&stage=3&open=1&cat=gov,accel&sort=new&entry=${id}#directory`);
+  await page.goto(`./?need=compute&stage=3&open=1&added=6&cat=gov,accel&sort=new&entry=${id}#directory`);
   await waitForApp(page);
   await expect(page.locator("#drawer")).toHaveClass(/\bopen\b/);
   await expect(need(page, "#needChips", "open")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#dirStage")).toHaveValue("3");
+  await expect(page.locator("#dirAdded")).toHaveValue("6");
   await expect(page.locator("#dirSort")).toHaveValue("new");
   await expect(page.locator('#catChips .cat-chip[aria-pressed="true"]')).toHaveCount(2);
   await page.keyboard.press("Escape");
   // closing the drawer rewrites the address, and only ?entry= goes
   await expect(page).not.toHaveURL(/entry=/);
-  for(const param of ["need=compute", "stage=3", "open=1", "sort=new"]) expect(page.url()).toContain(param);
+  for(const param of ["need=compute", "stage=3", "open=1", "added=6", "sort=new"]) expect(page.url()).toContain(param);
 });
 
 test("unknown values in a link are ignored", async ({ page }) => {
-  await page.goto("./?need=compute,nonsense&stage=9&open=maybe&cat=nope&sort=sideways#directory");
+  await page.goto("./?need=compute,nonsense&stage=9&open=maybe&added=2&cat=nope&sort=sideways#directory");
   await waitForApp(page);
   await expect(page.locator('#needChips .need-chip[aria-pressed="true"]')).toHaveCount(1);
   await expect(page.locator("#dirStage")).toHaveValue("");
+  await expect(page.locator("#dirAdded")).toHaveValue("");
   await expect(page.locator("#dirSort")).toHaveValue("name");
   await expect(page.locator("#cards .card")).toHaveCount(offering("compute").length);
+});
+
+// "Added" narrows both views to what joined lately: this month, or the last 3 or 6. The test takes
+// the shortest of those that has anything in it today, so it has something to count whenever an
+// entry was added in the last six months.
+test("the Added list narrows the map and the Directory, and a link keeps it", async ({ page }) => {
+  const span = ["1", "3", "6"].find(months => addedIn(+months).length);
+  test.skip(!span, "nothing was added in the last six months");
+  const lately = addedIn(+span).length;
+  expect(lately, "a filter that leaves everything isn't one").toBeLessThan(DATA.length);
+  await page.goto("./");
+  await waitForApp(page);
+  await page.locator("#mapAdded").selectOption(span);
+  await expect.poll(() => pins(page)).toBe(lately);
+  await expect(page.locator("#mapCount")).toHaveText(`${lately} of ${DATA.length} organizations on the map`);
+  await expect(page).toHaveURL(new RegExp(`[?&]added=${span}(&|#|$)`));
+
+  await page.locator('.tab[data-view="directory"]').click();
+  await expect(page.locator("#dirAdded")).toHaveValue(span);
+  await expect(page.locator("#cards .card")).toHaveCount(lately);
+  await page.reload();
+  await waitForApp(page);
+  await expect(page.locator("#dirAdded")).toHaveValue(span);
+  await expect(page.locator("#cards .card")).toHaveCount(lately);
+
+  await page.locator("#dirAdded").selectOption("");
+  await expect(page.locator("#cards .card")).toHaveCount(DATA.length);
+  await expect(page).not.toHaveURL(/added=/);
+});
+
+// The first month in the data is when the atlas began recording `added`, not a month when that
+// many organizations joined (see updates.spec.js). A span that reaches back to it would otherwise
+// be the whole atlas wearing a filter, so the page is asked about a span of fifty years as well.
+test("organizations here when the record began never count as added", async ({ page }) => {
+  await page.goto("./?added=6#directory");
+  await waitForApp(page);
+  await expect(page.locator("#cards .card")).toHaveCount(addedIn(6).length);
+  const fromTheStart = DATA.filter(d => d.added === FIRST).length;
+  expect(fromTheStart).toBeGreaterThan(0);
+  expect(await page.evaluate(first => DATA.filter(d => d.added === first && addedWithin(d, 600)).length, FIRST)).toBe(0);
+  expect(await page.evaluate(() => DATA.filter(d => addedWithin(d, 600)).length)).toBe(DATA.length - fromTheStart - DATA.filter(d => !d.added).length);
 });
 
 // The map answers to the same filters, whichever view set them.
