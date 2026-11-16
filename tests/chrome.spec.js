@@ -5,11 +5,18 @@
    markers. A first attempt at writing them out kept the class names but dropped their conditions
    (dark:, lg:, group-hover:) and left most classes with no rule, and nothing here caught it, so
    these check what the CDN used to do for free. */
-const { test, expect } = require("./helpers/atlas");
+const { test, expect, waitForApp } = require("./helpers/atlas");
 
 const PAGES = [["atlas", "./"], ["events", "./events/"]];
 const NAV = "#site-header nav";
 const UNDERLINE = "#site-header nav a >> nth=0 >> span";
+// The nav comes in at 1024 px, an iPad on its side, and until 2026-11 its row had no room for it
+// there. The logo, the 11 links, the LinkedIn icon and the theme button needed 998 px and the row
+// had 960, so the theme button ended 6 px past the window's edge and the page scrolled sideways, in
+// windows up to 1029 px wide. The links now sit 12 px apart up to 1099 px and 20 px apart from
+// 1100 px. So the row is at its tightest at 1024 px and again at 1100 px, and both are here with
+// the widths beside 1024 px.
+const AROUND_THE_NAV = [1023, 1024, 1025, 1100];
 
 // The atlas's first-visit tour starts by itself after 1.4 s; these tests are about the header.
 test.beforeEach(async ({ page }) => {
@@ -79,6 +86,31 @@ for(const [name, url] of PAGES){
       await expect(page.locator("#mobile-nav")).toHaveCSS("position", "fixed");
       await page.getByRole("button", { name: "Close Menu" }).click();
       await expect.poll(menuLeft).toBeGreaterThanOrEqual(edge);
+    });
+
+    // On the events page, whose text is narrower, the theme button ended 29 px past the row and
+    // 3 px short of the window's edge, so the page never scrolled there. That's why this reads the
+    // row as well as the page.
+    test("around 1024 px, where the nav comes in, the header's row holds its links and buttons", async ({ page }) => {
+      const seen = {};
+      for(const width of AROUND_THE_NAV){
+        // A fresh load at each width, as in a visitor's window.
+        await page.setViewportSize({ width, height: 700 });
+        await page.goto(url);
+        if(name === "atlas") await waitForApp(page);
+        seen[width] = await page.evaluate(async () => {
+          // The links are as wide as their font makes them, so wait for the page's own.
+          await document.fonts.ready;
+          const row = document.querySelector("#site-header > div"), edge = row.getBoundingClientRect().right;
+          return {
+            nav: getComputedStyle(row.querySelector("nav")).display !== "none",
+            pastTheRow: Math.max(0, Math.round(row.lastElementChild.getBoundingClientRect().right - edge)),
+            pastTheWindow: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
+          };
+        });
+      }
+      expect(seen, "at each width: whether the nav shows, and how many px the header's last button ends past its row and the page past the window")
+        .toEqual(Object.fromEntries(AROUND_THE_NAV.map(width => [width, { nav: width >= 1024, pastTheRow: 0, pastTheWindow: 0 }])));
     });
 
     test("the header follows the theme", async ({ page }) => {

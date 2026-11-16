@@ -96,13 +96,20 @@
      the 98 rules it built for the atlas page, plus the two blocks of defaults they read,
      unchanged: Tailwind CSS v3.4.17 (MIT License, https://tailwindcss.com) with the TOA site's
      config, which had dark mode by class, preflight off, and the brand colours gold #FFC600 and
-     dark bg #0A0A0F / card #12121A. Only the line breaks are new.
+     dark bg #0A0A0F / card #12121A. Only the line breaks are new, and the one rule the last
+     note names.
      - It sits at the end of <head>, where the CDN put its rules, so it still follows the
        page's own CSS when the two tie.
      - scripts/build-events-page.js copies it, marker to marker, into events/index.html.
      - A class added to the chrome needs its rule here, in Tailwind's order: the defaults, plain
-       utilities, then hover:, focus:, group-hover: and dark:, then md: and lg:.
-       tests/chrome.spec.js names any class in the chrome that has no rule. -->
+       utilities, then hover:, focus:, group-hover: and dark:, then md:, lg: and min-[1100px]:.
+       tests/chrome.spec.js names any class in the chrome that has no rule.
+     - One rule has changed since. The header's 11 links sat 20 px apart (gap-5) at every width,
+       and at 1024 px, where they come in, the row was 38 px too narrow for them: the theme
+       button ended 6 px past the window's edge and the page scrolled sideways. They now sit
+       12 px apart (gap-3) up to 1099 px, and 20 px apart from 1100 px, the first width where
+       that fits beside a 17 px scrollbar. So min-[1100px]:gap-5 took gap-5's place, written
+       as Tailwind writes it. tests/chrome.spec.js checks that the row holds what is in it. -->
 <style>
 *, ::before, ::after {
   --tw-border-spacing-x: 0;--tw-border-spacing-y: 0;--tw-translate-x: 0;--tw-translate-y: 0;--tw-rotate: 0;
@@ -174,7 +181,6 @@
 .justify-between {justify-content: space-between}
 .gap-3 {gap: 0.75rem}
 .gap-4 {gap: 1rem}
-.gap-5 {gap: 1.25rem}
 .gap-6 {gap: 1.5rem}
 .gap-x-8 {column-gap: 2rem}
 .gap-y-3 {row-gap: 0.75rem}
@@ -258,6 +264,9 @@
   .lg\:flex {display: flex}
   .lg\:hidden {display: none}
 }
+@media (min-width: 1100px) {
+  .min-\[1100px\]\:gap-5 {gap: 1.25rem}
+}
 </style>
 <!-- ============ END TOA SITE CHROME CSS ============ -->
 </head>
@@ -268,7 +277,7 @@
     <a href="https://the-open-accelerator.com/" class="flex items-center gap-3 z-50">
       <img id="header-logo" src="https://the-open-accelerator.com/images/toa-white.png" alt="The Open Accelerator" class="h-10 w-auto">
     </a>
-    <nav class="hidden lg:flex items-center gap-5" aria-label="The Open Accelerator">
+    <nav class="hidden lg:flex items-center gap-3 min-[1100px]:gap-5" aria-label="The Open Accelerator">
       <a href="https://the-open-accelerator.com/about-why.html" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">About<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
       <a href="https://the-open-accelerator.com/residency/" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">Residency<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
       <a href="https://the-open-accelerator.com/community/" class="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white font-medium relative group transition-colors">Community<span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-0.5 bg-gold transition-all duration-300"></span></a>
