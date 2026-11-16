@@ -173,6 +173,10 @@ a.stat:hover span{color:var(--text);text-decoration-color:currentColor}
 .map-filters .need-chips{margin-top:0;gap:6px}
 .map-filters .need-chip{padding:5px 9px;font-size:12px}
 .map-filters .dir-select{padding:4px 8px;font-size:12px;border-radius:99px}
+/* The row of chips is full on a laptop: at 1280 px there are 67 px after the stage list, and a
+   list that wrapped under it would take 32 px from the map. So the "Added" list takes the room
+   there is, down to its ✨, and its title says the rest. It gets a line only with the stage list. */
+.map-filters .added-select{flex:1 1 60px;max-width:max-content;min-width:0;text-overflow:ellipsis}
 /* how many pins the filters leave, under the search box so it shows without scrolling */
 .map-note{position:absolute;z-index:999;top:62px;left:54px;max-width:calc(100% - 66px);display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:var(--text)}
 .map-note.on{padding:6px 7px 6px 14px;border-radius:18px;background:rgba(10,15,30,.92);border:1px solid var(--line)}
@@ -229,6 +233,8 @@ html:not(.dark) .gx-search .map-results{background:rgba(10,15,30,.97);color:#e6e
 .pop-desc{font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:8px}
 .pop-colocated{font-size:12px;color:var(--muted);line-height:1.45;margin:-2px 0 8px}
 .pop-colocated a{color:var(--gold-ink);text-decoration:underline;text-underline-offset:2px}
+/* "New" goes on the button's line, where it adds no height to a popup that has a limit */
+.pop-new{margin-left:8px;vertical-align:middle}
 /* names that would make a popup too tall wait behind this button (popupHtml) */
 .pop-more{font:inherit;color:var(--gold-ink);background:none;border:0;padding:0;margin:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .pop-btn{display:inline-block;font-size:12px;font-weight:700;color:#000;background:linear-gradient(90deg,#ffd54f,#ffc600);
@@ -457,6 +463,8 @@ html:not(.dark) .cmp-bar{background:#fff;border-color:#ddd}
 .need-chip{font:500 12.5px/1 inherit;font-family:inherit;padding:6px 11px;border-radius:999px;cursor:pointer;
   background:transparent;border:1px solid #2a2f38;color:#b7bdc6}
 .need-chip.on{border-color:#ffc600;color:var(--gold-ink);background:rgba(255,198,0,.08)}
+/* the "Added" list sits in the row of chips, in their shape; above the map it has the stage list's */
+.need-chips .dir-select{flex:none;padding:5px 9px;font-size:12.5px;border-radius:99px}
 html:not(.dark) .need-chip{border-color:#d8d3ca;color:#5d574e}
 html:not(.dark) .need-chip.on{border-color:#b45309;color:#b45309;background:rgba(180,83,9,.07)}
 .dr-apply{margin-top:14px;font-size:13.5px;font-weight:500;color:#4ade80}
@@ -472,6 +480,7 @@ html:not(.dark) .apply-tag{color:#166534;border-color:rgba(21,128,61,.35)}   /* 
 .offer-tag{font-size:12.5px}
 .match-tag{color:var(--text)}
 .dr-verified{font-size:12px;color:var(--muted);margin-top:16px}
+.dr-added{font-size:12px;color:var(--muted);margin-top:4px}
 .dr-verified.stale{color:#fbbf24}
 .stale-tag{color:#fbbf24;border-color:rgba(251,191,36,.4)}
 /* Light chrome: amber #fbbf24 washes out on white panels — darken it there (icon + text still carry the meaning). */
@@ -1229,6 +1238,17 @@ const isNew = d => {
   const now = new Date();
   return d.added === localYM(now) || d.added === localYM(new Date(now.getFullYear(), now.getMonth()-1, 15));
 };
+// The first month in the data is when the atlas began recording `added`, not a month when that
+// many organizations joined. So its entries were here already, and only later ones count as
+// added. The What's new page reads the field the same way.
+const ADDED_FROM = DATA.map(d => d.added).filter(Boolean).sort()[0];
+const wasAdded = d => !!d.added && d.added > ADDED_FROM;
+// Added in the last `months` months, counting this one: 1 is this month alone.
+const addedWithin = (d, months) => {
+  const now = new Date();
+  return wasAdded(d) && d.added >= localYM(new Date(now.getFullYear(), now.getMonth() - (months - 1), 15));
+};
+const ADDED_SPANS = [["1", "✨ Added this month"], ["3", "✨ Added in the last 3 months"], ["6", "✨ Added in the last 6 months"]];
 // shortlist / compare state (declared early — renderCards reads them on first paint)
 let starSet = new Set();
 try{ starSet = new Set(JSON.parse(localStorage.getItem("toa-atlas-stars")||"[]")); }catch(e){}
@@ -1269,7 +1289,7 @@ const fmtDeadline = v => { const [y,m,dd] = v.split("-"); return `${MONTH_NAMES[
 
 /* ---------- filters ---------- */
 // One set of filters for the map and the Directory: the categories that show, what a founder
-// needs, their stage, and whether applications are open. Until 2026-11 only the Directory had
+// needs, their stage, whether applications are open, and how lately an organization was added. Until 2026-11 only the Directory had
 // needs and stages, and a reload cleared them. They live in the address now, so a reload keeps
 // them and a link shares them (`?need=compute&stage=3`). What someone types in a search box
 // stays out of it on purpose: a link, a server log or an analytics beacon should never carry
@@ -1278,6 +1298,7 @@ const activeCats = new Set();
 const dirNeeds = new Set();   // soft needs — values from the `offers` vocabulary
 let dirStage = "";            // a stage's number as a string, or "" for every stage
 let dirOpenOnly = false;      // ⏳ hard constraint: is this org accepting applications?
+let dirAdded = "";            // "1", "3" or "6": added in that many months, counting this one. "" for any time
 // Unknown values are ignored, as they are for ?entry= and ?list=.
 function readFilters(params){
   const listed = name => (params.get(name) || "").split(",");
@@ -1288,6 +1309,7 @@ function readFilters(params){
   listed("need").filter(k => OFFERS_META[k]).forEach(k => dirNeeds.add(k));
   dirStage = STAGES.some(s => String(s.n) === params.get("stage")) ? params.get("stage") : "";
   dirOpenOnly = params.get("open") === "1";
+  dirAdded = ADDED_SPANS.some(([months]) => months === params.get("added")) ? params.get("added") : "";
 }
 readFilters(new URLSearchParams(location.search));
 function writeFilters(params){
@@ -1297,13 +1319,14 @@ function writeFilters(params){
   put("need", Object.keys(OFFERS_META).filter(k => dirNeeds.has(k)).join(","));
   put("stage", dirStage);
   put("open", dirOpenOnly ? "1" : "");
+  put("added", dirAdded);
   put("sort", $("dirSort").value === "name" ? "" : $("dirSort").value);
 }
-const filtersOn = () => activeCats.size < Object.keys(CATS).length || dirNeeds.size > 0 || dirStage !== "" || dirOpenOnly;
-// Category and stage gate the list, and so does ⏳: it is a fact about the org, not a need it
-// satisfies, so it must never become a term in need matching (or, later, in need scoring).
+const filtersOn = () => activeCats.size < Object.keys(CATS).length || dirNeeds.size > 0 || dirStage !== "" || dirOpenOnly || dirAdded !== "";
+// Category and stage gate the list, and so do ⏳ and "Added": each is a fact about the org, not a
+// need it satisfies, so it must never become a term in need matching (or, later, in need scoring).
 const passesFilters = d => activeCats.has(d.cat) && (!dirStage || (d.stages||[]).includes(+dirStage))
-  && (!dirOpenOnly || applyOpen(d));
+  && (!dirOpenOnly || applyOpen(d)) && (!dirAdded || addedWithin(d, +dirAdded));
 // Needs run last, against whatever the hard filters left, and they relax instead
 // of dead-ending: show the entries meeting the most selected needs that anything
 // here meets. 97 of 171 orgs offer exactly one thing, so demanding all of three
@@ -1334,6 +1357,8 @@ function syncFilters(){
     chip.setAttribute("aria-pressed", String(on));
   });
   document.querySelectorAll(".stage-select").forEach(sel=>{ sel.value = dirStage; });
+  // the title is for the map's list, which a laptop's row can squeeze to its first few letters
+  document.querySelectorAll(".added-select").forEach(sel=>{ sel.value = dirAdded; sel.title = sel.selectedOptions[0].textContent; });
   document.querySelectorAll("#catChips .cat-chip, #mapCatBar .cat-btn").forEach(el=>{
     const on = activeCats.has(el.dataset.cat);
     el.classList.toggle("on", on);
@@ -1591,6 +1616,8 @@ function openDrawer(id){
   if(d.lastVerified) html += isStale(d)
     ? `<div class="dr-verified stale">⚠️ Last verified ${fmtMonth(d.lastVerified)} — details may have changed. Spot something off? Use 🚩 Flag below.</div>`
     : `<div class="dr-verified">✓ ${fmtVerified(d.lastVerified)}</div>`;
+  // an entry from the month the record began was on the map already, so "or earlier"
+  if(d.added) html += `<div class="dr-added">Added ${fmtMonth(d.added)}${wasAdded(d) ? "" : " or earlier"}</div>`;
   const applyNow = applyOpen(d) && d.applyUrl;
   html += `<div class="dr-actions">
     ${applyNow ? `<a class="btn btn-pri" href="${esc(d.applyUrl)}" target="_blank" rel="noopener">Apply ↗</a>` : ""}
@@ -1775,15 +1802,15 @@ function mapCanAnimate(){
   const box = map.getContainer().getBoundingClientRect();
   return box.bottom > 0 && box.top < innerHeight && !reduceMotion();
 }
-// A need or a stage can leave a handful of pins across the state, most of them outside the
-// Boston view, so frame what is left. Categories don't move the map: hiding one takes pins
+// A need, a stage or "Added" can leave a handful of pins across the state, most of them outside
+// the Boston view, so frame what is left. Categories don't move the map: hiding one takes pins
 // away from a view someone chose. Filters set in the Directory frame on the way back to the map.
 let frameOnShow = false;
 function framePins(){
   if(!map) return;
   if(currentView !== "map"){ frameOnShow = true; return; }
   frameOnShow = false;
-  if(!dirNeeds.size && !dirStage && !dirOpenOnly) return homeMap();
+  if(!dirNeeds.size && !dirStage && !dirOpenOnly && !dirAdded) return homeMap();
   const { list } = mapEntries();
   if(list.length) map.fitBounds(list.map(d => [d.lat, d.lng]), {padding:[50,50], maxZoom:14, animate:mapCanAnimate()});
 }
@@ -2015,7 +2042,8 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
         `<a href="?entry=${o.id}" onclick="openDrawer('${o.id}');return false">${esc(o.name)}</a>`).join(", ")}`+
         (shown < others.length ? ` <button type="button" class="pop-more" onclick="showAllHere(event,'${d.id}')">and ${others.length - shown} more</button>` : "")+
         `</div>` : "")+
-      `<button type="button" class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</button>`;
+      `<button type="button" class="pop-btn" onclick="openDrawer('${d.id}')">Full details →</button>`+
+      (isNew(d) ? `<span class="tag new-tag pop-new">✨ New</span>` : "");
     let shown = others.length;
     if(shown > 1 && allHere !== d.id){
       if(!fitBox){
@@ -2090,7 +2118,7 @@ function setMapTiles(){ if(!map) return; if(mapTiles) map.removeLayer(mapTiles);
 
   // apply the remembered preset now the pins are on the map (no animation on load)
   applyMapView(mapView, false);
-  if(dirNeeds.size || dirStage || dirOpenOnly) framePins();
+  if(dirNeeds.size || dirStage || dirOpenOnly || dirAdded) framePins();
 
   // categories
   buildCatBar($("mapCatBar"), activeCats, ()=>filtersChanged());
@@ -2762,6 +2790,19 @@ fetch("data/pathways.yml")
       });
       row.appendChild(el);
     });
+  });
+  // When an organization was added: one list beside the Directory's chips and one above the map,
+  // after the stage list. They show one state, as the chips do.
+  [[$("needChips"), "dirAdded", "Filter by when an organization was added"],
+   [document.querySelector(".map-filters"), "mapAdded", "Filter the map by when an organization was added"]].forEach(([row, id, label])=>{
+    const sel = document.createElement("select");
+    sel.className = "dir-select added-select"; sel.id = id; sel.setAttribute("aria-label", label);
+    [["", "✨ Added any time"], ...ADDED_SPANS].forEach(([value, text])=>{
+      const o = document.createElement("option"); o.value = value; o.textContent = text;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", ()=>{ dirAdded = sel.value; filtersChanged(); framePins(); });
+    row.appendChild(sel);
   });
   // stage options, for the map's list and the Directory's
   document.querySelectorAll(".stage-select").forEach(sel=>{

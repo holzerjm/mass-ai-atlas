@@ -136,6 +136,53 @@ test("every entry opens a drawer with its name", async ({ page }) => {
   expect(broken).toEqual([]);
 });
 
+// Each entry says when it joined. The first month in the data is when the atlas began recording
+// `added`, so an entry from that month was on the map already, and its drawer says "or earlier".
+test("the drawer says when an entry was added", async ({ page }) => {
+  const first = DATA.map(d => d.added).filter(Boolean).sort()[0];
+  const later = DATA.find(d => d.added && d.added > first), fromTheStart = DATA.find(d => d.added === first);
+  test.skip(!later || !fromTheStart, "every entry was added in the same month");
+  const month = ym => new Date(+ym.slice(0, 4), +ym.slice(5) - 1, 15).toLocaleString("en-US", { month: "long", year: "numeric" });
+  await page.goto(`./?entry=${later.id}`);
+  await waitForApp(page);
+  await expect(page.locator("#drawer .dr-added")).toHaveText(`Added ${month(later.added)}`);
+  await page.evaluate(id => openDrawer(id), fromTheStart.id);
+  await expect(page.locator("#drName")).toHaveText(fromTheStart.name);
+  await expect(page.locator("#drawer .dr-added")).toHaveText(`Added ${month(first)} or earlier`);
+});
+
+// "New" is the cards' rule, added this month or last, and the page works it out from today's date.
+// The tag goes on the button's line: a popup's content has a limit (POPUP_FITS), and a line of
+// its own would have put names behind the button in the tallest popups.
+test("a new entry's popup is marked New, and is no taller for it", async ({ page }) => {
+  await page.goto("./");
+  await waitForApp(page);
+  const { fresh, old } = await page.evaluate(() => ({ fresh: (DATA.find(isNew) || {}).id, old: (DATA.find(d => !isNew(d)) || {}).id }));
+  test.skip(!fresh || !old, "no entry was added this month or last, or every one was");
+  const open = id => page.evaluate(id => {
+    setClustered(false);
+    map.setView(markers[id].getLatLng(), 15, { animate: false });
+    markers[id].openPopup();
+  }, id);
+  await open(fresh);
+  const content = page.locator(".leaflet-popup .leaflet-popup-content"), tag = content.locator(".pop-new");
+  await expect(tag).toHaveText("✨ New");
+  const heights = await content.evaluate(el => {
+    const withTag = el.scrollHeight, new_ = el.querySelector(".pop-new"), after = new_.nextSibling;
+    new_.remove();
+    const without = el.scrollHeight;
+    el.insertBefore(new_, after);
+    return { withTag, without };
+  });
+  expect(heights.withTag).toBe(heights.without);
+  // asked of the pin's own popup: the one before it is still on the page while it fades out
+  await open(old);
+  expect(await page.evaluate(id => {
+    const popup = markers[id].getPopup().getElement();
+    return markers[id].isPopupOpen() && !!popup.querySelector(".pop-btn") && !popup.querySelector(".pop-new");
+  }, old), "an entry that isn't new has the button and no tag").toBe(true);
+});
+
 // Serves data/entities.yml with `n` entries moved onto one spot, so a test can see what a pin does
 // when many organizations share its place. The real data has no such spot, and the day it had
 // one, it failed a test only in CI. The entries with the longest names go there, since they make
