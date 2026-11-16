@@ -48,10 +48,10 @@
   steps:
     - do: Get a mentor through your school
       why: This costs you nothing if you're eligible. Each program sets its own rules on who counts, so check before you apply.
-      entries: [ilab, trust, vms]
+      entries: [ilab, trust, uml-nvd, vms]
     - do: Apply for small, equity-free money
       why: Small grants pay for your first experiments and leave your equity alone. Most have set windows, so check the status shown here.
-      entries: [idea-neu, mit-sandbox, nu-eclub, venturewell]
+      entries: [deshpande, icorps-ne, idea-neu, mit-sandbox, nu-eclub, venturewell]
     - do: Test it outside your campus
       why: Classmates are polite. Strangers who have built products will tell you what doesn't work.
       entries: [tinkerers, vcafe]
@@ -63,7 +63,7 @@
   steps:
     - do: Look for a free desk and a peer group
       why: Other founders will tell you what isn't working. All of these choose who joins, so apply early.
-      entries: [build617, startup-worcester, toa]
+      entries: [bic, build617, lever, startup-worcester, toa]
     - do: Pay for structure only if you need it
       why: A paid program gives you a schedule and mentors, and it asks for money and equity in return. Decide what that's worth to you.
       entries: [founder-institute]
@@ -78,10 +78,10 @@
   steps:
     - do: Start with a public pilot program
       why: These put new technology in front of real users. Some run in rounds, so check the status shown here and ask when the next one opens.
-      entries: [boston-oet, masscec, mehi-sandbox]
+      entries: [boston-oet, massaitc, masscec, mehi-sandbox]
     - do: Ask companies that want to pilot
       why: This route runs through Massachusetts companies rather than public money, so it doesn't depend on a program's next round.
-      entries: [mass-ai-coalition]
+      entries: [mass-ai-coalition, mit-stex]
 
 # --- Build -----------------------------------------------------------------
 - id: build-compute
@@ -102,11 +102,14 @@
 - id: build-bench
   stage: 3
   title: I need a lab or a bench
-  lead: Start on a low-cost bench. Apply to a specialist lab once you know what you need from it.
+  lead: Start on a low-cost bench and pay by the hour for tests. Apply to a specialist lab once you know what you need from it.
   steps:
     - do: Prototype somewhere cheap
       why: Early prototypes change fast, so don't commit to more space than you need yet.
       entries: [artisans, umassd-cie, worclab]
+    - do: Pay by the hour to test it
+      why: A test site gives you results a customer or an investor can check, and you don't sign a lease. You pay for the hours you use, so arrive with a test plan.
+      entries: [nerve-center, practicepoint]
     - do: Apply to the lab for your field
       why: These are built around one field, with equipment and neighbors to match. Each has its own application.
       entries: [greentown, labcentral, massrobotics]
@@ -127,7 +130,7 @@
       entries: [hackharvard, hackmit]
     - do: Try someone out on a university project
       why: Sponsored projects and internships let you work with someone for a semester before you make an offer.
-      entries: [brandeis-cs, cdsai]
+      entries: [brandeis-cs, bristol-cc, cdsai]
 
 # --- Fund ------------------------------------------------------------------
 - id: fund-equity-free
@@ -137,7 +140,7 @@
   steps:
     - do: Enter a zero-equity competition
       why: This costs you time rather than ownership, and you don't need a school behind you.
-      entries: [masschallenge]
+      entries: [lever, masschallenge]
     - do: Use money set aside for your school
       why: These are limited to students or alumni, often of one school, so check whether you count.
       entries: [deltav, ilab, mit-sandbox, venturewell]
