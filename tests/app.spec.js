@@ -1,6 +1,9 @@
 /* Core invariants founders rely on: the page boots, shared links land where
    they point, and each view actually shows. See docs/testing.md. */
-const { test, expect, DATA, ATLAS, metersBetween, waitForApp } = require("./helpers/atlas");
+const { test, expect, ROOT, DATA, ATLAS, metersBetween, waitForApp } = require("./helpers/atlas");
+const fs = require("fs");
+const path = require("path");
+const yaml = require("js-yaml");
 
 const VIEWS = ["map", "galaxy", "journey", "directory"];
 const entry = DATA.find(d => d.id === "csail") || DATA[0];
@@ -133,6 +136,21 @@ test("every entry opens a drawer with its name", async ({ page }) => {
   expect(broken).toEqual([]);
 });
 
+// Serves data/entities.yml with `n` entries moved onto one spot, so a test can see what a pin does
+// when many organizations share its place. The real data has no such spot, and the day it had
+// one, it failed a test only in CI. The entries with the longest names go there, since they make
+// the longest list and the tallest popups. Returns them, in the order the page lists them.
+async function crowdSpot(page, n = 7){
+  const all = yaml.load(fs.readFileSync(path.join(ROOT, "data", "entities.yml"), "utf8"), { schema: yaml.CORE_SCHEMA });
+  const crowd = new Set(all.slice().sort((x, y) => y.name.length - x.name.length).slice(0, n));
+  const { lat, lng } = [...crowd][0];
+  for(const d of crowd){ d.lat = lat; d.lng = lng; }
+  await page.route("**/data/entities.yml", route => route.fulfill({
+    status: 200, contentType: "application/yaml; charset=utf-8",
+    body: yaml.dump(all, { schema: yaml.CORE_SCHEMA, lineWidth: -1 }) }));
+  return all.filter(d => crowd.has(d));
+}
+
 // Pins at the same spot draw on top of each other at street zoom (clustering
 // stops at z15 and spiderfy is off), so only the top one can be clicked: on
 // 2026-11-01, 16 entries could not be reached from the map at all. Each popup
@@ -156,13 +174,17 @@ test.describe("co-located pins", () => {
   // every marker on the map: inside a cluster a marker has no map, and
   // openPopup() does nothing. autoPan is off while the test opens it, because
   // each pan re-renders the WebGL basemap and dozens in a row stall a busy machine.
+  // Names that would make the popup too tall wait behind its button. On today's data and fonts
+  // none do, but a font that wraps more could put some away, so the button is pressed first:
+  // the text is every name the popup can show.
   const colocatedText = (page, id) => page.evaluate(id => {
     setClustered(false);
     const m = markers[id], pop = m.getPopup(), autoPan = pop.options.autoPan;
     pop.options.autoPan = false;
     m.openPopup();
+    const el = m.isPopupOpen() && pop.getElement(), more = el && el.querySelector(".pop-more");
+    if(more) more.click();
     pop.options.autoPan = autoPan;
-    const el = m.isPopupOpen() && pop.getElement();
     if(!el) return null;
     const co = el.querySelector(".pop-colocated");
     return co ? co.textContent : "";
@@ -221,6 +243,70 @@ test.describe("co-located pins", () => {
     await list.getByText(other.name, { exact: true }).click();
     await expect(page.locator("#drawer")).toHaveClass(/\bopen\b/);
     await expect(page.locator("#drName")).toHaveText(other.name);
+  });
+
+  // A popup's content keeps to POPUP_FITS, the height the page makes room for (see index.html).
+  // Six names at one spot made a popup too tall for a phone on its side, which only CI's fonts
+  // showed (2026-11). The tallest popup in the data is 4 px under the limit, so no real list
+  // loses a name today. A font that wraps more could change that, so this asks only that the
+  // button is never there when every name would have fitted.
+  test("a list has the button only when its names don't all fit", async ({ page }) => {
+    const shared = [...new Set([...exactGroups.flat(), ...nearPairs.flat()].map(d => d.id))];
+    await page.goto("./");
+    await waitForApp(page);
+    const needless = await page.evaluate(ids => {
+      setClustered(false);
+      return ids.filter(id => {
+        const m = markers[id], pop = m.getPopup(), autoPan = pop.options.autoPan;
+        pop.options.autoPan = false;
+        m.openPopup();
+        const el = pop.getElement(), more = el.querySelector(".pop-more");
+        if(more) more.click();
+        pop.options.autoPan = autoPan;
+        // scrollHeight is the whole content, however much of it the popup shows
+        return more && el.querySelector(".leaflet-popup-content").scrollHeight <= POPUP_FITS;
+      });
+    }, shared);
+    expect(needless).toEqual([]);
+  });
+
+  // Seven entries share a spot here, so six names. The map goes to the spot first: Leaflet opens
+  // a popup inside the map, where its button can be pressed. This window's map has the height
+  // for every name, so the popup grows to show them, with its own button still under them.
+  test("names that would make a popup too tall wait behind a button, which shows them all", async ({ page }) => {
+    const crowd = await crowdSpot(page), total = crowd.length - 1;
+    await page.goto("./");
+    await waitForApp(page);
+    await page.evaluate(id => {
+      setClustered(false);
+      map.setView(markers[id].getLatLng(), 15, { animate: false });
+      markers[id].openPopup();
+    }, crowd[0].id);
+    const content = page.locator(".leaflet-popup .leaflet-popup-content");
+    const list = content.locator(".pop-colocated"), names = list.locator("a"), more = list.locator(".pop-more");
+    const scrolls = () => content.evaluate(el => el.classList.contains("leaflet-popup-scrolled"));
+    await expect(more).toBeVisible();
+    const shown = await names.count();
+    expect(shown).toBeGreaterThan(0);
+    expect(shown, "some names are put away").toBeLessThan(total);
+    await expect(more).toHaveText(`and ${total - shown} more`);
+    expect(await content.evaluate(el => el.offsetHeight)).toBeLessThanOrEqual(await page.evaluate(() => POPUP_FITS));
+    expect(shown === 1 || !await scrolls(), "a popup scrolls only when one name is still too many").toBe(true);
+
+    await more.click();
+    await expect(names).toHaveCount(total);
+    await expect(more).toHaveCount(0);
+    await expect(names.nth(shown), "the first name it showed takes the focus").toBeFocused();
+    expect(await page.evaluate(id => markers[id].isPopupOpen(), crowd[0].id), "the popup stays open").toBe(true);
+    expect(await scrolls(), "the map has the height for every name").toBe(false);
+    await expect.poll(() => page.evaluate(() => {
+      const popup = document.querySelector(".leaflet-popup").getBoundingClientRect(), box = map.getContainer().getBoundingClientRect();
+      return popup.top >= box.top && popup.bottom <= box.bottom;
+    }), "Leaflet moves the map to keep the taller popup inside it").toBe(true);
+    const last = await names.last().textContent();
+    await names.last().click();
+    await expect(page.locator("#drawer")).toHaveClass(/\bopen\b/);
+    await expect(page.locator("#drName")).toHaveText(last);
   });
 });
 
@@ -748,6 +834,46 @@ test.describe("Show on map", () => {
       await show(page);
       await popupOpens(page, id);
       await onScreen(page, id);
+    });
+
+    // Seven entries at one spot: with six names the popup didn't fit this window (2026-11). Shown
+    // whole, the names are more than this map has the height for, so they scroll inside the popup,
+    // and the page gives up the rest of the category row to keep the pin on screen. The button is
+    // pressed from the page. Playwright can scroll an element before it clicks it, and the page
+    // glides (`scroll-smooth`), so a click of its own left the page still moving after the press:
+    // 2 runs in 60 ended with the map's top under the nav, which the page had not put there.
+    test("a pin at a crowded spot and its popup end on screen, and stay there with every name shown", async ({ page }) => {
+      const [first] = await crowdSpot(page);
+      await page.goto(`./?entry=${first.id}`);
+      await waitForApp(page);
+      await show(page);
+      await popupOpens(page, first.id);
+      const more = page.locator(".leaflet-popup .pop-more");
+      await expect(more).toBeVisible();
+      await onScreen(page, first.id);
+      await more.evaluate(button => button.click());
+      await expect(more).toHaveCount(0);
+      await expect(page.locator(".leaflet-popup .leaflet-popup-content")).toHaveClass(/leaflet-popup-scrolled/);
+      await onScreen(page, first.id);
+    });
+
+    // Wide letter spacing stands in for whatever makes text wrap more than it does today: another
+    // font, a bigger text size, a longer name. One name is still too many then, so the popup
+    // scrolls instead of growing, and the button at its foot is reached by scrolling inside it.
+    test("a popup too tall with one name scrolls, and still ends on screen with its pin", async ({ page }) => {
+      const [first] = await crowdSpot(page);
+      await page.goto(`./?entry=${first.id}`);
+      await waitForApp(page);
+      await page.addStyleTag({ content: ".leaflet-popup-content, .leaflet-popup-content *{letter-spacing:3px !important}" });
+      await show(page);
+      await popupOpens(page, first.id);
+      const content = page.locator(".leaflet-popup .leaflet-popup-content");
+      await expect(content).toHaveClass(/leaflet-popup-scrolled/);
+      await expect(content.locator(".pop-colocated a")).toHaveCount(1);
+      await onScreen(page, first.id);
+      await content.locator(".pop-btn").click();
+      await expect(page.locator("#drawer")).toHaveClass(/\bopen\b/);
+      await expect(page.locator("#drName")).toHaveText(first.name);
     });
   });
 });
