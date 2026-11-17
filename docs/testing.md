@@ -326,6 +326,8 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | a shared shortlist link isn't interrupted | the banner covering what someone was sent to see |
 | | a first visit gets the tour | news about what changed reaching someone who hasn't seen any of it |
 | | the tour mentions applying, and points at the pathways | the tour falling behind the page again. Its text is hand-written, so nothing else notices |
+| | two presses on the tour's Next at once draw one step | a quick second press drawing two steps. The tour draws a step 180 ms after a press, and until 2026-11 a second press inside that time drew the skipped step first, with its title beside the next step's number, and left its target outlined until the next press. The page records the card each time it is drawn, because the second draw covers what the first one wrote |
+| | closing the tour right after a press keeps it closed | a step asked for just before Skip or Esc drawing itself after the tour closed. Until 2026-11 that brought the card back reading "0 / 5", and Esc no longer closed it |
 | | the tour without pathways | the Journey step pointing at nothing. It falls back to the stages |
 | | the updates page fits a phone | a long name forcing the page sideways at 390 px |
 | `a11y.spec.js` | axe on each view | see below |
