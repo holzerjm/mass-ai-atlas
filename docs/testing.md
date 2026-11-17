@@ -11,6 +11,8 @@ Two checks, both added in v2.0 Part A (2026-09-30):
    live site is serving exactly the files in your checkout. You run it by hand,
    with `npm run verify:live`: no workflow runs it, `deploy.yml` included.
 
+One script also has tests of its own, in `test/`: see [Script tests](#script-tests-test).
+
 The atlas itself is still buildless: `index.html` + `data/*.yml` open in a browser
 with no npm step. `package.json` exists only for this tooling — nothing in it
 is deployed, and nobody editing `data/entities.yml` needs to install anything.
@@ -462,6 +464,27 @@ map and 207 in the Directory, before the category ink and other fixes in between
 
 The tour card's light scan came with its step-counter fix: the colour first proposed for
 the counter passed in the dark theme and failed, at 2.61:1, in the light one.
+
+---
+
+## Script tests (`test/`)
+
+`scripts/kpi.js`, the KPI summary the monthly health check posts, has tests that need no
+browser and no network. Node's built-in runner runs them in a few seconds:
+
+```sh
+node --test test/kpi.test.js
+```
+
+Most of them hand small made-up inputs to the functions the script exports: the ring
+around Boston City Hall, the freshness count and its forecast, re-checks read from
+snapshots of the data, the review counts, and both renderings. The rest run the script
+itself: with GitHub left out, with no `gh` and no git at all, and from a saved result.
+Those assert only what is true of any valid atlas, in a full clone or a shallow one, so
+an edit to `data/` cannot fail them.
+
+`test/data-refactor-equivalence.test.js` is a one-time check from the October 2026 data
+refactor. Nothing runs it.
 
 ---
 
