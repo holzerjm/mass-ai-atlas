@@ -481,7 +481,8 @@ around Boston City Hall, the freshness count and its forecast, re-checks read fr
 snapshots of the data, the review counts, and both renderings. The rest run the script
 itself: with GitHub left out, with no `gh` and no git at all, and from a saved result.
 Those assert only what is true of any valid atlas, in a full clone or a shallow one, so
-an edit to `data/` cannot fail them.
+an edit to `data/` cannot fail them. In CI they run in the `validate` job, which makes
+them part of the one required check.
 
 `test/data-refactor-equivalence.test.js` is a one-time check from the October 2026 data
 refactor. Nothing runs it.
@@ -499,7 +500,7 @@ there either.
 
 | Workflow | Job | What it does |
 |---|---|---|
-| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit `index.html`); then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
+| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit `index.html`); then `node --test test/kpi.test.js`, the [script tests](#script-tests-test); then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
 | Browser tests | `e2e (1 of 2)`, `e2e (2 of 2)`, `webkit, report only (1 of 2)`, `webkit, report only (2 of 2)` | Four jobs at once: each browser runs half the suite per job with `npm run test:e2e -- --shard=N/2`, with `ATLAS_BROWSER` set to `chromium` or `webkit`, inside Playwright's image (`mcr.microsoft.com/playwright`, both browsers and their system libraries built in, its tag kept equal to `@playwright/test`'s version); on failure each uploads `playwright-report/` as **playwright-report-1** or **-2**, or **playwright-report-webkit-1** or **-2**, kept 7 days |
 
 **Only `validate` is a required status check** on `main`. Browser tests runs and reports

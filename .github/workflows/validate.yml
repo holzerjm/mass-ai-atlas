@@ -44,6 +44,11 @@ jobs:
       # index.html. Fail if the version in index.html no longer matches the file.
       - name: Loader version matches atlas-data.js
         run: node scripts/loader-version.js
+      # scripts/kpi.js feeds a monthly Slack post, where a wrong figure would look
+      # as plausible as a right one. Its tests are offline and take a few seconds;
+      # none of them depends on what data/ holds, so a data edit cannot fail them.
+      - name: KPI script tests
+        run: node --test test/kpi.test.js
       - name: Freshness report (informational, never fails the build)
         continue-on-error: true
         run: node scripts/stale.js >> "$GITHUB_STEP_SUMMARY"
