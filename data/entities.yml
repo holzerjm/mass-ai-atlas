@@ -2204,6 +2204,22 @@
   added: 2026-11
   lastVerified: 2026-11
 
+- id: asymmetric
+  name: Asymmetric Capital Partners
+  cat: vc
+  loc: 11 Arlington St, Boston
+  lat: 42.3543
+  lng: -71.0722
+  url: https://www.acp.vc/
+  desc: Early-stage venture firm, launched in 2021 by Catalant co-founder Rob Biederman, that looks for practical uses of AI in long-established industries. In 2026 it led the Series A rounds of Rebuild, an AI-native operating system for property restoration, and of Voomi Supply, an AI-native marketplace for HVAC and plumbing supplies. It makes two to four new investments a year.
+  why: A lead investor for a company that already has recurring revenue, in an industry most funds pass over. It writes first institutional checks of $5 million to $10 million for a stake in the high teens to 20% and takes a board seat, and it says it invests from pre-seed through Series A. A pitch starts with a 30-minute first meeting. Its site prints no email address for pitches, so the way in is a partner, and each partner's page links their LinkedIn profile.
+  facts: [[Check size, 'Up to $10M; first checks $5M–$10M'], [Stage, Pre-seed through Series A], [Equity, High teens to 20%], [Board seat, 'Yes']]
+  tags: [seed, applied AI]
+  stages: [4]
+  offers: [funding]
+  added: 2026-11
+  lastVerified: 2026-11
+
 # ---------- ANGEL GROUPS ----------
 - id: bha
   name: Boston Harbor Angels
@@ -2454,7 +2470,7 @@
   lng: -71.0368
   url: https://www.massrobotics.org
   desc: 'The world''s largest independent robotics innovation hub: shared labs, test space and corporate partners for robotics & physical-AI startups.'
-  why: Embodied-AI founders get equipment, space and intros that nowhere else in the US concentrates this densely.
+  why: Embodied-AI founders get equipment, space and intros that nowhere else in the US concentrates this densely. Its women's group, run with the Boston chapter of Women in Robotics, held four meet-ups in 2025, and a form on its site signs you up.
   facts: [[Equity, 0% — nonprofit innovation hub], [Focus, Robotics and physical AI], [Terms, 'Paid monthly residency; shared labs, test space']]
   tags: [robotics, lab space]
   stages: [3]
