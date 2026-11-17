@@ -10,7 +10,7 @@
 #
 # A copy of this template should replace this list, or set it to [].
 
-- date: 2026-11-16
+- date: 2026-11-15
   title: See what was added, and when
   text: Filter the map and the Directory to the organizations added this month, or in the last 3 or 6 months. Each entry now says when it joined, and a new one is marked on its map popup.
   try: '?added=3'

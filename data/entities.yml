@@ -333,12 +333,14 @@
   lng: -72.5311
   url: https://massaitc.org
   desc: The Massachusetts AI and Technology Center for Connected Care in Aging & Alzheimer's Disease, a National Institute on Aging research center spanning UMass Amherst and Massachusetts General Hospital. It funds pilot projects on AI-enhanced technology for older adults, people with Alzheimer's disease and their caregivers, at up to $200,000 over 12 to 24 months.
-  why: A grant for AI in aging and dementia care that a startup can apply for in its own name. The national call lists for-profit companies, small businesses and startups as eligible, and the center asks for industry researchers and academic–industry teams. It is NIH research money with NIH rules, most of it reserved for Alzheimer's and related dementias, and it starts with a letter of intent. For the 2027 round, the letter-of-intent deadline is Nov. 16, 2026, and full proposals are due Jan. 22, 2027.
+  why: A grant for AI in aging and dementia care that a startup can apply for in its own name. The national call lists for-profit companies, small businesses and startups as eligible, and the center asks for industry researchers and academic–industry teams. It is NIH research money with NIH rules, most of it reserved for Alzheimer's and related dementias, and it starts with a letter of intent. The competition is annual. Letters of intent for the 2027 round closed on Nov. 16, 2026, and only invited applicants go on to a full proposal, due Jan. 22, 2027. That round's call came out on Oct. 19, 2026.
   facts: [[Check size, 'Up to $200,000 over 12–24 months'], [Cohort size, '10 to 15 pilots expected for 2027'], [Terms, NIH pilot grant; letter of intent first], [Focus, "AI for aging and Alzheimer's care"]]
   tags: [healthcare, research, equity-free]
   stages: [2, 3]
   links: [cics]
   offers: [grants]
+  applyNote: Annual call; the next is not posted
+  applyUrl: https://www.aitcc.ai/rfa/aitc-ara-27-001
   added: 2026-11
   lastVerified: 2026-11
 - id: bristol-cc
