@@ -164,14 +164,19 @@ test.describe("a first visit", () => {
 });
 
 test.describe("the tour", () => {
+  // The tour draws a step 180 ms after it is asked for, title and number together. So after each
+  // press this waits for the next step's own number before it reads the card again. A press on a
+  // card that still shows the step before leaves the walk one step behind, and it then passes by
+  // luck, takes the highlight off the step it wanted, or presses Done.
   const toStep = async (page, title) => {
-    await page.evaluate(() => startTour());
-    for(let i = 0; i < 8; i++){
+    const total = await page.evaluate(() => TOUR.length);
+    // Start the tour if it isn't running. Otherwise go on from the step it is showing.
+    let n = await page.evaluate(() => { if(tourStep < 0) startTour(); return tourStep + 1; });
+    for(; n <= total; n++){
+      await expect(page.locator("#tourStep")).toHaveText(`${n} / ${total}`);
       await expect(page.locator("#tourCard")).toBeVisible();
       if((await page.locator("#tourTitle").textContent()).includes(title)) return;
-      const shown = await page.locator("#tourStep").textContent();
       await page.locator("#tourNext").click();
-      await expect(page.locator("#tourStep")).not.toHaveText(shown);
     }
     throw new Error(`the tour has no step called ${title}`);
   };
