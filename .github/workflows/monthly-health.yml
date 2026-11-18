@@ -2,6 +2,8 @@
 # On the 1st of each month (and on demand): run the link-rot checker and
 # the verification rota, post both to the TOA Slack, and mirror them in
 # the job summary. A report, not a gate — it never fails the build.
+# After that report has gone out, the same run counts the KPIs (scripts/kpi.js)
+# and posts them as a second message.
 #
 # NOTE: GitHub disables cron workflows after ~60 days without repo
 # activity. This repo's badge-bot commits normally keep it alive; if the
@@ -88,3 +90,38 @@ jobs:
                  text:("Fix an entry: edit data/entities.yml on <" + $repo + "|GitHub>, bump lastVerified, merge — it deploys itself.")}]}])
             }' \
           | curl -sS -X POST -H 'Content-type: application/json' -d @- "$SLACK_WEBHOOK_URL"
+
+      # The KPIs come after the health report above has been posted, and each step
+      # here is continue-on-error with its own timeout, so nothing in them can
+      # delay, fail or stand in for that report. scripts/kpi.js only prints; this
+      # workflow does the posting, as it does for the link check and the rota.
+      - name: KPI summary
+        if: ${{ !cancelled() }}
+        timeout-minutes: 5
+        continue-on-error: true
+        env:
+          # Read only. It lists this repository's own public issues and pull requests.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # The checkout above holds one commit, and the re-check figures are read
+          # from the history. Without it they say "not available" and the rest stands.
+          git fetch --unshallow --quiet || true
+          node scripts/kpi.js --json > kpi.json
+          node scripts/kpi.js --from kpi.json | tee kpi.txt
+          { echo '## KPIs'; echo '```'; cat kpi.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Post KPIs to Slack
+        if: always()
+        timeout-minutes: 2
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && { echo "SLACK_WEBHOOK_URL not set — skipping"; exit 0; }
+          # Say so out loud rather than leave a month with no figures unexplained
+          if ! node scripts/kpi.js --from kpi.json --slack > kpi-slack.json; then
+            RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            jq -n --arg run "$RUN_URL" \
+              '{text: ("📊 Atlas KPIs could not be counted this month — <" + $run + "|see the run log>")}' > kpi-slack.json
+          fi
+          curl -sS -X POST -H 'Content-type: application/json' -d @kpi-slack.json "$SLACK_WEBHOOK_URL"

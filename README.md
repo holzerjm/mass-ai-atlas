@@ -114,6 +114,8 @@ scripts/validate.js               schema + integrity validation (runs in CI and 
 scripts/load-data.js              Node wrapper around atlas-data.js — scripts load data via this
 test/data-refactor-equivalence.test.js  one-time check that data/ matches the old data.js
 scripts/stale.js                  freshness report — entries longest unverified
+scripts/kpi.js                    KPI summary: geography, freshness and its forecast, review
+test/kpi.test.js                  tests for scripts/kpi.js (node --test, offline)
 scripts/export-csv.js             export the dataset to a spreadsheet-friendly CSV
 scripts/export-ai.js              export a compact text file for a founder's own AI assistant
 scripts/issue-to-entry.js         the suggestion bot's form parser / entry builder
@@ -127,7 +129,7 @@ scripts/sync-to-site.sh           manual deploy fallback (CI normally deploys on
 .github/workflows/suggest-to-pr.yml  the suggestion bot (maintainer-gated, drafts PRs)
 .github/workflows/weekly-events.yml  Monday 7am ET events refresh + Slack post
 .github/workflows/e2e.yml         browser tests on every pull request and push to main
-.github/workflows/monthly-health.yml  monthly link check + re-check queue, posted to Slack
+.github/workflows/monthly-health.yml  monthly link check + re-check queue + KPIs, posted to Slack
 .github/workflows/server-check.yml  Sunday check that a deploy can still reach the server
 docs/events-guide.md              how the events page & weekly refresh work
 docs/your-region.md               starting an atlas for another state or region

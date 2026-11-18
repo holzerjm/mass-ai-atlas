@@ -300,6 +300,27 @@ entries that is **19 re-checks a month, about half an hour**. A fixed `--queue`
 quietly stops covering everything as soon as entries outrun it — at 13 a month it
 would now take **17 months** to come round, against a 12-month threshold.
 
+### The KPI message
+
+Right after the health report, the same action posts a second message, **Atlas KPIs**.
+It is the output of `node scripts/kpi.js`, which you can run yourself at any time (add
+`--offline` to leave GitHub out). The full figures are in the action's job summary.
+Nothing is stored: today's figures come from `data/`, the history from git, and the
+review figures from this repository's own issues and pull requests.
+
+Each figure is printed with what it hides, because each one misleads on its own:
+
+| Figure | What it counts | What it hides |
+|---|---|---|
+| **Geography** | Entries whose pin is more than 25 miles from Boston City Hall, with and without companies and corporate labs. | A pin is where an organization sits, not whom it serves. The share outside Boston and Cambridge isn't counted yet, because an entry has no town. |
+| **Freshness** | Entries checked within six months, counted the way `stale.js` counts. | While the oldest check is younger than six months, it reads 100% whatever anyone does. So it comes with a forecast: what it will read on the 1st of each coming month if every month's queue is checked. |
+| **Re-checks** | From git: each time an entry's `lastVerified` moved forward, and whether anything else in that entry changed in the same commit. | It includes entries fixed because someone already knew they were wrong, so it runs high. If it says **no entry was re-checked** last month, the queue was skipped. |
+| **Review** | Issues and pull requests from anyone but a maintainer or a bot: how many a machine checked, how many it prepared, how many it decided. | **Machine-decided has to read 0.** Nothing is published without a maintainer. If it doesn't, the message names the issue or pull request to look at. |
+
+A figure that reads **not available** says why: the re-checks need the repository's full
+history, and the review figures need GitHub to answer. The others still stand. Trouble
+with the KPIs never holds back or changes the health report, which has already gone out.
+
 ---
 
 ## Founder pathways

@@ -11,6 +11,8 @@ Two checks, both added in v2.0 Part A (2026-09-30):
    live site is serving exactly the files in your checkout. You run it by hand,
    with `npm run verify:live`: no workflow runs it, `deploy.yml` included.
 
+One script also has tests of its own, in `test/`: see [Script tests](#script-tests-test).
+
 The atlas itself is still buildless: `index.html` + `data/*.yml` open in a browser
 with no npm step. `package.json` exists only for this tooling — nothing in it
 is deployed, and nobody editing `data/entities.yml` needs to install anything.
@@ -467,6 +469,28 @@ the counter passed in the dark theme and failed, at 2.61:1, in the light one.
 
 ---
 
+## Script tests (`test/`)
+
+`scripts/kpi.js`, the KPI summary the monthly health check posts, has tests that need no
+browser and no network. Node's built-in runner runs them in a few seconds:
+
+```sh
+node --test test/kpi.test.js
+```
+
+Most of them hand small made-up inputs to the functions the script exports: the ring
+around Boston City Hall, the freshness count and its forecast, re-checks read from
+snapshots of the data, the review counts, and both renderings. The rest run the script
+itself: with GitHub left out, with no `gh` and no git at all, and from a saved result.
+Those assert only what is true of any valid atlas, in a full clone or a shallow one, so
+an edit to `data/` cannot fail them. In CI they run in the `validate` job, which makes
+them part of the one required check.
+
+`test/data-refactor-equivalence.test.js` is a one-time check from the October 2026 data
+refactor. Nothing runs it.
+
+---
+
 ## CI (`.github/workflows/validate.yml` and `e2e.yml`)
 
 Two workflows run on every pull request, and **neither is path-filtered**. That is
@@ -478,7 +502,7 @@ there either.
 
 | Workflow | Job | What it does |
 |---|---|---|
-| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit `index.html`); then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
+| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit `index.html`); then `node --test test/kpi.test.js`, the [script tests](#script-tests-test); then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
 | Browser tests | `e2e (1 of 2)`, `e2e (2 of 2)`, `webkit, report only (1 of 2)`, `webkit, report only (2 of 2)` | Four jobs at once: each browser runs half the suite per job with `npm run test:e2e -- --shard=N/2`, with `ATLAS_BROWSER` set to `chromium` or `webkit`, inside Playwright's image (`mcr.microsoft.com/playwright`, both browsers and their system libraries built in, its tag kept equal to `@playwright/test`'s version); on failure each uploads `playwright-report/` as **playwright-report-1** or **-2**, or **playwright-report-webkit-1** or **-2**, kept 7 days |
 
 **Only `validate` is a required status check** on `main`. Browser tests runs and reports
