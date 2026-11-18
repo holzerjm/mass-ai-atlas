@@ -471,16 +471,19 @@ the counter passed in the dark theme and failed, at 2.61:1, in the light one.
 
 ## Script tests (`test/`)
 
-`scripts/kpi.js`, the KPI summary the monthly health check posts, has tests that need no
-browser and no network. Node's built-in runner runs them in a few seconds:
+`scripts/kpi.js`, the KPI summary the monthly health check posts, and `scripts/towns.js`,
+the list of towns it counts by, have tests that need no browser and no network. Node's
+built-in runner runs them in a few seconds:
 
 ```sh
 node --test test/kpi.test.js
 ```
 
-Most of them hand small made-up inputs to the functions the script exports: the ring
-around Boston City Hall, the freshness count and its forecast, re-checks read from
-snapshots of the data, the review counts, and both renderings. The rest run the script
+Most of them hand small made-up inputs to the functions the script exports: the split by
+town and the ring around Boston City Hall, the freshness count and its forecast, re-checks
+read from snapshots of the data, the review counts, and both renderings. A few check the
+list itself and the validator's rule about a town: 351 names, a neighborhood refused, a
+misspelling answered with the name that was meant. The rest run the script
 itself: with GitHub left out, with no `gh` and no git at all, and from a saved result.
 Those assert only what is true of any valid atlas, in a full clone or a shallow one, so
 an edit to `data/` cannot fail them. In CI they run in the `validate` job, which makes

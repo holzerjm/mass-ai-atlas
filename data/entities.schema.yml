@@ -5,8 +5,9 @@ description: >-
   One object per organization. Rules that span records or files are checked in
   scripts/validate.js rather than here: unique ids and names, `cat` is a key of
   categories.yml, `stages` are stage numbers in stages.yml, `links` resolve to
-  existing ids, `added`/`lastVerified` not in the future, plus warnings (missing
-  optional fields, non-canonical tags, passed applyBy dates).
+  existing ids, `town` is present and one of the state's cities and towns,
+  `added`/`lastVerified` not in the future, plus warnings (missing optional
+  fields, non-canonical tags, passed applyBy dates).
 type: array
 items:
   type: object
@@ -31,6 +32,15 @@ items:
       type: string
     loc:
       description: address or neighborhood label
+      type: string
+      pattern: *nohtml
+      minLength: 1
+    # town is left out of `required` on purpose, though scripts/validate.js refuses an
+    # entry without one. The page checks the data it fetches against this file, and a
+    # deploy uploads this file before entities.yml. A schema that demanded `town` would
+    # turn the previous data away if a deploy stopped between the two.
+    town:
+      description: the Massachusetts city or town the pin sits in, by its name in scripts/towns.js (a neighborhood or village belongs in `loc`)
       type: string
       pattern: *nohtml
       minLength: 1

@@ -47,6 +47,9 @@ An annotated example:
   cat: startup                      # startup | vc | angel | accel | university |
                                     # corporate | community | event | gov | space | student
   loc: 1 Broadway, Cambridge        # address, or neighborhood if venues vary
+  town: Cambridge                   # the city or town the pin sits in, one of the state's
+                                    # 351 (scripts/towns.js). A neighborhood or village goes
+                                    # in loc: Kendall Sq is Cambridge, Allston is Boston
   lat: 42.3629                      # lat/lng must be within Massachusetts
   lng: -71.0838
   approx: true                      # include if coordinates are neighborhood-level
@@ -153,7 +156,8 @@ Use this path for a change outside `data/`, such as an issue labelled
 ## Review process
 
 - CI (`scripts/validate.js`) must pass: the JSON Schemas in `data/` (field types,
-  MA coordinates, https links, …) plus unique ids, valid category, resolvable connections
+  MA coordinates, https links, …) plus unique ids, valid category, a `town` that is a
+  Massachusetts city or town, resolvable connections
 - The browser tests run on every pull request too. They don't block a merge, but a code
   change is expected to pass them. A failure only in the two `webkit, report only` checks,
   which run the same tests in Safari's engine, won't hold up your pull request

@@ -16,10 +16,11 @@
  *   --repo o/n    the GitHub repository (default: GITHUB_REPOSITORY, then git's origin)
  *   --now DATE    count as if today were YYYY-MM-DD (for tests)
  *
- * GEOGRAPHY   Entries whose pin is more than 25 miles from Boston City Hall. A pin is
- *             where an organization sits, not whom it serves. The share outside Boston
- *             and Cambridge cannot be counted yet: an entry has coordinates and a
- *             free-text `loc`, but no town.
+ * GEOGRAPHY   Entries whose `town` is neither Boston nor Cambridge, and entries whose pin
+ *             is more than 25 miles from Boston City Hall. A pin is where an organization
+ *             sits, not whom it serves. The town is read from the entry and never worked
+ *             out from the pin: an entry with none is left out and counted as left out,
+ *             and when no entry has one the split reads "not available".
  * FRESHNESS   Entries whose lastVerified month is within N months of this month, counted
  *             as scripts/stale.js counts it. While the oldest check is younger than the
  *             window, 100% says nothing, so the figure comes with a forecast: what it
@@ -73,6 +74,10 @@ const dayLabel = iso => `${MONTHS[Number(iso.slice(5, 7)) - 1]} ${Number(iso.sli
 // another region changes both, as it changes BASE in build-pages.js.
 const CITY_HALL = { name: "Boston City Hall", lat: 42.3601, lng: -71.0589 };
 const RING_MILES = 25;
+// The two cities most of the atlas sits in. The share outside them leads the report.
+const CORE_TOWNS = ["Boston", "Cambridge"];
+// Every city and town there is (scripts/towns.js), to say how many the atlas reaches.
+const { TOWNS: ALL_TOWNS } = require("./towns");
 // Companies and corporate labs are places a founder hires from or sells to, not
 // resources. Counting without them shows how far the resources themselves reach.
 const EMPLOYERS = new Set(["startup", "corporate"]);
@@ -98,11 +103,40 @@ function geography(DATA) {
     all: count(DATA),
     resources: count(DATA.filter(d => !EMPLOYERS.has(d.cat))),
     needs: Object.fromEntries(Object.entries(needs).map(([k, v]) => [k, count(v)])),
-    // Boston against Cambridge against the rest is a question about towns, and
-    // distance cannot answer it: Cambridge, Somerville and Brookline are as close to
-    // Boston City Hall as much of Boston is. Say so rather than print a small ring
-    // that looks like an answer.
-    towns: { available: false, reason: "entries carry no town yet" },
+    towns: towns(DATA),
+  };
+}
+
+// Boston against Cambridge against the rest is a question about towns, and distance
+// cannot answer it: Cambridge, Somerville and Brookline are as close to Boston City
+// Hall as much of Boston is. So it is counted from each entry's `town` and from nothing
+// else. An entry without one is left out and reported as left out, and when no entry
+// has one the split says so rather than print a small ring that looks like an answer.
+function towns(DATA) {
+  const placed = DATA.filter(d => typeof d.town === "string" && d.town);
+  if (!placed.length) return { available: false, reason: "entries carry no town yet" };
+  const core = new Set(CORE_TOWNS);
+  const count = list => {
+    const outside = list.filter(d => !core.has(d.town)).length;
+    return { total: list.length, outside, pct: pct(outside, list.length) };
+  };
+  const needs = {}, per = {};
+  for (const d of placed) {
+    per[d.town] = (per[d.town] || 0) + 1;
+    for (const o of d.offers || []) (needs[o] ||= []).push(d);
+  }
+  return {
+    available: true,
+    core: CORE_TOWNS,
+    all: count(placed),
+    resources: count(placed.filter(d => !EMPLOYERS.has(d.cat))),
+    needs: Object.fromEntries(Object.entries(needs).map(([k, v]) => [k, count(v)])),
+    unplaced: DATA.length - placed.length,
+    // how many cities and towns hold an entry, out of how many there are
+    reached: Object.keys(per).length,
+    of: ALL_TOWNS.length,
+    list: Object.entries(per).map(([town, entries]) => ({ town, entries }))
+      .sort((a, b) => b.entries - a.entries || a.town.localeCompare(b.town)),
   };
 }
 
@@ -222,14 +256,19 @@ function rechecks(snapshots) {
 }
 
 // The atlas at the end of each month up to last month: how many entries, and how
-// many beyond the ring. The last commit of a month is that month's state.
+// many beyond the ring. The last commit of a month is that month's state. `outside`,
+// the entries outside the two cities, is there only for a month that ended with a town
+// on every entry: before Nov. 2026 no entry had one, and a part count would mislead.
 function monthEnds(snapshots, now) {
   const out = [];
   if (!snapshots.length) return out;
   for (let i = monthIndex(snapshots[0].date.slice(0, 7)); i < monthIndex(now); i++) {
     const month = monthAt(i);
     const last = snapshots.filter(s => s.date.slice(0, 7) <= month).pop();
-    if (last) out.push({ month, entries: last.entries.length, beyond: last.entries.filter(isBeyond).length });
+    if (!last) continue;
+    const t = towns(last.entries);
+    out.push({ month, entries: last.entries.length, beyond: last.entries.filter(isBeyond).length,
+      ...(t.available && !t.unplaced ? { outside: t.all.outside } : {}) });
   }
   return out;
 }
@@ -390,6 +429,7 @@ async function compute({ DATA, now, today, months, cycle, repo, offline, env }) 
 /* ---------- rendering ---------- */
 
 const of = (n, total) => `${n} of ${total} (${pct(n, total)}%)`;
+const listOf = names => (names.length < 2 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`);
 const NEEDS_SHOWN = ["funding", "customers", "compute"];   // the three the first count singled out
 
 // The sentences both formats share. Each headline has a `mind`: what the number hides.
@@ -397,17 +437,36 @@ function sentences(r) {
   const g = r.geography, f = r.freshness, rc = r.rechecks, rv = r.review;
   const lastEnd = r.monthEnds.available ? r.monthEnds.months[r.monthEnds.months.length - 1] : null;
 
-  const geo = {
-    head: `${of(g.all.beyond, g.all.total)} sit beyond ${g.miles} miles of ${g.from}`,
-    mind: "A pin is where an organization sits, not whom it serves.",
-    more: [],
-    missing: "The share outside Boston and Cambridge is not available: entries carry no town yet.",
-  };
-  if (g.resources.total !== g.all.total)
-    geo.more.push(`Without companies and corporate labs: ${of(g.resources.beyond, g.resources.total)}`);
-  const needs = NEEDS_SHOWN.filter(k => g.needs[k]).map(k => `${k} ${g.needs[k].beyond} of ${g.needs[k].total}`);
-  if (needs.length) geo.more.push(`Beyond ${g.miles} miles, by what founders get: ${needs.join(", ")}`);
-  if (lastEnd) geo.more.push(`At the end of ${monthLabel(lastEnd.month)}: ${lastEnd.beyond} of ${lastEnd.entries}`);
+  const t = g.towns, ring = `${of(g.all.beyond, g.all.total)} sit beyond ${g.miles} miles of ${g.from}`;
+  const byNeed = (set, n) => NEEDS_SHOWN.filter(k => set[k]).map(k => `${k} ${set[k][n]} of ${set[k].total}`).join(", ");
+  const mind = "A pin is where an organization sits, not whom it serves.";
+  let geo;
+  if (t.available) {
+    // The towns lead and the ring follows: a quarter of the atlas can sit outside the
+    // two cities and still be a short drive from them.
+    const outside = `outside ${listOf(t.core)}`;
+    geo = { head: `${of(t.all.outside, t.all.total)} sit ${outside}`, next: ring, mind, more: [
+      `Beyond ${g.miles} miles of ${g.from}: ${of(g.all.beyond, g.all.total)}`,
+    ] };
+    if (g.resources.total !== g.all.total)
+      geo.more.push(`Without companies and corporate labs: ${of(t.resources.outside, t.resources.total)} ${outside}, ` +
+        `${of(g.resources.beyond, g.resources.total)} beyond ${g.miles} miles`);
+    if (byNeed(t.needs, "outside")) geo.more.push(`By what founders get, ${outside}: ${byNeed(t.needs, "outside")}`);
+    if (byNeed(g.needs, "beyond")) geo.more.push(`By what founders get, beyond ${g.miles} miles: ${byNeed(g.needs, "beyond")}`);
+    geo.more.push(`Entries sit in ${t.reached}${t.of ? ` of ${t.of}` : ""} cities and towns`);
+    if (lastEnd) geo.more.push(`At the end of ${monthLabel(lastEnd.month)}: ` +
+      (lastEnd.outside === undefined ? "" : `${lastEnd.outside} of ${lastEnd.entries} ${outside}, `) +
+      `${lastEnd.beyond} of ${lastEnd.entries} beyond ${g.miles} miles`);
+    if (t.unplaced) geo.more.push(`${t.unplaced} ${t.unplaced === 1 ? "entry has" : "entries have"} no town, ` +
+      "so the figures by town leave " + (t.unplaced === 1 ? "it" : "them") + " out");
+  } else {
+    geo = { head: ring, mind, more: [],
+      missing: `The share outside ${listOf(CORE_TOWNS)} is not available: ${t.reason}.` };
+    if (g.resources.total !== g.all.total)
+      geo.more.push(`Without companies and corporate labs: ${of(g.resources.beyond, g.resources.total)}`);
+    if (byNeed(g.needs, "beyond")) geo.more.push(`Beyond ${g.miles} miles, by what founders get: ${byNeed(g.needs, "beyond")}`);
+    if (lastEnd) geo.more.push(`At the end of ${monthLabel(lastEnd.month)}: ${lastEnd.beyond} of ${lastEnd.entries}`);
+  }
 
   const at = k => f.forecast[k - 1];
   const points = [1, 3, 6, 9, 12].map(at).filter(Boolean);
@@ -501,7 +560,7 @@ function renderSlack(r, env = process.env) {
     (x.mind ? ` _${esc(x.mind + (x.missing ? " " + x.missing : ""))}_` : "");
   const lines = [
     `*${r.entries} organizations* as of ${dayLabel(r.generated)}`,
-    bullet("Geography", s.geo),
+    bullet("Geography", s.geo, s.geo.next ? `${s.geo.next}.` : ""),
     bullet("Freshness", s.fresh, s.fresh.forecastEnd ? `At the rota's ${r.freshness.rota.batch} a month it reads ${s.fresh.forecastEnd}.` : ""),
     bullet("Re-checks", s.re),
     bullet("Review", s.rev),
@@ -515,7 +574,9 @@ function renderSlack(r, env = process.env) {
   context.push(env.GITHUB_ACTIONS ? "via GitHub Actions" : "node scripts/kpi.js");
   const title = "📊 Atlas KPIs";
   return {
-    text: `${title} — ${r.geography.all.pct}% beyond ${r.geography.miles} miles, ` +
+    text: `${title} — ` + (r.geography.towns.available
+      ? `${r.geography.towns.all.pct}% outside ${listOf(r.geography.towns.core)}, `
+      : `${r.geography.all.pct}% beyond ${r.geography.miles} miles, `) +
       `${r.freshness.pct}% checked within ${r.freshness.months} months`,
     blocks: [
       { type: "header", text: { type: "plain_text", text: title, emoji: true } },
@@ -580,8 +641,8 @@ async function main() {
 }
 
 module.exports = {
-  milesFromCityHall, geography, freshness, rechecks, monthEnds, review, isOutside,
-  githubClient, fetchReview, renderText, renderSlack, parseArgs, RING_MILES, SCHEMA,
+  milesFromCityHall, geography, towns, freshness, rechecks, monthEnds, review, isOutside,
+  githubClient, fetchReview, renderText, renderSlack, parseArgs, RING_MILES, CORE_TOWNS, SCHEMA,
 };
 
 if (require.main === module) main();

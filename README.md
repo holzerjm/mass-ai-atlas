@@ -152,8 +152,8 @@ deploy:
   organization, ready for Google Sheets (*File → Import*) or Excel (*Data → From
   Text/CSV*)
 
-Columns/fields include name, category, location, lat/lng, website, description, tags,
-founder stages and the month a maintainer last verified the entry.
+Columns/fields include name, category, location, city or town, lat/lng, website,
+description, tags, founder stages and the month a maintainer last verified the entry.
 
 To regenerate locally: `node scripts/export-json.js`, `node scripts/export-csv.js`, and
 `node scripts/export-ai.js`.
