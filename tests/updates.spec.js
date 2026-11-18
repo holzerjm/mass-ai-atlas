@@ -164,14 +164,19 @@ test.describe("a first visit", () => {
 });
 
 test.describe("the tour", () => {
+  // The tour draws a step 180 ms after it is asked for, title and number together. So after each
+  // press this waits for the next step's own number before it reads the card again. A press on a
+  // card that still shows the step before leaves the walk one step behind, and it then passes by
+  // luck, takes the highlight off the step it wanted, or presses Done.
   const toStep = async (page, title) => {
-    await page.evaluate(() => startTour());
-    for(let i = 0; i < 8; i++){
+    const total = await page.evaluate(() => TOUR.length);
+    // Start the tour if it isn't running. Otherwise go on from the step it is showing.
+    let n = await page.evaluate(() => { if(tourStep < 0) startTour(); return tourStep + 1; });
+    for(; n <= total; n++){
+      await expect(page.locator("#tourStep")).toHaveText(`${n} / ${total}`);
       await expect(page.locator("#tourCard")).toBeVisible();
       if((await page.locator("#tourTitle").textContent()).includes(title)) return;
-      const shown = await page.locator("#tourStep").textContent();
       await page.locator("#tourNext").click();
-      await expect(page.locator("#tourStep")).not.toHaveText(shown);
     }
     throw new Error(`the tour has no step called ${title}`);
   };
@@ -185,6 +190,43 @@ test.describe("the tour", () => {
     await expect(page.locator("#tourText")).toContainText("Closing soon");
     await toStep(page, "Founder Journey");
     await expect(page.locator(".pw-picks")).toHaveClass(/\btour-spot\b/);
+  });
+
+  // Two presses inside those 180 ms used to draw two steps. First came the step being skipped: its
+  // title beside the next step's number, and an outline on its target that stayed until the next
+  // press. Then came the step asked for. So the page keeps a record of the card each time it is
+  // drawn. A look after both draws would find the second one's title and number, and miss the first.
+  test("two presses at once draw one step", async ({ page }) => {
+    await page.goto("./");
+    await waitForApp(page);
+    const titles = await page.evaluate(() => TOUR.map(s => s.title));
+    await toStep(page, titles[0]);
+    await page.evaluate(() => {
+      const target = s => document.querySelector(s.sel) || (s.alt && document.querySelector(s.alt));
+      window.tourDraws = [];
+      new MutationObserver(() => tourDraws.push({
+        title: document.querySelector("#tourTitle").textContent,
+        step: document.querySelector("#tourStep").textContent,
+        // the steps whose targets are outlined, by number
+        outlined: [...document.querySelectorAll(".tour-spot")].map(el => 1 + TOUR.findIndex(s => target(s) === el)),
+      })).observe(document.querySelector("#tourCard"), { childList: true, characterData: true, subtree: true });
+    });
+    await page.evaluate(() => { nextTourStep(); nextTourStep(); });
+    await expect(page.locator("#tourTitle")).toHaveText(titles[2]);   // the newest press's step: it is drawn last
+    expect(await page.evaluate(() => tourDraws), "the card, each time it was drawn after the two presses")
+      .toEqual([{ title: titles[2], step: `3 / ${titles.length}`, outlined: [3] }]);
+  });
+
+  // The same wait, when the tour closes inside it. A step asked for just before Skip or Esc used to
+  // draw itself afterwards: the card came back reading "0 / 5", and Esc no longer closed it.
+  test("closing it right after a press keeps it closed", async ({ page }) => {
+    await page.goto("./");
+    await waitForApp(page);
+    await toStep(page, await page.evaluate(() => TOUR[0].title));
+    // A page's timers run in the order they fall due, so this wait ends after the step's own.
+    await page.evaluate(() => { nextTourStep(); endTour(); return new Promise(done => setTimeout(done, 400)); });
+    await expect(page.locator("#tourCard")).toBeHidden();
+    await expect(page.locator(".tour-spot")).toHaveCount(0);
   });
 });
 
