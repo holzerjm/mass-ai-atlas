@@ -352,13 +352,19 @@ test("with no token, no gh and no git it reports what it can, and exits 0", () =
   assert.match(r.stdout, /^REVIEW: not available \(/m);
 });
 
+// The figures are compared with what freshness() gives this repository's data for the same month,
+// so the test holds whatever data/ says. It used to expect no entry inside six months of Feb. 2031,
+// which is true only until an entry is checked in Aug. 2030: from then on this test, and the
+// required check it runs in, would have failed on the first re-check.
 test("--now sets the month the figures are counted for", () => {
   const r = run(["--now", "2031-02-09", "--json"], { bare: true });
   assert.equal(r.status, 0, r.stderr);
   const out = JSON.parse(r.stdout);
   assert.equal(out.month, "2031-02");
+  assert.equal(out.generated, "2031-02-09T00:00:00Z");
   assert.equal(out.freshness.forecast[0].month, "2031-03");
-  assert.equal(out.freshness.within, 0);          // no check made by 2026 is inside six months of 2031
+  const { months, cycle } = kpi.parseArgs([]);     // the script's own window and rota cycle
+  assert.deepEqual(out.freshness, kpi.freshness(loadData().DATA, "2031-02", { months, cycle }));
 });
 
 test("a wrong option, or a file that is not a saved result, exits 1 and says why", () => {
