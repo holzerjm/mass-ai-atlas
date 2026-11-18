@@ -1448,13 +1448,16 @@ function searchTerms(query){
   return terms.length > 3 && specific.length ? Object.assign(specific, {sentence:true}) : terms;
 }
 // Each field is folded once, with a space at each end so a word's start can be found. A name, a
-// tag or an offer says more about an entry than a passing word in its description does.
+// tag or an offer says more about an entry than a passing word in its description does. The place
+// is the address and the town: an address often names only a neighborhood or a campus ("Kendall Sq",
+// "Seaport", "Allston"), so until 2026-11 "Cambridge" missed the MIT-IBM lab and "Boston" the Harvard
+// Innovation Labs. 15 entries named their city nowhere, and 5 more only in passing.
 const SEARCH_FIELDS = [["name", 4], ["vocab", 4], ["place", 3], ["cat", 2], ["text", .25]];
 let searchDocs = null;
 function searchDoc(d){
   const pad = s => " " + foldText(s) + " ";
   searchDocs = searchDocs || Object.fromEntries(DATA.map(e => [e.id, {
-    name: pad(e.name), place: pad(e.loc), cat: pad(cLabel(e.cat)), text: pad(e.desc + " " + (e.why||"")),
+    name: pad(e.name), place: pad(e.loc + " " + (e.town||"")), cat: pad(cLabel(e.cat)), text: pad(e.desc + " " + (e.why||"")),
     vocab: pad([...(e.tags||[]), ...(e.offers||[]).map(o => OFFERS_META[o].label)].join(" ")),
   }]));
   return searchDocs[d.id];
