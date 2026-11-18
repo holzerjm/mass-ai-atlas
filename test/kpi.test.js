@@ -99,9 +99,10 @@ test("the town is read from the entry, never worked out from the pin", () => {
 });
 
 test("an entry with no town is left out of the figures by town, and counted as left out", () => {
-  const t = kpi.towns([placed("a", "accel", "Boston"), placed("b", "accel", "Lowell"), { id: "c", cat: "accel", ...north(40) }]);
+  const t = kpi.towns([placed("a", "accel", "Boston"), placed("b", "accel", "Lowell"), { id: "c", cat: "accel", ...north(40) },
+    { id: "d", cat: "accel", town: "", ...north(40) }]);                  // an empty town is no town
   assert.deepEqual(t.all, { total: 2, outside: 1, pct: 50 });
-  assert.equal(t.unplaced, 1);
+  assert.equal(t.unplaced, 2);
 });
 
 // An entry is marked statewide when its own text says it serves the whole state. The count goes
@@ -113,11 +114,29 @@ test("geography counts the entries marked statewide, and how many of them sit in
     placed("c", "accel", "Cambridge"),
     { ...placed("d", "accel", "Lowell"), statewide: false },
   ]);
-  assert.deepEqual(g.statewide, { total: 2, inside: 1 });
+  assert.deepEqual(g.statewide, { total: 2, inside: 1, unplaced: 0 });
   assert.deepEqual(g.towns.all, { total: 4, outside: 2, pct: 50 });     // the mark moves nobody out of their town
   // with no town on any entry the count stands, and where they sit is not known
   const bare = kpi.geography([{ id: "a", cat: "gov", offers: [], statewide: true, ...north(1) }, { id: "b", cat: "gov", offers: [], ...north(1) }]);
-  assert.deepEqual(bare.statewide, { total: 1, inside: null });
+  assert.deepEqual(bare.statewide, { total: 1, inside: null, unplaced: null });
+});
+
+// "4 from Boston or Cambridge" reads as "the rest are elsewhere". A marked entry with no town is in
+// neither group, so it is counted apart and the caveat says so, in the text and in Slack.
+test("a statewide entry with no town is counted apart, not as outside the two cities", () => {
+  const some = [
+    { ...placed("a", "gov", "Boston"), statewide: true },
+    { ...placed("b", "gov", "Holyoke"), statewide: true },
+    { id: "c", cat: "gov", offers: [], statewide: true, ...north(1) },          // marked, and no town
+    placed("d", "accel", "Cambridge"),
+  ];
+  const g = kpi.geography(some);
+  assert.deepEqual(g.statewide, { total: 3, inside: 1, unplaced: 1 });
+  const r = result({ entries: some.length, geography: g });
+  const caveat = "A pin is where an organization sits, not whom it serves. 3 entries serve the whole state (1 from Boston or Cambridge, 1 with no town).";
+  assert.ok(kpi.renderText(r).includes(`\n  Keep in mind: ${caveat}\n`));
+  const line = kpi.renderSlack(r, {}).blocks[1].text.text.split("\n").find(l => l.startsWith("• *Geography:* "));
+  assert.ok(line.endsWith(` _${caveat}_`), line);
 });
 
 test("the list holds Massachusetts' 351 cities and towns, once each, A to Z", () => {

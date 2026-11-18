@@ -108,9 +108,12 @@ function geography(DATA) {
     towns: byTown,
     // The number behind "a pin is where an organization sits, not whom it serves": the
     // entries whose own text says they serve the whole state, and how many of them sit
-    // in the two cities. Without towns the second is not known.
+    // in the two cities. One with no town is in neither group, so it is counted apart:
+    // "4 from Boston or Cambridge" must not read as "the rest are elsewhere" when where
+    // one sits is not known. With no town on any entry, neither figure is known.
     statewide: { total: state.length,
-      inside: byTown.available ? state.filter(d => CORE_TOWNS.includes(d.town)).length : null },
+      inside: byTown.available ? state.filter(d => CORE_TOWNS.includes(d.town)).length : null,
+      unplaced: byTown.available ? state.filter(d => !hasTown(d)).length : null },
   };
 }
 
@@ -119,8 +122,9 @@ function geography(DATA) {
 // Hall as much of Boston is. So it is counted from each entry's `town` and from nothing
 // else. An entry without one is left out and reported as left out, and when no entry
 // has one the split says so rather than print a small ring that looks like an answer.
+const hasTown = d => typeof d.town === "string" && d.town !== "";
 function towns(DATA) {
-  const placed = DATA.filter(d => typeof d.town === "string" && d.town);
+  const placed = DATA.filter(hasTown);
   if (!placed.length) return { available: false, reason: "entries carry no town yet" };
   const core = new Set(CORE_TOWNS);
   const count = list => {
@@ -451,7 +455,8 @@ function sentences(r) {
   const sw = g.statewide && g.statewide.total ? g.statewide : null;
   const mind = "A pin is where an organization sits, not whom it serves." + (sw
     ? ` ${sw.total} ${sw.total === 1 ? "entry serves" : "entries serve"} the whole state` +
-      (sw.inside === null ? "" : ` (${sw.inside} from ${listOf(t.core, "or")})`) + "."
+      (sw.inside === null ? "" : ` (${sw.inside} from ${listOf(t.core, "or")}` +
+        (sw.unplaced ? `, ${sw.unplaced} with no town` : "") + ")") + "."
     : "");
   let geo;
   if (t.available) {
