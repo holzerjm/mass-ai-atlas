@@ -480,7 +480,7 @@ node --test test/kpi.test.js
 ```
 
 Most of them hand small made-up inputs to the functions the script exports: the split by
-town and the ring around Boston City Hall, the freshness count and its forecast, re-checks
+town, the entries marked statewide and the ring around Boston City Hall, the freshness count and its forecast, re-checks
 read from snapshots of the data, the review counts, and both renderings. A few check the
 list itself and the validator's rule about a town: 351 names, a neighborhood refused, a
 misspelling answered with the name that was meant. The rest run the script

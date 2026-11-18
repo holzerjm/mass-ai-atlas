@@ -103,7 +103,7 @@ it, read the published dataset instead of scraping:
 
 - `/ecosystem/atlas.json` — every entry plus the category and stage definitions, in a
   versioned envelope. The `schema` field is bumped on any breaking change, so you can detect one.
-- `/ecosystem/atlas.csv` — the same records as 21 columns.
+- `/ecosystem/atlas.csv` — the same records as 22 columns.
 - `/ecosystem/events.json` — AI events in the next 10 days.
 
 ## Make it yours

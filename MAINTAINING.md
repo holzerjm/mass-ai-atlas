@@ -325,7 +325,7 @@ Each figure is printed with what it hides, because each one misleads on its own:
 
 | Figure | What it counts | What it hides |
 |---|---|---|
-| **Geography** | Entries whose `town` is neither Boston nor Cambridge, then entries whose pin is more than 25 miles from Boston City Hall. Each with and without companies and corporate labs. | A pin is where an organization sits, not whom it serves: a statewide program counts in the town its office is in. And outside the two cities isn't far from them. Somerville and Brookline count as outside, which is why the 25-mile figure follows. |
+| **Geography** | Entries whose `town` is neither Boston nor Cambridge, then entries whose pin is more than 25 miles from Boston City Hall. Each with and without companies and corporate labs. | A pin is where an organization sits, not whom it serves: a statewide program counts in the town its office is in. So the message also says how many entries are marked `statewide`, and how many of those sit in the two cities. And outside the two cities isn't far from them. Somerville and Brookline count as outside, which is why the 25-mile figure follows. |
 | **Freshness** | Entries checked within six months, counted the way `stale.js` counts. | While the oldest check is younger than six months, it reads 100% whatever anyone does. So it comes with a forecast: what it will read on the 1st of each coming month if every month's queue is checked. |
 | **Re-checks** | From git: each time an entry's `lastVerified` moved forward, and whether anything else in that entry changed in the same commit. | It includes entries fixed because someone already knew they were wrong, so it runs high. If it says **no entry was re-checked** last month, the queue was skipped. |
 | **Review** | Issues and pull requests from anyone but a maintainer or a bot: how many a machine checked, how many it prepared, how many it decided. | **Machine-decided has to read 0.** Nothing is published without a maintainer. If it doesn't, the message names the issue or pull request to look at. |
@@ -431,6 +431,7 @@ Every entry has these fields. ⭐ = required.
 | `cat` | ⭐ | The category **key** — translate from the form using the table below. | `startup` |
 | `loc` | ⭐ | Street address, or neighborhood if it moves around. | `1 Broadway, Cambridge` |
 | `town` | ⭐ | The **city or town** the pin sits in: one of Massachusetts' 351, spelled as in `scripts/towns.js`. Not a neighborhood or a village. Kendall Sq is `Cambridge`; Allston, Charlestown and the Seaport are `Boston`. If you can't tell, see "Which town is it in?" in Part 1, Step 2. | `Cambridge` |
+| `statewide` |  | Add `statewide: true` **only** when the entry's own `desc` or `why` says its mandate or program covers Massachusetts as a whole: a state agency, or a program or network that runs across the state. Not because anyone may apply (most funds and accelerators take applications from anywhere), not for a region of the state, and not for a national program. The KPI message counts these beside the figures by town. | `true` |
 | `lat` | ⭐ | First coordinate from Google Maps. | `42.3629` |
 | `lng` | ⭐ | Second coordinate from Google Maps. | `-71.0838` |
 | `approx` |  | Add `approx: true` **only** if the location is neighborhood-level, not exact. | `true` |

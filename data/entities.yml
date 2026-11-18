@@ -1929,6 +1929,7 @@
   cat: vc
   loc: 1075 Main St, Waltham
   town: Waltham
+  statewide: true
   lat: 42.3768
   lng: -71.2541
   url: https://www.mass-ventures.com
@@ -2895,6 +2896,7 @@
   cat: accel
   loc: 85 Main St, North Adams
   town: North Adams
+  statewide: true
   lat: 42.6992
   lng: -73.1125
   url: https://leverinc.org
@@ -3587,6 +3589,7 @@
   cat: event
   loc: Statewide · Sept 16–Oct 28, 2027
   town: Boston
+  statewide: true
   lat: 42.3554
   lng: -71.0603
   url: https://aiweek.boston
@@ -3795,6 +3798,7 @@
   cat: gov
   loc: 75A North Drive, Westborough
   town: Westborough
+  statewide: true
   lat: 42.2872
   lng: -71.6289
   url: https://masstech.org
@@ -3812,6 +3816,7 @@
   cat: gov
   loc: 2 Center Plaza, Boston
   town: Boston
+  statewide: true
   lat: 42.3597
   lng: -71.0602
   url: https://aihub.masstech.org
@@ -3833,6 +3838,7 @@
   cat: gov
   loc: 100 Bigelow St, Holyoke
   town: Holyoke
+  statewide: true
   lat: 42.2025
   lng: -72.6079
   url: https://mghpcc.org
@@ -3850,6 +3856,7 @@
   cat: gov
   loc: 294 Washington St, Boston
   town: Boston
+  statewide: true
   lat: 42.3573
   lng: -71.0582
   url: https://www.masscec.com
@@ -3867,6 +3874,7 @@
   cat: gov
   loc: 1075 Main St, Waltham
   town: Waltham
+  statewide: true
   lat: 42.3768
   lng: -71.2541
   url: https://www.masslifesciences.com
@@ -3897,6 +3905,7 @@
   cat: gov
   loc: 2 Center Plaza, Boston
   town: Boston
+  statewide: true
   lat: 42.3597
   lng: -71.0602
   url: https://mehi.masstech.org/digital-health-sandbox-program
@@ -3934,6 +3943,7 @@
   cat: gov
   loc: 75A North Drive, Westborough
   town: Westborough
+  statewide: true
   lat: 42.2872
   lng: -71.6289
   url: https://masscybercenter.org
