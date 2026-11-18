@@ -10,6 +10,11 @@
 #
 # A copy of this template should replace this list, or set it to [].
 
+- date: 2026-11-18
+  title: Search by city
+  text: Type a city, such as Cambridge or Worcester, into any search box to find the organizations there. It now works where an address names only a neighborhood or a campus, like Kendall Sq or the Seaport.
+  try: '#directory'
+
 - date: 2026-11-15
   title: See what was added, and when
   text: Filter the map and the Directory to the organizations added this month, or in the last 3 or 6 months. Each entry now says when it joined, and a new one is marked on its map popup.

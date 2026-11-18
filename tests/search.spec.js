@@ -45,6 +45,31 @@ test("several words must all match, wherever each one is", async ({ page }) => {
   await expect(page.locator("#dirCount")).not.toContainText("closest");
 });
 
+// An address often names only a neighborhood or a campus: "Kendall Sq", "Seaport", "Allston". Until
+// 2026-11 the search read the address alone, so "Cambridge" missed the MIT-IBM lab and "Boston" the
+// Kempner Institute: 15 entries named their city nowhere. The search reads each entry's town too.
+test("a city finds every entry in it, whatever its address calls the place", async ({ page }) => {
+  const named = d => d.loc.toLowerCase().includes(d.town.toLowerCase());
+  // every town that some entry's address leaves out, and one that every address names
+  const leftOut = [...new Set(DATA.filter(d => !named(d)).map(d => d.town))];
+  const spelled = DATA.map(d => d.town).find(t => !leftOut.includes(t));
+  expect(leftOut.length, "no address leaves its town out, so this test proves nothing").toBeGreaterThan(0);
+  for(const town of [...leftOut, spelled]){
+    await search(page, town);
+    const names = await shownIds(page);
+    for(const d of DATA.filter(d => d.town === town)) expect(names, `"${town}" finds ${d.name}`).toContain(d.name);
+  }
+  // and beside another word: everything in that town that offers funding, and nothing from a
+  // town away that never mentions it
+  const town = leftOut[0], funds = d => d.offers.includes("funding");
+  const away = DATA.find(d => funds(d) && d.town !== town && !JSON.stringify(d).toLowerCase().includes(town.toLowerCase()));
+  await search(page, `funding ${town}`);
+  const names = await shownIds(page);
+  for(const d of DATA.filter(d => funds(d) && d.town === town)) expect(names, `"funding ${town}" finds ${d.name}`).toContain(d.name);
+  expect(names).not.toContain(away.name);
+  await expect(page.locator("#dirCount")).not.toContainText("closest");
+});
+
 // One or two letters match a whole word only, or "ai" would find "air" and "vc" anything.
 test("a word matches at the start of a word, and a short word only as a whole word", async ({ page }) => {
   await search(page, "robot");

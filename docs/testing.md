@@ -219,6 +219,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | `search.spec.js` | hyphens, plurals, and founders' words | the atlas's own spelling deciding what a founder finds again. "wet lab" must find LabCentral's "wet-lab", "women" must find January Ventures' "Woman-led", and a plural must match |
 | | a need finds every entry that offers it | a search that doesn't read `offers`. "grant" missed 8 of the 17 entries offering grants until 2026-11. "gpu", "pilot", and "mentor" must each find every entry with that offer |
 | | several words must all match | a short query turning into "any of these words". Each word may match anywhere in the entry |
+| | a city finds every entry in it | a search that reads the address alone again. An address often names only a neighborhood or a campus, so until 2026-11 "Cambridge" missed the MIT-IBM lab and "Boston" the Kempner Institute. Each town that some address leaves out must find every entry in it, on its own and beside a need |
 | | word starts, and short words whole | matching inside words. "robot" must find robotics, and "bu" must not match "built" |
 | | a sentence finds the closest entries | a founder's sentence finding nothing, as every sentence did until 2026-11, or a list that doesn't say it is only the closest. The count must say so, the sort must read "Best match", and each card must show what it matched on |
 | | no match, then Clear filters | a dead end. Clear filters must empty the search and bring every entry back |
