@@ -3,8 +3,9 @@
    Per-field rules (types, formats, lengths, allowed values, no HTML) live in
    data/*.schema.yml. This script runs those schemas, then the checks a schema
    can't express: uniqueness, references across files, links between entries,
-   dates relative to today, and warnings. */
+   an entry's town, dates relative to today, and warnings. */
 const { checkData } = require("./load-data");
+const { townProblem } = require("./towns");
 
 let checked;
 try { checked = checkData(); }
@@ -56,6 +57,10 @@ for (const d of DATA) {
   // typing "Cambridge, MA" should get a nudge, not a red build.
   if (/,\s*(MA|Mass|Massachusetts)\.?$/i.test(d.loc))
     warn.push(`  ⚠ [${id}] loc ends in ", MA" — the atlas writes "street, city" and leaves the state implied`);
+  // town is the city or town the pin sits in, one of those listed in scripts/towns.js.
+  // Missing or unknown is an error, though the schema leaves the field optional (it says why).
+  const townIssue = townProblem(d.town);
+  if (townIssue) err(id, townIssue);
   if (!d.why) warn.push(`  ⚠ [${id}] missing "why it matters" — strongly encouraged`);
   if (!d.tags || d.tags.length < 1) warn.push(`  ⚠ [${id}] no tags`);
   for (const s of d.stages || [])

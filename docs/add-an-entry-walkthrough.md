@@ -30,6 +30,9 @@ The form gives you an **address** but not the map coordinates. Get them in 20 se
 > No fixed address (a meetup that moves venues)? Use the neighborhood (e.g. "Kendall Sq")
 > and add `approx: true` to the entry.
 
+Note which **city or town** the spot is in, too. Usually the address says it. A
+neighborhood isn't one: Kendall Sq is Cambridge, and Allston is Boston.
+
 ## Step 3 — Fill in the entry
 
 Copy this template into a notes app and replace the blanks:
@@ -39,6 +42,7 @@ Copy this template into a notes app and replace the blanks:
   name: 
   cat: 
   loc: 
+  town: 
   lat: 0
   lng: 0
   url: https://
@@ -64,6 +68,7 @@ Copy this template into a notes app and replace the blanks:
 | `name` | The display name. |
 | `cat` | The category **code** — translate the form's label with the table below. |
 | `loc` | The street address (or neighborhood). |
+| `town` | **Required.** The city or town the pin sits in, one of Massachusetts' 351: `Cambridge`, `Boston`, `Worcester`. Never a neighborhood. |
 | `lat`, `lng` | The two numbers from Step 2. |
 | `url` | The website. **Must start with `https://`** |
 | `desc` | 1–2 plain, factual sentences (max 400 characters). Trim any marketing language. |
@@ -148,6 +153,7 @@ A suggestion comes in: *Epipelagic Ventures · https://www.epipelagic.vc · Vent
   name: Epipelagic Ventures
   cat: vc
   loc: 1 Broadway, Cambridge
+  town: Cambridge
   lat: 42.3626
   lng: -71.0843
   url: https://www.epipelagic.vc

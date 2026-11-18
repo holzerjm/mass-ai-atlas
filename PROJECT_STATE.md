@@ -97,6 +97,7 @@ by `validate.js` in CI rather than in the browser. One entry:
   name: Acme AI Labs
   cat: startup
   loc: 1 Broadway, Cambridge
+  town: Cambridge
   lat: 42.3629
   lng: -71.0838
   approx: true
@@ -116,6 +117,9 @@ rules live in `data/*.schema.yml`; `scripts/validate.js` adds what a schema can'
 (uniqueness, cross-file references, links, dates vs. today, warnings).
 
 `id` kebab-case & unique · `cat` ∈ CATS keys · lat/lng inside MA bounds · `url` https ·
+`town` is the city or town the pin sits in, one of the 351 in `scripts/towns.js` (optional
+in the schema, so the page accepts data from before it; the validator errors if it's
+missing or not on the list, because the KPI summary counts by it) ·
 `links` must resolve to real ids (they draw Galaxy edges) · `approx: true` when the pin is
 neighbourhood-level · `lastVerified` is the month a maintainer last **actually checked**
 the org (validator warns if missing, errors if malformed; drawer shows "✓ Verified …",
@@ -169,7 +173,9 @@ transparent moderation, contribution history, on-brand for an open-source accele
 
 Maintainer adds the **`bot:draft`** label to a suggestion issue → the bot parses the
 form, geocodes the address (Nominatim), builds a `yaml.dump`-serialized `data/entities.yml` entry, and
-opens a **draft PR** with a review checklist. It never publishes (merge does that).
+opens a **draft PR** with a review checklist. It never publishes (merge does that). The entry's
+`town` comes from the geocoder's answer, and only when that names a city or town on the list in
+`scripts/towns.js`. Otherwise the draft has none and stays red until a maintainer adds it.
 
 **Trust model — read before editing this workflow:**
 - **Maintainer-gated.** The trigger is `issues: [labeled]` gated on the `bot:draft`
@@ -208,7 +214,8 @@ opens a **draft PR** with a review checklist. It never publishes (merge does tha
 | `scripts/load-data.js` | Node side of `atlas-data.js`: `loadData()` returns `{CATS, STAGES, DATA}` (throws on schema errors). Every script loads data through it. |
 | `scripts/stale.js` | Freshness report (`lastVerified` older than N months, default 12); `--queue N` prints the monthly verification rota. Never fails; CI appends it to the job summary. |
 | `scripts/linkcheck.js` | Link-rot checker — probes every entry URL, classifies broken/moved/blocked. A report, always exits 0. Run monthly by `monthly-health.yml` (with the rota), posted to Slack. |
-| `scripts/kpi.js` | KPI summary, each figure with what it hides: pins beyond 25 miles of Boston City Hall; entries checked within six months, with a forecast at the rota's pace; how many re-checks needed an edit, read from git; how outside submissions were reviewed, read from GitHub. Stores nothing. A report: when git history or GitHub is missing it says which figure is not available and still exits 0. Run monthly by `monthly-health.yml` after the health report and posted to Slack as a second message. Tests: `node --test test/kpi.test.js`. |
+| `scripts/towns.js` | The 351 Massachusetts cities and towns an entry's `town` may name, and `townProblem()`, the validator's rule about it (with a "did you mean" for a slip of spelling). |
+| `scripts/kpi.js` | KPI summary, each figure with what it hides: entries outside Boston and Cambridge, by each entry's `town`, and pins beyond 25 miles of Boston City Hall; entries checked within six months, with a forecast at the rota's pace; how many re-checks needed an edit, read from git; how outside submissions were reviewed, read from GitHub. Stores nothing. A report: when git history or GitHub is missing it says which figure is not available and still exits 0. Run monthly by `monthly-health.yml` after the health report and posted to Slack as a second message. Tests: `node --test test/kpi.test.js`. |
 | `scripts/fetch-events.js` | Builds `events.json` (gitignored) for **/ecosystem/events/** — Boston AI events, next 10 days, from Luma calendar ICS feeds (`events-sources.json`), Luma's discover API (best-effort, undocumented), AI Tinkerers (`llms-full.txt` + JSON-LD, per their agents.md), and `events-manual.json`. Runs Mondays 7am ET via `weekly-events.yml`, started by a cron on the origin server (`scripts/trigger-weekly-events.sh`, fine-grained token on `toa-forge`) because GitHub's scheduler delivered this repo's crons hours late or not at all; GitHub crons remain as Mon/Tue/Wed fallbacks behind a Monday-anchored idempotent gate (a run does the work only if it is past 7am Eastern on the latest Monday and the live `events.json` was not regenerated since; a manual run passes `force=true` to skip it); a sanity check refuses to ship a broken refresh (most sources failed), a Verify step fails the run if the live file does not show it, and a Slack rejection is red, not silent; the workflow then rsyncs the JSON and posts to the Scouts Slack (`SLACK_SCOUTS_WEBHOOK_URL`). The static page `events/index.html` deploys with the atlas; suggestions arrive via `suggest-event.yml` (label `event-suggestion`). Builds on nkpng2k/startup-event-scraper (Apache-2.0, credited). Full maintainer guide: `docs/events-guide.md`. |
 | `scripts/build-events-page.js` | Assembles `events/index.html` (a **generated file** — never hand-edit it) by lifting the TOA header/mobile-nav/footer/theme-toggle chrome verbatim from the atlas's `index.html` and wrapping it around the events page content. Re-run after changing either the shared chrome or the events layout. |
 | `scripts/export-csv.js` | Dataset → `atlas.csv` for Sheets/Excel. Output is gitignored. |

@@ -50,6 +50,7 @@ const COLUMNS = [
   ["apply_by",       d => d.applyBy || ""],             // "rolling" or "YYYY-MM-DD" deadline
   ["apply_note",     d => d.applyNote || ""],
   ["apply_url",      d => d.applyUrl || ""],            // the application page, when it isn't `url`
+  ["town",           d => d.town || ""],                // the city or town the pin sits in; last, so no earlier column moves
 ];
 
 // --- Build the CSV ---

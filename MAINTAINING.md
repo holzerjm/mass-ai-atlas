@@ -72,6 +72,15 @@ numbers so the pin lands in the right spot.
 > If the org doesn't have one fixed address (a meetup that moves around, etc.), use the
 > neighborhood (e.g. "Kendall Sq") and add `approx: true` to the entry.
 
+> **Which town is it in?** Every entry also names the **city or town** its pin sits in.
+> Usually the address says it. A neighborhood or a village isn't one: Kendall Sq is
+> `Cambridge`, and Allston, Charlestown and the Seaport are `Boston`. When you can't tell
+> (Devens is parts of three towns), ask the Census Bureau, which is how the existing
+> entries were filled. Open this address with your two numbers in place of `LNG` and `LAT`,
+> and read the name under **County Subdivisions**:
+> `https://geocoding.geo.census.gov/geocoder/geographies/coordinates?x=LNG&y=LAT&benchmark=Public_AR_Current&vintage=Current_Current&layers=County%20Subdivisions&format=json`
+> It answers "Harvard town" or "Amherst Town city": write `Harvard`, `Amherst`.
+
 ### Step 3 — Build the entry
 
 Copy this template and fill it in. Field-by-field help is in
@@ -82,6 +91,7 @@ Copy this template and fill it in. Field-by-field help is in
   name: 
   cat: 
   loc: 
+  town: 
   lat: 0
   lng: 0
   url: https://
@@ -113,7 +123,8 @@ the tables in Appendix A do this for you:
   GitHub file view, press **`/`** or `Ctrl/Cmd-F` and search the id).
 
 `offers` is **required** and needs at least one value — an entry without it is invisible to
-the "I need…" filter, so validation rejects it. Add a `badge:` line only if
+the "I need…" filter, so validation rejects it. `town` is required too, and has to be one
+of the state's 351 cities and towns: the KPI message counts by it. Add a `badge:` line only if
 there's something to flag (an empty value is an error). `links` is optional — see
 Appendix A. For `added` **and** `lastVerified`, put **today's month** as
 `YYYY-MM` (e.g. `2026-08`) — the entry joins the atlas now, and you just verified
@@ -190,6 +201,8 @@ is your judgment, next.
    - [ ] **Website works** and is the official one (click it)
    - [ ] **Right category** and the **pin location looks correct** (paste the lat/lng into
          Google Maps if unsure)
+   - [ ] **`town` is the city or town the pin sits in** — the robot checks the spelling,
+         not whether it's the right one
    - [ ] **No duplicate** of an org already in the atlas
    - [ ] **Carries a current `lastVerified`** (this month, or close to it) — it should
          reflect when the org was actually checked
@@ -312,7 +325,7 @@ Each figure is printed with what it hides, because each one misleads on its own:
 
 | Figure | What it counts | What it hides |
 |---|---|---|
-| **Geography** | Entries whose pin is more than 25 miles from Boston City Hall, with and without companies and corporate labs. | A pin is where an organization sits, not whom it serves. The share outside Boston and Cambridge isn't counted yet, because an entry has no town. |
+| **Geography** | Entries whose `town` is neither Boston nor Cambridge, then entries whose pin is more than 25 miles from Boston City Hall. Each with and without companies and corporate labs. | A pin is where an organization sits, not whom it serves: a statewide program counts in the town its office is in. And outside the two cities isn't far from them. Somerville and Brookline count as outside, which is why the 25-mile figure follows. |
 | **Freshness** | Entries checked within six months, counted the way `stale.js` counts. | While the oldest check is younger than six months, it reads 100% whatever anyone does. So it comes with a forecast: what it will read on the 1st of each coming month if every month's queue is checked. |
 | **Re-checks** | From git: each time an entry's `lastVerified` moved forward, and whether anything else in that entry changed in the same commit. | It includes entries fixed because someone already knew they were wrong, so it runs high. If it says **no entry was re-checked** last month, the queue was skipped. |
 | **Review** | Issues and pull requests from anyone but a maintainer or a bot: how many a machine checked, how many it prepared, how many it decided. | **Machine-decided has to read 0.** Nothing is published without a maintainer. If it doesn't, the message names the issue or pull request to look at. |
@@ -417,6 +430,7 @@ Every entry has these fields. ⭐ = required.
 | `name` | ⭐ | The display name (must be unique). | `Acme AI Labs` |
 | `cat` | ⭐ | The category **key** — translate from the form using the table below. | `startup` |
 | `loc` | ⭐ | Street address, or neighborhood if it moves around. | `1 Broadway, Cambridge` |
+| `town` | ⭐ | The **city or town** the pin sits in: one of Massachusetts' 351, spelled as in `scripts/towns.js`. Not a neighborhood or a village. Kendall Sq is `Cambridge`; Allston, Charlestown and the Seaport are `Boston`. If you can't tell, see "Which town is it in?" in Part 1, Step 2. | `Cambridge` |
 | `lat` | ⭐ | First coordinate from Google Maps. | `42.3629` |
 | `lng` | ⭐ | Second coordinate from Google Maps. | `-71.0838` |
 | `approx` |  | Add `approx: true` **only** if the location is neighborhood-level, not exact. | `true` |
@@ -492,6 +506,7 @@ You look up `1 Broadway, Cambridge` in Google Maps → `42.3629, -71.0838`, and 
   name: Acme AI Labs
   cat: startup
   loc: 1 Broadway, Cambridge
+  town: Cambridge
   lat: 42.3629
   lng: -71.0838
   url: https://acme.ai
@@ -561,6 +576,8 @@ pattern …`. Common ones:
 | `must NOT have additional properties "…"` | A field name is misspelled (e.g. `lastverified`) or isn't one of the fields in Appendix A. |
 | `must be string` | A field was left empty (e.g. `badge:` with nothing after it). Fill it in or delete the line. |
 | `links to unknown entry` | A value in `links` doesn't match any `id`. Fix the spelling or remove it. |
+| `missing town` | Add a `town:` line with the city or town the pin sits in, e.g. `town: Cambridge`. |
+| `is not a Massachusetts city or town` | `town` has to be one of the state's 351 cities and towns. If the message asks "did you mean…", that's the spelling. If it doesn't, you probably wrote a neighborhood or a village: that goes in `loc`, and `town` is the city or town it's part of (`Boston` for Allston). |
 | `[updates.yml] … links to unknown pathway` (or `entry`) | A `try` link names a pathway or an entry that doesn't exist. Fix the link, or remove it if the feature moved. |
 | `[updates.yml] … in the future` | Check the date. Use the day the change goes live. |
 | `[pathways.yml] … unknown entry` | A step in `data/pathways.yml` names an `id` that doesn't exist. Fix the spelling, or take it out of the step if the entry was removed. |

@@ -22,6 +22,7 @@ const path = require("path");
 const https = require("https");
 const yaml = require("js-yaml");
 const { loadData } = require("./load-data");
+const { TOWNS } = require("./towns");
 
 const ROOT = path.join(__dirname, "..");
 const TMP = process.env.RUNNER_TEMP || path.join(ROOT, ".bot-tmp");
@@ -151,7 +152,7 @@ if (connectionsText) {
 
 // ---------- geocode (Nominatim, one request, proper UA) ----------
 function geocode(q) {
-  const qs = new URLSearchParams({ q, format: "json", limit: "1", countrycodes: "us" });
+  const qs = new URLSearchParams({ q, format: "json", limit: "1", countrycodes: "us", addressdetails: "1" });
   return new Promise((resolve) => {
     const req = https.get({
       host: "nominatim.openstreetmap.org",
@@ -176,11 +177,18 @@ function geocode(q) {
     const la = +(+hit.lat).toFixed(4), ln = +(+hit.lon).toFixed(4);
     if (la >= 41.5 && la <= 43 && ln >= -73.5 && ln <= -70.5) { lat = la; lng = ln; geocoded = true; }
   }
+  // The city or town around the pin. The geocoder's answer names it under one of these
+  // keys, beside neighborhoods and villages under others ("town: Devens, village: Harvard").
+  // Only a name on the atlas's own list is taken, and it is the list's copy that is written,
+  // so nothing in the answer reaches the entry. With none found the entry gets no town and
+  // the validator fails the draft until a maintainer adds it.
+  const place = (geocoded && hit.address) || {};
+  const town = ["city", "town", "village", "municipality"].map(k => TOWNS.find(t => t === place[k])).find(Boolean);
 
   // ---------- build the entry (serialized with yaml.dump, same layout as entities.yml) ----------
   const month = new Date().toISOString().slice(0, 7);
   const entry = yaml.dump([{
-    id, name, cat, loc, approx: true, lat, lng, url, desc,
+    id, name, cat, loc, ...(town ? { town } : {}), approx: true, lat, lng, url, desc,
     ...(why ? { why } : {}),
     tags, stages,
     ...(links.length ? { links } : {}),
@@ -225,6 +233,7 @@ function geocode(q) {
     `| id | \`${id}\` |`,
     `| category | \`${cat}\` |`,
     `| pin | ${geocoded ? `${lat}, ${lng} — geocoded via Nominatim (© OpenStreetMap contributors) from \`${query.replace(/[`|\r\n]/g, " ")}\`, marked \`approx:true\`` : "**GEOCODING FAILED** — lat/lng are 0,0 and CI is red on purpose; fix the pin before merge"} |`,
+    `| town | ${town ? `${town} — the city or town the geocoder puts the pin in` : geocoded ? "**NOT FOUND** — add `town`, the city or town the pin sits in; CI is red until it is there" : "(none: the pin was not found)"} |`,
     `| stages | ${stages.join(", ") || "(none given)"} |`,
     ``,
     `Submitted text (already serialized safely into \`data/entities.yml\`; edit for house voice before merge):`,
@@ -237,7 +246,7 @@ function geocode(q) {
     ``,
     `**Maintainer checklist — merging publishes to the live site:**`,
     `- [ ] Opened the org's website; it is real, active, and in Massachusetts`,
-    `- [ ] Pin location is right (fix coordinates / remove \`approx\` if exact)`,
+    `- [ ] Pin location is right (fix coordinates / remove \`approx\` if exact), and \`town\` is the city or town it sits in`,
     `- [ ] \`desc\` is factual + neutral, \`why\` is founder-useful (rewrite as needed)`,
     `- [ ] Category and stages are honest`,
     `- [ ] Merging attests you verified this entry (\`lastVerified\` is pre-stamped ${month})`,

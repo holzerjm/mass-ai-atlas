@@ -31,6 +31,7 @@
   name: MIT CSAIL
   cat: university
   loc: Stata Center, 32 Vassar St, Cambridge
+  town: Cambridge
   lat: 42.3617
   lng: -71.0906
   url: https://www.csail.mit.edu
@@ -46,6 +47,7 @@
   name: MIT Media Lab
   cat: university
   loc: 75 Amherst St, Cambridge
+  town: Cambridge
   lat: 42.3606
   lng: -71.0873
   url: https://www.media.mit.edu
@@ -61,6 +63,7 @@
   name: MIT Schwarzman College of Computing
   cat: university
   loc: 51 Vassar St, Cambridge
+  town: Cambridge
   lat: 42.3614
   lng: -71.0926
   url: https://computing.mit.edu
@@ -75,6 +78,7 @@
   name: MIT Jameel Clinic
   cat: university
   loc: Cambridge (MIT campus)
+  town: Cambridge
   lat: 42.3621
   lng: -71.0898
   url: https://jclinic.mit.edu
@@ -90,6 +94,7 @@
   name: Kempner Institute (Harvard)
   cat: university
   loc: 150 Western Ave, Allston
+  town: Boston
   lat: 42.3635
   lng: -71.1283
   url: https://kempnerinstitute.harvard.edu
@@ -104,6 +109,7 @@
   name: Harvard Data Science Initiative
   cat: university
   loc: 114 Western Ave, Allston
+  town: Boston
   lat: 42.3632
   lng: -71.1244
   url: https://datascience.harvard.edu
@@ -118,6 +124,7 @@
   name: Berkman Klein Center
   cat: university
   loc: 1557 Massachusetts Ave, Cambridge
+  town: Cambridge
   lat: 42.3782
   lng: -71.1191
   url: https://cyber.harvard.edu
@@ -132,6 +139,7 @@
   name: Institute for Experiential AI (Northeastern)
   cat: university
   loc: Northeastern University, Boston
+  town: Boston
   approx: true
   lat: 42.3398
   lng: -71.0892
@@ -149,6 +157,7 @@
   name: BU Computing & Data Sciences
   cat: university
   loc: 665 Commonwealth Ave, Boston
+  town: Boston
   lat: 42.3505
   lng: -71.1054
   url: https://www.bu.edu/cds-faculty/
@@ -164,6 +173,7 @@
   name: UMass Amherst Manning CICS
   cat: university
   loc: 140 Governors Dr, Amherst
+  town: Amherst
   lat: 42.3952
   lng: -72.5311
   url: https://www.cics.umass.edu
@@ -180,6 +190,7 @@
   name: WPI AI Programs
   cat: university
   loc: 100 Institute Rd, Worcester
+  town: Worcester
   lat: 42.2746
   lng: -71.8063
   url: https://www.wpi.edu/about/ai
@@ -194,6 +205,7 @@
   name: Tufts CS & HRI Lab
   cat: university
   loc: Medford
+  town: Medford
   lat: 42.4075
   lng: -71.119
   url: https://engineering.tufts.edu/cs/
@@ -209,6 +221,7 @@
   name: UMass Amherst Center for Data Science and AI (CDSAI)
   cat: university
   loc: UMass Amherst (LGRC), Amherst
+  town: Amherst
   lat: 42.3939
   lng: -72.5277
   url: https://ds.cs.umass.edu
@@ -225,6 +238,7 @@
   name: UMass Amherst CIIR
   cat: university
   loc: 140 Governors Dr, Amherst
+  town: Amherst
   lat: 42.3952
   lng: -72.5311
   url: https://ciir.cs.umass.edu
@@ -241,6 +255,7 @@
   name: Paul English Applied AI Institute (UMass Boston)
   cat: university
   loc: UMass Boston, 100 Morrissey Blvd, Dorchester
+  town: Boston
   approx: true
   lat: 42.3134
   lng: -71.0354
@@ -258,6 +273,7 @@
   name: National Deep Inference Fabric (Northeastern)
   cat: university
   loc: 216 Massachusetts Ave, Boston
+  town: Boston
   approx: true
   lat: 42.3449
   lng: -71.0854
@@ -276,6 +292,7 @@
   name: Tufts Institute for Artificial Intelligence
   cat: university
   loc: Joyce Cummings Center, 177 College Ave, Medford
+  town: Medford
   approx: true
   lat: 42.4079
   lng: -71.1164
@@ -293,6 +310,7 @@
   name: IAIFI (NSF AI + Physics Institute)
   cat: university
   loc: MIT Bldg 26, 77 Massachusetts Ave, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3601
   lng: -71.0942
@@ -311,6 +329,7 @@
   name: Brandeis Michtom School of Computer Science
   cat: university
   loc: Brandeis University, Waltham
+  town: Waltham
   approx: true
   lat: 42.3657
   lng: -71.2626
@@ -328,6 +347,7 @@
   name: MassAITC
   cat: university
   loc: Manning CICS, UMass Amherst
+  town: Amherst
   approx: true
   lat: 42.3952
   lng: -72.5311
@@ -347,6 +367,7 @@
   name: Bristol Community College
   cat: university
   loc: 777 Elsbree St, Fall River
+  town: Fall River
   lat: 41.7232
   lng: -71.1221
   url: https://bristolcc.edu/AI
@@ -362,6 +383,7 @@
   name: Middlesex Community College
   cat: university
   loc: 591 Springs Rd, Bedford
+  town: Bedford
   lat: 42.5178
   lng: -71.2729
   url: https://www.middlesex.edu/academics/micro/offerings/programs/ComputerScienceArtificialIntelligenceMicroCredential.html
@@ -377,6 +399,7 @@
   name: The Generator (Babson)
   cat: university
   loc: 9 Map Hill Dr, Wellesley
+  town: Wellesley
   lat: 42.2946
   lng: -71.2642
   url: https://www.babson.edu/thegenerator/
@@ -395,6 +418,7 @@
   name: MIT-IBM Computing Research Lab
   cat: corporate
   loc: 314 Main St, Kendall Sq
+  town: Cambridge
   lat: 42.3622
   lng: -71.0857
   url: https://mitibm.mit.edu/
@@ -410,6 +434,7 @@
   name: Microsoft New England R&D (NERD)
   cat: corporate
   loc: 1 Memorial Dr, Cambridge
+  town: Cambridge
   lat: 42.3614
   lng: -71.0813
   url: https://microsoftnewengland.com/
@@ -428,6 +453,7 @@
   name: Google Cambridge
   cat: corporate
   loc: 325 Main St, Kendall Sq
+  town: Cambridge
   lat: 42.3621
   lng: -71.0846
   url: https://about.google/company-info/locations/
@@ -445,6 +471,7 @@
   name: Meta Cambridge
   cat: corporate
   loc: 100 Binney St, Cambridge
+  town: Cambridge
   lat: 42.3672
   lng: -71.0805
   url: https://www.metacareers.com/bostonjobsearch/
@@ -459,6 +486,7 @@
   name: Amazon Boston (Seaport)
   cat: corporate
   loc: 111 Harbor Way, Seaport
+  town: Boston
   lat: 42.3513
   lng: -71.0448
   url: https://www.aboutamazon.com
@@ -476,6 +504,7 @@
   name: RAI Institute
   cat: corporate
   loc: 145 Broadway, Kendall Sq
+  town: Cambridge
   lat: 42.365
   lng: -71.0851
   url: https://rai-inst.com
@@ -491,6 +520,7 @@
   name: Anthropic (Cambridge)
   cat: corporate
   loc: Central Square, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3653
   lng: -71.1037
@@ -507,6 +537,7 @@
   name: NVIDIA (Westford)
   cat: corporate
   loc: Westford
+  town: Westford
   lat: 42.5795
   lng: -71.4377
   url: https://nvidia.com
@@ -522,6 +553,7 @@
   name: Oracle (Burlington)
   cat: corporate
   loc: 8 Van de Graaff Dr, Burlington
+  town: Burlington
   lat: 42.4807
   lng: -71.1997
   url: https://oracle.com
@@ -537,6 +569,7 @@
   name: Salesforce (Boston)
   cat: corporate
   loc: 500 Boylston St, Boston
+  town: Boston
   lat: 42.3504
   lng: -71.074
   url: https://salesforce.com
@@ -551,6 +584,7 @@
   name: Apple (Cambridge)
   cat: corporate
   loc: 314 Main St, Kendall Sq
+  town: Cambridge
   lat: 42.3622
   lng: -71.0857
   url: https://apple.com
@@ -566,6 +600,7 @@
   name: Red Hat (Boston)
   cat: corporate
   loc: 300 A St, Boston
+  town: Boston
   lat: 42.3475
   lng: -71.0509
   url: https://redhat.com
@@ -581,6 +616,7 @@
   name: Microsoft Research New England
   cat: corporate
   loc: 1 Memorial Dr, Cambridge
+  town: Cambridge
   lat: 42.3614
   lng: -71.0813
   url: https://www.microsoft.com/en-us/research/lab/microsoft-research-new-england/
@@ -597,6 +633,7 @@
   name: Amazon Robotics
   cat: corporate
   loc: 300 Riverpark Dr, North Reading
+  town: North Reading
   lat: 42.5559
   lng: -71.132
   url: https://www.amazon.jobs/content/en/teams/ftr/amazon-robotics
@@ -614,6 +651,7 @@
   name: RTX BBN Technologies
   cat: corporate
   loc: 10 Moulton St, Cambridge
+  town: Cambridge
   lat: 42.3897
   lng: -71.1475
   url: https://www.rtx.com/what-we-do/bbn-technologies
@@ -630,6 +668,7 @@
   name: MITRE (Bedford)
   cat: corporate
   loc: 202 Burlington Rd, Bedford
+  town: Bedford
   lat: 42.505
   lng: -71.2366
   url: https://www.mitre.org/
@@ -646,6 +685,7 @@
   name: Draper Laboratory
   cat: corporate
   loc: 555 Technology Square, Cambridge
+  town: Cambridge
   lat: 42.3646
   lng: -71.0906
   url: https://www.draper.com/
@@ -662,6 +702,7 @@
   name: Analog Devices
   cat: corporate
   loc: One Analog Way, Wilmington
+  town: Wilmington
   lat: 42.5307
   lng: -71.1459
   url: https://www.analog.com/
@@ -678,6 +719,7 @@
   name: Microsoft Burlington (Nuance)
   cat: corporate
   loc: 15 Wayside Rd, Burlington
+  town: Burlington
   lat: 42.4851
   lng: -71.1922
   url: https://dragon.nuance.com/en-us/home
@@ -696,6 +738,7 @@
   name: Mitsubishi Electric Research Laboratories (MERL)
   cat: corporate
   loc: 201 Broadway, Cambridge
+  town: Cambridge
   lat: 42.3661
   lng: -71.0924
   url: https://www.merl.com/
@@ -713,6 +756,7 @@
   name: MIT Lincoln Laboratory
   cat: corporate
   loc: 244 Wood St, Lexington
+  town: Lexington
   lat: 42.4617
   lng: -71.2648
   url: https://www.ll.mit.edu/
@@ -732,6 +776,7 @@
   name: Toyota Research Institute
   cat: corporate
   loc: Cambridge (near MIT)
+  town: Cambridge
   approx: true
   lat: 42.3618
   lng: -71.0885
@@ -751,6 +796,7 @@
   name: Liquid AI
   cat: startup
   loc: Kendall Sq, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.364
   lng: -71.083
@@ -768,6 +814,7 @@
   name: Suno
   cat: startup
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3653
   lng: -71.1031
@@ -785,6 +832,7 @@
   name: Blitzy
   cat: startup
   loc: Kendall Sq, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.364
   lng: -71.083
@@ -802,6 +850,7 @@
   name: DataRobot
   cat: startup
   loc: 33 Arch St, Boston
+  town: Boston
   lat: 42.3554
   lng: -71.057
   url: https://www.datarobot.com
@@ -817,6 +866,7 @@
   name: Recorded Future
   cat: startup
   loc: 225 Franklin St, Boston
+  town: Boston
   lat: 42.3557
   lng: -71.0558
   url: https://www.recordedfuture.com
@@ -833,6 +883,7 @@
   name: Boston Dynamics
   cat: startup
   loc: 200 Smith St, Waltham
+  town: Waltham
   lat: 42.4188
   lng: -71.2542
   url: https://bostondynamics.com
@@ -849,6 +900,7 @@
   name: Kensho
   cat: startup
   loc: 44 Brattle St, Cambridge
+  town: Cambridge
   lat: 42.3738
   lng: -71.1224
   url: https://kensho.com
@@ -865,6 +917,7 @@
   name: Tamr
   cat: startup
   loc: 66 Church St, Cambridge
+  town: Cambridge
   lat: 42.374
   lng: -71.121
   url: https://www.tamr.com
@@ -880,6 +933,7 @@
   name: PathAI
   cat: startup
   loc: Fenway, Boston
+  town: Boston
   approx: true
   lat: 42.345
   lng: -71.103
@@ -896,6 +950,7 @@
   name: Generate:Biomedicines
   cat: startup
   loc: 101 South St, Somerville
+  town: Somerville
   lat: 42.3748
   lng: -71.0911
   url: https://generatebiomedicines.com
@@ -912,6 +967,7 @@
   name: Lila Sciences
   cat: startup
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.366
   lng: -71.076
@@ -928,6 +984,7 @@
   name: Realtime Robotics
   cat: startup
   loc: 27 Wormwood St, Fort Point
+  town: Boston
   lat: 42.3468
   lng: -71.0498
   url: https://rtr.ai
@@ -943,6 +1000,7 @@
   name: RightHand Robotics
   cat: startup
   loc: 237 Washington St, Somerville
+  town: Somerville
   lat: 42.3799
   lng: -71.0936
   url: https://www.righthandrobotics.com
@@ -958,6 +1016,7 @@
   name: Pickle Robot
   cat: startup
   loc: 465 Medford St, Charlestown
+  town: Boston
   lat: 42.3848
   lng: -71.068
   url: https://www.picklerobot.com
@@ -973,6 +1032,7 @@
   name: ConcertAI
   cat: startup
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.363
   lng: -71.085
@@ -988,6 +1048,7 @@
   name: Code Metal
   cat: startup
   loc: Boston
+  town: Boston
   approx: true
   lat: 42.3565
   lng: -71.0575
@@ -1005,6 +1066,7 @@
   name: Maven AGI
   cat: startup
   loc: 399 Boylston St, Boston
+  town: Boston
   lat: 42.3518
   lng: -71.0721
   url: https://www.mavenagi.com
@@ -1021,6 +1083,7 @@
   name: 7AI
   cat: startup
   loc: 10 St James Ave, Boston
+  town: Boston
   lat: 42.3504
   lng: -71.0709
   url: https://7ai.com
@@ -1037,6 +1100,7 @@
   name: EnFi
   cat: startup
   loc: Waltham
+  town: Waltham
   approx: true
   lat: 42.3765
   lng: -71.2356
@@ -1053,6 +1117,7 @@
   name: Pando Bioscience
   cat: startup
   loc: 134 Coolidge Ave, Watertown
+  town: Watertown
   lat: 42.3656
   lng: -71.1487
   url: https://www.pando.bio
@@ -1068,6 +1133,7 @@
   name: Foray Bioscience
   cat: startup
   loc: Boston
+  town: Boston
   approx: true
   lat: 42.358
   lng: -71.055
@@ -1084,6 +1150,7 @@
   name: Whelix
   cat: startup
   loc: MassRobotics, Seaport
+  town: Boston
   lat: 42.3452
   lng: -71.045
   url: https://whelix.com
@@ -1099,6 +1166,7 @@
   name: Nervoid
   cat: startup
   loc: The Engine, Cambridge
+  town: Cambridge
   lat: 42.3638
   lng: -71.097
   url: https://nervoidai.net
@@ -1114,6 +1182,7 @@
   name: Intertwined Biosciences
   cat: startup
   loc: LabCentral, Kendall Sq
+  town: Cambridge
   lat: 42.3628
   lng: -71.0948
   url: https://intertwined.bio
@@ -1129,6 +1198,7 @@
   name: Fleet Robotics
   cat: startup
   loc: 500 Rutherford Ave, Charlestown
+  town: Boston
   lat: 42.3814
   lng: -71.0727
   url: https://www.fleetrobotics.ai
@@ -1144,6 +1214,7 @@
   name: CRABI Robotics
   cat: startup
   loc: Boston
+  town: Boston
   approx: true
   lat: 42.353
   lng: -71.05
@@ -1160,6 +1231,7 @@
   name: Luminous
   cat: startup
   loc: South Boston
+  town: Boston
   approx: true
   lat: 42.3381
   lng: -71.0476
@@ -1176,6 +1248,7 @@
   name: Endox
   cat: startup
   loc: MassRobotics, Seaport
+  town: Boston
   lat: 42.3448
   lng: -71.0458
   url: https://www.endoxai.com
@@ -1191,6 +1264,7 @@
   name: Longreach
   cat: startup
   loc: Brookline
+  town: Brookline
   approx: true
   lat: 42.3329
   lng: -71.1188
@@ -1207,6 +1281,7 @@
   name: Evolv Technology
   cat: startup
   loc: 500 Totten Pond Rd, Waltham
+  town: Waltham
   lat: 42.3965
   lng: -71.2592
   url: https://evolv.com
@@ -1223,6 +1298,7 @@
   name: VALIS Insights
   cat: startup
   loc: 104 Prescott St, Worcester
+  town: Worcester
   lat: 42.2783
   lng: -71.7994
   url: https://valisinsights.com
@@ -1239,6 +1315,7 @@
   name: Commonwealth Fusion Systems
   cat: startup
   loc: 117 Hospital Rd, Devens
+  town: Harvard
   lat: 42.5422
   lng: -71.626
   url: https://cfs.energy
@@ -1255,6 +1332,7 @@
   name: iRobot
   cat: startup
   loc: 8 Crosby Dr, Bedford
+  town: Bedford
   lat: 42.5046
   lng: -71.2418
   url: https://www.irobot.com/
@@ -1272,6 +1350,7 @@
   name: Locus Robotics
   cat: startup
   loc: 100 Fordham Rd, Wilmington
+  town: Wilmington
   lat: 42.5608
   lng: -71.14
   url: https://locusrobotics.com/
@@ -1288,6 +1367,7 @@
   name: Berkshire Grey
   cat: startup
   loc: 140 South Rd, Bedford
+  town: Bedford
   lat: 42.4854
   lng: -71.2756
   url: https://www.berkshiregrey.com/
@@ -1306,6 +1386,7 @@
   name: Symbotic
   cat: startup
   loc: 200 Research Dr, Wilmington
+  town: Wilmington
   lat: 42.6034
   lng: -71.158
   url: https://www.symbotic.com/
@@ -1323,6 +1404,7 @@
   name: Motional
   cat: startup
   loc: Seaport, Boston
+  town: Boston
   approx: true
   lat: 42.351
   lng: -71.0438
@@ -1340,6 +1422,7 @@
   name: Tutor Intelligence
   cat: startup
   loc: 80 Coolidge Hill Rd, Watertown
+  town: Watertown
   lat: 42.3676
   lng: -71.1526
   url: https://tutorintelligence.com/
@@ -1357,6 +1440,7 @@
   name: Vecna Robotics
   cat: startup
   loc: 425 Waverley Oaks Rd, Waltham
+  town: Waltham
   lat: 42.3866
   lng: -71.2047
   url: https://www.vecnarobotics.com/
@@ -1373,6 +1457,7 @@
   name: Sea Machines Robotics
   cat: startup
   loc: 266 Summer St, Boston
+  town: Boston
   lat: 42.3506
   lng: -71.0509
   url: https://sea-machines.com/
@@ -1389,6 +1474,7 @@
   name: Cognex
   cat: startup
   loc: One Vision Dr, Natick
+  town: Natick
   lat: 42.3027
   lng: -71.3548
   url: https://www.cognex.com/
@@ -1406,6 +1492,7 @@
   name: Walden Robotics
   cat: startup
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3662
   lng: -71.1045
@@ -1424,6 +1511,7 @@
   name: Merlin
   cat: startup
   loc: 100 Causeway St, Boston
+  town: Boston
   lat: 42.3652
   lng: -71.0618
   url: https://merlinlabs.com/
@@ -1441,6 +1529,7 @@
   name: Ven^X
   cat: vc
   loc: 125 High St, Boston
+  town: Boston
   lat: 42.3553
   lng: -71.0541
   url: https://www.venx.vc
@@ -1456,6 +1545,7 @@
   name: Epipelagic Ventures
   cat: vc
   loc: 1 Broadway, Cambridge
+  town: Cambridge
   lat: 42.3626
   lng: -71.0843
   url: https://www.epipelagic.vc
@@ -1471,6 +1561,7 @@
   name: NextView Ventures
   cat: vc
   loc: 22 Boston Wharf Rd, Seaport
+  town: Boston
   lat: 42.3504
   lng: -71.047
   url: https://nextview.vc
@@ -1487,6 +1578,7 @@
   name: GC Venture Fellowship (fka Rough Draft Ventures)
   cat: vc
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3656
   lng: -71.1009
@@ -1507,6 +1599,7 @@
   name: Matrix (fka Matrix Partners)
   cat: vc
   loc: 101 Main St, Cambridge
+  town: Cambridge
   lat: 42.3622
   lng: -71.0813
   url: https://matrix.vc/
@@ -1521,6 +1614,7 @@
   name: IBM Ventures
   cat: vc
   loc: Cambridge, Kendall Sq
+  town: Cambridge
   approx: true
   lat: 42.3625
   lng: -71.0843
@@ -1538,6 +1632,7 @@
   name: General Catalyst
   cat: vc
   loc: 20 University Rd, Cambridge
+  town: Cambridge
   lat: 42.3722
   lng: -71.1183
   url: https://www.generalcatalyst.com
@@ -1554,6 +1649,7 @@
   name: Glasswing Ventures
   cat: vc
   loc: 275 Newbury St, Boston
+  town: Boston
   lat: 42.3495
   lng: -71.0838
   url: https://glasswing.vc
@@ -1570,6 +1666,7 @@
   name: Pillar VC
   cat: vc
   loc: Back Bay, Boston
+  town: Boston
   approx: true
   lat: 42.3515
   lng: -71.079
@@ -1586,6 +1683,7 @@
   name: Hyperplane
   cat: vc
   loc: Back Bay, Boston
+  town: Boston
   approx: true
   lat: 42.3513
   lng: -71.0772
@@ -1601,6 +1699,7 @@
   name: Flybridge
   cat: vc
   loc: Back Bay, Boston
+  town: Boston
   approx: true
   lat: 42.351
   lng: -71.072
@@ -1617,6 +1716,7 @@
   name: Underscore VC
   cat: vc
   loc: 131 Oliver St, Boston
+  town: Boston
   lat: 42.3552
   lng: -71.0525
   url: https://underscore.vc
@@ -1632,6 +1732,7 @@
   name: Founder Collective
   cat: vc
   loc: Harvard Sq, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3744
   lng: -71.12
@@ -1647,6 +1748,7 @@
   name: Battery Ventures
   cat: vc
   loc: One Marina Park Dr, Seaport
+  town: Boston
   lat: 42.3535
   lng: -71.044
   url: https://www.battery.com
@@ -1661,6 +1763,7 @@
   name: Bessemer Venture Partners (Boston)
   cat: vc
   loc: 100 Worcester St, Wellesley
+  town: Wellesley
   lat: 42.3161
   lng: -71.2386
   url: https://www.bvp.com
@@ -1675,6 +1778,7 @@
   name: Flagship Pioneering
   cat: vc
   loc: 55 Cambridge Pkwy, Cambridge
+  town: Cambridge
   lat: 42.3654
   lng: -71.0762
   url: https://www.flagshippioneering.com
@@ -1691,6 +1795,7 @@
   name: Atlas Venture
   cat: vc
   loc: 300 Technology Sq, Cambridge
+  town: Cambridge
   lat: 42.3633
   lng: -71.093
   url: https://www.atlasventure.com
@@ -1705,6 +1810,7 @@
   name: Polaris Partners
   cat: vc
   loc: One Marina Park Dr, Seaport
+  town: Boston
   lat: 42.3532
   lng: -71.0453
   url: https://www.polarispartners.com
@@ -1719,6 +1825,7 @@
   name: Engine Ventures
   cat: vc
   loc: 750 Main St, Cambridge
+  town: Cambridge
   lat: 42.3638
   lng: -71.0975
   url: https://engineventures.com
@@ -1738,6 +1845,7 @@
   name: E14 Fund
   cat: vc
   loc: Kendall Sq, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3608
   lng: -71.0868
@@ -1757,6 +1865,7 @@
   name: Converge
   cat: vc
   loc: 245 Main St, Cambridge
+  town: Cambridge
   lat: 42.3625
   lng: -71.0847
   url: https://converge.vc
@@ -1771,6 +1880,7 @@
   name: Accomplice
   cat: vc
   loc: 56 Wareham St, Boston
+  town: Boston
   lat: 42.3391
   lng: -71.0674
   url: https://www.accomplice.co
@@ -1786,6 +1896,7 @@
   name: .406 Ventures
   cat: vc
   loc: 470 Atlantic Ave, Boston
+  town: Boston
   lat: 42.354189399999996
   lng: -71.0513553
   url: https://www.406ventures.com
@@ -1802,6 +1913,7 @@
   name: Material Impact
   cat: vc
   loc: 131 Dartmouth St, Boston
+  town: Boston
   lat: 42.347
   lng: -71.0754
   url: https://www.materialimpact.com
@@ -1816,6 +1928,7 @@
   name: MassVentures
   cat: vc
   loc: 1075 Main St, Waltham
+  town: Waltham
   lat: 42.3768
   lng: -71.2541
   url: https://www.mass-ventures.com
@@ -1835,6 +1948,7 @@
   name: FoundersEdge
   cat: vc
   loc: 100 Summer St, Boston
+  town: Boston
   approx: true
   lat: 42.3538
   lng: -71.0574
@@ -1852,6 +1966,7 @@
   name: Milemark Capital
   cat: vc
   loc: 303 Third St, Cambridge
+  town: Cambridge
   lat: 42.3643
   lng: -71.084
   url: https://www.milemark.capital
@@ -1867,6 +1982,7 @@
   name: Cybernetix Ventures
   cat: vc
   loc: 125 High St, Boston
+  town: Boston
   lat: 42.3553
   lng: -71.0541
   url: https://cybernetix.vc
@@ -1882,6 +1998,7 @@
   name: Two Lanterns Venture Partners
   cat: vc
   loc: Newton Centre
+  town: Newton
   approx: true
   lat: 42.335
   lng: -71.1915
@@ -1898,6 +2015,7 @@
   name: Innospark Ventures
   cat: vc
   loc: 31 St James Ave, Boston
+  town: Boston
   approx: true
   lat: 42.3509
   lng: -71.0718
@@ -1915,6 +2033,7 @@
   name: First Star Ventures
   cat: vc
   loc: 245 Main St, Cambridge
+  town: Cambridge
   lat: 42.3625
   lng: -71.0847
   url: https://firststar.vc
@@ -1931,6 +2050,7 @@
   name: Link Ventures
   cat: vc
   loc: One Kendall Sq, Cambridge
+  town: Cambridge
   lat: 42.3667
   lng: -71.0908
   url: https://www.linkventures.com
@@ -1948,6 +2068,7 @@
   name: HubSpot Ventures
   cat: vc
   loc: 2 Canal Park, Cambridge
+  town: Cambridge
   lat: 42.3701
   lng: -71.0763
   url: https://www.hubspot.com/ventures
@@ -1963,6 +2084,7 @@
   name: Spark Capital
   cat: vc
   loc: 200 Clarendon St, Boston
+  town: Boston
   lat: 42.3492
   lng: -71.0751
   url: https://www.sparkcapital.com
@@ -1978,6 +2100,7 @@
   name: Bain Capital Ventures
   cat: vc
   loc: 200 Clarendon St, Boston
+  town: Boston
   lat: 42.3492
   lng: -71.0751
   url: https://www.baincapitalventures.com
@@ -1994,6 +2117,7 @@
   name: GV (Google Ventures)
   cat: vc
   loc: 355 Main St, Cambridge
+  town: Cambridge
   lat: 42.3627
   lng: -71.0878
   url: https://www.gv.com
@@ -2009,6 +2133,7 @@
   name: Unusual Ventures
   cat: vc
   loc: 341 Newbury St, Boston
+  town: Boston
   lat: 42.3487
   lng: -71.0869
   url: https://www.unusual.vc
@@ -2024,6 +2149,7 @@
   name: Venture Guides
   cat: vc
   loc: 100 Causeway St, Boston
+  town: Boston
   lat: 42.3656
   lng: -71.0614
   url: https://www.ventureguides.com
@@ -2039,6 +2165,7 @@
   name: J2 Ventures
   cat: vc
   loc: Boston (downtown)
+  town: Boston
   approx: true
   lat: 42.3597
   lng: -71.0566
@@ -2055,6 +2182,7 @@
   name: Suffolk Technologies
   cat: vc
   loc: 65 Allerton St, Boston
+  town: Boston
   lat: 42.3281
   lng: -71.0697
   url: https://suffolktech.com
@@ -2071,6 +2199,7 @@
   name: January Ventures
   cat: vc
   loc: Boston (Back Bay)
+  town: Boston
   approx: true
   lat: 42.3496
   lng: -71.0746
@@ -2088,6 +2217,7 @@
   name: Companyon Ventures
   cat: vc
   loc: 184 High St, Boston
+  town: Boston
   lat: 42.3566
   lng: -71.0528
   url: https://companyon.vc
@@ -2104,6 +2234,7 @@
   name: Xfund
   cat: vc
   loc: 67 Mount Auburn St, Cambridge
+  town: Cambridge
   lat: 42.3718
   lng: -71.1183
   url: https://www.xfund.com
@@ -2119,6 +2250,7 @@
   name: Boston Seed Capital
   cat: vc
   loc: Wellesley Hills
+  town: Wellesley
   approx: true
   lat: 42.3255
   lng: -71.2538
@@ -2135,6 +2267,7 @@
   name: F-Prime Capital
   cat: vc
   loc: 1 Main St, Cambridge
+  town: Cambridge
   lat: 42.3622
   lng: -71.08
   url: https://www.fprimecapital.com
@@ -2149,6 +2282,7 @@
   name: Lama Partners
   cat: vc
   loc: 131 Dartmouth St, Boston
+  town: Boston
   approx: true
   lat: 42.3471
   lng: -71.076
@@ -2165,6 +2299,7 @@
   name: SBXi
   cat: vc
   loc: Kendall Sq, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3601
   lng: -71.09
@@ -2185,6 +2320,7 @@
   name: Bosch Ventures
   cat: vc
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.365
   lng: -71.085
@@ -2202,6 +2338,7 @@
   name: Misneach
   cat: vc
   loc: 131 Dartmouth St, Boston
+  town: Boston
   lat: 42.347
   lng: -71.0754
   url: https://misneach.ai
@@ -2220,6 +2357,7 @@
   name: Volition Capital
   cat: vc
   loc: 177 Huntington Ave, Boston
+  town: Boston
   lat: 42.3448
   lng: -71.0827
   url: https://www.volitioncapital.com/
@@ -2239,6 +2377,7 @@
   name: Asymmetric Capital Partners
   cat: vc
   loc: 11 Arlington St, Boston
+  town: Boston
   lat: 42.3543
   lng: -71.0722
   url: https://www.acp.vc/
@@ -2256,6 +2395,7 @@
   name: Boston Harbor Angels
   cat: angel
   loc: Boston
+  town: Boston
   approx: true
   lat: 42.3565
   lng: -71.055
@@ -2274,6 +2414,7 @@
   name: Hub Angels
   cat: angel
   loc: Boston
+  town: Boston
   approx: true
   lat: 42.3545
   lng: -71.06
@@ -2289,6 +2430,7 @@
   name: MIT Alumni Angels of Boston
   cat: angel
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.362
   lng: -71.087
@@ -2307,6 +2449,7 @@
   name: TiE Boston Angels
   cat: angel
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.365
   lng: -71.09
@@ -2324,6 +2467,7 @@
   name: Walnut Venture Associates
   cat: angel
   loc: Boston area
+  town: Boston
   approx: true
   lat: 42.35
   lng: -71.07
@@ -2339,6 +2483,7 @@
   name: LaunchPad Venture Group
   cat: angel
   loc: Boston area (forums meet downtown)
+  town: Boston
   approx: true
   lat: 42.3558
   lng: -71.0556
@@ -2357,6 +2502,7 @@
   name: HBS Alumni Angels of Boston
   cat: angel
   loc: Allston, Boston
+  town: Boston
   approx: true
   lat: 42.366
   lng: -71.123
@@ -2374,6 +2520,7 @@
   name: MIT delta v
   cat: accel
   loc: 1 Amherst St, Cambridge (Trust Center)
+  town: Cambridge
   lat: 42.3612
   lng: -71.0848
   url: https://entrepreneurship.mit.edu/accelerator/
@@ -2391,6 +2538,7 @@
   name: Martin Trust Center for MIT Entrepreneurship
   cat: accel
   loc: 1 Amherst St, Cambridge
+  town: Cambridge
   lat: 42.3612
   lng: -71.0848
   url: https://entrepreneurship.mit.edu
@@ -2406,6 +2554,7 @@
   name: MIT Venture Mentoring Service
   cat: accel
   loc: 292 Main St, Cambridge (MIT E38)
+  town: Cambridge
   lat: 42.362
   lng: -71.0858
   url: https://vms.mit.edu
@@ -2423,6 +2572,7 @@
   name: Harvard Innovation Labs
   cat: accel
   loc: 125 Western Ave, Allston
+  town: Boston
   lat: 42.3637
   lng: -71.1252
   url: https://innovationlabs.harvard.edu
@@ -2441,6 +2591,7 @@
   name: The Engine
   cat: accel
   loc: 750 Main St, Cambridge
+  town: Cambridge
   lat: 42.3636
   lng: -71.0973
   url: https://engine.xyz
@@ -2460,6 +2611,7 @@
   name: Techstars Boston
   cat: accel
   loc: Boston
+  town: Boston
   approx: true
   lat: 42.351
   lng: -71.045
@@ -2479,6 +2631,7 @@
   name: MassChallenge
   cat: accel
   loc: Seaport, Boston (moving to the Fenway)
+  town: Boston
   approx: true
   lat: 42.3496
   lng: -71.044
@@ -2497,6 +2650,7 @@
   name: MassRobotics
   cat: accel
   loc: 12 Channel St, Seaport
+  town: Boston
   lat: 42.3455
   lng: -71.0368
   url: https://www.massrobotics.org
@@ -2516,6 +2670,7 @@
   name: Greentown Labs
   cat: accel
   loc: 444 Somerville Ave, Somerville
+  town: Somerville
   lat: 42.3818
   lng: -71.1057
   url: https://greentown.org
@@ -2534,6 +2689,7 @@
   name: The Open Accelerator (TOA)
   cat: accel
   loc: 300 A St, Fort Point, Boston
+  town: Boston
   lat: 42.3486
   lng: -71.0502
   url: https://the-open-accelerator.com
@@ -2552,6 +2708,7 @@
   name: SSC Venture Partners
   cat: accel
   loc: Boston area (serves the BC community)
+  town: Boston
   approx: true
   lat: 42.3355
   lng: -71.1685
@@ -2569,6 +2726,7 @@
   name: IDEA (Northeastern)
   cat: accel
   loc: Northeastern, Boston
+  town: Boston
   approx: true
   lat: 42.3398
   lng: -71.0892
@@ -2586,6 +2744,7 @@
   name: C10 Labs
   cat: accel
   loc: CIC, 1 Broadway, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3626
   lng: -71.0842
@@ -2606,6 +2765,7 @@
   name: Founder Institute Boston
   cat: accel
   loc: Boston
+  town: Boston
   approx: true
   lat: 42.3554
   lng: -71.062
@@ -2625,6 +2785,7 @@
   name: LearnLaunch Accelerator
   cat: accel
   loc: 55 Court St, Boston
+  town: Boston
   lat: 42.3593
   lng: -71.0591
   url: https://learnlaunch.com
@@ -2641,6 +2802,7 @@
   name: PharmStars
   cat: accel
   loc: Newton
+  town: Newton
   approx: true
   lat: 42.33
   lng: -71.1949
@@ -2658,6 +2820,7 @@
   name: AI BioHub (LabCentral × C10 Labs)
   cat: accel
   loc: 700 Main St North, Cambridge
+  town: Cambridge
   lat: 42.3626
   lng: -71.0951
   url: https://www.labcentral.org/startup-support/ai-biohub
@@ -2674,6 +2837,7 @@
   name: StartUp Worcester
   cat: accel
   loc: WorcLab, 44 Portland St, Worcester
+  town: Worcester
   lat: 42.2598
   lng: -71.8019
   url: https://www.worcesterchamber.org/startup-worcester/
@@ -2691,6 +2855,7 @@
   name: Auxilium Worcester
   cat: accel
   loc: 311 Main St, Worcester
+  town: Worcester
   lat: 42.266
   lng: -71.801
   url: https://www.auxiliumworcester.com/
@@ -2708,6 +2873,7 @@
   name: VentureWell
   cat: accel
   loc: 57 East Pleasant St, Amherst
+  town: Amherst
   lat: 42.3811
   lng: -72.519
   url: https://venturewell.org/
@@ -2728,6 +2894,7 @@
   name: Lever
   cat: accel
   loc: 85 Main St, North Adams
+  town: North Adams
   lat: 42.6992
   lng: -73.1125
   url: https://leverinc.org
@@ -2746,6 +2913,7 @@
   name: Berkshire Innovation Center
   cat: accel
   loc: 45 Woodlawn Ave, Pittsfield
+  town: Pittsfield
   lat: 42.4514
   lng: -73.2354
   url: https://www.berkshireinnovationcenter.com
@@ -2763,6 +2931,7 @@
   name: UMass Lowell New Venture Development
   cat: accel
   loc: 220 Pawtucket St, Lowell
+  town: Lowell
   lat: 42.6504
   lng: -71.3243
   url: https://www.uml.edu/new-venture-development/
@@ -2779,6 +2948,7 @@
   name: 'NSF I-Corps Hub: New England Region'
   cat: accel
   loc: 292 Main St, Cambridge (MIT E38)
+  town: Cambridge
   lat: 42.3623
   lng: -71.086
   url: https://neicorps.org
@@ -2798,6 +2968,7 @@
   name: MIT Deshpande Center
   cat: accel
   loc: 292 Main St, Cambridge (MIT E38)
+  town: Cambridge
   lat: 42.3623
   lng: -71.086
   url: https://deshpande.mit.edu
@@ -2813,6 +2984,7 @@
   name: MIT Startup Exchange
   cat: accel
   loc: 1 Main St, Cambridge
+  town: Cambridge
   lat: 42.3622
   lng: -71.08
   url: https://ilpstex.mit.edu/pages/STEX
@@ -2830,6 +3002,7 @@
   name: CIC Cambridge
   cat: space
   loc: 1 Broadway & 245 Main St, Kendall Sq
+  town: Cambridge
   lat: 42.3629
   lng: -71.0838
   url: https://cic.com
@@ -2845,6 +3018,7 @@
   name: Venture Café Cambridge
   cat: space
   loc: 1 Broadway, Kendall Sq
+  town: Cambridge
   lat: 42.3632
   lng: -71.0841
   url: https://venturecafecambridge.org
@@ -2860,6 +3034,7 @@
   name: The Venture Lane
   cat: space
   loc: Downtown Boston
+  town: Boston
   approx: true
   lat: 42.3585
   lng: -71.059
@@ -2875,6 +3050,7 @@
   name: The Foundry (Cambridge)
   cat: space
   loc: 101 Rogers St, Cambridge
+  town: Cambridge
   lat: 42.369
   lng: -71.079
   url: https://www.cambridgefoundry.org/
@@ -2889,6 +3065,7 @@
   name: LabCentral
   cat: space
   loc: 700 Main St North, Cambridge
+  town: Cambridge
   lat: 42.3626
   lng: -71.0951
   url: https://www.labcentral.org
@@ -2904,6 +3081,7 @@
   name: Harvard St. Commons
   cat: space
   loc: Harvard Sq, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3735
   lng: -71.1189
@@ -2919,6 +3097,7 @@
   name: CIC Boston
   cat: space
   loc: 50 Milk St, Boston
+  town: Boston
   lat: 42.3571
   lng: -71.0576
   url: https://cic.com/boston
@@ -2934,6 +3113,7 @@
   name: Artisan's Asylum
   cat: space
   loc: 96 Holton St, Allston
+  town: Boston
   lat: 42.3596
   lng: -71.1395
   url: https://www.artisansasylum.com
@@ -2948,6 +3128,7 @@
   name: UMass Dartmouth Center for Innovation & Entrepreneurship
   cat: space
   loc: 151 Martine St, Fall River
+  town: Fall River
   lat: 41.6838
   lng: -71.1274
   url: https://www.umassd.edu/innovate/
@@ -2964,6 +3145,7 @@
   name: WorcLab
   cat: space
   loc: 44 Portland St, Worcester
+  town: Worcester
   lat: 42.2598
   lng: -71.8019
   url: https://worclab.org
@@ -2980,6 +3162,7 @@
   name: UMass Lowell NERVE Center
   cat: space
   loc: 110 Canal St, Lowell
+  town: Lowell
   lat: 42.642
   lng: -71.3142
   url: https://www.uml.edu/research/nerve/
@@ -2995,6 +3178,7 @@
   name: WPI PracticePoint
   cat: space
   loc: 50 Prescott St, Worcester
+  town: Worcester
   lat: 42.275
   lng: -71.7993
   url: https://www.wpi.edu/research/centers/practicepoint
@@ -3013,6 +3197,7 @@
   name: AI Tinkerers Boston
   cat: community
   loc: Venues vary (often Kendall Sq)
+  town: Cambridge
   approx: true
   lat: 42.3625
   lng: -71.0862
@@ -3029,6 +3214,7 @@
   name: Boston Generative AI Meetup
   cat: community
   loc: 1 Memorial Dr, Cambridge
+  town: Cambridge
   lat: 42.3616
   lng: -71.0816
   url: https://www.meetup.com/boston-generative-ai-meetup/
@@ -3045,6 +3231,7 @@
   name: The AI Collective (Boston)
   cat: community
   loc: Venues vary
+  town: Boston
   approx: true
   lat: 42.36
   lng: -71.062
@@ -3060,6 +3247,7 @@
   name: The AI Furnace (Boston)
   cat: community
   loc: Venues vary
+  town: Boston
   approx: true
   lat: 42.355
   lng: -71.06
@@ -3075,6 +3263,7 @@
   name: PyData Boston
   cat: community
   loc: Venues vary (often Cambridge)
+  town: Cambridge
   approx: true
   lat: 42.362
   lng: -71.0855
@@ -3091,6 +3280,7 @@
   name: Sundai Club
   cat: community
   loc: MIT, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3601
   lng: -71.087
@@ -3107,6 +3297,7 @@
   name: Startup Boston
   cat: community
   loc: Citywide
+  town: Boston
   approx: true
   lat: 42.3554
   lng: -71.056
@@ -3123,6 +3314,7 @@
   name: BUILD617
   cat: community
   loc: 38 Chauncy St, Downtown Crossing
+  town: Boston
   lat: 42.3539
   lng: -71.0597
   url: https://www.build617.org
@@ -3141,6 +3333,7 @@
   name: Cambridge Boston Alignment Initiative (CBAI)
   cat: community
   loc: Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3715
   lng: -71.1125
@@ -3159,6 +3352,7 @@
   name: AI@MIT
   cat: student
   loc: MIT, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3592
   lng: -71.0935
@@ -3174,6 +3368,7 @@
   name: MIT Sloan AI & ML Club
   cat: student
   loc: MIT Sloan, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.361
   lng: -71.083
@@ -3190,6 +3385,7 @@
   name: MIT AI Alignment
   cat: student
   loc: 245 Main St, Cambridge
+  town: Cambridge
   lat: 42.3625
   lng: -71.0847
   url: https://mitaialignment.org/
@@ -3204,6 +3400,7 @@
   name: Harvard AI Safety Team (AIST)
   cat: student
   loc: Harvard, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.377
   lng: -71.1167
@@ -3220,6 +3417,7 @@
   name: Northeastern AI Club
   cat: student
   loc: Northeastern, Boston
+  town: Boston
   approx: true
   lat: 42.3395
   lng: -71.089
@@ -3235,6 +3433,7 @@
   name: Harvard Undergraduate Machine Intelligence Community
   cat: student
   loc: Harvard, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3741
   lng: -71.1167
@@ -3252,6 +3451,7 @@
   name: Harvard Undergraduate Society for AI
   cat: student
   loc: Harvard, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3741
   lng: -71.1167
@@ -3267,6 +3467,7 @@
   name: Tufts AI Society
   cat: student
   loc: Tufts, Medford
+  town: Medford
   approx: true
   lat: 42.4113
   lng: -71.1222
@@ -3285,6 +3486,7 @@
   name: MIT Sandbox
   cat: student
   loc: 292 Main St, Cambridge
+  town: Cambridge
   lat: 42.362
   lng: -71.0858
   url: https://sandbox.mit.edu
@@ -3302,6 +3504,7 @@
   name: Harvard Ventures
   cat: student
   loc: 59 Shepard St, Cambridge
+  town: Cambridge
   lat: 42.3808
   lng: -71.1248
   url: https://www.harvardventures.org
@@ -3316,6 +3519,7 @@
   name: Northeastern Entrepreneurs Club
   cat: student
   loc: Curry Student Center, Boston
+  town: Boston
   lat: 42.3395
   lng: -71.0879
   url: https://www.nuentrepreneursclub.com
@@ -3330,6 +3534,7 @@
   name: eTower (Babson)
   cat: student
   loc: Babson College, Wellesley
+  town: Wellesley
   approx: true
   lat: 42.2949
   lng: -71.2649
@@ -3347,6 +3552,7 @@
   name: BU AI Society
   cat: student
   loc: Boston University, Comm Ave
+  town: Boston
   approx: true
   lat: 42.3505
   lng: -71.1054
@@ -3362,6 +3568,7 @@
   name: MassAI
   cat: student
   loc: UMass Amherst, Amherst
+  town: Amherst
   approx: true
   lat: 42.3952
   lng: -72.5311
@@ -3379,6 +3586,7 @@
   name: Boston AI Week
   cat: event
   loc: Statewide · Sept 16–Oct 28, 2027
+  town: Boston
   lat: 42.3554
   lng: -71.0603
   url: https://aiweek.boston
@@ -3399,6 +3607,7 @@
   name: ODSC AI East
   cat: event
   loc: Boston Convention & Exhibition Center
+  town: Boston
   lat: 42.3456
   lng: -71.0463
   url: https://odsc.ai/east/
@@ -3413,6 +3622,7 @@
   name: HackMIT
   cat: event
   loc: Johnson Athletic Center, MIT
+  town: Cambridge
   lat: 42.3586
   lng: -71.0966
   url: https://hackmit.org
@@ -3427,6 +3637,7 @@
   name: HackHarvard
   cat: event
   loc: Harvard, Cambridge
+  town: Cambridge
   lat: 42.3772
   lng: -71.117
   url: https://hhuh.io/
@@ -3441,6 +3652,7 @@
   name: MIT Sloan Tech Summit
   cat: event
   loc: MIT Media Lab, Cambridge
+  town: Cambridge
   lat: 42.3604
   lng: -71.0873
   url: https://www.mitsloantechsummit.com/
@@ -3456,6 +3668,7 @@
   name: Imagination in Action
   cat: event
   loc: MIT Media Lab, Cambridge
+  town: Cambridge
   lat: 42.3608
   lng: -71.0875
   url: https://www.imaginationinaction.co
@@ -3471,6 +3684,7 @@
   name: delta v Demo Day
   cat: event
   loc: Kresge Auditorium, MIT
+  town: Cambridge
   lat: 42.3583
   lng: -71.0946
   url: https://entrepreneurship.mit.edu/accelerator/
@@ -3486,6 +3700,7 @@
   name: Boston Tech Week (a16z)
   cat: event
   loc: Citywide · late April–early May
+  town: Boston
   approx: true
   lat: 42.354
   lng: -71.055
@@ -3502,6 +3717,7 @@
   name: Robotics Summit & Expo
   cat: event
   loc: Hynes Convention Center, Boston · June 2–3, 2027
+  town: Boston
   lat: 42.3483
   lng: -71.0838
   url: https://www.roboticssummit.com/
@@ -3521,6 +3737,7 @@
   name: EmTech AI
   cat: event
   loc: MIT Media Lab, Cambridge · May 11–13, 2027
+  town: Cambridge
   lat: 42.3606
   lng: -71.0873
   url: https://event.technologyreview.com/emtech-ai-2027/
@@ -3538,6 +3755,7 @@
   name: QCon AI Boston
   cat: event
   loc: BU George Sherman Union, Boston · July 8–9, 2027
+  town: Boston
   lat: 42.3506
   lng: -71.1101
   url: https://boston.qcon.ai/
@@ -3555,6 +3773,7 @@
   name: Massachusetts AI Coalition
   cat: community
   loc: Boston
+  town: Boston
   approx: true
   lat: 42.3554
   lng: -71.062
@@ -3575,6 +3794,7 @@
   name: MassTech Collaborative
   cat: gov
   loc: 75A North Drive, Westborough
+  town: Westborough
   lat: 42.2872
   lng: -71.6289
   url: https://masstech.org
@@ -3591,6 +3811,7 @@
   name: Massachusetts AI Hub
   cat: gov
   loc: 2 Center Plaza, Boston
+  town: Boston
   lat: 42.3597
   lng: -71.0602
   url: https://aihub.masstech.org
@@ -3611,6 +3832,7 @@
   name: MGHPCC / AICR Compute
   cat: gov
   loc: 100 Bigelow St, Holyoke
+  town: Holyoke
   lat: 42.2025
   lng: -72.6079
   url: https://mghpcc.org
@@ -3627,6 +3849,7 @@
   name: Massachusetts Clean Energy Center
   cat: gov
   loc: 294 Washington St, Boston
+  town: Boston
   lat: 42.3573
   lng: -71.0582
   url: https://www.masscec.com
@@ -3643,6 +3866,7 @@
   name: Massachusetts Life Sciences Center
   cat: gov
   loc: 1075 Main St, Waltham
+  town: Waltham
   lat: 42.3768
   lng: -71.2541
   url: https://www.masslifesciences.com
@@ -3657,6 +3881,7 @@
   name: City of Boston Office of Emerging Technology
   cat: gov
   loc: 1 City Hall Sq, Boston
+  town: Boston
   lat: 42.3604
   lng: -71.058
   url: https://www.boston.gov/departments/emerging-technology
@@ -3671,6 +3896,7 @@
   name: MeHI Digital Health Sandbox
   cat: gov
   loc: 2 Center Plaza, Boston
+  town: Boston
   lat: 42.3597
   lng: -71.0602
   url: https://mehi.masstech.org/digital-health-sandbox-program
@@ -3688,6 +3914,7 @@
   name: Defense Innovation Unit (Boston)
   cat: gov
   loc: Kendall Sq, Cambridge
+  town: Cambridge
   approx: true
   lat: 42.3665
   lng: -71.0765
@@ -3706,6 +3933,7 @@
   name: MassCyberCenter
   cat: gov
   loc: 75A North Drive, Westborough
+  town: Westborough
   lat: 42.2872
   lng: -71.6289
   url: https://masscybercenter.org

@@ -1,4 +1,5 @@
-/* scripts/kpi.js, the KPI summary. Fast and offline: no network and no browser.
+/* scripts/kpi.js, the KPI summary, and scripts/towns.js, the list of towns it counts by.
+   Fast and offline: no network and no browser.
 
      node --test test/kpi.test.js
 
@@ -12,6 +13,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const kpi = require("../scripts/kpi");
+const { TOWNS, townProblem } = require("../scripts/towns");
 const { loadData } = require("../scripts/load-data");
 
 const SCRIPT = path.join(__dirname, "..", "scripts", "kpi.js");
@@ -60,6 +62,75 @@ test("geography says the town split is missing instead of guessing it from dista
   const g = kpi.geography([{ id: "a", cat: "accel", offers: ["funding"], ...north(2) }]);
   assert.equal(g.towns.available, false);
   assert.match(g.towns.reason, /town/);
+});
+
+/* ---------- towns ---------- */
+
+const placed = (id, cat, town, offers = ["talent"]) => ({ id, cat, town, offers, ...north(1) });
+
+test("the split by town counts entries outside Boston and Cambridge, with and without employers, and by need", () => {
+  const t = kpi.towns([
+    placed("a", "accel", "Boston", ["funding"]),
+    placed("b", "startup", "Cambridge"),
+    placed("c", "accel", "Somerville", ["funding", "compute"]),   // next door, and still outside
+    placed("d", "corporate", "Worcester"),
+    placed("e", "gov", "Worcester", ["funding"]),
+  ]);
+  assert.equal(t.available, true);
+  assert.deepEqual(t.core, ["Boston", "Cambridge"]);
+  assert.deepEqual(t.all, { total: 5, outside: 3, pct: 60 });
+  assert.deepEqual(t.resources, { total: 3, outside: 2, pct: 67 });      // without startup and corporate
+  assert.deepEqual(t.needs.funding, { total: 3, outside: 2, pct: 67 });
+  assert.deepEqual(t.needs.compute, { total: 1, outside: 1, pct: 100 });
+  assert.deepEqual(t.needs.talent, { total: 2, outside: 1, pct: 50 });
+  assert.equal(t.unplaced, 0);
+  assert.deepEqual([t.reached, t.of], [4, TOWNS.length]);
+  assert.deepEqual(t.list, [{ town: "Worcester", entries: 2 }, { town: "Boston", entries: 1 },
+    { town: "Cambridge", entries: 1 }, { town: "Somerville", entries: 1 }]);
+});
+
+test("the town is read from the entry, never worked out from the pin", () => {
+  const t = kpi.towns([
+    { id: "a", cat: "accel", town: "Boston", ...north(60) },      // a pin far out that says Boston
+    { id: "b", cat: "accel", town: "Lowell", ...north(0.1) },     // a pin beside City Hall that says Lowell
+  ]);
+  assert.deepEqual(t.all, { total: 2, outside: 1, pct: 50 });
+  assert.deepEqual(t.list.map(x => x.town), ["Boston", "Lowell"]);
+});
+
+test("an entry with no town is left out of the figures by town, and counted as left out", () => {
+  const t = kpi.towns([placed("a", "accel", "Boston"), placed("b", "accel", "Lowell"), { id: "c", cat: "accel", ...north(40) }]);
+  assert.deepEqual(t.all, { total: 2, outside: 1, pct: 50 });
+  assert.equal(t.unplaced, 1);
+});
+
+test("the list holds Massachusetts' 351 cities and towns, once each, A to Z", () => {
+  assert.equal(TOWNS.length, 351);
+  assert.equal(new Set(TOWNS).size, 351);
+  assert.deepEqual(TOWNS, [...TOWNS].sort());
+  for (const t of kpi.CORE_TOWNS) assert.ok(TOWNS.includes(t), `${t} is not on the list`);
+  // the Census Bureau's "Amherst Town" is written as the town writes it
+  assert.ok(TOWNS.includes("Amherst"));
+  assert.deepEqual(TOWNS.filter(t => / (town|city)$/i.test(t)), []);
+});
+
+test("a town is wrong when it is missing or not on the list, and a neighborhood is not a town", () => {
+  for (const t of TOWNS) assert.equal(townProblem(t), null);
+  assert.match(townProblem(undefined), /^missing town /);
+  for (const t of ["Allston", "Kendall Sq", "Devens", "Dorchester", "Roxbury", "Brighton", "Greater Boston"]) {
+    assert.match(townProblem(t), /is not a Massachusetts city or town/, t);
+    assert.doesNotMatch(townProblem(t), /did you mean/, `${t} is nobody's misspelling`);
+  }
+});
+
+test("a slip in a town's name is answered with the name that was meant", () => {
+  const meant = t => (townProblem(t).match(/did you mean "([^"]+)"\?$/) || [])[1];
+  assert.equal(meant("cambridge"), "Cambridge");
+  assert.equal(meant("Worchester"), "Worcester");
+  assert.equal(meant("Westboro"), "Westborough");
+  assert.equal(meant("Attleborough"), "Attleboro");
+  assert.equal(meant("Amherst Town"), "Amherst");
+  assert.equal(meant("Manchester"), "Manchester-by-the-Sea");
 });
 
 /* ---------- freshness ---------- */
@@ -164,6 +235,18 @@ test("a month's state is its last commit, and a quiet month keeps the one before
   ]);
 });
 
+test("a month end counts by town only when every entry had one by then", () => {
+  const near = { id: "near", town: "Boston", ...north(1) }, far = { id: "far", town: "Pittsfield", ...north(60) };
+  const ends = kpi.monthEnds([
+    snap("a", "2026-10-20", [near, { id: "far", ...north(60) }]),     // one entry has no town yet
+    snap("b", "2026-11-18", [near, far]),
+  ], "2026-12");
+  assert.deepEqual(ends, [
+    { month: "2026-10", entries: 2, beyond: 1 },
+    { month: "2026-11", entries: 2, beyond: 1, outside: 1 },
+  ]);
+});
+
 /* ---------- review ---------- */
 
 const item = (number, association, o = {}) => ({
@@ -236,6 +319,15 @@ const result = (over = {}) => ({
   ...over,
 });
 const NO_HISTORY = { available: false, reason: "this is a shallow clone, so the history is not here" };
+// The same three entries with a town each, in a history that has carried towns throughout.
+const TOWN_OF = { a: "Boston", b: "Cambridge", c: "Pittsfield" };
+const withTowns = list => list.map(e => ({ ...e, town: TOWN_OF[e.id] }));
+const PLACED_HISTORY = HISTORY.map(s => ({ ...s, entries: withTowns(s.entries) }));
+const placedResult = (over = {}) => result({
+  geography: kpi.geography(withTowns(ENTRIES)),
+  monthEnds: { available: true, months: kpi.monthEnds(PLACED_HISTORY, "2026-11") },
+  ...over,
+});
 
 test("the text names each measure and what its headline hides", () => {
   const text = kpi.renderText(result());
@@ -251,6 +343,36 @@ test("the text names each measure and what its headline hides", () => {
   assert.match(text, /At the end of Oct\. 2026: 1 of 3/);
   assert.doesNotMatch(text, /undefined|NaN|null|\[object/);
   assert.ok(text.endsWith("\n"));
+});
+
+test("with towns the text leads with the share outside Boston and Cambridge, and the ring follows", () => {
+  const text = kpi.renderText(placedResult());
+  const block = text.split("\n\n").find(b => b.startsWith("GEOGRAPHY: "));
+  assert.deepEqual(block.split("\n"), [
+    "GEOGRAPHY: 1 of 3 (33%) sit outside Boston and Cambridge",
+    "  Beyond 25 miles of Boston City Hall: 1 of 3 (33%)",
+    "  Without companies and corporate labs: 1 of 2 (50%) outside Boston and Cambridge, 1 of 2 (50%) beyond 25 miles",
+    "  By what founders get, outside Boston and Cambridge: funding 1 of 2, compute 1 of 1",
+    "  By what founders get, beyond 25 miles: funding 1 of 2, compute 1 of 1",
+    `  Entries sit in 3 of ${TOWNS.length} cities and towns`,
+    "  At the end of Oct. 2026: 1 of 3 outside Boston and Cambridge, 1 of 3 beyond 25 miles",
+    "  Keep in mind: A pin is where an organization sits, not whom it serves.",
+  ]);
+  assert.doesNotMatch(text, /not available: entries carry no town/);
+  assert.doesNotMatch(text, /undefined|NaN|null|\[object/);
+});
+
+test("a month that ended before entries had towns shows its ring figure alone", () => {
+  const text = kpi.renderText(result({ geography: kpi.geography(withTowns(ENTRIES)) }));
+  assert.match(text, /\n {2}At the end of Oct\. 2026: 1 of 3 beyond 25 miles\n/);
+});
+
+test("the text says how many entries the figures by town leave out", () => {
+  const some = [...withTowns(ENTRIES), { id: "d", cat: "accel", offers: ["funding"], lastVerified: "2026-11", ...north(2) }];
+  const text = kpi.renderText(result({ entries: some.length, geography: kpi.geography(some) }));
+  assert.match(text, /GEOGRAPHY: 1 of 3 \(33%\) sit outside Boston and Cambridge\n/);
+  assert.match(text, /\n {2}Beyond 25 miles of Boston City Hall: 1 of 4 \(25%\)\n/);
+  assert.match(text, /\n {2}1 entry has no town, so the figures by town leave it out\n/);
 });
 
 test("a part that could not be counted says so and why, and the rest still shows", () => {
@@ -295,6 +417,15 @@ test("the Slack message has the TOA shape: header, one section, a context line, 
   assert.doesNotMatch(JSON.stringify(p), /undefined|NaN|\[object/);
 });
 
+test("with towns the Slack message gives both figures, and its fallback leads with the towns", () => {
+  const p = kpi.renderSlack(placedResult(), {});
+  const line = p.blocks[1].text.text.split("\n").find(l => l.startsWith("• *Geography:* "));
+  assert.equal(line, "• *Geography:* 1 of 3 (33%) sit outside Boston and Cambridge. " +
+    "1 of 3 (33%) sit beyond 25 miles of Boston City Hall. _A pin is where an organization sits, not whom it serves._");
+  assert.equal(p.text, "📊 Atlas KPIs — 33% outside Boston and Cambridge, 100% checked within 6 months");
+  assert.doesNotMatch(JSON.stringify(p), /undefined|NaN|\[object/);
+});
+
 test("the Slack context links the commit and the run when a workflow built it", () => {
   const local = kpi.renderSlack(result(), {}).blocks[2].elements[0].text;
   assert.equal(local, "node scripts/kpi.js");
@@ -322,6 +453,10 @@ test("offline it still reports on this repository's data, and exits 0", () => {
   assert.equal(out.entries, DATA.length);
   assert.equal(out.geography.all.total, DATA.length);
   assert.ok(out.geography.all.beyond <= DATA.length);
+  // scripts/validate.js turns away an entry without a town, so in a valid atlas none is left out
+  assert.equal(out.geography.towns.available, true);
+  assert.deepEqual([out.geography.towns.all.total, out.geography.towns.unplaced], [DATA.length, 0]);
+  assert.ok(out.geography.towns.all.outside <= DATA.length);
   assert.equal(out.freshness.total, DATA.length);
   assert.equal(out.freshness.forecast.length, 12);
   for (const p of out.freshness.forecast) assert.ok(p.pct >= 0 && p.pct <= 100);
