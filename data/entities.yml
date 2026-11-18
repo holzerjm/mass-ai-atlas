@@ -358,6 +358,37 @@
   offers: [talent]
   added: 2026-11
   lastVerified: 2026-11
+- id: middlesex-cc
+  name: Middlesex Community College
+  cat: university
+  loc: 591 Springs Rd, Bedford
+  lat: 42.5178
+  lng: -71.2729
+  url: https://www.middlesex.edu/academics/micro/offerings/programs/ComputerScienceArtificialIntelligenceMicroCredential.html
+  desc: Community college in Bedford and Lowell. Its Computer Science Artificial Intelligence micro-credential is four courses, 13 to 16 credits, over two semesters. Two are AI courses, Introduction to Generative AI and Applied Generative Artificial Intelligence. The others are introductory computer science or programming, and statistics or math. All count toward its computer science associate degree.
+  why: A source of entry-level AI talent northwest of Boston, beyond the research universities. The college says the micro-credential teaches machine learning and deep learning fundamentals, with hands-on training in several AI domains. It is two AI courses on top of introductory computer science and math, so look here for interns and entry-level hires rather than machine-learning engineers.
+  facts: [[Program length, '4 courses, 13–16 credits, 2 semesters'], [Focus, Generative AI on a computer science base]]
+  tags: [education, applied AI, students]
+  stages: [3]
+  offers: [talent]
+  added: 2026-11
+  lastVerified: 2026-11
+- id: babson-generator
+  name: The Generator (Babson)
+  cat: university
+  loc: 9 Map Hill Dr, Wellesley
+  lat: 42.2946
+  lng: -71.2642
+  url: https://www.babson.edu/thegenerator/
+  desc: Babson College's interdisciplinary AI lab, part of its C. Dean Metropoulos Institute for Technology and Entrepreneurship. Faculty and students work in eight specialty labs, from AI entrepreneurship and prototyping with AI to AI ethics and the arts. Its student lab runs weekly Generator Cafes at the Weissman Foundry and Ignite, an eight-week incubator.
+  why: Mostly a Babson resource. Most of its events are for Babson students and faculty, and Ignite is run by its student lab. What reaches outside is the AI Innovators Bootcamp, a one-day course for small business owners taught in cohorts of 30 or more, and a few talks and workshops open to the wider community. The bootcamp page still shows its April 2026 dates, so ask for the next ones by email. For a founder nearby it is also a place to meet business students who build with AI.
+  facts: [[Focus, AI for entrepreneurship and business], [Program length, 'Bootcamp, 1 day; Ignite, 8 weeks'], [Cohort size, 30 or more per bootcamp]]
+  tags: [Babson, education, events, students]
+  stages: [1]
+  offers: [community, talent]
+  links: [etower]
+  added: 2026-11
+  lastVerified: 2026-11
 
 # ---------- CORPORATE AI LABS ----------
 - id: mit-ibm

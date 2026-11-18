@@ -295,10 +295,10 @@ To keep those honest, do a small sweep about once a month:
    An organization can close, move, or stop fitting its step.
 
 `--cycle 12` sizes that list from the dataset, so it keeps pace as the atlas grows:
-every entry comes round within a year without anyone re-tuning a number. At 226
+every entry comes round within a year without anyone re-tuning a number. At 228
 entries that is **19 re-checks a month, about half an hour**. A fixed `--queue`
 quietly stops covering everything as soon as entries outrun it — at 13 a month it
-would now take **17 months** to come round, against a 12-month threshold.
+would now take **18 months** to come round, against a 12-month threshold.
 
 ### The KPI message
 
@@ -598,6 +598,8 @@ the reasoning is open rather than a silent judgment.
 | **MIT Proto Ventures** | MIT's venture studio, real and active. But its own site labels artificial intelligence a former channel, with geothermal and fusion and clean energy as the current ones. A founder cannot apply to it either: MIT hires a venture builder for each channel, who works with MIT researchers. Revisit if it opens an AI channel again. |
 | **Beacon Angels** | Real and active: a Boston-based angel group that invests $50,000 to $400,000 and meets each month in Woburn. But its pages make no AI claim, and invited presenters pay a registration fee that it calls non-waivable. |
 | **Dorm Room Fund** | Real, and it backs student founders at Massachusetts schools with first checks of $90,000 to $500,000. But its site names no office here: its student investors work from their campuses. A pin implies a presence, as with Y Combinator, and its companies belong in the atlas as their own entries. |
+| **Tectonic Ventures** | Real and active: an early-stage venture firm led by an MIT Sloan professor who, by its own account, helps MIT researchers spin out applied-AI companies. But its site prints no address, email, phone number or contact form, only an investor login and a LinkedIn page, so it gives a founder no way in. The one address found is in a regulatory filing, and the atlas does not pin an address a firm has not published itself. Revisit if it prints an office address or a way to pitch. |
+| **Innovation and Digital Health Accelerator** (Boston Children's Hospital) | Real and active: the hospital's digital health group, with an Accelerator Program and spinouts such as Ladder Health in 2023. But its stated mission is to surface, support and accelerate innovations at Boston Children's, and the program works with the hospital's own staff and experts. It shows no application for outside companies: the way in is an interest form, answered within 5 to 10 business days if the team sees an opportunity to connect. AI is one of its tools, not its claim. Revisit if it opens a program outside companies can apply to. |
 
 The rules those add up to:
 
