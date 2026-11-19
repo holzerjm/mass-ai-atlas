@@ -2495,9 +2495,10 @@
   approx: true
   lat: 42.35
   lng: -71.07
-  url: https://www.linkedin.com/company/walnut-ventures
+  url: https://www.walnutventures.com
   desc: Veteran angel group of exited founders and operators.
   why: Angels who have run companies — diligence doubles as advice.
+  firstMove: Submit your pitch from its For Entrepreneurs page; monthly chairs choose presenters after a short call and a longer meeting.
   tags: [seed]
   stages: [4]
   offers: [funding]
@@ -3851,8 +3852,7 @@
   stages: [1, 2, 3, 4, 5]
   links: [aihub, sundai, engine]
   offers: [community, space, compute, customers]
-  applyBy: rolling
-  applyNote: Founder Starter Pack applications
+  applyNote: Founder Starter Pack submissions closed
   applyUrl: https://massaicoalition.com/founders/#apply
   facts: [[Terms, 'No equity, no fees; pack sent within 7 days'], [Focus, AI founders building in Massachusetts]]
   added: 2026-06
@@ -3977,14 +3977,15 @@
   lat: 42.3597
   lng: -71.0602
   url: https://mehi.masstech.org/digital-health-sandbox-program
-  desc: State program at the Massachusetts eHealth Institute (a MassTech division) granting up to $60K per company to test digital-health and AI products across a network of 11 hospital and lab sandboxes.
+  desc: State program at the Massachusetts eHealth Institute (a MassTech division) granting up to $60K per company to test digital-health and AI products across a network of 11 hospital and lab sandboxes. Its Rural Digital Health Sandbox grant, launched in October 2026, offers up to $475,000 for projects that serve rural communities.
   why: 'Health-AI founders: state money to validate your product inside real Massachusetts hospital environments — clinical evidence and a design partner without giving up equity.'
   firstMove: Sign up for sandbox office hours with its team, then contact a sandbox to confirm it can support your company before you apply.
   tags: [healthcare]
   stages: [2, 4]
   links: [masstech]
   offers: [grants, customers]
-  applyNote: Rural grant notice coming soon
+  applyBy: '2026-12-07'
+  applyNote: Rural Digital Health Sandbox grant
   applyUrl: https://mehi.masstech.org/rural-digital-health-sandbox
   added: 2026-08
   lastVerified: 2026-08
