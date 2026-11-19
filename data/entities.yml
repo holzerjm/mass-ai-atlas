@@ -146,6 +146,7 @@
   url: https://ai.northeastern.edu
   desc: 'Northeastern''s applied AI institute, organized around human-in-the-loop AI. Five focus areas: AI + Health, AI + Life Sciences and AI for Climate and Sustainability, informed by two core research pillars, Responsible AI and Generative AI. The institute''s AI Solutions Hub takes paid, scoped engagements.'
   why: 'Set up for company collaboration rather than founder programs: the realistic asks are co-op and graduate hires, a paid AI Solutions Hub engagement — explicitly not a student placement — or the ''Ask an AI Expert'' form, which routes a question to staff.'
+  firstMove: Book a short conversation with its team from the Partner With Us page; its AI Solutions Hub takes paid, scoped projects.
   tags: [applied AI, research, healthcare, Northeastern]
   stages: [1, 5]
   offers: [talent]
@@ -227,6 +228,7 @@
   url: https://ds.cs.umass.edu
   desc: Research center inside UMass Amherst's Manning CICS, founded 2015, with 45+ affiliated faculty across machine learning, NLP, computer vision and robotics. Runs a membership-based Industry Affiliates Program, semester-long sponsored student projects (Industry Mentorship Program), the Data Science for the Common Good summer program and an applied-AI engineering team, dataCore.
   why: 'The industry door into UMass Amherst''s ML bench: sponsor a spring project and a small team of data-science MS students spends the semester on it for about 30 minutes a week of your time; affiliates also get recruiting help. Startups have sponsored projects alongside Google, Amazon and Microsoft, and the Wednesday ML & Friends lunch is open to anyone, in person or over Zoom.'
+  firstMove: Reach out through its contact form about its industry programs; affiliate members can propose semester projects for graduate student teams.
   facts: [[Focus, 'ML, NLP, vision, robotics research'], [Terms, Membership-based affiliates program], [Program length, 'Sponsored projects: one spring semester']]
   tags: [research, ML, applied AI]
   stages: [1, 3, 5]
@@ -281,6 +283,7 @@
   badge: $9M NSF project
   desc: 'NSF-funded research computing project led by David Bau (PI and director) at Northeastern''s Khoury College: free remote access to large open-weight models (Llama 3.1 up to 405B, GPT-OSS 120B, Qwen, Gemma and OLMo families) on NCSA''s Delta cluster at UIUC, plus the open-source NNsight library for inspecting and editing model internals. The $9M award runs May 2024 to April 2028.'
   why: 'For founders building interpretability, evals or AI-safety tooling: free API access to open models up to 405B with their internals exposed, so you can run intervention experiments without renting GPUs. The 1,200+-member Discord and bi-weekly reading group are online and national, not a Boston meetup; the team itself sits in Khoury College. Needs US residency or a US-based collaborator; research use, not production inference.'
+  firstMove: Sign up for an NDIF API key to use hosted open-weight models free of charge; it serves education and research users with a U.S. tie.
   facts: [[Focus, Interpretability of large open-weight models], [Terms, Free; US residency or US collaborator]]
   tags: [research, AI safety, infrastructure, Northeastern]
   stages: [1, 3]
@@ -336,6 +339,7 @@
   url: https://www.brandeis.edu/computer-science/
   desc: Brandeis's computer science department in Waltham, with 12 research faculty and a two-year MS in Computational Linguistics that has run NLP industry receptions every semester since 2013. Labs led by Nianwen Xue, James Pustejovsky and Hongfu Liu work on multilingual NLP, meaning representation and data-centric machine learning; Liu's group had two papers accepted at NeurIPS 2026.
   why: 'An NLP-specific talent pipeline: CL master''s students take for-credit internships, and the program hosts a CL/NLP industry reception each semester where companies collect resumes. Email the CL outreach team to attend.'
+  firstMove: Email its computational linguistics industry outreach team to attend an industry reception, held every semester with students and alumni.
   facts: [[Focus, 'NLP, computational linguistics, core ML'], [Terms, CL/NLP industry reception each semester]]
   tags: [research, ML]
   stages: [3, 5]
@@ -354,6 +358,7 @@
   url: https://massaitc.org
   desc: The Massachusetts AI and Technology Center for Connected Care in Aging & Alzheimer's Disease, a National Institute on Aging research center spanning UMass Amherst and Massachusetts General Hospital. It funds pilot projects on AI-enhanced technology for older adults, people with Alzheimer's disease and their caregivers, at up to $200,000 over 12 to 24 months.
   why: A grant for AI in aging and dementia care that a startup can apply for in its own name. The national call lists for-profit companies, small businesses and startups as eligible, and the center asks for industry researchers and academic–industry teams. It is NIH research money with NIH rules, most of it reserved for Alzheimer's and related dementias, and it starts with a letter of intent. The competition is annual. Letters of intent for the 2027 round closed on Nov. 16, 2026, and only invited applicants go on to a full proposal, due Jan. 22, 2027. That round's call came out on Oct. 19, 2026.
+  firstMove: Submit a letter of intent to the national AITC pilot award competition and select MassAITC; invited applicants send a full application.
   facts: [[Check size, 'Up to $200,000 over 12–24 months'], [Cohort size, '10 to 15 pilots expected for 2027'], [Terms, NIH pilot grant; letter of intent first], [Focus, "AI for aging and Alzheimer's care"]]
   tags: [healthcare, research, equity-free]
   stages: [2, 3]
@@ -373,6 +378,7 @@
   url: https://bristolcc.edu/AI
   desc: Community college with campuses in Fall River, Attleboro, New Bedford and Taunton, and by its own account the first in Massachusetts to offer an Associate of Applied Science in Artificial Intelligence. The two-year degree and a 28-credit AI Practitioner Certificate are taught fully online and cover machine learning, data analytics, natural language processing, computer vision and AI ethics.
   why: A source of entry-level AI talent beyond the research universities. Students work on applied business problems, and the certificate is meant for people who already hold a bachelor's degree or have experience in a related field. It is a teaching program, not a research lab, so look here for practitioners and interns rather than model researchers.
+  firstMove: Reach out to its Experiential Education Center to host an intern; posting internships for students and alumni costs nothing.
   facts: [[Program length, '2-year degree; 28-credit certificate'], [Focus, 'Applied AI, taught fully online']]
   tags: [education, applied AI, students]
   stages: [3]
@@ -440,6 +446,7 @@
   url: https://microsoftnewengland.com/
   desc: Microsoft's Cambridge R&D center — and one of the most generous event venues in the ecosystem.
   why: Hosts the Boston Generative AI Meetup and dozens of community events; Microsoft for Startups credits flow through here.
+  firstMove: Apply to Microsoft for Startups on Microsoft's site; approved startups get Azure credits, with more after business verification.
   tags: [events]
   stages: [1, 3, 5]
   links: [genai-meetup]
@@ -459,6 +466,7 @@
   url: https://about.google/company-info/locations/
   desc: Google's multi-building Kendall Square campus, with significant AI/ML engineering teams.
   why: Google for Startups programs, cloud credits, and a deep local hiring pool of alumni.
+  firstMove: Apply to the Google for Startups Cloud Program from an email on your company's domain; most tiers need funding from a known investor.
   tags: [infrastructure]
   stages: [3, 5]
   offers: [compute, talent]
@@ -492,6 +500,7 @@
   url: https://www.aboutamazon.com
   desc: Amazon's Seaport offices at 111 Harbor Way house Alexa, Devices, AWS and Amazon Pharmacy teams, with interior fit-out underway since 2026 on the adjacent One Boston Wharf Road tower. Amazon Robotics operates separately in North Reading and Westborough.
   why: AWS Activate credits and a large pool of applied-ML engineers.
+  firstMove: 'Apply for AWS Activate credits: Activate Founders if self-funded, or Activate Portfolio with an Org ID from your investor or accelerator.'
   tags: [infrastructure, robotics]
   stages: [3, 5]
   offers: [compute, talent]
@@ -559,6 +568,7 @@
   url: https://oracle.com
   desc: Enterprise software and cloud infrastructure employer in Greater Boston. Oracle consolidated its Burlington campus into 8 Van de Graaff Drive, listing roughly 376,000 sq ft across three other buildings for sublease or lease.
   why: Oracle Cloud Infrastructure hardware engineering roles in Burlington, and enterprise customer relationships relevant to AI startups.
+  firstMove: Join the Oracle PartnerNetwork from its partner page; it is not set up for companies under six months old or with fewer than five employees.
   tags: [infrastructure, enterprise]
   stages: [5]
   links: []
@@ -575,6 +585,7 @@
   url: https://salesforce.com
   desc: CRM and enterprise AI vendor. Salesforce lists offices at 500 Boylston Street in Boston and 5 Wall Street in Burlington. Its AI platform is now branded Agentforce, with Einstein covering the embedded predictive-AI layer.
   why: An enterprise platform many AI startups build on or sell through.
+  firstMove: Apply to Salesforce Launchpad with its short form; it is free, for venture-backed startups, and the team reviews proof of funding.
   tags: [enterprise, infrastructure]
   stages: [5]
   offers: [talent, customers]
@@ -691,6 +702,7 @@
   url: https://www.draper.com/
   desc: Independent nonprofit R&D lab spun out of MIT in 1973, formerly the Instrumentation Lab that designed the Apollo Guidance Computer; 2,800+ staff and roughly $1B in annual revenue ($949M on its FY2025 Form 990); autonomy, perception and machine learning are core capabilities for defense and space. Runs DraperSPARX, pairing defense startups with its engineers, secure labs and government customers.
   why: 'Autonomy or dual-use hardware founders can get secure-lab access and introductions to DoD programs of record through DraperSPARX, but it is invitation- or referral-only (via a DoD contracting officer or DIU) and expects a potential DoD or federal contract already in view. For everyone else the draw is talent: 2,200+ employees in Cambridge and a 151-student graduate Scholars pipeline that includes MIT, Harvard, Northeastern and Tufts.'
+  firstMove: Ask your contracting officer for a DraperSPARX application if you hold a DoD contract; providers are invited after due diligence.
   facts: [[Focus, 'Guidance & nav, autonomy/ML, microchips, biotech'], [Stage, Startups with DoD/USG contract prospects], [Terms, 'DraperSPARX: invite/referral, no funding'], [Cohort size, 'Draper Scholars: 151 grad students (2026)']]
   tags: [defense, research, deep tech, MIT spinout]
   stages: [3, 5]
@@ -762,6 +774,7 @@
   url: https://www.ll.mit.edu/
   desc: MIT's federally funded research and development center for national security, in Lexington. It builds operational prototypes of advanced technology and transfers them to government and industry. Its Artificial Intelligence Technology and Systems group works on pulling information out of multimedia data, adversarial AI and AI assurance. It says more than 110 companies have come out of it.
   why: A way into defense work for a small company, and a large technical employer, with 249 open roles in November 2026. Its Small Business Program names four routes, which are partnering on SBIR and STTR proposals, cooperative research agreements, paid use of its test facilities, and Commercial Solutions Openings. It is for US small businesses, the Laboratory says it is selective, and no opportunities were posted when we looked, so register your interests and wait to hear.
+  firstMove: Register in its small business database to be emailed when funding opportunities match your interest areas; it is selective about partners.
   facts: [[Terms, US small businesses; testing is reimbursable], [Focus, National security R&D and prototypes]]
   tags: [defense, research, deep tech]
   stages: [5]
@@ -1621,6 +1634,7 @@
   url: https://www.ibm.com/ventures
   desc: IBM's strategic investment arm — backs early-stage AI and quantum startups solving enterprise problems, from infrastructure to applications.
   why: Co-sponsor of The Open Accelerator. Strategic investor that brings enterprise distribution, not just capital. Particularly valuable for startups selling to regulated industries.
+  firstMove: Send your opportunity through the inbound form linked from its Ventures page; it focuses on early-stage enterprise AI and quantum companies.
   tags: [strategic, enterprise, infrastructure]
   stages: [4, 5]
   links: [toa]
@@ -1935,6 +1949,7 @@
   url: https://www.mass-ventures.com
   desc: The Commonwealth's own venture arm — START grants and early capital for MA deep-tech startups.
   why: 'Non-dilutive state grants: $100K at Round 1, $200K at Round 2, then up to $500K of Round 3 seed capital in a spinout. Needs an SBIR/STTR Phase II; the window reopens Feb 1, 2027. MV Accelerate adds free SBIR coaching and Founders School.'
+  firstMove: Apply on its venture program page for investment, or see START for grants to SBIR Phase II companies; it funds only Massachusetts firms.
   facts: [[Check size, $100K Round 1; up to $500K by Round 3], [Equity, 0% on Rounds 1-2 grants], [Terms, 'SBIR/STTR Phase II; reopens Feb 1, 2027'], [Focus, MA deep-tech startups], [Stage, Seed equity; MA academic spinouts], [Cohort size, '26 START awards/yr: 16 R1, 7 R2, 3 R3']]
   tags: [strategic, deep tech, equity-free, diverse founders]
   stages: [3, 4]
@@ -2058,6 +2073,7 @@
   url: https://www.linkventures.com
   desc: Kendall Square fund backing technical AI founders from MIT, Harvard and beyond — leads pre-seed through Series A and incubates companies in its 40,000 sq ft Link Studio.
   why: AI-first capital that comes with space, compute and back-office support in the middle of Kendall Square.
+  firstMove: Use the contact form on its site to pitch; it invests in technical AI founders from pre-seed to Series A.
   facts: [[Stage, Pre-seed to Series A; leads], [Focus, 'Technical AI founders (MIT, Harvard)'], [Terms, 'Link Studio: space, compute, back office']]
   tags: [AI-native, incubator]
   stages: [3, 4]
@@ -2190,6 +2206,7 @@
   url: https://suffolktech.com
   desc: Venture platform of Suffolk Construction investing pre-seed through growth in built-environment technology — ConTech, PropTech and infrastructure, with a strong AI tilt; runs the BOOST accelerator.
   why: The go-to investor for AI founders building for construction and the built world — with Suffolk Construction as a built-in pilot customer.
+  firstMove: Submit your pitch with a deck through the form on its home page; it backs startups in construction, real estate and infrastructure.
   facts: [[Stage, Pre-seed through growth], [Focus, 'Built world: ConTech, PropTech, infra'], [Terms, Suffolk Construction as pilot customer]]
   tags: [industrial]
   stages: [4, 5]
@@ -2329,6 +2346,7 @@
   url: https://bosch.ventures
   desc: Robert Bosch's corporate venture arm, whose Boston-area office anchors its North American enterprise-AI investing — a $270M sixth fund writing $5M–$10M checks, with local investments including Blitzy.
   why: Strategic capital plus a route to industrial customers — strongest for AI applied to the physical world.
+  firstMove: Send your pitch deck to the funding address on its Open Bosch site; it invests mainly at early stage and prefers to syndicate.
   facts: [[Check size, $5M–$10M], [Focus, 'Enterprise AI, industrial/physical AI'], [Terms, Corporate strategic investor]]
   tags: [strategic, industrial]
   stages: [4, 5]
@@ -2424,6 +2442,7 @@
   url: https://www.hubangels.com
   desc: Long-running Boston angel fund investing in early-stage tech. Takes companies by referral only.
   why: Fund structure means faster, cleaner closes than loose syndicates.
+  firstMove: Get referred by someone in its network; it accepts only referred companies and does not take unsolicited plans.
   tags: [seed]
   stages: [4]
   offers: [funding]
@@ -2440,6 +2459,7 @@
   url: https://www.mitalumniangels.com/
   desc: Angel network of MIT alumni backing MIT-connected founders.
   why: Warmest possible audience for an MIT-affiliated pitch.
+  firstMove: Fill out the form on its Apply page; a committee member replies if there is a fit, and it strongly prefers MIT-affiliated companies.
   tags: [MIT]
   stages: [4]
   offers: [funding, community]
@@ -2494,6 +2514,7 @@
   url: https://launchpadventuregroup.com
   desc: One of the most active angel groups in New England, with 175+ members.
   why: A monthly forum for rounds of $500K–$2M, plus a casual Catalyst pitch event as an on-ramp.
+  firstMove: Answer the prescreen questions on its site; it backs early-stage science or tech companies headquartered in New England.
   tags: [seed]
   stages: [4]
   offers: [funding]
@@ -2513,6 +2534,7 @@
   url: https://angels-hbsab.org/
   desc: Angel network of Harvard Business School alumni.
   why: Capital plus the HBS operator rolodex.
+  firstMove: Submit a business plan on its Gust page; no Harvard tie is needed, and a committee invites four to six teams to each quarterly pitch event.
   tags: [Harvard]
   stages: [4]
   offers: [funding, community]
@@ -2530,6 +2552,7 @@
   url: https://entrepreneurship.mit.edu/accelerator/
   desc: 'MIT''s summer venture accelerator: up to $75K in equity-free funding, ending in a famous September Demo Day.'
   why: The single best on-ramp for MIT student founders. Zero dilution.
+  firstMove: Apply on its program page when the year's applications open; a team needs at least one current MIT student co-founder.
   facts: [[Check size, Up to $75K equity-free], [Equity, 0% — equity-free], [Program length, Summer; Demo Day in September], [Focus, MIT student founders]]
   tags: [equity-free, students]
   stages: [3, 4]
@@ -2565,6 +2588,7 @@
   url: https://vms.mit.edu
   desc: Free, team-based mentoring from vetted entrepreneurs and executives for MIT-affiliated ventures. No equity, ever.
   why: Arguably the most underrated free resource in the ecosystem.
+  firstMove: Complete its Venture Information Form; mentoring is free and takes no equity, for MIT students, alumni, faculty and staff near Boston.
   tags: [equity-free]
   stages: [2]
   offers: [mentorship]
@@ -2583,6 +2607,7 @@
   url: https://innovationlabs.harvard.edu
   desc: Harvard's venture launchpad — programming, space and accelerator tracks for student and alumni founders.
   why: Free for Harvard affiliates and the President's Innovation Challenge awards $500K+ yearly.
+  firstMove: Sign up for Student i-lab membership if you are a Harvard student or your venture has a Harvard student founder; it is not competitive.
   tags: [students, equity-free]
   stages: [2, 3, 4]
   links: [kempner]
@@ -2602,6 +2627,7 @@
   url: https://engine.xyz
   desc: MIT created this tough-tech hub in 2016; it became an independent 501(c)(3) in 2025, and Engine Ventures spun out as a separate investment firm in 2023. 220,000 sq ft of managed wet lab, engineering and office space, plus Blueprint, a free 8-week mostly virtual program for researchers turning lab work into a company.
   why: Lab space and equipment that would otherwise cost millions, for AI that meets hardware, energy or bio. Fee-based and month-to-month, no equity, no MIT affiliation or Engine Ventures funding required. Residency grants can subsidize teams short on cash; the space itself brings no investment.
+  firstMove: Begin a Residency application to learn about pricing and grants; it is open to early-stage Tough Tech companies, with no MIT tie needed.
   tags: [lab space, deep tech, MIT, events]
   stages: [2, 3]
   links: [engine-v]
@@ -2623,6 +2649,7 @@
   url: https://www.techstars.com
   desc: The storied global accelerator's Boston program — mentor-driven, 13 weeks, $220K standard deal.
   why: The classic accelerator brand with a deep Boston mentor bench.
+  firstMove: Choose the Boston program on its accelerators page and apply online; it invests for equity, charges no fee, and opens in cycles.
   facts: [[Check size, $220K ($20K + $200K MFN SAFE)], [Equity, 5% plus uncapped MFN SAFE], [Program length, 13 weeks], [Focus, Mentor-driven; Boston program active]]
   tags: [seed, founders]
   stages: [4]
@@ -2643,6 +2670,7 @@
   url: https://masschallenge.org
   desc: Zero-equity accelerator headquartered in Boston. Its challenge programs match startups with corporate partners for pilots, and some programs carry prizes.
   why: Pilots with big partners and a massive network, at no equity. Read the challenge statements before you apply.
+  firstMove: Create a startup profile on its site, then apply to its challenge cycle; it takes no equity and backs pre-seed to Series A startups.
   facts: [[Equity, 0% — zero-equity], [Terms, Partner pilots; prizes in some programs]]
   tags: [equity-free]
   stages: [3, 4]
@@ -2661,6 +2689,7 @@
   url: https://www.massrobotics.org
   desc: 'The world''s largest independent robotics innovation hub: shared labs, test space and corporate partners for robotics & physical-AI startups.'
   why: Embodied-AI founders get equipment, space and intros that nowhere else in the US concentrates this densely. Its women's group, run with the Boston chapter of Women in Robotics, held four meet-ups in 2025, and a form on its site signs you up.
+  firstMove: Apply to become a resident through the form on its site; fees depend on your company's size and the space you need.
   facts: [[Equity, 0% — nonprofit innovation hub], [Focus, Robotics and physical AI], [Terms, 'Paid monthly residency; shared labs, test space']]
   tags: [robotics, lab space]
   stages: [3]
@@ -2681,6 +2710,7 @@
   url: https://greentown.org
   desc: North America's largest climatetech incubator — increasingly home to AI-for-energy and AI-for-climate startups.
   why: If your AI serves climate or energy, this is your tribe (and your lab bench).
+  firstMove: Fill out the membership application on its Apply page; an introductory call, a campus tour and a committee review follow.
   facts: [[Equity, 0% — no equity taken], [Focus, Climatetech; AI for energy and climate], [Terms, Membership incubator with lab space]]
   tags: [climate, incubator]
   stages: [3]
@@ -2721,6 +2751,7 @@
   url: https://sscventurepartners.com
   desc: Accelerator + fund for the Boston College founder community.
   why: BC alumni's answer to delta v — a 12-week summer accelerator with a $20K SAFE, plus alumni capital.
+  firstMove: Apply through the online application on its accelerator page; at least one founder must be part of the Boston College community.
   tags: [students, BC]
   stages: [3, 4]
   offers: [funding, mentorship, community]
@@ -2739,6 +2770,7 @@
   url: https://www.ideaneu.com/
   desc: Northeastern's student-led venture accelerator with gap funding up to $10K.
   why: Equity-free gap funding and coaching, run by students for students.
+  firstMove: Attend a Ready Stage Orientation, then create a startup profile on its venture platform; founders need a Northeastern connection.
   facts: [[Check size, Gap funding up to $10K], [Equity, 0% — equity-free], [Focus, Northeastern students]]
   tags: [students, equity-free]
   stages: [2, 3]
@@ -2868,6 +2900,7 @@
   url: https://www.auxiliumworcester.com/
   desc: Worcester innovation studio and accelerator backed by the Rucker Investments family office since June 2025. The accelerator invests $250K per company; pitched at two to three cohorts a year, only two have run (June 2025; June 2026 with Massachusetts Biomedical Initiatives (MBI) on life sciences). A studio residency adds up to $100K. Applications are closed and by invitation as of October 2026.
   why: A first institutional check plus a free 24/7 desk for founders who will build in Central Massachusetts, and AI is explicitly in scope. It is full-time and on-site at 311 Main St, so expect to relocate for the program; cohorts to date have skewed to healthcare and medtech.
+  firstMove: Sign up for its newsletter to hear when applications open; participation is by invitation only and costs companies nothing.
   facts: [[Check size, $250K accelerator; up to $100K studio], [Terms, Convertible note; studio milestone-based], [Stage, Post-ideation with MVP; pre-revenue OK], [Program length, 3 months; studio up to 12 months], [Cohort size, 3–4 companies per class to date], [Focus, 'Broad incl. AI, medtech; no drug development']]
   tags: [seed, pre-seed, incubator, healthcare]
   stages: [2, 3, 4]
@@ -2887,6 +2920,7 @@
   badge: Up to $25K equity-free
   desc: Nonprofit founded 1995 as the NCIIA, renamed 2014; long based in Hadley, now listed in downtown Amherst. E-Team grants US student invention teams up to $25K non-dilutive, plus training; Aspire and Ascend are five- and six-week investor-readiness programs for pre-seed and seed-stage science and engineering startups nationwide. Ran ARPA-H's Investor Catalyst Hub in Cambridge, Sept 2023–Feb 2026.
   why: 'Equity-free money and a national investor-mentor bench for university-born hardware, medtech and applied-AI teams: $5K Pioneer, then $20K Propel, and the Summer 2026 cohort included several AI-powered devices. Programs are national rather than Boston-local, and E-Team requires currently enrolled students plus a faculty advisor.'
+  firstMove: Apply through its web portal to the E-Team Program as a student-led team of at least two; grants go to your college, not the venture.
   facts: [[Check size, 'E-Team: $5K Pioneer + $20K Propel'], [Equity, 0% — E-Team grants are non-dilutive], [Program length, Aspire 5 weeks; Ascend 6 weeks], [Cohort size, Aspire/Ascend 10–15; E-Team 26–27/cohort], [Stage, Students; pre-seed (Ascend) to seed (Aspire)], [Focus, Science and engineering inventions]]
   tags: [equity-free, students, deep tech, healthcare]
   stages: [2, 4]
@@ -2963,6 +2997,7 @@
   url: https://neicorps.org
   desc: NSF-funded partnership of eight New England universities, led by MIT and launched in January 2025, that teaches researchers to test whether their science has a market. Its free three-week Hub Spark Online course runs on Zoom, a follow-on program adds microgrants of up to $1,000, and finishing both can qualify a team for NSF's national I-Corps program and a grant of up to $50,000.
   why: A cheap first step for a researcher with an AI result and no company yet. Three weeks, at least 12 customer interviews, no fee and no equity, and a route to NSF money for more customer discovery. It is built for scientists and engineers, the grants pay for interviews rather than building, and all three fall 2026 courses filled, so apply early.
+  firstMove: Request an application on its Apply page for the free three-week Spark Online course; it is for technology projects in New England.
   facts: [[Program length, '3 weeks, online'], [Equity, None; no fee], [Terms, 'Microgrants to $1,000; NSF up to $50,000'], [Focus, STEM research commercialization]]
   tags: [research, equity-free, MIT]
   stages: [1, 2]
@@ -2983,6 +3018,7 @@
   url: https://deshpande.mit.edu
   desc: MIT's Deshpande Center for Technological Innovation funds research from MIT labs on its way to a startup or a license, in health, climate and energy, AI and tech, and manufacturing. Teams get grant money that isn't tied to equity, a mentor the center calls a Catalyst, and introductions to investors, suppliers and customers.
   why: If your AI work is still an MIT lab project, this is money to prove it out before there is a company, and reviewers send feedback to every applicant whether or not they fund the project. Only MIT faculty and principal investigators can apply, the grant can't pay the PI's salary, and the page gives no amounts or dates, so ask the center about the current round.
+  firstMove: Ask an MIT principal investigator to submit a pre-proposal; only MIT staff with PI status can apply, for research from MIT labs.
   facts: [[Equity, None; grants], [Stage, 'MIT lab research, pre-company'], [Terms, MIT principal investigators only], [Focus, 'Health, climate, AI and tech, manufacturing']]
   tags: [MIT, research, equity-free]
   stages: [1, 2]
@@ -3081,6 +3117,7 @@
   url: https://www.labcentral.org
   desc: Shared wet-lab and office facility for early-stage life-science startups in Kendall Square, and the physical home of the AI BioHub accelerator run with C10 Labs.
   why: If you're building AI-for-bio, this is where the bench work happens — subsidized lab space in the densest biotech neighborhood on earth.
+  firstMove: Fill in its short online application; admission is competitive, for incorporated human-health companies with six months of financing.
   tags: [lab space, biotech]
   stages: [3]
   links: [c10, ai-biohub, mlsc]
@@ -3129,6 +3166,7 @@
   url: https://www.artisansasylum.com
   desc: Nonprofit 52,000 sq ft makerspace with 16+ shops including dedicated electronics and robotics facilities, 30–40 public classes a month, and rentable private studios.
   why: Prototyping infrastructure for robotics and hardware-AI founders at hobbyist prices — build the thing before you raise for it.
+  firstMove: Take a free tour or sign up for a plan on its member portal; shop access follows a new-member orientation and tool testing.
   tags: [lab space, robotics]
   stages: [2, 3]
   offers: [space]
@@ -3144,6 +3182,7 @@
   url: https://www.umassd.edu/innovate/
   desc: UMass Dartmouth's technology innovation center in Fall River, opened in 2001 as the 60,000 sq ft Advanced Technology & Manufacturing Center and renamed the CIE in 2015. Its Technology Venture Center incubator offers offices, a biomanufacturing lab, prototyping, interns and faculty access, on site or virtually. Graduates include OceanServer (sold to L3 in 2017) and Catalytic Innovations (2026).
   why: 'For hardware, marine-tech or biotech founders adding an AI layer on the South Coast: university-run office and lab space with UMass Dartmouth interns and faculty on hand, plus no-cost SBDC advising on site. It is a general tech incubator, not an AI program, and you get in by contacting the center and submitting a business plan rather than applying to a cohort.'
+  firstMove: Email the center, at the address on its About page, for information or to book a tour of the facility.
   facts: [[Focus, 'Marine tech, life sciences, optics, acoustics'], [Terms, Flexible offices and labs; send a business plan]]
   tags: [incubator, lab space, deep tech]
   stages: [2, 3]
@@ -3161,6 +3200,7 @@
   url: https://worclab.org
   desc: 'Nonprofit 501(c)(3) incubator and coworking space on the fourth floor of the Printers Building in downtown Worcester: a 10,000 sq ft space with shared and dedicated desks, private offices and a 2,400 sq ft prototyping lab (3D printer farm, laser cutter, lab benches), home to over two dozen member companies. Co-runs the free StartUp Worcester program with the Worcester Regional Chamber of Commerce.'
   why: A $175/month 24/7 shared desk ($300 for a dedicated desk) or $350/month lab bench in downtown Worcester, plus a $10K AWS credit and software discounts for members. Expert office hours (IP, SEO, engineering, HR, finance) are open to non-members, and StartUp Worcester, which picks up to 10 ventures a year, is a route to a free year of membership. The focus is general tech (IoT, cloud, online services) rather than AI-specific.
+  firstMove: Pick a membership plan and sign up through its member portal; it takes startups from all industries and specializes in technology.
   facts: [[Equity, 0% — nonprofit 501(c)(3); fee-based membership], [Terms, 'Shared desk $175, dedicated $300, bench $350/mo'], [Focus, 'Tech, IoT, cloud, online services; any industry']]
   tags: [coworking, incubator, lab space]
   stages: [2, 3]
@@ -3178,6 +3218,7 @@
   url: https://www.uml.edu/research/nerve/
   desc: UMass Lowell's robotics testing, research and training facility, now 10 years old. It evaluates robots, exoskeletons and human-robot interaction on site, in the field or remotely, and its test methods feed ASTM's standards for response robots, automation and exoskeletons.
   why: Independent test results for a robot before a customer asks for them. Reserve the test courses by the hour and run your own trials, or have NERVE's staff run them, collect the data and record video. It is a paid service, booked through the university's core-facility system or a contract, in the same building as UMass Lowell's Innovation Hub.
+  firstMove: Email the center to review your test plan, then register on UMass Lowell's Core Research Facility site and reserve time.
   facts: [[Terms, Paid; hourly or by contract], [Focus, 'Robots, exoskeletons, human-robot interaction']]
   tags: [robotics, lab space, research]
   stages: [3]
@@ -3194,6 +3235,7 @@
   url: https://www.wpi.edu/research/centers/practicepoint
   desc: WPI's healthcare-technology test facility at Gateway Park, with a 3T MRI, a working operating room, an ICU, a physician's office, an apartment and motion capture in one place. Companies use it to test, train on and demonstrate medical devices, including surgical and wearable robots.
   why: Somewhere to try a medical robot or device in a realistic clinical setting, and to stage a demonstration for investors. It is fee for service, with discounts and packages for startups, and it can connect you to WPI researchers in analytics, cybersecurity and AI. Its focus is medical devices, so it suits AI that ships in hardware more than software alone.
+  firstMove: Email the center, at the address on its Engage page, to request facility access; use is fee for service, with discounts for start-ups.
   facts: [[Terms, Fee for service; startup discounts], [Focus, 'Medical devices, surgical and wearable robots']]
   tags: [healthcare, robotics, lab space]
   stages: [3]
@@ -3614,6 +3656,7 @@
   approx: true
   desc: Statewide AI festival built from independently hosted events — talks, workshops, demo nights and hackathons — with Boston's Seaport as the hub neighborhood. The 2027 run is Sept 16 to Oct 28, with a core week Sept 24 to Oct 1. Free to attend, and most individual events are free. In 2026, 193 organizations ran 252 events, and 23 countries took part.
   why: The week the whole Massachusetts AI ecosystem is in one place — plan launches, hiring and investor meetings around it. Any Massachusetts host can list an event on the official calendar for free, approved on a rolling basis, so you can run your own demo night inside the program.
+  firstMove: Register once for the festival, which is free, then RSVP to each event with its host; the host's own list is what secures your spot.
   tags: [events, hackathons, founders]
   stages: [1, 2, 4, 5]
   links: [toa, redhat-bos, masstech, glasswing, link-ventures, c10, imagination, venturelane, cic, genai-meetup, aihub, massrobotics, nerd]
@@ -3633,6 +3676,7 @@
   url: https://odsc.ai/east/
   desc: One of the world's largest applied data science & AI conferences, held in Boston every spring.
   why: Thousands of practitioners in town — recruiting and learning in one badge.
+  firstMove: Register for a pass on its East page; an Expo pass is free by application, subject to approval.
   tags: [events]
   stages: [1, 5]
   offers: [community, talent]
@@ -3648,6 +3692,7 @@
   url: https://hackmit.org
   desc: MIT's flagship student hackathon, every fall.
   why: 1,000+ of the best student builders in the world, in one gym, for one weekend.
+  firstMove: Apply through its portal when the year's applications open if you are an undergraduate; it is free, and others can judge or mentor.
   tags: [hackathons, students]
   stages: [3]
   offers: [community, talent]
@@ -3663,6 +3708,7 @@
   url: https://hhuh.io/
   desc: Harvard's international collegiate hackathon each October.
   why: Cofounder and first-hire hunting ground.
+  firstMove: Create a new account on its portal each year to apply; it is for undergraduate students and free for accepted hackers.
   tags: [hackathons, students]
   stages: [3]
   offers: [community, talent]
@@ -3800,6 +3846,7 @@
   url: https://massaicoalition.com
   desc: 'Private-sector coalition of Massachusetts AI founders, operators, investors and students, launched February 2026. Not an incubator or accelerator: it runs a free founder coworking space donated by Wayfair, a resource pack of compute credits and warm intros, a customer-pilot program with member companies, and a year-round event calendar.'
   why: 'If you are committed to building in Massachusetts, the Founder Starter Pack is the concrete ask: a free desk, GPU and cloud credits and warm intros, with no equity or fees. The pilot program pitches startups to member companies as first paying customers; quarterly Founder Rooms put founders in front of pledged angels.'
+  firstMove: Attend its events, which are open to all founders with no application; further resources go to founders it accepts on a rolling basis.
   tags: [founders, events, equity-free, coworking]
   stages: [1, 2, 3, 4, 5]
   links: [aihub, sundai, engine]
@@ -3840,6 +3887,7 @@
   badge: $100M initiative
   desc: State AI office inside the MassTech Collaborative, announced Dec 2024 with $100M under the Mass Leads Act. Runs the Applied AI Models Innovation Challenge, the Data Commons Collaborative, the $31M AI Compute Resources cluster at MGHPCC and no-cost Google AI training for state residents; co-sponsors The Open Accelerator with IBM and Red Hat.
   why: Startups can request compute through the Hub's Data Commons intake form, and the Hub's Google AI training is free to any Massachusetts resident. Innovation Challenge grants need a college, university or nonprofit lead, so a startup gets in as a named partner or subcontractor on someone else's bid.
+  firstMove: Submit your interest in its compute and storage through the Data Commons Use Case Intake Form on its FAQ page.
   tags: [policy, equity-free]
   stages: [1, 3, 4]
   links: [mghpcc, toa, massventures, masstech, google]
@@ -3879,6 +3927,7 @@
   url: https://www.masscec.com
   desc: The Commonwealth's quasi-public climatetech agency — non-dilutive Catalyst grants up to $75K, InnovateMass demonstration grants up to $350K and CriticalMass awards up to $1M, plus equity investments and pilot support.
   why: If your AI touches grid, buildings or climate, this is non-dilutive money that funds a demonstration pilot with Massachusetts utilities and customers.
+  firstMove: Choose a program such as InnovateMass and apply through the online portal linked in its request for proposals.
   tags: [climate]
   stages: [2, 4]
   offers: [grants, customers, funding]
@@ -3897,6 +3946,7 @@
   url: https://www.masslifesciences.com
   desc: Quasi-public agency funding life-sciences innovation. Its data and AI funding now runs through the ARC Awards (~$750K, absorbing the retired Bits to Bytes program), alongside internship wage subsidies and job-creation tax incentives.
   why: 'AI-in-bio founders: the big data and ML grants need a Massachusetts nonprofit research institution to apply with you as the company partner, so line up the academic collaborator first.'
+  firstMove: Pick a funding program on its site, then create an account in its application portal and submit an application.
   tags: [biotech]
   stages: [3, 4]
   offers: [grants]
@@ -3912,6 +3962,7 @@
   url: https://www.boston.gov/departments/emerging-technology
   desc: The city's front door for AI — leads Boston's AI project portfolio and generative-AI policy, and partners with startups on pilots in AI, climate and transportation.
   why: If you want a municipal pilot or a govtech reference customer, this is the office running Boston's AI experiments — and they take partnership conversations.
+  firstMove: Email the office if you want to pilot or partner with the city; it brings a startup's idea to the right teams inside City Hall.
   tags: [policy]
   stages: [2]
   offers: [customers]
@@ -3928,6 +3979,7 @@
   url: https://mehi.masstech.org/digital-health-sandbox-program
   desc: State program at the Massachusetts eHealth Institute (a MassTech division) granting up to $60K per company to test digital-health and AI products across a network of 11 hospital and lab sandboxes.
   why: 'Health-AI founders: state money to validate your product inside real Massachusetts hospital environments — clinical evidence and a design partner without giving up equity.'
+  firstMove: Sign up for sandbox office hours with its team, then contact a sandbox to confirm it can support your company before you apply.
   tags: [healthcare]
   stages: [2, 4]
   links: [masstech]
@@ -3947,6 +3999,7 @@
   url: https://www.diu.mil
   desc: The Pentagon's commercial-technology front door, with an East Coast office in Kendall Square — open solicitations and prototype contracts awarded in months, heavily weighted toward AI and autonomy.
   why: Dual-use AI founders can land a DoD prototype contract in months rather than years — non-dilutive revenue and a path to production.
+  firstMove: Submit your solution to a posted solicitation on its open solicitations page; any individual or commercial entity may respond.
   tags: [defense]
   stages: [4, 5]
   offers: [customers]
@@ -3966,6 +4019,7 @@
   url: https://masscybercenter.org
   desc: Cybersecurity division of the MassTech Collaborative, launched in 2017 and written into state law in 2022. Convenes the state's cyber ecosystem through two working groups and Cyber Month events, grant-funds the SOC run by CyberTrust Massachusetts and cyber ranges on four campuses, and runs the Cyber Resilient Massachusetts grant for small businesses, nonprofits and municipalities.
   why: 'Security-AI founders: this is the state''s convening body for the cyber ecosystem, and its Cyber Resilient grant reimburses up to a third of CyberTrust Massachusetts SOC/MDR costs for Massachusetts small businesses, with AI/ML firms a named priority sector. Useful when a first enterprise customer demands a security posture you can''t yet afford; it is not product funding.'
+  firstMove: Get a scope of work from CyberTrust Massachusetts first, then apply for its grant, which can fund up to one-third of the cost of services.
   facts: [[Focus, 'Cyber resiliency, workforce, awareness'], [Terms, Up to 1/3 of CyberTrust SOC costs], [Equity, '0% — state grant, reimbursement-based']]
   tags: [security, policy]
   stages: [1, 5]
