@@ -99,9 +99,44 @@ test("the town is read from the entry, never worked out from the pin", () => {
 });
 
 test("an entry with no town is left out of the figures by town, and counted as left out", () => {
-  const t = kpi.towns([placed("a", "accel", "Boston"), placed("b", "accel", "Lowell"), { id: "c", cat: "accel", ...north(40) }]);
+  const t = kpi.towns([placed("a", "accel", "Boston"), placed("b", "accel", "Lowell"), { id: "c", cat: "accel", ...north(40) },
+    { id: "d", cat: "accel", town: "", ...north(40) }]);                  // an empty town is no town
   assert.deepEqual(t.all, { total: 2, outside: 1, pct: 50 });
-  assert.equal(t.unplaced, 1);
+  assert.equal(t.unplaced, 2);
+});
+
+// An entry is marked statewide when its own text says it serves the whole state. The count goes
+// beside the figures by town, because four of the first ten so marked sit in Boston.
+test("geography counts the entries marked statewide, and how many of them sit in the two cities", () => {
+  const g = kpi.geography([
+    { ...placed("a", "gov", "Boston"), statewide: true },
+    { ...placed("b", "gov", "Holyoke"), statewide: true },
+    placed("c", "accel", "Cambridge"),
+    { ...placed("d", "accel", "Lowell"), statewide: false },
+  ]);
+  assert.deepEqual(g.statewide, { total: 2, inside: 1, unplaced: 0 });
+  assert.deepEqual(g.towns.all, { total: 4, outside: 2, pct: 50 });     // the mark moves nobody out of their town
+  // with no town on any entry the count stands, and where they sit is not known
+  const bare = kpi.geography([{ id: "a", cat: "gov", offers: [], statewide: true, ...north(1) }, { id: "b", cat: "gov", offers: [], ...north(1) }]);
+  assert.deepEqual(bare.statewide, { total: 1, inside: null, unplaced: null });
+});
+
+// "4 from Boston or Cambridge" reads as "the rest are elsewhere". A marked entry with no town is in
+// neither group, so it is counted apart and the caveat says so, in the text and in Slack.
+test("a statewide entry with no town is counted apart, not as outside the two cities", () => {
+  const some = [
+    { ...placed("a", "gov", "Boston"), statewide: true },
+    { ...placed("b", "gov", "Holyoke"), statewide: true },
+    { id: "c", cat: "gov", offers: [], statewide: true, ...north(1) },          // marked, and no town
+    placed("d", "accel", "Cambridge"),
+  ];
+  const g = kpi.geography(some);
+  assert.deepEqual(g.statewide, { total: 3, inside: 1, unplaced: 1 });
+  const r = result({ entries: some.length, geography: g });
+  const caveat = "A pin is where an organization sits, not whom it serves. 3 entries serve the whole state (1 from Boston or Cambridge, 1 with no town).";
+  assert.ok(kpi.renderText(r).includes(`\n  Keep in mind: ${caveat}\n`));
+  const line = kpi.renderSlack(r, {}).blocks[1].text.text.split("\n").find(l => l.startsWith("• *Geography:* "));
+  assert.ok(line.endsWith(` _${caveat}_`), line);
 });
 
 test("the list holds Massachusetts' 351 cities and towns, once each, A to Z", () => {
@@ -375,6 +410,23 @@ test("the text says how many entries the figures by town leave out", () => {
   assert.match(text, /\n {2}1 entry has no town, so the figures by town leave it out\n/);
 });
 
+test("the caveat about pins carries how many entries serve the whole state", () => {
+  const marked = withTowns(ENTRIES).map(e => ({ ...e, statewide: e.id !== "b" }));     // a in Boston, c in Pittsfield
+  const r = placedResult({ geography: kpi.geography(marked) });
+  const caveat = "A pin is where an organization sits, not whom it serves. 2 entries serve the whole state (1 from Boston or Cambridge).";
+  assert.ok(kpi.renderText(r).includes(`\n  Keep in mind: ${caveat}\n`));
+  const line = kpi.renderSlack(r, {}).blocks[1].text.text.split("\n").find(l => l.startsWith("• *Geography:* "));
+  assert.ok(line.endsWith(` _${caveat}_`), line);
+  // one entry, in a set with no towns: no "from", because where it sits is not known
+  const one = kpi.geography([{ ...ENTRIES[0], statewide: true }, ENTRIES[1]]);
+  assert.ok(kpi.renderText(result({ entries: 2, geography: one })).includes("not whom it serves. 1 entry serves the whole state.\n"));
+  // none marked, or a result saved before entries could be: the caveat as it always read
+  const plain = "\n  Keep in mind: A pin is where an organization sits, not whom it serves.\n";
+  assert.ok(kpi.renderText(placedResult()).includes(plain));
+  const { statewide, ...before } = kpi.geography(withTowns(ENTRIES));
+  assert.ok(kpi.renderText(placedResult({ geography: before })).includes(plain));
+});
+
 test("a part that could not be counted says so and why, and the rest still shows", () => {
   const text = kpi.renderText(result({
     rechecks: NO_HISTORY, monthEnds: NO_HISTORY,
@@ -457,6 +509,8 @@ test("offline it still reports on this repository's data, and exits 0", () => {
   assert.equal(out.geography.towns.available, true);
   assert.deepEqual([out.geography.towns.all.total, out.geography.towns.unplaced], [DATA.length, 0]);
   assert.ok(out.geography.towns.all.outside <= DATA.length);
+  assert.equal(out.geography.statewide.total, DATA.filter(d => d.statewide === true).length);
+  assert.ok(out.geography.statewide.inside <= out.geography.statewide.total);
   assert.equal(out.freshness.total, DATA.length);
   assert.equal(out.freshness.forecast.length, 12);
   for (const p of out.freshness.forecast) assert.ok(p.pct >= 0 && p.pct <= 100);

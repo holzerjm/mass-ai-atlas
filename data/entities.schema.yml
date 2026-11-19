@@ -44,6 +44,12 @@ items:
       type: string
       pattern: *nohtml
       minLength: 1
+    statewide:
+      description: >-
+        true when the entry's own text says its mandate or program covers Massachusetts as a
+        whole: a state body, or a program or network that runs across the state. Not because
+        anyone may apply, and not for a national program
+      type: boolean
     lat:
       description: latitude (Massachusetts bounding box — a typo guard, not a geofence)
       type: number

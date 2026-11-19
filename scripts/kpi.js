@@ -20,7 +20,8 @@
  *             is more than 25 miles from Boston City Hall. A pin is where an organization
  *             sits, not whom it serves. The town is read from the entry and never worked
  *             out from the pin: an entry with none is left out and counted as left out,
- *             and when no entry has one the split reads "not available".
+ *             and when no entry has one the split reads "not available". Entries marked
+ *             `statewide` are counted beside it, and how many of those sit in the two cities.
  * FRESHNESS   Entries whose lastVerified month is within N months of this month, counted
  *             as scripts/stale.js counts it. While the oldest check is younger than the
  *             window, 100% says nothing, so the figure comes with a forecast: what it
@@ -97,13 +98,22 @@ function geography(DATA) {
   };
   const needs = {};
   for (const d of DATA) for (const o of d.offers || []) (needs[o] ||= []).push(d);
+  const byTown = towns(DATA), state = DATA.filter(d => d.statewide === true);
   return {
     from: CITY_HALL.name,
     miles: RING_MILES,
     all: count(DATA),
     resources: count(DATA.filter(d => !EMPLOYERS.has(d.cat))),
     needs: Object.fromEntries(Object.entries(needs).map(([k, v]) => [k, count(v)])),
-    towns: towns(DATA),
+    towns: byTown,
+    // The number behind "a pin is where an organization sits, not whom it serves": the
+    // entries whose own text says they serve the whole state, and how many of them sit
+    // in the two cities. One with no town is in neither group, so it is counted apart:
+    // "4 from Boston or Cambridge" must not read as "the rest are elsewhere" when where
+    // one sits is not known. With no town on any entry, neither figure is known.
+    statewide: { total: state.length,
+      inside: byTown.available ? state.filter(d => CORE_TOWNS.includes(d.town)).length : null,
+      unplaced: byTown.available ? state.filter(d => !hasTown(d)).length : null },
   };
 }
 
@@ -112,8 +122,9 @@ function geography(DATA) {
 // Hall as much of Boston is. So it is counted from each entry's `town` and from nothing
 // else. An entry without one is left out and reported as left out, and when no entry
 // has one the split says so rather than print a small ring that looks like an answer.
+const hasTown = d => typeof d.town === "string" && d.town !== "";
 function towns(DATA) {
-  const placed = DATA.filter(d => typeof d.town === "string" && d.town);
+  const placed = DATA.filter(hasTown);
   if (!placed.length) return { available: false, reason: "entries carry no town yet" };
   const core = new Set(CORE_TOWNS);
   const count = list => {
@@ -429,7 +440,8 @@ async function compute({ DATA, now, today, months, cycle, repo, offline, env }) 
 /* ---------- rendering ---------- */
 
 const of = (n, total) => `${n} of ${total} (${pct(n, total)}%)`;
-const listOf = names => (names.length < 2 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`);
+const listOf = (names, word = "and") => (names.length < 2 ? names.join("")
+  : `${names.slice(0, -1).join(", ")} ${word} ${names[names.length - 1]}`);
 const NEEDS_SHOWN = ["funding", "customers", "compute"];   // the three the first count singled out
 
 // The sentences both formats share. Each headline has a `mind`: what the number hides.
@@ -439,7 +451,13 @@ function sentences(r) {
 
   const t = g.towns, ring = `${of(g.all.beyond, g.all.total)} sit beyond ${g.miles} miles of ${g.from}`;
   const byNeed = (set, n) => NEEDS_SHOWN.filter(k => set[k]).map(k => `${k} ${set[k][n]} of ${set[k].total}`).join(", ");
-  const mind = "A pin is where an organization sits, not whom it serves.";
+  // A result saved before entries could be marked statewide has no such count.
+  const sw = g.statewide && g.statewide.total ? g.statewide : null;
+  const mind = "A pin is where an organization sits, not whom it serves." + (sw
+    ? ` ${sw.total} ${sw.total === 1 ? "entry serves" : "entries serve"} the whole state` +
+      (sw.inside === null ? "" : ` (${sw.inside} from ${listOf(t.core, "or")}` +
+        (sw.unplaced ? `, ${sw.unplaced} with no town` : "") + ")") + "."
+    : "");
   let geo;
   if (t.available) {
     // The towns lead and the ring follows: a quarter of the atlas can sit outside the

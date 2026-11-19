@@ -50,6 +50,8 @@ An annotated example:
   town: Cambridge                   # the city or town the pin sits in, one of the state's
                                     # 351 (scripts/towns.js). A neighborhood or village goes
                                     # in loc: Kendall Sq is Cambridge, Allston is Boston
+  statewide: true                   # include only if the entry's own text says it serves all
+                                    # of Massachusetts: a state agency, a statewide program
   lat: 42.3629                      # lat/lng must be within Massachusetts
   lng: -71.0838
   approx: true                      # include if coordinates are neighborhood-level
