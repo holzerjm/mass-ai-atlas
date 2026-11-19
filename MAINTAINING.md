@@ -431,7 +431,7 @@ Every entry has these fields. ⭐ = required.
 | `cat` | ⭐ | The category **key** — translate from the form using the table below. | `startup` |
 | `loc` | ⭐ | Street address, or neighborhood if it moves around. | `1 Broadway, Cambridge` |
 | `town` | ⭐ | The **city or town** the pin sits in: one of Massachusetts' 351, spelled as in `scripts/towns.js`. Not a neighborhood or a village. Kendall Sq is `Cambridge`; Allston, Charlestown and the Seaport are `Boston`. If you can't tell, see "Which town is it in?" in Part 1, Step 2. | `Cambridge` |
-| `statewide` |  | Add `statewide: true` **only** when the entry's own `desc` or `why` says its mandate or program covers Massachusetts as a whole: a state agency, or a program or network that runs across the state. Not because anyone may apply (most funds and accelerators take applications from anywhere), not for a region of the state, and not for a national program. The KPI message counts these beside the figures by town. | `true` |
+| `statewide` |  | Add `statewide: true` **only** when the entry's own `desc` or `why` says its mandate or program covers Massachusetts as a whole: a state agency, or a program or network that runs across the state. Not because anyone may apply (most funds and accelerators take applications from anywhere), not for a region of the state, and not for a national program. The entry's panel and card then say so, a search for "statewide" finds it, the AI file carries it, and the KPI message counts these beside the figures by town. | `true` |
 | `lat` | ⭐ | First coordinate from Google Maps. | `42.3629` |
 | `lng` | ⭐ | Second coordinate from Google Maps. | `-71.0838` |
 | `approx` |  | Add `approx: true` **only** if the location is neighborhood-level, not exact. | `true` |

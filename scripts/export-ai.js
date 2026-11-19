@@ -38,9 +38,16 @@ function applications(d) {
   return "";
 }
 
+// Where it is, for a reader who has only this file. The address often names a neighborhood, a
+// campus or no fixed place ("Kendall Sq", "Venues vary"), so the town is added when the address
+// leaves it out. An entry marked statewide says so: its pin is one place and its offer is not.
+const STATEWIDE = "serves all of Massachusetts";
+const townNote = d => (d.town && !d.loc.toLowerCase().includes(d.town.toLowerCase()) ? `town: ${d.town}` : "");
+
 function entry(d) {
   const lines = [`### ${d.name} [${d.id}]`];
-  lines.push([CATS[d.cat].label, d.loc, d.lastVerified && `verified ${d.lastVerified}`].filter(Boolean).join(" · "));
+  lines.push([CATS[d.cat].label, d.loc, townNote(d), d.statewide && STATEWIDE,
+    d.lastVerified && `verified ${d.lastVerified}`].filter(Boolean).join(" · "));
   const about = [
     (d.stages || []).length && `Stages: ${d.stages.map(n => stageName[n]).join(", ")}.`,
     `Offers: ${d.offers.join(", ")}.`,
@@ -78,6 +85,7 @@ const text = [
   "## How to read it",
   `An organization's atlas page is ${SITE}?entry=ID, where ID is the value in square brackets after its name.`,
   "\"verified\" is the month a person last confirmed the organization is real and its entry is right.",
+  `"town:" gives the city or town an organization's map pin is in, where its address names only a neighborhood, a campus or no fixed place. "${STATEWIDE}" marks a state body, or a program or network that runs across the state, by its own description, wherever its pin is.`,
   "Applications: \"open, rolling\" means taking applications now, \"apply by\" gives the next deadline, \"closed\" means not now, and \"takes pitches\" means a funder's own page invites pitches, with no set application process. With no Applications line, the atlas has no information, which doesn't mean there's no way in.",
   `Stages: ${STAGES.map(s => `${s.t} (${s.s})`).join(", ")}.`,
   "",

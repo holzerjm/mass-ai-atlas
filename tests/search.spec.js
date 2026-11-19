@@ -70,6 +70,23 @@ test("a city finds every entry in it, whatever its address calls the place", asy
   await expect(page.locator("#dirCount")).not.toContainText("closest");
 });
 
+// An entry marked statewide seldom uses the word itself: until 2026-11 "statewide" found 2 of the
+// 10 so marked. The search reads the mark, and knows a few other ways a founder says it.
+test("\"statewide\" finds every entry that serves the whole state, however a founder says it", async ({ page }) => {
+  const marked = DATA.filter(d => d.statewide);
+  expect(marked.length, "no entry is marked statewide, so this test proves nothing").toBeGreaterThan(0);
+  for(const words of ["statewide", "state-wide", "across the state", "anywhere in Massachusetts"]){
+    await search(page, words);
+    const names = await shownIds(page);
+    for(const d of marked) expect(names, `"${words}" finds ${d.name}`).toContain(d.name);
+    await expect(page.locator("#dirCount")).not.toContainText("closest");
+  }
+  // beside a need: every marked entry that offers it
+  await search(page, "statewide compute");
+  const names = await shownIds(page);
+  for(const d of marked.filter(d => d.offers.includes("compute"))) expect(names, `"statewide compute" finds ${d.name}`).toContain(d.name);
+});
+
 // One or two letters match a whole word only, or "ai" would find "air" and "vc" anything.
 test("a word matches at the start of a word, and a short word only as a whole word", async ({ page }) => {
   await search(page, "robot");
