@@ -191,6 +191,23 @@ test.describe("atlas-ai.txt", () => {
     expect(block(none.id)).not.toContain("Applications:");
   });
 
+  // Someone's assistant has only this file. An address often names a neighborhood, a campus or no
+  // fixed place, and a pin says nothing about whom an organization serves, so both go on the line.
+  test("says which town an entry is in when its address doesn't, and which entries serve the whole state", () => {
+    const line = d => text.split(/^### /m).find(b => b.includes(`[${d.id}]`)).split("\n")[1];
+    const named = d => d.loc.toLowerCase().includes(d.town.toLowerCase());
+    for(const d of DATA){
+      if(named(d)) expect(line(d), d.id).not.toContain(" · town: ");
+      else expect(line(d), d.id).toContain(` · town: ${d.town} · `);
+      if(d.statewide) expect(line(d), d.id).toContain(" · serves all of Massachusetts");
+      else expect(line(d), d.id).not.toContain("serves all of Massachusetts");
+    }
+    expect(DATA.some(d => !named(d)) && DATA.some(d => d.statewide), "the data has neither case, so this test proves nothing").toBe(true);
+    const head = text.slice(0, text.indexOf("## Pathways"));
+    expect(head).toContain('"town:" gives the city or town');
+    expect(head).toContain('"serves all of Massachusetts" marks');
+  });
+
   test("stays compact", () => {
     expect(Buffer.byteLength(text)).toBeLessThan(200 * 1024);
   });

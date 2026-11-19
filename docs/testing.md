@@ -128,6 +128,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | footer `#footCount` | the footer count being hand-typed again (it said "101 organizations" while the atlas listed 171) |
 | | footer `#footCurated` | the curation month being hand-typed again (it still said "Curated June 2026" in October). The test takes the newest `lastVerified` in the data, the way the page does, so it never needs updating by hand |
 | | the drawer says when an entry was added | an entry's month going unshown, or an entry from the month the record began claiming it joined then: its drawer says "or earlier" |
+| | a statewide entry says so, in its panel and on its card | the mark staying in the data where no visitor sees it, as it did until 2026-11. A marked entry's panel must say "Serves all of Massachusetts", an unmarked one must not, and the Directory must chip exactly the marked entries |
 | | a new entry's popup is marked New, and is no taller for it | the tag costing a popup a line. A popup's content has a limit (`POPUP_FITS`), so the tag sits on the button's line, and the test takes it out and checks the content is the same height. An entry that isn't new has no tag |
 | | every entry opens a drawer | one malformed entry (unknown category, stage with no row) throwing only when someone opens it |
 | | co-located pins | a pin that shares its spot losing the others: every pin within 25 m of another (exact or near, by the map's own haversine) must list them in its popup's `.pop-colocated`, each name there must open that entry's drawer, and markers must stay at their exact coordinates. Without it, 16 entries could not be reached from the map at street zoom (2026-11-01) |
@@ -220,6 +221,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | a need finds every entry that offers it | a search that doesn't read `offers`. "grant" missed 8 of the 17 entries offering grants until 2026-11. "gpu", "pilot", and "mentor" must each find every entry with that offer |
 | | several words must all match | a short query turning into "any of these words". Each word may match anywhere in the entry |
 | | a city finds every entry in it | a search that reads the address alone again. An address often names only a neighborhood or a campus, so until 2026-11 "Cambridge" missed the MIT-IBM lab and "Boston" the Kempner Institute. Each town that some address leaves out must find every entry in it, on its own and beside a need |
+| | "statewide" finds every marked entry | the search going by the entry's own words alone. Until 2026-11 "statewide" found 2 of the 10 entries so marked. It, "state-wide", "across the state" and "anywhere in Massachusetts" must each find every marked entry, and beside a need every marked entry that offers it |
 | | word starts, and short words whole | matching inside words. "robot" must find robotics, and "bu" must not match "built" |
 | | a sentence finds the closest entries | a founder's sentence finding nothing, as every sentence did until 2026-11, or a list that doesn't say it is only the closest. The count must say so, the sort must read "Best match", and each card must show what it matched on |
 | | no match, then Clear filters | a dead end. Clear filters must empty the search and bring every entry back |
@@ -314,6 +316,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | it holds no instructions for an assistant | rules creeping into the file. They belong in the prompt a founder reads |
 | | it shows the same application status as the page | the file and the page disagreeing about what's open |
 | | it stays compact | the file growing until web tools cut it |
+| | it says the town and who serves the whole state | an assistant holding only this file not knowing where a "Kendall Sq" address is, or that a state program serves founders far from its pin. A line must carry `town:` exactly when the address leaves the town out, and "serves all of Massachusetts" exactly on the marked entries |
 | `updates.spec.js` | every update, newest first | the page drifting from `data/updates.yml`, or a date out of order |
 | | every Try it link lands inside the atlas | a `try` link pointing at something that isn't there. A pathway link must open that pathway |
 | | a Try it link on the page opens what it says | the page building the wrong address from a `try` value |

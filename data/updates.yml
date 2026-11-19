@@ -10,6 +10,11 @@
 #
 # A copy of this template should replace this list, or set it to [].
 
+- date: 2026-11-19
+  title: See who serves the whole state
+  text: Some organizations serve founders anywhere in Massachusetts, such as state agencies and statewide programs. Each now says so on its card and in its panel, and a search for "statewide" finds them all.
+  try: '?entry=massventures#directory'
+
 - date: 2026-11-18
   title: Search by city
   text: Type a city, such as Cambridge or Worcester, into any search box to find the organizations there. It now works where an address names only a neighborhood or a campus, like Kendall Sq or the Seaport.

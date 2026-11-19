@@ -471,6 +471,7 @@ html:not(.dark) .need-chip.on{border-color:#b45309;color:#b45309;background:rgba
 html:not(.dark) .dr-apply{color:#15803d}
 .dr-closed,html:not(.dark) .dr-closed{color:var(--muted)}
 .dr-pitch,html:not(.dark) .dr-pitch{color:var(--text)}
+.dr-state{margin-top:14px;font-size:13.5px;font-weight:500;color:var(--text)}
 .dr-apply a{color:inherit;text-decoration:underline}
 .apply-tag{color:#4ade80;border-color:rgba(74,222,128,.4)}
 html:not(.dark) .apply-tag{color:#166534;border-color:rgba(21,128,61,.35)}   /* 6.3:1 on --panel2; #15803d was 4.43:1 */
@@ -1423,6 +1424,7 @@ const SEARCH_SAME = [
   ["defense", "defence", "dual use", "military"],
   ["security", "cybersecurity", "cyber"],
   ["meetup", "meet up"],
+  ["statewide", "state wide", "whole state", "across the state", "across massachusetts", "all of massachusetts", "anywhere in massachusetts"],
 ];
 const searchSame = new Map(SEARCH_SAME.flatMap(group => group.map(w => [w, group])));
 const singular = w => w.length > 4 && w.endsWith("ies") ? w.slice(0, -3) + "y"
@@ -1458,7 +1460,9 @@ function searchDoc(d){
   const pad = s => " " + foldText(s) + " ";
   searchDocs = searchDocs || Object.fromEntries(DATA.map(e => [e.id, {
     name: pad(e.name), place: pad(e.loc + " " + (e.town||"")), cat: pad(cLabel(e.cat)), text: pad(e.desc + " " + (e.why||"")),
-    vocab: pad([...(e.tags||[]), ...(e.offers||[]).map(o => OFFERS_META[o].label)].join(" ")),
+    // An entry marked statewide says so here, because its own text seldom uses the word:
+    // until 2026-11 "statewide" found 2 of the 10 so marked.
+    vocab: pad([...(e.tags||[]), ...(e.offers||[]).map(o => OFFERS_META[o].label), e.statewide ? "statewide" : ""].join(" ")),
   }]));
   return searchDocs[d.id];
 }
@@ -1601,6 +1605,8 @@ function openDrawer(id){
   $("drLoc").textContent = "📍 " + d.loc + (d.approx ? " (approx.)" : "");
   let html = `<p>${esc(d.desc)}</p>`;
   if(d.why) html += `<div class="dr-why" style="--cc:${col}"><b>Why it matters for founders</b><div>${esc(d.why)}</div></div>`;
+  // Its pin is one place, and what it offers reaches the whole state: say so before anyone rules it out as too far.
+  if(d.statewide) html += `<div class="dr-state">🗺 Serves all of Massachusetts</div>`;
   if(applyOpen(d)) html += `<div class="dr-apply">⏳ Applications open — ${d.applyBy==="rolling" ? "rolling" : "apply by " + fmtDeadline(d.applyBy)}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`;
   else if(applyClosed(d)) html += `<div class="dr-apply dr-closed">⏸ Applications closed · ${esc(d.applyNote)}${d.applyUrl ? ` — <a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">how to apply ↗</a>` : ""}</div>`;
   else if(takesPitches(d)) html += `<div class="dr-apply dr-pitch">📨 Takes pitches — <a href="${esc(d.applyUrl)}" target="_blank" rel="noopener">how to pitch ↗</a></div>`;
@@ -2895,7 +2901,7 @@ function renderCards(){
       <div class="card-tools">${canCompare?`<button class="card-tool cmp ${cmpSet.has(d.id)?'on':''}" title="Compare" aria-pressed="${cmpSet.has(d.id)}" aria-label="Add ${esc(d.name)} to comparison" onclick="event.stopPropagation();toggleCompare('${d.id}')">⚖</button>`:""}<button class="card-tool star ${starSet.has(d.id)?'on':''}" title="Save to shortlist" aria-pressed="${starSet.has(d.id)}" aria-label="Save ${esc(d.name)} to your shortlist" onclick="event.stopPropagation();toggleStar('${d.id}')">${starSet.has(d.id)?"★":"☆"}</button></div>
       <div class="c-cat" style="color:${cInk(d.cat)}">${cLabel(d.cat)} · ${esc(d.loc.split(",")[0])}</div>
       <p>${esc(d.desc.length>150 ? d.desc.slice(0,150)+"…" : d.desc)}</p>
-      <div class="c-meta">${closest ? (found.words[d.id]||[]).slice(0,3).map(w=>`<span class="tag match-tag">${esc(w)}</span>`).join("") : ""}${relaxed ? (d.offers||[]).filter(o=>dirNeeds.has(o)).map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join("") : ""}${isNew(d)?`<span class="tag new-tag">✨ New</span>`:""}${eventHosts[d.id]?`<span class="tag event-tag" title="${esc(eventHosts[d.id].title)}">🎟 event this week</span>`:""}${d.applyBy && d.applyBy!=="rolling" && applyOpen(d) ? `<span class="tag apply-tag">⏳ Apply by ${esc(fmtDeadline(d.applyBy))}</span>`:""}${isStale(d)?`<span class="tag stale-tag" title="Last verified ${fmtMonth(d.lastVerified)}">⚠ not recently verified</span>`:""}${d.badge?`<span class="badge">${esc(d.badge)}</span>`:""}${(d.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+      <div class="c-meta">${closest ? (found.words[d.id]||[]).slice(0,3).map(w=>`<span class="tag match-tag">${esc(w)}</span>`).join("") : ""}${relaxed ? (d.offers||[]).filter(o=>dirNeeds.has(o)).map(o=>OFFERS_META[o]).filter(Boolean).map(m=>`<span class="tag offer-tag">${m.icon} ${m.label}</span>`).join("") : ""}${isNew(d)?`<span class="tag new-tag">✨ New</span>`:""}${d.statewide?`<span class="tag state-tag">🗺 Statewide</span>`:""}${eventHosts[d.id]?`<span class="tag event-tag" title="${esc(eventHosts[d.id].title)}">🎟 event this week</span>`:""}${d.applyBy && d.applyBy!=="rolling" && applyOpen(d) ? `<span class="tag apply-tag">⏳ Apply by ${esc(fmtDeadline(d.applyBy))}</span>`:""}${isStale(d)?`<span class="tag stale-tag" title="Last verified ${fmtMonth(d.lastVerified)}">⚠ not recently verified</span>`:""}${d.badge?`<span class="badge">${esc(d.badge)}</span>`:""}${(d.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
     </div>`;
   }).join("") || `<div style="color:var(--muted)">No matches — try fewer words or clearing the filters, or <a href="#" onclick="suggestEntry();return false" style="color:#ffc600">suggest a new entry</a>.</div>`;
 }

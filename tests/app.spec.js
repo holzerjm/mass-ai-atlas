@@ -151,6 +151,24 @@ test("the drawer says when an entry was added", async ({ page }) => {
   await expect(page.locator("#drawer .dr-added")).toHaveText(`Added ${month(first)} or earlier`);
 });
 
+// A pin is where an organization sits, not whom it serves. An entry whose own text says it serves the
+// whole state is marked in the data, and until 2026-11 nothing on the page showed it: a founder in
+// Pittsfield had no way to tell MassVentures in Waltham from any other Waltham address.
+test("an entry that serves the whole state says so, in its panel and on its card", async ({ page }) => {
+  const marked = DATA.filter(d => d.statewide), plain = DATA.find(d => !d.statewide);
+  test.skip(!marked.length, "no entry is marked statewide");
+  await page.goto(`./?entry=${marked[0].id}`);
+  await waitForApp(page);
+  await expect(page.locator("#drBody .dr-state")).toHaveText("🗺 Serves all of Massachusetts");
+  await page.evaluate(id => openDrawer(id), plain.id);
+  await expect(page.locator("#drName")).toHaveText(plain.name);
+  await expect(page.locator("#drBody .dr-state")).toHaveCount(0);
+  await page.evaluate(() => closeDrawer());
+  await page.locator('.tab[data-view="directory"]').click();
+  const tagged = await page.locator("#cards .card:has(.state-tag) .card-open").evaluateAll(els => els.map(el => el.textContent));
+  expect(tagged.sort()).toEqual(marked.map(d => d.name).sort());
+});
+
 // "New" is the cards' rule, added this month or last, and the page works it out from today's date.
 // The tag goes on the button's line: a popup's content has a limit (POPUP_FITS), and a line of
 // its own would have put names behind the button in the tallest popups.
