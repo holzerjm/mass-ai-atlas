@@ -46,6 +46,23 @@ test("?list= restores the shared shortlist, and the list survives opening an ent
   expect(await page.evaluate(() => localStorage.getItem("toa-atlas-stars"))).toBeNull();
 });
 
+// The shortlist prints with a box to tick beside each organization. With an entry's first move
+// under its name, the printed page says what to do at each one, not only where it is.
+test("a shortlist row carries the entry's first move, and nothing where the entry has none", async ({ page }) => {
+  await page.goto(`./?list=${a.id},${b.id}`);
+  await waitForApp(page);
+  await expect(page.locator("#shortlistModal")).toBeVisible();
+  await page.evaluate(([a, b]) => {
+    byId[a].firstMove = "Register for the next open night & bring a demo."; delete byId[b].firstMove;
+    renderShortlist([a, b]);
+  }, [a.id, b.id]);
+  const rows = page.locator("#shortlistModal .sl-row");
+  await expect(rows.nth(0).locator(".sl-move")).toHaveText("First move: Register for the next open night & bring a demo.");
+  await expect(rows.nth(1).locator(".sl-move")).toHaveCount(0);
+  await page.emulateMedia({ media: "print" });
+  await expect(rows.nth(0).locator(".sl-move")).toBeVisible();
+});
+
 test("a ?list= of only unknown ids opens nothing and breaks nothing", async ({ page }) => {
   await page.goto("./?list=no-such-org,also-missing");
   await waitForApp(page);

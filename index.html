@@ -311,6 +311,8 @@ html:not(.dark) .pw-status{color:#166534}
 .pw-status.closed,html:not(.dark) .pw-status.closed{color:var(--muted)}
 .pw-status.pitch,html:not(.dark) .pw-status.pitch{color:var(--text)}
 .pw-org p{margin-top:5px}
+.pw-move{margin-top:6px}
+.pw-move b,.sl-move b{font-weight:700;color:var(--gold-ink)}
 .pw-verified{color:var(--muted);font-size:11.5px;margin-top:6px}
 .pw-more{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;color:var(--gold-ink)}
 .pw-note{color:var(--muted);font-size:12.5px;line-height:1.5;max-width:780px}
@@ -365,6 +367,11 @@ button.chip{font-family:inherit;color:inherit;line-height:inherit;text-align:inh
 .dr-body p{font-size:14px;line-height:1.65;color:#c4cdf0;margin-bottom:16px}
 .dr-why{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--cc,#60a5fa);border-radius:10px;padding:13px 15px;margin-bottom:18px}
 .dr-why b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#9fb4ff;margin-bottom:5px}
+/* what to do first, said once and near the top: the panel's buttons are at its foot. A rule and
+   no box, so it doesn't read as a second "why" */
+.dr-move{border-left:3px solid var(--gold-ink);padding:1px 0 1px 14px;margin-bottom:18px}
+.dr-move b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold-ink);margin-bottom:4px}
+.dr-move div{font-size:14.5px;line-height:1.5;font-weight:600;color:var(--text)}
 .dr-why div{font-size:13px;line-height:1.55;color:#c4cdf0}
 .meet-list{display:flex;flex-direction:column;gap:6px}
 .meet-row{display:flex;align-items:baseline;gap:9px;font-size:13px;padding:5px 8px;border-radius:8px;background:rgba(148,163,255,.07)}
@@ -436,6 +443,7 @@ html:not(.dark) .modal-card{background:#fff;border-color:#ddd}
 .sl-main a{color:inherit}
 .sl-sub{display:block;font-size:12px;color:var(--muted)}
 .sl-url{opacity:.8}
+.sl-move{display:block;font-size:12.5px;line-height:1.45;margin-top:3px}
 /* on the light modal, muted ink at .8 opacity was 3.8:1; a solid grey a shade lighter than the
    line around it keeps the URL quieter and reads 4.8:1 */
 html:not(.dark) .sl-url{opacity:1;color:#6b7280}
@@ -455,7 +463,7 @@ html:not(.dark) .cmp-bar{background:#fff;border-color:#ddd}
   body.shortlist-open .modal-card{box-shadow:none;border:none;max-height:none;max-width:none;background:#fff;color:#000}
   body.shortlist-open .modal-actions,body.shortlist-open .sl-x{display:none!important}
   body.shortlist-open .sl-row::before{content:"☐ ";font-size:15px}
-  body.shortlist-open .sl-sub,body.shortlist-open .sl-main a{color:#000!important}
+  body.shortlist-open .sl-sub,body.shortlist-open .sl-main a,body.shortlist-open .sl-move,body.shortlist-open .sl-move b{color:#000!important}
 }
 /* offers / application windows / facts */
 .need-chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
@@ -1614,6 +1622,8 @@ function openDrawer(id){
   $("drName").textContent = d.name;
   $("drLoc").textContent = "📍 " + d.loc + (d.approx ? " (approx.)" : "");
   let html = `<p>${esc(d.desc)}</p>`;
+  // The first thing to do, from the organization's own page, where it has been written down.
+  if(d.firstMove) html += `<div class="dr-move"><b>Your first move</b><div>${esc(d.firstMove)}</div></div>`;
   if(d.why) html += `<div class="dr-why" style="--cc:${col}"><b>Why it matters for founders</b><div>${esc(d.why)}</div></div>`;
   // Its pin is one place, and what it offers reaches the whole state: say so before anyone rules it out as too far.
   if(d.statewide) html += `<div class="dr-state">🗺 Serves all of Massachusetts</div>`;
@@ -2719,8 +2729,8 @@ function renderStepper(){
     el.addEventListener("click", ()=>{ jrStage=+el.dataset.n; jrPathway=""; renderStepper(); renderJourney(); updateURL(); }));
   if(hadFocus) st.querySelector(`.step[data-n="${jrStage}"]`).focus();
 }
-// One organization in a step: its own reason, and the same status and date the drawer shows, so
-// a pathway never restates a fact that lives in the entry.
+// One organization in a step: its own reason, its first move where the entry has one, and the same
+// status and date the drawer shows, so a pathway never restates a fact that lives in the entry.
 function pathwayOrg(d){
   const status = applyOpen(d)
     ? `<div class="pw-status">⏳ ${d.applyBy==="rolling" ? "Open" : "Apply by " + esc(fmtDeadline(d.applyBy))}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`
@@ -2729,7 +2739,7 @@ function pathwayOrg(d){
   const verified = !d.lastVerified ? "" : isStale(d) ? `⚠️ Last verified ${fmtMonth(d.lastVerified)}` : fmtVerified(d.lastVerified);
   return `<li class="pw-org">
     <button type="button" class="pw-name" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</button>
-    ${status}<p>${esc(d.why || d.desc)}</p>${verified ? `<div class="pw-verified">${verified}</div>` : ""}
+    ${status}<p>${esc(d.why || d.desc)}</p>${d.firstMove ? `<div class="pw-move"><b>First move:</b> ${esc(d.firstMove)}</div>` : ""}${verified ? `<div class="pw-verified">${verified}</div>` : ""}
   </li>`;
 }
 // A step can point at the Directory instead of naming a few organizations when many fit it,
@@ -2967,7 +2977,8 @@ function renderShortlist(ids){
     <div class="sl-row">
       <span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>
       <div class="sl-main"><a href="#" onclick="closeShortlist();openDrawer('${d.id}');return false"><b>${esc(d.name)}</b></a>
-        <span class="sl-sub">${cLabel(d.cat)} · ${esc(d.loc.split(",")[0])} · <span class="sl-url">${esc(d.url.replace(/^https:\/\/(www\.)?/,""))}</span></span></div>
+        <span class="sl-sub">${cLabel(d.cat)} · ${esc(d.loc.split(",")[0])} · <span class="sl-url">${esc(d.url.replace(/^https:\/\/(www\.)?/,""))}</span></span>${d.firstMove ? `
+        <span class="sl-move"><b>First move:</b> ${esc(d.firstMove)}</span>` : ""}</div>
       ${sharedList ? "" : `<button class="sl-x" aria-label="Remove ${esc(d.name)}" onclick="toggleStar('${d.id}')">✕</button>`}
     </div>`).join("") || `<p style="color:var(--muted)">Nothing saved yet — hit ☆ on any card or entry.</p>`;
   $("slTitle").textContent = sharedList ? "A shared shortlist" : "Your shortlist";

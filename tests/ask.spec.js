@@ -208,6 +208,20 @@ test.describe("atlas-ai.txt", () => {
     expect(head).toContain('"serves all of Massachusetts" marks');
   });
 
+  // "What do I do first?" is what someone asks an assistant next, and an assistant with no answer
+  // in the file makes one up. The line is the organization's own way in, so the file carries it
+  // where an entry has one, says nothing where it has none, and says how many have one.
+  test("carries an entry's first move, and only where the entry has one", () => {
+    const block = d => text.split(/^### /m).find(b => b.includes(`[${d.id}]`));
+    for(const d of DATA){
+      if(d.firstMove) expect(block(d), d.id).toContain(`\nFirst move: ${d.firstMove}\n`);
+      else expect(block(d), d.id).not.toContain("First move:");
+    }
+    const head = text.slice(0, text.indexOf("## Pathways"));
+    expect(head).toContain(`"First move:" is the first thing a founder does to get in`);
+    expect(head).toContain(`${DATA.filter(d => d.firstMove).length} of the ${DATA.length} have one so far`);
+  });
+
   test("stays compact", () => {
     expect(Buffer.byteLength(text)).toBeLessThan(200 * 1024);
   });

@@ -52,6 +52,7 @@ const COLUMNS = [
   ["apply_url",      d => d.applyUrl || ""],            // the application page, when it isn't `url`
   ["town",           d => d.town || ""],                // the city or town the pin sits in; last, so no earlier column moves
   ["statewide",      d => (d.statewide ? "yes" : "")],  // its own text says it serves all of Massachusetts
+  ["first_move",     d => d.firstMove || ""],           // the first thing a founder does to get in, from the organization's own page
 ];
 
 // --- Build the CSV ---

@@ -59,6 +59,10 @@ An annotated example:
   badge: Applications open          # optional highlight
   desc: 1-2 factual sentences. What it is, what it does.   # max 400 chars
   why: One sentence on why an early-stage founder should care.
+  firstMove: Apply through the form on its site.   # optional, max 140 chars: the first thing a
+                                    # founder does to get in, as one sentence starting with a
+                                    # verb, taken from the organization's own page (link the
+                                    # page in your PR). Leave it out if the page doesn't say
   tags: [robotics, lab space]       # 2-4 short lowercase tags
   stages: [1, 3]                    # founder stages served: 1 Spark, 2 Validate,
                                     # 3 Build, 4 Fund, 5 Scale

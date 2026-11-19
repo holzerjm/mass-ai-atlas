@@ -151,6 +151,27 @@ test("the drawer says when an entry was added", async ({ page }) => {
   await expect(page.locator("#drawer .dr-added")).toHaveText(`Added ${month(first)} or earlier`);
 });
 
+// Until 2026-11 a panel said what an organization is and why it matters, and left "what do I do
+// now?" to its site. An entry can now carry the first thing a founder does to get in, taken from
+// the organization's own page. It goes near the top, because the panel's buttons are at its foot.
+test("a panel gives the entry's first move above why it matters, and nothing where the entry has none", async ({ page }) => {
+  const withMove = DATA.find(d => d.firstMove && d.why), plain = DATA.find(d => !d.firstMove);
+  test.skip(!withMove, "no entry has a first move");
+  await page.goto(`./?entry=${withMove.id}`);
+  await waitForApp(page);
+  const move = page.locator("#drBody .dr-move");
+  await expect(move.locator("b")).toHaveText("Your first move");
+  await expect(move.locator("div")).toHaveText(withMove.firstMove);
+  expect(await page.evaluate(() => {
+    const [desc, m, why] = ["p", ".dr-move", ".dr-why"].map(s => document.querySelector("#drBody " + s));
+    const before = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    return before(desc, m) && before(m, why);
+  }), "the order is: what it is, the first move, why it matters").toBe(true);
+  await page.evaluate(id => openDrawer(id), plain.id);
+  await expect(page.locator("#drName")).toHaveText(plain.name);
+  await expect(page.locator("#drBody .dr-move")).toHaveCount(0);
+});
+
 // A pin is where an organization sits, not whom it serves. An entry whose own text says it serves the
 // whole state is marked in the data, and until 2026-11 nothing on the page showed it: a founder in
 // Pittsfield had no way to tell MassVentures in Waltham from any other Waltham address.

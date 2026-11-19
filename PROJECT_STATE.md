@@ -33,7 +33,9 @@ detail. The design brief was: *same domain, far more engaging and useful.*
 | 🧭 **Founder Journey** | 5 stages (Spark → Validate → Build → Fund → Scale); each shows hand-written pathways, curated tips, and every entry whose `stages` includes that number |
 | 📇 **Directory** | Card grid, word-by-word search that reads each entry's town as well as its address and finds the entries marked statewide, category chips, need and stage filters, an "Added" filter for what joined this month or in the last 3 or 6, sort. The map and the Directory share one set of filters, kept in the address (`?need=`, `?stage=`, `?open=`, `?added=`, `?cat=`, `?sort=`) |
 
-A detail **drawer** is shared by all views: description, "why it matters for founders",
+A detail **drawer** is shared by all views: description, "your first move" where the entry
+has one (`firstMove`: the first thing a founder does to get in, from the organization's own
+page; pathways and the shortlist show it too), "why it matters for founders",
 tags, stages, connected entries, website link, "show on map", **places to meet** (cafés,
 quick bites and quieter options within ~450 m, read from the basemap's OpenStreetMap
 points of interest on demand), and a **🚩 Flag** button.
@@ -121,7 +123,9 @@ rules live in `data/*.schema.yml`; `scripts/validate.js` adds what a schema can'
 in the schema, so the page accepts data from before it; the validator errors if it's
 missing or not on the list, because the KPI summary counts by it) · `statewide: true` marks
 an entry whose own text says its mandate or program covers the whole state, which the KPI
-summary counts beside the figures by town ·
+summary counts beside the figures by town · `firstMove` is optional: one sentence, starting
+with a verb, on the first thing a founder does to get in, taken from the organization's own
+page (the validator checks its shape; a reviewer checks it against that page) ·
 `links` must resolve to real ids (they draw Galaxy edges) · `approx: true` when the pin is
 neighbourhood-level · `lastVerified` is the month a maintainer last **actually checked**
 the org (validator warns if missing, errors if malformed; drawer shows "✓ Verified …",
