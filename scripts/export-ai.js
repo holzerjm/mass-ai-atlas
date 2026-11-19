@@ -60,6 +60,7 @@ function entry(d) {
   lines.push(`Site: ${d.url}`);
   lines.push(`About: ${d.desc}`);
   if (d.why) lines.push(`Why it matters: ${d.why}`);
+  if (d.firstMove) lines.push(`First move: ${d.firstMove}`);
   if (d.facts) lines.push(`Facts: ${d.facts.map(([k, v]) => `${k}: ${v}`).join("; ")}`);
   return lines.join("\n");
 }
@@ -88,6 +89,7 @@ const text = [
   "\"verified\" is the month a person last confirmed the organization is real and its entry is right.",
   `"town:" gives the city or town an organization's map pin is in, where its address names only a neighborhood, a campus or no fixed place. "${STATEWIDE}" marks a state body, or a program or network that runs across the state, by its own description, wherever its pin is.`,
   "Applications: \"open, rolling\" means taking applications now, \"apply by\" gives the next deadline, \"closed\" means not now, and \"takes pitches\" means a funder's own page invites pitches, with no set application process. With no Applications line, the atlas has no information, which doesn't mean there's no way in.",
+  `"First move:" is the first thing a founder does to get in, as the organization's own page gives it. ${DATA.filter(d => d.firstMove).length} of the ${DATA.length} have one so far. Without one, the way in is on the organization's site.`,
   `Stages: ${STAGES.map(s => `${s.t} (${s.s})`).join(", ")}.`,
   "",
   "## Pathways",

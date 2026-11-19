@@ -66,6 +66,11 @@ for (const d of DATA) {
   if (townIssue) err(id, townIssue);
   if (!d.why) warn.push(`  ⚠ [${id}] missing "why it matters" — strongly encouraged`);
   if (!d.tags || d.tags.length < 1) warn.push(`  ⚠ [${id}] no tags`);
+  // firstMove is a sentence said to a founder ("Register for a Thursday gathering."), and the
+  // page prints it as one. Only its shape can be checked here: whether the organization's own
+  // page says so is the reviewer's to check.
+  if (d.firstMove !== undefined && !/^[A-Z].*[^.!?\s]\.$/.test(d.firstMove))
+    err(id, "firstMove is a sentence: start it with a verb and a capital letter, and end it with one full stop");
   for (const s of d.stages || [])
     if (!validStages.has(s)) err(id, `invalid stage ${s} (valid: ${[...validStages].join(", ")})`);
   if (d.applyBy !== undefined && d.applyBy !== "rolling" && d.applyBy < today())

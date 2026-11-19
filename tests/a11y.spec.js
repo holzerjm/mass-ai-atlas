@@ -35,6 +35,9 @@ test("every KNOWN_SERIOUS entry is scoped to named elements", () => {
 const entry = DATA.find(d => d.id === "csail") || DATA[0];
 const closed = DATA.find(d => !d.applyBy && d.applyNote && d.applyUrl) || entry;
 const pitch = DATA.find(d => ["vc", "angel"].includes(d.cat) && d.applyUrl && !d.applyBy && !d.applyNote) || entry;
+// an entry whose panel has "Your first move", and a shortlist that has one in it
+const moved = DATA.find(d => d.firstMove) || entry;
+const listed = [...new Set([DATA[0].id, moved.id, DATA[1].id])].slice(0, 2).join(",");
 const openComparison = page => page.evaluate(ids => { ids.forEach(toggleCompare); openCompare(); },
   [...new Set([pitch.id, ...DATA.filter(d => d.cat === "vc").slice(0, 2).map(d => d.id)])].slice(0, 3));
 
@@ -58,7 +61,7 @@ const SCANS = [
     theme: "light", prepare: page => expect(page.locator(".pw-status.closed").first()).toBeVisible() },
   { name: "directory view", url: "./#directory" },
   { name: "entry drawer", url: `./?entry=${entry.id}`, include: "#drawer" },
-  { name: "shared shortlist", url: `./?list=${DATA[0].id},${DATA[1].id}`, include: "#shortlistModal" },
+  { name: "shared shortlist", url: `./?list=${listed}`, include: "#shortlistModal" },
   // The atlas in the light theme, scanned since 2026-11. Until then it failed 21 to 34 times per
   // view: category colours as text on white, the site footer's grey on its dark band, and footer
   // links told apart by colour alone.
@@ -73,10 +76,13 @@ const SCANS = [
   // the "Takes pitches" line and its link, which only a funder with no application has
   { name: "funder that takes pitches", url: `./?entry=${pitch.id}`, include: "#drawer" },
   { name: "funder that takes pitches (light theme)", url: `./?entry=${pitch.id}`, include: "#drawer", theme: "light" },
+  // "Your first move", whose label is gold ink on the panel, which only an entry with one has
+  { name: "entry with a first move", url: `./?entry=${moved.id}`, include: "#drawer" },
+  { name: "entry with a first move (light theme)", url: `./?entry=${moved.id}`, include: "#drawer", theme: "light" },
   // Compare, whose links were the browser's default blue, 1.91:1 on the dark panel, until 2026-11
   { name: "compare", url: "./#directory", include: "#compareModal", open: openComparison },
   { name: "compare (light theme)", url: "./#directory", include: "#compareModal", theme: "light", open: openComparison },
-  { name: "shared shortlist (light theme)", url: `./?list=${DATA[0].id},${DATA[1].id}`, include: "#shortlistModal",
+  { name: "shared shortlist (light theme)", url: `./?list=${listed}`, include: "#shortlistModal",
     theme: "light" },
   { name: "first-visit tour", url: "./", firstVisit: true, include: "#tourCard" },
   { name: "first-visit tour (light theme)", url: "./", firstVisit: true, include: "#tourCard",

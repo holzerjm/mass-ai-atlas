@@ -11,6 +11,11 @@
 # A copy of this template should replace this list, or set it to [].
 
 - date: 2026-11-19
+  title: Your first move
+  text: Some entries now say the first thing to do to get in, taken from the organization's own page. Look for it in an entry's panel, under each organization in a pathway, and in your shortlist.
+  try: '?pathway=spark-new-here#journey'
+
+- date: 2026-11-19
   title: See who serves the whole state
   text: Some organizations serve founders anywhere in Massachusetts, such as state agencies and statewide programs. Each now says so on its card and in its panel, and a search for "statewide" finds them all.
   try: '?entry=massventures#directory'

@@ -301,7 +301,8 @@ To keep those honest, do a small sweep about once a month:
    longest without a check. (No terminal? The robot prints the same list in the **job
    summary** of every CI run.)
 2. For each stale org: open its website, fix anything that changed — or confirm it's
-   all still right.
+   all still right. If the entry has a `firstMove`, check that the way in is still what
+   the line says: a form or a meeting night changes more often than an address.
 3. Bump `lastVerified` to the current month for each one you checked, and put them all
    in **one PR**.
 4. If a change you made affects a [pathway](#founder-pathways), read that pathway again.
@@ -349,9 +350,10 @@ trust:
 - **The order of the steps is the advice.** `lead` says why they come in that order, and each
   step's `why` says why it comes where it does. Inside a step the page sorts by closing date,
   then by name, so nobody's position is a judgment.
-- **Facts stay in the entry.** The page shows each organization's own `why`, its application
-  status, and the month it was verified. A step's `why` doesn't repeat them, so a correction
-  happens in one place.
+- **Facts stay in the entry.** The page shows each organization's own `why`, its `firstMove`
+  where it has one, its application status, and the month it was verified. A step's `why`
+  doesn't repeat them, so a correction happens in one place. A step's `do` says what kind of
+  thing to do; how to do it at one organization is that entry's `firstMove`.
 - **Say what it costs.** Write what a founder gets and what they give up, without selling.
 - **Nobody pays or partners their way in, and nobody is kept out.** Sponsoring TOA buys
   nothing here. TOA and the sponsors face the same test as everyone else: an organization is
@@ -439,6 +441,7 @@ Every entry has these fields. ⭐ = required.
 | `badge` |  | A short highlight, or omit. | `Applications open` |
 | `desc` | ⭐ | 1–2 factual sentences (**max 400 characters**). | `A robotics-AI startup…` |
 | `why` |  | One sentence on why an early-stage founder should care. | `Hires from hackathons…` |
+| `firstMove` |  | The **first thing a founder does to get in**, as one sentence that starts with a verb and ends with a full stop (**max 140 characters**): how to register, apply, join, book or turn up. **Take it from the organization's own page**, and link that page in the PR so a reviewer can check it. Say the catch if the page does: a fee, who is eligible, a waitlist. It's a fact about the way in, not advice (which organization to try first is a [pathway's](#founder-pathways) job), so don't write "best" or "start here". Leave it out when the page doesn't say, and for a company or lab with nothing for a founder to join. The panel shows it as "Your first move" above why it matters, a pathway and the shortlist show it under the name, and the AI file and the CSV carry it. | `Register for a free Thursday Gathering.` |
 | `tags` |  | 2–4 short lowercase tags. | `[robotics, lab space]` |
 | `stages` |  | Which founder stages it serves — **numbers**, see table below. | `[1, 3]` |
 | `links` |  | `id`s of related entries (draws lines in the Galaxy view). Optional. | `[csail, engine]` |
@@ -573,6 +576,8 @@ pattern …`. Common ones:
 | `/lat: must be >=` (or `<=`, or `/lng: …`) | A typo in lat/lng, or they're swapped. In Massachusetts, `lat` is around **42** and `lng` is **negative**, around **-71**. |
 | `/url: must match pattern` | The URL must start with `https://` (not `http://`) and contain no spaces or quotes. |
 | `/desc: must NOT have more than 400 characters` | Trim the description to 400 characters or fewer. |
+| `firstMove is a sentence` | Start the line with a verb and a capital letter, and end it with one full stop: `Register for a free Thursday Gathering.` |
+| `/firstMove: must NOT have more than 140 characters` | Cut the line to the one thing to do first. The rest belongs in `desc` or `why`. |
 | `must have required property` | A ⭐ field from Appendix A is missing. |
 | `must NOT have additional properties "…"` | A field name is misspelled (e.g. `lastverified`) or isn't one of the fields in Appendix A. |
 | `must be string` | A field was left empty (e.g. `badge:` with nothing after it). Fill it in or delete the line. |

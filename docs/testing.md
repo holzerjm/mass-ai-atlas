@@ -129,6 +129,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | footer `#footCurated` | the curation month being hand-typed again (it still said "Curated June 2026" in October). The test takes the newest `lastVerified` in the data, the way the page does, so it never needs updating by hand |
 | | the drawer says when an entry was added | an entry's month going unshown, or an entry from the month the record began claiming it joined then: its drawer says "or earlier" |
 | | a statewide entry says so, in its panel and on its card | the mark staying in the data where no visitor sees it, as it did until 2026-11. A marked entry's panel must say "Serves all of Massachusetts", an unmarked one must not, and the Directory must chip exactly the marked entries |
+| | a panel gives the entry's first move above why it matters | the line staying in the data where no visitor sees it, or sinking below the fold. A panel must show "Your first move" between the description and "Why it matters", and an entry without one must show nothing |
 | | a new entry's popup is marked New, and is no taller for it | the tag costing a popup a line. A popup's content has a limit (`POPUP_FITS`), so the tag sits on the button's line, and the test takes it out and checks the content is the same height. An entry that isn't new has no tag |
 | | every entry opens a drawer | one malformed entry (unknown category, stage with no row) throwing only when someone opens it |
 | | co-located pins | a pin that shares its spot losing the others: every pin within 25 m of another (exact or near, by the map's own haversine) must list them in its popup's `.pop-colocated`, each name there must open that entry's drawer, and markers must stay at their exact coordinates. Without it, 16 entries could not be reached from the map at street zoom (2026-11-01) |
@@ -265,7 +266,8 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | a deadline's last day ends at midnight in Massachusetts | the page going by the UTC date again, which turns over at 7 PM in Boston (8 PM in summer): until 2026-11 a deadline stopped showing five hours before its day was out. With the clock set, a deadline must still show on its last evening in winter and in summer, and to a visitor in Tokyo, and must be gone after midnight in Boston, also for a visitor in Honolulu where it is still that day |
 | | a funder's deadline that has passed doesn't turn into a pitch | an entry that needs updating claiming a way in |
 | | Closing soon lists the nearest date first | the sort dropping dated deadlines below rolling ones, or leaving the address |
-| `pathways.spec.js` | every pathway shows its steps in order | a pathway drifting from `data/pathways.yml`: a step out of order, a missing organization, or an organization shown without its own reason |
+| `pathways.spec.js` | every pathway shows its steps in order | a pathway drifting from `data/pathways.yml`: a step out of order, a missing organization, an organization shown without its own reason, or one whose entry has a first move shown without it |
+| | an organization in a step shows its first move under its reason | a pathway restating or dropping what the entry says to do. Two real entries get a known line and none, so writing a real one can't change the result |
 | | a step lists its organizations by closing date, then by name | someone's place in a step becoming a judgment. Real entries get fixed statuses, so a deadline passing can't change the result |
 | | a closed program says so in a step | a closed program reading like an open one, or like one with no information |
 | | a funder that takes pitches says so in a step | a pathway hiding what the entry shows |
@@ -279,6 +281,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | without `data/pathways.yml` | the Journey depending on the file. `deploy.yml` sends the page before `data/`, so a visitor can load a new page a moment before its file arrives |
 | | the longest pathway fits a phone | a pathway forcing the page sideways at 390 px |
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
+| | a shortlist row carries the entry's first move | the printed checklist saying where an organization is and not what to do there. The line must show on screen and in print, and a row whose entry has none must show nothing |
 | | `?list=` of unknown ids | a stale list link breaking the page |
 | `events.spec.js` | `/events/` loads and lists events | the events page breaking |
 | | "→ on the atlas" link | the events page → atlas drawer hand-off |
@@ -316,6 +319,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | it ends where it says it does | the last line or the count going missing, so an assistant couldn't tell it read only part |
 | | it holds no instructions for an assistant | rules creeping into the file. They belong in the prompt a founder reads |
 | | it shows the same application status as the page | the file and the page disagreeing about what's open |
+| | it carries an entry's first move, and only where the entry has one | an assistant asked "what do I do first?" finding nothing and making it up, or a line appearing on an entry that has none. The file must also say how many entries have one |
 | | it stays compact | the file growing until web tools cut it |
 | | it says the town and who serves the whole state | an assistant holding only this file not knowing where a "Kendall Sq" address is, or that a state program serves founders far from its pin. A line must carry `town:` exactly when the address leaves the town out, and "serves all of Massachusetts" exactly on the marked entries |
 | `updates.spec.js` | every update, newest first | the page drifting from `data/updates.yml`, or a date out of order |
@@ -390,8 +394,8 @@ loader the page uses (`atlas-data.js`), exactly as
 
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
-an open entry drawer, a closed program's and a funder's drawer, Compare, a founder pathway with open
-and closed programs, a shared shortlist,
+an open entry drawer, a closed program's and a funder's drawer, the drawer of an entry with a first
+move, Compare, a founder pathway with open and closed programs, a shared shortlist with a first move in it,
 the first-visit tour card, the what's-new banner, the Ask your own AI dialog, the events page,
 the credits page and the updates page, each in both the dark and the light theme; and the galaxy's keyboard
 list and search with a category open and results showing, in the dark theme.

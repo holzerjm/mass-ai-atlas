@@ -41,9 +41,28 @@ test.describe("pathways", () => {
         await expect(page.locator(".pw-org")).toHaveCount(ids.length);
         expect((await page.locator(".pw-org p").allTextContents()).sort())
           .toEqual(ids.map(id => byId[id].why || byId[id].desc).sort());
+        expect((await page.locator(".pw-move").allTextContents()).sort(), `${p.id}: first moves`)
+          .toEqual(ids.filter(id => byId[id].firstMove).map(id => `First move: ${byId[id].firstMove}`).sort());
         await expect(page.locator(".pw-more")).toHaveCount(p.steps.filter(x => x.more).length);
       }
     }
+  });
+
+  // A step says what kind of option this is. What to do at one organization is that
+  // organization's own way in, so it comes from the entry, under the entry's reason. The entries
+  // here get known lines, so writing or removing a real one can't change this test.
+  test("an organization in a step shows its first move under its reason, where its entry has one", async ({ page }) => {
+    await openJourney(page);
+    const [a, b] = DATA.filter(d => d.why).slice(0, 2).map(d => d.id);
+    await page.evaluate(([a, b]) => {
+      byId[a].firstMove = "Register for the next open night & bring a demo."; delete byId[b].firstMove;
+    }, [a, b]);
+    await drawPathway(page, [{ do: "A step", why: "Why", entries: [a, b] }]);
+    const org = id => page.locator(".pw-org").filter({ has: page.getByRole("button", { name: byId[id].name, exact: true }) });
+    await expect(org(a).locator(".pw-move")).toHaveText("First move: Register for the next open night & bring a demo.");
+    await expect(org(a).locator("p + .pw-move")).toHaveCount(1);
+    await expect(org(a).locator("p")).toHaveText(byId[a].why);
+    await expect(org(b).locator(".pw-move")).toHaveCount(0);
   });
 
   // The order inside a step is never a judgment. Real entries get known statuses here, so a

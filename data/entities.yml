@@ -1956,6 +1956,7 @@
   url: https://www.foundersedge.com
   desc: Pre-seed fund writing $100–$200K first checks into AI-native, software-first B2B startups, run by post-exit operators Greg Raiz (Raizlabs, Techstars Boston) and Jess Lynch (Wishroute).
   why: Operator GPs who lead or co-invest without taking a board seat, plus a CEO peer cohort and open demo nights like Ditch the Deck — first-check money that comes with hands-on company.
+  firstMove: Pitch through its apply form with your deck; the fund says it reads every company submitted and no warm intro is required.
   facts: [[Check size, $100K–$200K first checks], [Stage, Pre-seed], [Board seat, None taken], [Terms, Leads or co-invests], [Focus, 'AI-native, software-first B2B']]
   tags: [pre-seed, enterprise, AI-native]
   stages: [2, 4]
@@ -2403,6 +2404,7 @@
   url: https://www.bostonharborangels.com
   desc: Boston angel group investing since 2004 across tech and life sciences.
   why: Monthly pitch meetings — a classic first-check source.
+  firstMove: Apply online from its Entrepreneurs page; a one-time $400 fee applies if you are invited to present at the General Investor Meeting.
   tags: [events]
   stages: [2, 4]
   offers: [funding]
@@ -2457,6 +2459,7 @@
   url: https://www.tieboston.org/
   desc: Angel arm of TiE Boston, one of the region's largest entrepreneur networks.
   why: Mentorship + capital + a giant founder community in one membership.
+  firstMove: Register your startup through Apply to Present on its Angels page; its leadership team selects who presents at each Investor Forum.
   tags: [seed, founders]
   stages: [2, 4]
   offers: [funding, mentorship, community]
@@ -2545,6 +2548,7 @@
   url: https://entrepreneurship.mit.edu
   desc: 'MIT''s entrepreneurship home: courses, coaching and the machinery behind delta v.'
   why: Open-door entrepreneurship help if you're an MIT student; their 'Disciplined Entrepreneurship' lessons are open to everyone on the DIY MTC site.
+  firstMove: Join Orbit to book office hours with an entrepreneur in residence if you are an MIT student; its knowledgebase and events are public.
   tags: [education]
   stages: [1, 2]
   links: [deltav]
@@ -2696,6 +2700,7 @@
   url: https://the-open-accelerator.com
   desc: Boston's open-source AI innovation hub — an initiative between the MA AI Hub, Red Hat and IBM Ventures, launched at Boston Tech Week 2026. Runs a founder residency (workspace, mentorship, GPU access), a community membership program, and a hands-on hackathon series.
   why: 'A free 16-week residency, no equity taken, built to close the enterprise-readiness gap: two mentors, GPU access and Google Cloud resources, a security and compliance review against what enterprise buyers ask, and structured conversations with real buyers. For teams past a working prototype and before repeatable revenue, who can be in Fort Point 4 days a week and commit to Massachusetts for a year; up to 12 per cycle. Its community program runs hackathons and events for everyone else. TOA also maintains this atlas.'
+  firstMove: Join its community from the Community page to be kept posted on events and opportunities; the residency takes applications by cycle.
   facts: [[Focus, 'Open-source AI, enterprise readiness'], [Terms, 'Residency: workspace, mentors, GPU access']]
   tags: [incubator, open source, hackathons]
   stages: [1, 2, 3, 4, 5]
@@ -2773,6 +2778,7 @@
   url: https://fi.co/s/boston
   desc: Global pre-seed accelerator's Boston chapter. Four-month program for idea-stage to early-traction founders, with a paid entrance fee and a 2.5% equity warrant pledged about two-thirds of the way through rather than at enrollment.
   why: A structured first step for founders not yet ready for Techstars or MassChallenge — but note it charges an entrance fee, and the equity warrant activates once you raise $100K or more.
+  firstMove: Create an account on its Boston page and answer a few questions about you and your startup; you pay only after you are accepted.
   facts: [[Equity, '2.5% warrant, pledged mid-program'], [Terms, 'Entrance fee $999-$1,299'], [Program length, 4 months], [Stage, Idea stage to early traction]]
   tags: [pre-seed]
   stages: [1, 2]
@@ -2902,6 +2908,7 @@
   url: https://leverinc.org
   desc: Nonprofit startup accelerator in North Adams, co-founded in 2014. It runs short challenge programs, invests $25,000–$100,000 in post-revenue companies with links to Berkshire County, and produces the statewide Massachusetts Founders Network with MassTech's support. Its first Applied AI B2B Challenge, for early-stage startups that use AI, ended in March 2026 with a $20,000 award.
   why: The way in for an AI founder in the Berkshires, and open well beyond them. The Applied AI B2B Challenge takes early-stage B2B startups from anywhere in the state through workshops and mentoring to a final pitch, and the Founders Network offers resources and experts wherever you are. Lever's own checks go to companies that already have revenue and a tie to Berkshire County, and no date is posted for the next AI challenge.
+  firstMove: Apply to its Massachusetts Founders Network to find out if you qualify; it replies within 72 hours and lists members publicly.
   facts: [[Check size, '$25,000–$100,000'], [Stage, Post-revenue for its investments], [Terms, 'Challenge award of $20,000 in 2026'], [Focus, 'Applied AI, health tech, sustainability']]
   tags: [applied AI, founders]
   stages: [2, 4]
@@ -3026,6 +3033,7 @@
   url: https://venturecafecambridge.org
   desc: Free Thursday-night gatherings at CIC — programming, office hours and the most reliable serendipity engine in Boston.
   why: 'Every founder''s week-one move: just show up on a Thursday.'
+  firstMove: Sign up ahead or register at the door for a free Thursday Gathering at CIC, and bring a government-issued ID.
   tags: [equity-free, events]
   stages: [1, 2]
   links: [cic, techweek]
@@ -3206,6 +3214,7 @@
   url: https://boston.aitinkerers.org
   desc: Hands-on meetup for people building with LLMs and agents — live demos, technical Q&A, zero fluff. Part of the global AI Tinkerers network.
   why: The room where Boston's AI builders actually show their work. Demo here before you launch.
+  firstMove: Register for the next meetup with a link to your technical work; registration is an application that organizers approve.
   tags: [founders, events]
   stages: [1, 2, 3]
   links: [nerd, c10]
@@ -3222,6 +3231,7 @@
   url: https://www.meetup.com/boston-generative-ai-meetup/
   desc: Meets about every six weeks for evening talks, panels and demos on frontier and open-weight models, AI agents and putting AI into production. More than 6,000 members; paid admission, about $22. Usually at Microsoft NERD in Cambridge, but venues move around Greater Boston, so check each listing.
   why: 'Big-tent crowd: founders, executives, researchers and artists — great for first hires and first customers.'
+  firstMove: Reserve your place with the RSVP button on the event's Meetup page; an RSVP is required and space is limited.
   tags: [generative AI, events]
   stages: [1, 3]
   links: [nerd, aiweek]
@@ -3240,6 +3250,7 @@
   url: https://www.aicollective.com/chapters/boston
   desc: Boston chapter of the national founder/investor GenAI community.
   why: Curated rooms with a high founder-to-tourist ratio.
+  firstMove: Join the Boston chapter on its page, then request to join each event when one is posted; space is limited and not everyone is accepted.
   tags: [founders, generative AI]
   stages: [1, 2]
   offers: [community]
@@ -3289,6 +3300,7 @@
   url: https://www.sundai.club
   desc: MIT- and Harvard-born club that ships a new AI project every Sunday — students and professionals hacking side by side.
   why: The fastest way to find a technical cofounder may be to build with one on a Sunday.
+  firstMove: Join the Boston chapter on its site to be told about upcoming hacks, then register for a Sunday hack on its event page.
   tags: [hackathons, events]
   stages: [1, 3]
   links: [csail, medialab, c10]
@@ -3306,6 +3318,7 @@
   url: https://www.startupbos.org
   desc: Community organization running Startup Boston Week (September) and year-round founder programming.
   why: The broadest on-ramp into Boston startup life beyond AI.
+  firstMove: Join its mailing list for weekly updates; its calendar lists startup events across Greater Boston and New England.
   tags: [equity-free]
   stages: [1, 2]
   links: [cic]
@@ -3322,6 +3335,7 @@
   url: https://www.build617.org
   desc: Founder-led community for early-stage tech founders in Boston and Cambridge, started by Nathan Spielberg (Tamarin AI) and Nick Leonard (VoiceRun). Founder dinners, tactical sessions and a podcast, plus a free workspace in Downtown Crossing opened in September 2026 with the real-estate firm Synergy. Membership skews heavily to AI companies.
   why: Free desks and a peer group that takes no equity — but it selects for AI-native startups, expects you in three days a week, and asks companies to move on past eight employees. The space is sponsor-funded and committed for a year.
+  firstMove: Apply from its homepage, which puts you on a waitlist; cohorts are small and curated, and it says it is always free.
   tags: [founders, coworking, events, applied AI]
   stages: [2, 3]
   links: []
@@ -3494,6 +3508,7 @@
   url: https://sandbox.mit.edu
   desc: MIT's university-run venture program — up to $25K in non-dilutive funding, mentorship and startup education for any MIT student team, across every discipline.
   why: Free money and structured mentorship before you've even incorporated — the widest on-ramp into MIT's startup pipeline.
+  firstMove: Have one teammate apply on the Sandbox Portal as Primary Contact for the fall or spring cohort; summer is for continuing teams.
   tags: [MIT, equity-free]
   stages: [1, 2, 4]
   links: [sbxi]
@@ -3512,6 +3527,7 @@
   url: https://www.harvardventures.org
   desc: Harvard's largest student startup club — supports founders from day zero through the Venture Works program, fireside chats, pitch events and a founder summit.
   why: The default first community for a Harvard student with a startup itch.
+  firstMove: Join its Founder Community from the For Founders page; that also adds you to a startup database it shares with investors.
   tags: [Harvard, founders]
   stages: [1, 2]
   offers: [community, talent]
@@ -3527,6 +3543,7 @@
   url: https://www.nuentrepreneursclub.com
   desc: Northeastern's largest student-led organization — 2,000+ members, 30+ events a semester, and the Husky Startup Challenge incubator with $10K in prizes.
   why: The biggest student founder community in Boston, with an incubator built in.
+  firstMove: Attend a Husky Startup Challenge info session at the start of a semester; it is for Northeastern student founders in any major.
   tags: [Northeastern, incubator]
   stages: [1, 2]
   offers: [community, talent, grants]

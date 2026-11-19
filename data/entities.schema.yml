@@ -81,6 +81,16 @@ items:
       description: why it matters for founders
       type: string
       pattern: *nohtml
+    firstMove:
+      description: >-
+        the first thing a founder does to get in, as one sentence that starts with a verb and
+        ends with a full stop, taken from the organization's own page: how to join, apply,
+        book or turn up. A fact about the way in, not advice. Leave it out when that page
+        doesn't say
+      type: string
+      pattern: *nohtml
+      minLength: 12
+      maxLength: 140
     tags:
       description: 2-4 short lowercase tags (vocabulary in scripts/validate.js)
       type: array
