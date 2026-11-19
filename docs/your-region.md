@@ -53,6 +53,7 @@ real work is the research behind each entry, and the care to keep it current.
 | `data/entities.schema.yml` | The `lat` and `lng` limits form a box around Massachusetts that catches typed-in mistakes. Set your region's box. |
 | `scripts/towns.js` | The cities and towns an entry's `town` may name. Put in your region's, or empty the list to make `town` optional free text. |
 | `scripts/kpi.js`, `CORE_TOWNS` and `CITY_HALL` | The KPI summary reports the share of entries outside Boston and Cambridge, and beyond 25 miles of Boston City Hall. Name your own center. |
+| `index.html`, `ATLAS_ZONE`, and `scripts/today.js`, `ZONE` | The time zone a deadline's last day ends in. Both say `America/New_York`. |
 | `index.html`, `MA_BOUNDS` and the map's views | The map's outer bounds, its two preset views ("Boston area" and "Whole Commonwealth"), and the re-center button's label. |
 | `index.html`, the copy | The page's name, title, description, and help text name Massachusetts and Boston. Search the file for both. |
 | Your site's address | `BASE` in `scripts/build-pages.js`, `SITE` in `scripts/export-ai.js`, `website` in `scripts/export-json.js`, the links in `scripts/build-events-page.js`, the default in `tests/deploy/verify-live.js`, and the canonical and `og:url` links at the top of `index.html`. |

@@ -18,11 +18,12 @@ const fs = require("fs");
 const path = require("path");
 
 const { loadData, loadPathways } = require("./load-data");
+const today = require("./today");
 const { CATS, STAGES, DATA } = loadData();
 const PATHWAYS = loadPathways();
 
 const SITE = "https://the-open-accelerator.com/ecosystem/";   // a copy changes this, as it does BASE in build-pages.js
-const TODAY = new Date().toISOString().slice(0, 10);
+const TODAY = today();   // the date in Massachusetts, as the page counts a deadline's last day
 const LAST_LINE = "End of file";
 const stageName = Object.fromEntries(STAGES.map(s => [s.n, s.t]));
 const byId = Object.fromEntries(DATA.map(d => [d.id, d]));

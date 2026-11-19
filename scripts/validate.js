@@ -5,6 +5,7 @@
    can't express: uniqueness, references across files, links between entries,
    an entry's town, dates relative to today, and warnings. */
 const { checkData } = require("./load-data");
+const today = require("./today");
 const { townProblem } = require("./towns");
 
 let checked;
@@ -29,6 +30,8 @@ const err = (id, msg) => errors.push(`  ✗ [${id}] ${msg}`);
 
 const ids = new Set();
 const names = new Set();
+// "In the future" is judged by the UTC date, which is never behind Massachusetts: a line dated
+// today in Boston always passes. "Has passed" is judged where the atlas is, as the page does.
 const TODAY = new Date().toISOString().slice(0, 10);
 // canonical tag vocabulary — unknown tags only WARN (contributors may propose new
 // ones; a maintainer either maps them to an existing tag or adds them here)
@@ -65,7 +68,7 @@ for (const d of DATA) {
   if (!d.tags || d.tags.length < 1) warn.push(`  ⚠ [${id}] no tags`);
   for (const s of d.stages || [])
     if (!validStages.has(s)) err(id, `invalid stage ${s} (valid: ${[...validStages].join(", ")})`);
-  if (d.applyBy !== undefined && d.applyBy !== "rolling" && d.applyBy < TODAY)
+  if (d.applyBy !== undefined && d.applyBy !== "rolling" && d.applyBy < today())
     warn.push(`  ⚠ [${id}] applyBy ${d.applyBy} has passed — set the next deadline or remove it`);
   // On a funder, applyUrl alone means "takes pitches". Anywhere else, the page shows nothing for it.
   if (d.applyUrl && !d.applyBy && !d.applyNote && d.cat !== "vc" && d.cat !== "angel")

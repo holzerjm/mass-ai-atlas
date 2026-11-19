@@ -262,6 +262,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | the Open filter leaves out a funder that only takes pitches | the filter promising applications that don't exist |
 | | Compare links a funder's pitch page | the Compare table and the entry disagreeing |
 | | a deadline that has passed shows nothing | an expired date, or the note that described it, outliving the deadline |
+| | a deadline's last day ends at midnight in Massachusetts | the page going by the UTC date again, which turns over at 7 PM in Boston (8 PM in summer): until 2026-11 a deadline stopped showing five hours before its day was out. With the clock set, a deadline must still show on its last evening in winter and in summer, and to a visitor in Tokyo, and must be gone after midnight in Boston, also for a visitor in Honolulu where it is still that day |
 | | a funder's deadline that has passed doesn't turn into a pitch | an entry that needs updating claiming a way in |
 | | Closing soon lists the nearest date first | the sort dropping dated deadlines below rolling ones, or leaving the address |
 | `pathways.spec.js` | every pathway shows its steps in order | a pathway drifting from `data/pathways.yml`: a step out of order, a missing organization, or an organization shown without its own reason |
@@ -485,7 +486,8 @@ node --test test/kpi.test.js
 
 Most of them hand small made-up inputs to the functions the script exports: the split by
 town, the entries marked statewide and the ring around Boston City Hall, the freshness count and its forecast, re-checks
-read from snapshots of the data, the review counts, and both renderings. A few check the
+read from snapshots of the data, the review counts, and both renderings. One checks
+`scripts/today.js`, the date in Massachusetts that a deadline is counted by. A few check the
 list itself and the validator's rule about a town: 351 names, a neighborhood refused, a
 misspelling answered with the name that was meant. The rest run the script
 itself: with GitHub left out, with no `gh` and no git at all, and from a saved result.
