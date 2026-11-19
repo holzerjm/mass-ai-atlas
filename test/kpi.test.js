@@ -1,4 +1,5 @@
 /* scripts/kpi.js, the KPI summary, and scripts/towns.js, the list of towns it counts by.
+   Also scripts/today.js, the date the other scripts count a deadline by.
    Fast and offline: no network and no browser.
 
      node --test test/kpi.test.js
@@ -15,6 +16,7 @@ const path = require("path");
 const kpi = require("../scripts/kpi");
 const { TOWNS, townProblem } = require("../scripts/towns");
 const { loadData } = require("../scripts/load-data");
+const today = require("../scripts/today");
 
 const SCRIPT = path.join(__dirname, "..", "scripts", "kpi.js");
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), "kpi-test-"));
@@ -28,6 +30,21 @@ const run = (args, { bare = false } = {}) => {
   if (bare) env.PATH = TMP;
   return spawnSync(process.execPath, [SCRIPT, ...args], { env, encoding: "utf8" });
 };
+
+/* ---------- today, where the atlas is ---------- */
+
+// A deadline's last day ends at midnight in Massachusetts. The UTC date turns over at 7 PM in
+// Boston, 8 PM in summer, and until Nov. 2026 the scripts and the page went by it.
+test("today is the date in Massachusetts, not the UTC date", () => {
+  assert.equal(today.ZONE, "America/New_York");
+  assert.equal(today(new Date("2026-11-19T01:30:00Z")), "2026-11-18");     // 8:30 PM EST on the 18th
+  assert.equal(today(new Date("2026-11-19T04:59:59Z")), "2026-11-18");     // a second before midnight
+  assert.equal(today(new Date("2026-11-19T05:00:00Z")), "2026-11-19");
+  assert.equal(today(new Date("2026-07-02T03:59:59Z")), "2026-07-01");     // summer time: midnight is 04:00 UTC
+  assert.equal(today(new Date("2026-07-02T04:00:00Z")), "2026-07-02");
+  assert.equal(today(new Date("2027-01-01T04:59:59Z")), "2026-12-31");     // the year turns in Boston, not in UTC
+  assert.match(today(), /^\d{4}-\d{2}-\d{2}$/);
+});
 
 /* ---------- geography ---------- */
 

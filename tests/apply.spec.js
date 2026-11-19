@@ -101,6 +101,39 @@ test("a deadline that has passed shows nothing", async ({ page }) => {
   await expect(action(page, "Apply")).toHaveCount(0);
 });
 
+// A deadline's last day ends at midnight in Massachusetts, wherever the visitor sits. The page took
+// the date from UTC until 2026-11, and UTC turns over at 7 PM in Boston (8 PM in summer), so a
+// deadline stopped showing five hours before its day was out. The clock is set here, and the
+// browser's own time zone too, so this holds at any hour and on any machine.
+test.describe("a deadline's last day", () => {
+  for(const [when, now, zone, lastDay, says, dayBefore] of [
+    ["on a winter evening in Boston", "2026-11-19T01:30:00Z", "America/New_York", "2026-11-18", "November 18, 2026", "2026-11-17"],   // 8:30 PM EST
+    ["on a summer evening in Boston", "2026-07-02T03:30:00Z", "America/New_York", "2026-07-01", "July 1, 2026", "2026-06-30"],        // 11:30 PM EDT
+    ["read in Tokyo that same evening", "2026-11-19T01:30:00Z", "Asia/Tokyo", "2026-11-18", "November 18, 2026", "2026-11-17"],       // 10:30 AM on the 19th there
+  ]) test.describe(when, () => {
+    test.use({ timezoneId: zone });
+    test("still shows, and the day before it doesn't", async ({ page }) => {
+      await page.clock.setFixedTime(new Date(now));
+      await openWith(page, { applyBy: lastDay, applyUrl: APPLY });
+      await expect(page.locator("#drBody .dr-apply")).toContainText(`Applications open — apply by ${says}`);
+      await expect(action(page, "Apply")).toHaveAttribute("href", APPLY);
+      await page.evaluate(([id, day]) => { byId[id].applyBy = day; openDrawer(id); }, [first, dayBefore]);
+      await expect(page.locator("#drBody .dr-apply")).toHaveCount(0);
+    });
+  });
+  for(const [where, zone] of [["in Boston", "America/New_York"], ["read in Honolulu, where it is still that day", "Pacific/Honolulu"]])
+    test.describe(`after midnight in Massachusetts, ${where}`, () => {
+      test.use({ timezoneId: zone });
+      test("is over", async ({ page }) => {
+        await page.clock.setFixedTime(new Date("2026-11-19T05:30:00Z"));      // 12:30 AM EST on Nov. 19
+        await openWith(page, { applyBy: "2026-11-18", applyUrl: APPLY });
+        await expect(page.locator("#drBody .dr-apply")).toHaveCount(0);
+        await page.evaluate(id => { byId[id].applyBy = "2026-11-19"; openDrawer(id); }, first);
+        await expect(page.locator("#drBody .dr-apply")).toContainText("apply by November 19, 2026");
+      });
+    });
+});
+
 // An expired date means the entry needs updating, not that the funder takes pitches.
 test("a funder's deadline that has passed doesn't turn into a pitch", async ({ page }) => {
   await openWith(page, { applyBy: "2020-01-01", applyUrl: APPLY }, fund);

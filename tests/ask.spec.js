@@ -177,7 +177,7 @@ test.describe("atlas-ai.txt", () => {
   });
 
   test("shows the same application status as the page", () => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = require(path.join(ROOT, "scripts", "today"))();   // the date in Massachusetts, as the page and the file take it
     const block = id => text.split(/^### /m).find(b => b.includes(`[${id}]`));
     const rolling = DATA.find(d => d.applyBy === "rolling");
     expect(block(rolling.id)).toContain("Applications: open, rolling");
