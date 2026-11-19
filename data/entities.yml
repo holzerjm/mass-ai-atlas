@@ -3852,7 +3852,7 @@
   stages: [1, 2, 3, 4, 5]
   links: [aihub, sundai, engine]
   offers: [community, space, compute, customers]
-  applyNote: Founder Starter Pack submissions closed
+  applyNote: 'Starter Pack: reviewing those received'
   applyUrl: https://massaicoalition.com/founders/#apply
   facts: [[Terms, 'No equity, no fees; pack sent within 7 days'], [Focus, AI founders building in Massachusetts]]
   added: 2026-06
