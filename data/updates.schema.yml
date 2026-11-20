@@ -29,7 +29,7 @@ items:
       allOf: [{ $ref: '#/definitions/text' }, { type: string, minLength: 20, maxLength: 240 }]
     try:
       description: >
-        where to see it, relative to the atlas page: a query, a hash, or a folder, such as
-        '?pathway=build-compute#journey' or 'credits/'
+        where to see it, relative to the atlas page: a query, a hash, a folder, or a page beside
+        the atlas, such as '?pathway=build-compute#journey', 'credits/' or 'atlas3d.html'
       type: string
-      pattern: '^(\?|#|[a-z][a-z0-9-]*/)[^\s"<>]*$'
+      pattern: '^(\?|#|[a-z][a-z0-9-]*/|[a-z][a-z0-9-]*\.html)[^\s"<>]*$'
