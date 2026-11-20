@@ -40,6 +40,13 @@ tags, stages, connected entries, website link, "show on map", **places to meet**
 quick bites and quieter options within ~450 m, read from the basemap's OpenStreetMap
 points of interest on demand), and a **🚩 Flag** button.
 
+**3D Lenses** (`atlas3d.html`) is a page of its own, linked from the corner of the map: a
+tiltable map that shows how complete the atlas's record of each entry is ("atlas confidence",
+never a rating of the organization), links every gap to its line of `data/entities.yml`, and
+draws the Galaxy's connections on the real map. Team CommonSpace built it at Chart the Common
+Wealth (#145). It loads the same data and loader as the atlas, deploys with it, and has its
+own tests (`tests/atlas3d.spec.js`).
+
 ---
 
 ## 2. Architecture & conventions

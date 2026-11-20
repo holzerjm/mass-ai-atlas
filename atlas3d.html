@@ -291,7 +291,8 @@ async function loadEvents(){
    How sure the atlas is about an entry: starts at 100 and loses points for each of
    the six doubt signals in the hackathon brief (approximate pin, verification month,
    no stage, no connections, funder with no check size, deadline rolling / dated /
-   gone), plus stacked coordinates. It measures how complete the atlas's record is,
+   gone), plus stacked coordinates. An event the feed says the entry hosts adds points;
+   an event that only names it is shown and adds none. It measures how complete the atlas's record is,
    not the organization, so every label describes the record. Each signal carries
    its evidence, a link to the exact line of data behind it, and what a founder
    should do about it. It is computed from the entry's own fields — never a
@@ -336,7 +337,7 @@ function scoreEntry(d, ctx){
   const hosted = ev.filter(e => e.atlasId === d.id).length, named = ev.length - hosted;
   if(hosted) add(true, Math.min(10, 5 * hosted), "Hosting events this month",
     `The weekly events feed lists ${hosted} upcoming event${hosted > 1 ? "s" : ""} it hosts.`, ev.find(e => e.atlasId === d.id).url);
-  else if(named) add(true, Math.min(10, 5 * named), "Active this month (inferred)",
+  else if(named) add(true, 0, "Active this month (inferred)",
     `Its name appears in ${named} upcoming event${named > 1 ? "s" : ""} in the weekly feed. This is a name match, not a confirmation.`, ev[0].url);
 
   const score = Math.max(0, Math.min(100, 100 + s.reduce((a,x) => a + x.pts, 0)));
@@ -846,7 +847,8 @@ function start({ CATS, STAGES, DATA, LINES }, EVENTS){
       ["High / Medium / Low", `${t.hi} / ${t.mid} / ${t.lo}`],
     ].map(row).join("") + `<span class="note" style="grid-column:1/-1;margin-top:8px">The six doubt signals · shown on every card</span>` + [
       ["Approximate pins (ring)", cnt(d => d.approx)],
-      ["Last verified June or earlier (faded)", cnt(d => !d.lastVerified || d.lastVerified <= "2026-06")],
+      // by age, as the card's "Not re-checked for months" and the map's fading go: a fixed month would drift
+      ["Not re-checked for 4 months or more (faded)", cnt(d => d.cred.age === null || d.cred.age >= 4)],
       ["No stage, so not in Founder Journey", cnt(d => !(d.stages || []).length)],
       ["No links of their own", cnt(d => !(d.links || []).length)],
       ["Connected to nothing either way", cnt(d => !d.deg)],

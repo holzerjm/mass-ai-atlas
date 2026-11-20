@@ -1,4 +1,4 @@
-/* 3D Lenses (atlas3d.html): its own page beside the atlas, linked from the nav.
+/* 3D Lenses (atlas3d.html): its own page beside the atlas, linked from the corner of its map.
    The page loads, puts every entry on the map, and an entry's card says how sure the atlas
    is and links each doubt to the line of data behind it. See docs/testing.md. */
 const fs = require("fs");
@@ -58,6 +58,40 @@ test("an event the feed says an entry hosts shows on its card as a fact, not a g
   await expect(card).toContainText("Hosting events this month");
   await expect(card).not.toContainText("(inferred)");
   await expect(card).toContainText(eventsFixture().events[0].title);
+});
+
+// An event that only names an entry is a guess. The card shows it and says so, and it adds
+// nothing to the score: until 2026-11 a name match added up to 10 points, as a hosted event does.
+test("an event that only names an entry shows as a guess and adds no points", async ({ page }) => {
+  const named = byId.csail || DATA.find(d => d.id !== DATA[0].id && d.name.length >= 8);
+  const now = Date.now(), h = 3600e3;
+  await page.route("**/events.json*", route => route.fulfill({ status: 200, contentType: "application/json",
+    body: JSON.stringify({ schema: 1, generated: new Date(now - 2*h).toISOString(), window_days: 10, events: [
+      { title: `Test fixture: an evening at ${named.name}`, start: new Date(now + 26*h).toISOString(),
+        end: new Date(now + 28*h).toISOString(), url: "https://example.com/fixture-3",
+        venue: "Boston, MA", organizer: "Fixture Meetup", source: "fixture" }] }) }));
+  await page.goto(`./atlas3d.html?entry=${named.id}`);
+  await ready(page);
+  const row = page.locator("#card li", { hasText: "(inferred)" });
+  await expect(row).toContainText("a name match, not a confirmation");
+  await expect(row.locator(".pts")).toHaveText("—");
+  await expect(page.locator("#card")).not.toContainText("Hosting events this month");
+});
+
+// The stats count what the map fades and what a card calls "Not re-checked for months": entries
+// whose last check is four or more months old. Until 2026-11 the row was fixed to June 2026.
+test("the stats count entries not re-checked for four months or more, by age", async ({ page }) => {
+  await page.goto("./atlas3d.html");
+  await ready(page);
+  const months = ym => { const [y, m] = ym.split("-").map(Number), t = new Date(); return (t.getFullYear() - y) * 12 + (t.getMonth() + 1 - m); };
+  const expected = DATA.filter(d => !d.lastVerified || months(d.lastVerified) >= 4).length;
+  const shown = await page.evaluate(() => {
+    const label = [...document.querySelectorAll("#stats span")].find(s => s.textContent.startsWith("Not re-checked for 4 months or more"));
+    return label ? label.nextElementSibling.textContent : null;
+  });
+  expect(shown, "the row is missing").not.toBeNull();
+  expect(Number(shown)).toBe(expected);
+  await expect(page.locator("#stats")).not.toContainText("June");
 });
 
 // The atlas's map links here from its bottom-left corner. It floats over the map rather than

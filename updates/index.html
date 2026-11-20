@@ -112,7 +112,7 @@ function fmt(iso){
   return d ? `${MONTHS[m - 1].slice(0, 3)} ${d}, ${y}` : `${MONTHS[m - 1]} ${y}`;
 }
 // A `try` link stays inside the atlas: the schema allows nothing else, and this keeps it so.
-const tryUrl = u => /^(\?|#|[a-z][a-z0-9-]*\/)/.test(u || "") ? "../" + u : null;
+const tryUrl = u => /^(\?|#|[a-z][a-z0-9-]*\/|[a-z][a-z0-9-]*\.html)/.test(u || "") ? "../" + u : null;
 
 function item(u){
   const href = tryUrl(u.try);

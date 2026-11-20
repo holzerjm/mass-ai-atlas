@@ -10,6 +10,11 @@
 #
 # A copy of this template should replace this list, or set it to [].
 
+- date: 2026-11-20
+  title: See the atlas in 3D
+  text: A new 3D map shows how complete the atlas's record of each organization is, links every gap to the line of data behind it, and draws the connections between organizations. Team CommonSpace built it at Chart the Common Wealth.
+  try: 'atlas3d.html'
+
 - date: 2026-11-19
   title: Your first move
   text: Some entries now say the first thing to do to get in, taken from the organization's own page. Look for it in an entry's panel, under each organization in a pathway, and in your shortlist.

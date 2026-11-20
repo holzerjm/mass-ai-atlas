@@ -90,11 +90,20 @@ mapmakers:
   - github: egornikot
     team: CommonSpace
     since: 2026-10-31
-    kinds: [research]
-    story: "Found that entries sharing a spot hid each other at street zoom. That finding became the “Also here” list in every map popup."
+    kinds: [research, code, tests]
+    story: "Found that entries sharing a spot hid each other at street zoom, which became the “Also here” list in every map popup. Then built 3D Lenses with the team: a 3D map of how complete each record is."
     links:
       - { label: "PR #79", url: "https://github.com/holzerjm/mass-ai-atlas/pull/79" }
       - { label: "Issue #87", url: "https://github.com/holzerjm/mass-ai-atlas/issues/87" }
+      - { label: "PR #145", url: "https://github.com/holzerjm/mass-ai-atlas/pull/145" }
+
+  - github: Fredess74
+    team: CommonSpace
+    since: 2026-10-31
+    kinds: [code]
+    story: "Built 3D Lenses with the team, then made the changes that let it ship beside the atlas: a loader both pages keep in step, and a place in the check that runs after every deploy."
+    links:
+      - { label: "PR #145", url: "https://github.com/holzerjm/mass-ai-atlas/pull/145" }
 
   - github: arshmehar
     linkedin: https://www.linkedin.com/in/arshmeharkaur05
@@ -199,3 +208,8 @@ milestones:
     title: "A hackathon finding ships"
     text: "Team CommonSpace's stacked-pins finding becomes the “Also here” list in every map popup."
     link: { label: "PR #89", url: "https://github.com/holzerjm/mass-ai-atlas/pull/89" }
+
+  - date: 2026-11-20
+    title: "3D Lenses ships"
+    text: "Team CommonSpace's 3D map of how complete each record is goes live beside the atlas, three weeks after Chart the Common Wealth."
+    link: { label: "PR #145", url: "https://github.com/holzerjm/mass-ai-atlas/pull/145" }

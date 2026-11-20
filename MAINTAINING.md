@@ -380,7 +380,7 @@ merged work is invisible to a visitor, and listing it would bury what they can u
 - **Add a line when a visitor would notice the change,** in the same pull request. For an
   outside contribution, a maintainer adds it at merge. Leave out fixes and work behind the scenes.
 - **Say what a visitor can now do,** in one or two plain sentences.
-- **Give a `try` link when there's a place to see it,** such as `?pathway=build-compute#journey`.
+- **Give a `try` link when there's a place to see it,** such as `?pathway=build-compute#journey`, `credits/` or `atlas3d.html`.
   `node scripts/validate.js` stops if it names a pathway or an entry that doesn't exist.
 - **Skip new organizations.** The page lists them by month from each entry's `added` field. The
   first month in the data is where the record starts, so it isn't shown as new.
