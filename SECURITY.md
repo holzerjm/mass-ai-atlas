@@ -50,7 +50,7 @@ behavior:
 
 - **There is no backend and no accounts.** No server-side code, no database, and no login, and
   the atlas's own code collects nothing about visitors. What a visitor does on the page stays
-  in their browser, in 6 `localStorage` keys, all starting with `toa-atlas-`.
+  in their browser, in 7 `localStorage` keys, all starting with `toa-atlas-`.
 - **Cloudflare counts page views.** Cloudflare serves the site and adds its Web Analytics script
   to each page, outside this repository. The script reports the page's address, without its
   query string, along with load timings, and it sets no cookies.

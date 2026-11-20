@@ -45,7 +45,7 @@ const ROOT = path.join(__dirname, "..", "..");
 // leaves the page showing its "data failed to load" banner. data/pathways.yml and
 // data/updates.yml are the exceptions: without them the Founder Journey loses its pathways
 // and the banner its newest update, and nothing else.
-const DEFAULT_FILES = ["index.html", "atlas-data.js", "data/entities.yml",
+const DEFAULT_FILES = ["index.html", "atlas3d.html", "atlas-data.js", "data/entities.yml",
   "data/entities.schema.yml", "data/categories.yml", "data/categories.schema.yml",
   "data/stages.yml", "data/stages.schema.yml", "data/pathways.yml", "data/pathways.schema.yml",
   "data/credits.yml", "data/credits.schema.yml", "data/updates.yml", "data/updates.schema.yml",
