@@ -453,6 +453,17 @@ html:not(.dark) .modal-card{background:#fff;border-color:#ddd}
 .sl-sub{display:block;font-size:12px;color:var(--muted)}
 .sl-url{opacity:.8}
 .sl-move{display:block;font-size:12.5px;line-height:1.45;margin-top:3px}
+/* a row says whether applications are open, in the pathway cards' colours */
+.sl-status{display:block;font-size:12.5px;font-weight:500;color:#4ade80;margin-top:3px}
+html:not(.dark) .sl-status{color:#166534}
+.sl-status.closed,html:not(.dark) .sl-status.closed{color:var(--muted)}
+.sl-status.pitch,html:not(.dark) .sl-status.pitch{color:var(--text)}
+/* a pathway as a checklist: the shortlist's rows under the pathway's steps */
+.sl-lead{font-size:13.5px;line-height:1.55;color:var(--muted)}
+.sl-step{font-size:14px;font-weight:700;margin:16px 0 6px}
+.sl-more .pw-more{margin-top:0}
+.sl-source{display:none}
+.pw-actions{margin:0 0 16px 44px}
 /* on the light modal, muted ink at .8 opacity was 3.8:1; a solid grey a shade lighter than the
    line around it keeps the URL quieter and reads 4.8:1 */
 html:not(.dark) .sl-url{opacity:1;color:#6b7280}
@@ -472,7 +483,9 @@ html:not(.dark) .cmp-bar{background:#fff;border-color:#ddd}
   body.shortlist-open .modal-card{box-shadow:none;border:none;max-height:none;max-width:none;background:#fff;color:#000}
   body.shortlist-open .modal-actions,body.shortlist-open .sl-x{display:none!important}
   body.shortlist-open .sl-row::before{content:"☐ ";font-size:15px}
-  body.shortlist-open .sl-sub,body.shortlist-open .sl-main a,body.shortlist-open .sl-move,body.shortlist-open .sl-move b{color:#000!important}
+  body.shortlist-open .sl-sub,body.shortlist-open .sl-main a,body.shortlist-open .sl-move,body.shortlist-open .sl-move b,
+  body.shortlist-open .sl-status,body.shortlist-open .sl-lead,body.shortlist-open .sl-step,body.shortlist-open .sl-source{color:#000!important}
+  body.shortlist-open .sl-source{display:block;margin-top:14px;font-size:11.5px}
 }
 /* offers / application windows / facts */
 .need-chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
@@ -1294,6 +1307,10 @@ let starSet = new Set();
 try{ starSet = new Set(JSON.parse(localStorage.getItem("toa-atlas-stars")||"[]")); }catch(e){}
 const cmpSet = new Set();
 let sharedList = null;   // set when viewing a ?list= URL someone shared
+// The pathway the shortlist dialog is showing as a checklist, by id; null for a shortlist. And a
+// checklist link (?checklist=<pathway id>), which waits until the pathways have loaded.
+let checklistId = null;
+let pendingChecklist = new URLSearchParams(location.search).get("checklist") || "";
 
 // orgs hosting an event in the next 7 days (events.json is produced by the
 // weekly events pipeline and served next to the app; absent locally — fail silent)
@@ -2725,7 +2742,9 @@ let jrStage = 1;
 // as they always were. validate.js checks the file, the way it checks credits.yml.
 let PATHWAYS = [];
 // The pathway someone chose or linked to. "" means the stage's first one, and leaves the link alone.
-let jrPathway = new URLSearchParams(location.search).get("pathway") || "";
+// A checklist link also picks the pathway the Journey shows, so closing the checklist leaves its
+// pathway on screen.
+let jrPathway = new URLSearchParams(location.search).get("pathway") || pendingChecklist;
 // The stages are buttons that say which one is chosen (aria-pressed), so the keyboard can pick
 // one too: until 2026-11 they were divs that took only a click, and the keyboard could see
 // only stage 1. Redrawing them removes the button just pressed, so its focus moves to the new one.
@@ -2741,13 +2760,19 @@ function renderStepper(){
     el.addEventListener("click", ()=>{ jrStage=+el.dataset.n; jrPathway=""; renderStepper(); renderJourney(); updateURL(); }));
   if(hadFocus) st.querySelector(`.step[data-n="${jrStage}"]`).focus();
 }
+// Whether an organization is taking applications, in the words a pathway card and a shortlist row
+// both use. null when the atlas has nothing to say.
+function applyStatus(d){
+  if(applyOpen(d)) return { cls:"", text:`⏳ ${d.applyBy==="rolling" ? "Open" : "Apply by " + fmtDeadline(d.applyBy)}${d.applyNote ? " · " + d.applyNote : ""}` };
+  if(applyClosed(d)) return { cls:"closed", text:`⏸ Closed · ${d.applyNote}` };
+  if(takesPitches(d)) return { cls:"pitch", text:"📨 Takes pitches" };
+  return null;
+}
+const statusLine = (d, tag, base) => { const st = applyStatus(d); return st ? `<${tag} class="${base}${st.cls ? " " + st.cls : ""}">${esc(st.text)}</${tag}>` : ""; };
 // One organization in a step: its own reason, its first move where the entry has one, and the same
 // status and date the drawer shows, so a pathway never restates a fact that lives in the entry.
 function pathwayOrg(d){
-  const status = applyOpen(d)
-    ? `<div class="pw-status">⏳ ${d.applyBy==="rolling" ? "Open" : "Apply by " + esc(fmtDeadline(d.applyBy))}${d.applyNote ? " · " + esc(d.applyNote) : ""}</div>`
-    : applyClosed(d) ? `<div class="pw-status closed">⏸ Closed · ${esc(d.applyNote)}</div>`
-    : takesPitches(d) ? `<div class="pw-status pitch">📨 Takes pitches</div>` : "";
+  const status = statusLine(d, "div", "pw-status");
   const verified = !d.lastVerified ? "" : isStale(d) ? `⚠️ Last verified ${fmtMonth(d.lastVerified)}` : fmtVerified(d.lastVerified);
   return `<li class="pw-org">
     <button type="button" class="pw-name" onclick="openDrawer('${d.id}')"><span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>${esc(d.name)}</button>
@@ -2765,23 +2790,26 @@ function pathwayMore(more, stage){
     && (!more.need || (d.offers||[]).includes(more.need))).length;
   return `<a class="pw-more" href="?${params}#directory">See all ${n} in the Directory →</a>`;
 }
+// A pathway's steps with the organizations in each, in the order the page lists them. The Journey
+// and the checklist both draw from this, so they can't disagree.
+// validate.js stops a build on an unknown id, so a miss here means a copy of the atlas has
+// removed an entry. Its step keeps whatever still resolves, and a step left with nothing goes.
+const pathwaySteps = path => path.steps
+  .map(step=>({ step, orgs:(step.entries||[]).map(id=>byId[id]).filter(Boolean).sort(byClosing) }))
+  .filter(x=>x.orgs.length || x.step.more);
 function pathwayHtml(s){
   const paths = PATHWAYS.filter(p=>p.stage===s.n);
   if(!paths.length) return "";
   const path = paths.find(p=>p.id===jrPathway) || paths[0];
-  // validate.js stops a build on an unknown id, so a miss here means a copy of the atlas has
-  // removed an entry. Its step keeps whatever still resolves, and a step left with nothing goes.
-  const steps = path.steps.map(step=>{
-    const orgs = (step.entries||[]).map(id=>byId[id]).filter(Boolean).sort(byClosing);
-    if(!orgs.length && !step.more) return "";
-    return `<li class="pw-step"><h5>${esc(step.do)}</h5><p class="pw-why">${esc(step.why)}</p>` +
+  const steps = pathwaySteps(path).map(({step, orgs})=>
+    `<li class="pw-step"><h5>${esc(step.do)}</h5><p class="pw-why">${esc(step.why)}</p>` +
       (orgs.length ? `<ul class="pw-orgs">${orgs.map(pathwayOrg).join("")}</ul>` : "") +
-      (step.more ? pathwayMore(step.more, s.n) : "") + `</li>`;
-  }).join("");
+      (step.more ? pathwayMore(step.more, s.n) : "") + `</li>`).join("");
   return `<section class="pw" aria-labelledby="pwAsk"><h4 class="pw-ask" id="pwAsk">Which sounds like you?</h4>
     <div class="pw-picks" role="group" aria-labelledby="pwAsk">${paths.map(p=>
       `<button type="button" class="pw-pick" data-pathway="${esc(p.id)}" aria-pressed="${p===path}">${esc(p.title)}</button>`).join("")}</div>
     <p class="pw-lead">${esc(path.lead)}</p><ol class="pw-steps">${steps}</ol>
+    <p class="pw-actions"><button type="button" class="btn btn-sec pw-check" data-checklist="${esc(path.id)}">📋 Open as a checklist</button></p>
     <p class="pw-note">A step is a kind of option, not a ranking: organizations in it are listed by closing date, then by name. Nobody pays to appear here. None of these sound like you? <a href="?ask=1#journey" onclick="openAsk();return false">Ask your own AI</a>.</p></section>`;
 }
 function renderJourney(){
@@ -2806,6 +2834,7 @@ function renderJourney(){
     jrPathway = el.dataset.pathway; renderJourney(); updateURL();
     $("jrPanel").querySelector(`.pw-pick[aria-pressed="true"]`).focus();
   }));
+  $("jrPanel").querySelectorAll(".pw-check").forEach(el=>el.addEventListener("click", ()=>openChecklist(el.dataset.checklist)));
 }
 renderStepper(); renderJourney();
 fetch("data/pathways.yml")
@@ -2815,8 +2844,11 @@ fetch("data/pathways.yml")
     const linked = PATHWAYS.find(p=>p.id===jrPathway);
     if(linked){ jrStage = linked.stage; renderStepper(); } else jrPathway = "";
     renderJourney();
+    const asked = pendingChecklist; pendingChecklist = "";
+    if(PATHWAYS.some(p=>p.id===asked)) setTimeout(()=>openChecklist(asked), 500);   // as a shared shortlist opens
+    else if(asked) updateURL();                                                       // no such pathway: the address drops it
   })
-  .catch(err=>console.warn("No pathways, so the Journey shows its stages alone:", err));
+  .catch(err=>{ pendingChecklist = ""; console.warn("No pathways, so the Journey shows its stages alone:", err); });
 
 /* ---------- directory ---------- */
 (function initDirectory(){
@@ -2949,6 +2981,8 @@ function updateURL(){
   if(drawerId) u.searchParams.set("entry", drawerId); else u.searchParams.delete("entry");
   writeFilters(u.searchParams);
   if(currentView === "journey" && jrPathway) u.searchParams.set("pathway", jrPathway); else u.searchParams.delete("pathway");
+  const cl = checklistId || pendingChecklist;
+  if(cl) u.searchParams.set("checklist", cl); else u.searchParams.delete("checklist");
   u.searchParams.delete("ask");   // ?ask=1 opens the dialog once; it isn't a state to keep
   u.hash = currentView !== "map" ? currentView : "";
   try{ history.replaceState(null, "", u.pathname + u.search.replace(/%2C/g, ",") + u.hash); }catch(e){}
@@ -2983,33 +3017,73 @@ function syncStarUI(){
 }
 function shortlistIds(){ return sharedList || [...starSet]; }
 
-function renderShortlist(ids){
-  const list = ids.map(i=>byId[i]).filter(Boolean);
-  $("slBody").innerHTML = list.map(d=>`
+// One organization in the shortlist dialog: where it is, whether it's taking applications, and
+// its first move. The list prints with a box to tick beside each row.
+const shortlistRow = (d, removable) => `
     <div class="sl-row">
       <span class="lg-dot" style="color:${cColor(d.cat)};background:${cColor(d.cat)}"></span>
       <div class="sl-main"><a href="#" onclick="closeShortlist();openDrawer('${d.id}');return false"><b>${esc(d.name)}</b></a>
-        <span class="sl-sub">${cLabel(d.cat)} · ${esc(d.loc.split(",")[0])} · <span class="sl-url">${esc(d.url.replace(/^https:\/\/(www\.)?/,""))}</span></span>${d.firstMove ? `
+        <span class="sl-sub">${cLabel(d.cat)} · ${esc(d.loc.split(",")[0])} · <span class="sl-url">${esc(d.url.replace(/^https:\/\/(www\.)?/,""))}</span></span>${statusLine(d, "span", "sl-status")}${d.firstMove ? `
         <span class="sl-move"><b>First move:</b> ${esc(d.firstMove)}</span>` : ""}</div>
-      ${sharedList ? "" : `<button class="sl-x" aria-label="Remove ${esc(d.name)}" onclick="toggleStar('${d.id}')">✕</button>`}
-    </div>`).join("") || `<p style="color:var(--muted)">Nothing saved yet — hit ☆ on any card or entry.</p>`;
+      ${removable ? `<button class="sl-x" aria-label="Remove ${esc(d.name)}" onclick="toggleStar('${d.id}')">✕</button>` : ""}
+    </div>`;
+const checklistUrl = id => location.origin + location.pathname + "?checklist=" + encodeURIComponent(id) + "#journey";
+function renderShortlist(ids){
+  const path = checklistId && PATHWAYS.find(p=>p.id===checklistId);
+  if(path){
+    // The pathway's steps as headings, with its organizations under each, as the Journey lists them.
+    // A step that points to the Directory keeps its link, as a row of its own.
+    $("slBody").innerHTML = `<p class="sl-lead">${esc(path.lead)}</p>` + pathwaySteps(path).map(({step, orgs}, i)=>
+      `<h4 class="sl-step">${i + 1}. ${esc(step.do)}</h4>` + orgs.map(d=>shortlistRow(d, false)).join("") +
+      (step.more ? `<div class="sl-row sl-more"><div class="sl-main">${pathwayMore(step.more, path.stage)}</div></div>` : "")).join("") +
+      `<p class="sl-source">From the Mass AI Atlas: ${esc(checklistUrl(path.id))}</p>`;
+    $("slTitle").textContent = path.title;
+    $("shortlistModal").setAttribute("aria-label", "Checklist: " + path.title);
+    $("slAdopt").style.display = "";
+    $("slAdopt").textContent = ids.every(id=>starSet.has(id)) ? "★ Saved to my shortlist" : "★ Save all to my shortlist";
+    $("slShare").style.display = $("slPrint").style.display = "";
+    return;
+  }
+  const list = ids.map(i=>byId[i]).filter(Boolean);
+  $("slBody").innerHTML = list.map(d=>shortlistRow(d, !sharedList)).join("") || `<p style="color:var(--muted)">Nothing saved yet — hit ☆ on any card or entry.</p>`;
   $("slTitle").textContent = sharedList ? "A shared shortlist" : "Your shortlist";
+  $("shortlistModal").setAttribute("aria-label", "Shortlist");
   $("slAdopt").style.display = sharedList ? "" : "none";
+  $("slAdopt").textContent = "★ Save all to my shortlist";
   $("slShare").style.display = list.length ? "" : "none";
   $("slPrint").style.display = list.length ? "" : "none";
 }
 function openShortlist(){ renderShortlist(shortlistIds()); $("shortlistModal").style.display="flex"; document.body.classList.add("shortlist-open"); dialogOpened($("shortlistModal")); }
-function closeShortlist(){ $("shortlistModal").style.display="none"; document.body.classList.remove("shortlist-open"); sharedList=null; dialogClosed(); }
+function closeShortlist(){
+  const wasChecklist = !!checklistId;
+  $("shortlistModal").style.display="none"; document.body.classList.remove("shortlist-open"); sharedList=null; checklistId=null; dialogClosed();
+  if(wasChecklist) updateURL();
+}
+// A pathway as a checklist: the shortlist dialog, with the pathway's organizations in its order.
+// Nothing is saved until someone asks, and the address names the pathway, so a link stays right
+// when the pathway's organizations change.
+function openChecklist(id){
+  const path = PATHWAYS.find(p=>p.id===id);
+  if(!path) return;
+  checklistId = id;
+  sharedList = pathwaySteps(path).flatMap(x=>x.orgs.map(d=>d.id));
+  openShortlist(); updateURL();
+}
 function shareShortlist(btn){
   if(!navigator.clipboard) return;
-  const url = location.origin + location.pathname + "?list=" + shortlistIds().join(",");
+  const url = checklistId ? checklistUrl(checklistId) : location.origin + location.pathname + "?list=" + shortlistIds().join(",");
   navigator.clipboard.writeText(url).then(()=>{
     if(!btn.dataset.label) btn.dataset.label = btn.textContent;
     btn.textContent = "✓ Copied"; setTimeout(()=>{ btn.textContent = btn.dataset.label; }, 1500);
   }).catch(()=>{});
 }
-function adoptShortlist(){ (sharedList||[]).forEach(id=>starSet.add(id)); sharedList=null; saveStars(); syncStarUI(); renderShortlist(shortlistIds()); }
-window.toggleStar=toggleStar; window.openShortlist=openShortlist; window.closeShortlist=closeShortlist;
+// A shared shortlist becomes the visitor's own. A checklist stays a checklist, and says it is saved.
+function adoptShortlist(){
+  (sharedList||[]).forEach(id=>starSet.add(id));
+  if(!checklistId) sharedList=null;
+  saveStars(); syncStarUI(); renderShortlist(shortlistIds());
+}
+window.toggleStar=toggleStar; window.openShortlist=openShortlist; window.closeShortlist=closeShortlist; window.openChecklist=openChecklist;
 window.shareShortlist=shareShortlist; window.adoptShortlist=adoptShortlist;
 
 function toggleCompare(id){
@@ -3067,7 +3141,7 @@ window.dismissNewBanner = dismissNewBanner;
   const month = localYM(new Date());
   const fresh = DATA.filter(d=>d.added===month).length;
   let seen = null; try{ seen = localStorage.getItem("toa-atlas-newbanner"); }catch(e){}
-  if(fresh >= 2 && (seen||"") < month && !lp){
+  if(fresh >= 2 && (seen||"") < month && !lp && !new URLSearchParams(location.search).get("checklist")){
     $("newBannerText").textContent = `✨ ${fresh} organizations added this month — `;
     $("newBanner").style.display = "";
   }
@@ -3083,7 +3157,8 @@ fetch("data/updates.yml")
     newestUpdate = latest.date;
     let seen = null, visited = null;
     try{ seen = localStorage.getItem("toa-atlas-newbanner"); visited = localStorage.getItem("toa-atlas-tour"); }catch(e){}
-    if(visited && (seen||"") < latest.date && !new URLSearchParams(location.search).get("list")){
+    const q = new URLSearchParams(location.search);
+    if(visited && (seen||"") < latest.date && !q.get("list") && !q.get("checklist")){
       $("newBannerText").textContent = `✨ New: ${latest.title} — `;
       $("newBanner").style.display = "";
     }

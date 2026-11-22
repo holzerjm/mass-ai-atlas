@@ -63,6 +63,22 @@ test("a shortlist row carries the entry's first move, and nothing where the entr
   await expect(rows.nth(0).locator(".sl-move")).toBeVisible();
 });
 
+// A row says whether the organization is taking applications, in the words its pathway card
+// uses, so a saved list shows what is open and what closes when.
+test("a shortlist row says whether applications are open, and nothing where the atlas doesn't know", async ({ page }) => {
+  await page.goto(`./?list=${a.id},${b.id}`);
+  await waitForApp(page);
+  await expect(page.locator("#shortlistModal")).toBeVisible();
+  await page.evaluate(([a, b]) => {
+    for(const id of [a, b]){ for(const k of ["applyBy", "applyNote", "applyUrl"]) delete byId[id][k]; }
+    byId[a].applyBy = "rolling"; byId[a].applyNote = "Reviewed monthly";
+    renderShortlist([a, b]);
+  }, [a.id, b.id]);
+  const rows = page.locator("#shortlistModal .sl-row");
+  await expect(rows.nth(0).locator(".sl-status")).toHaveText("⏳ Open · Reviewed monthly");
+  await expect(rows.nth(1).locator(".sl-status")).toHaveCount(0);
+});
+
 test("a ?list= of only unknown ids opens nothing and breaks nothing", async ({ page }) => {
   await page.goto("./?list=no-such-org,also-missing");
   await waitForApp(page);

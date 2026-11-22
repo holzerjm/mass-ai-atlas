@@ -366,6 +366,14 @@ listed at its pathway's stage. To remove an entry, take it out of any pathway fi
 A link can open a pathway directly: `?pathway=build-compute#journey`. Changing an `id` breaks
 links people have shared, so keep it once a pathway is live.
 
+Each pathway also opens as a checklist, from the button under its steps or by a link:
+`?checklist=build-compute#journey`. The checklist is the pathway's steps and organizations
+again, with each entry's first move and application status, in a dialog a founder can print
+or share. It holds nothing of its own, so there is nothing more to maintain: change the
+pathway or an entry, and the checklist follows. The link names the pathway, not the
+organizations, so it stays right when a step's list changes, and it breaks with the `id` as a
+pathway link does.
+
 Pathways are optional. If you copied this template for another region, write your own, or set
 the file to `[]` and the Journey shows its stages alone.
 

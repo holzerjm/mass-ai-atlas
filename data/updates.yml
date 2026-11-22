@@ -10,6 +10,11 @@
 #
 # A copy of this template should replace this list, or set it to [].
 
+- date: 2026-11-22
+  title: Turn a pathway into a checklist
+  text: Each pathway in the Founder Journey now opens as a checklist. It lists the steps in order, each organization's first move, and whether it's taking applications. Print it with a box to tick, or share it as a link.
+  try: '?checklist=spark-new-here#journey'
+
 - date: 2026-11-20
   title: See the atlas in 3D
   text: A new 3D map shows how complete the atlas's record of each organization is, links every gap to the line of data behind it, and draws the connections between organizations. Team CommonSpace built it at Chart the Common Wealth.

@@ -182,6 +182,7 @@ for (const d of DATA)
         seen.add(u.title);
         const q = new URLSearchParams((u.try || "").split("#")[0].split("?")[1] || "");
         if (q.get("pathway") && !pathways.has(q.get("pathway"))) uerr(`"${u.title}" links to unknown pathway "${q.get("pathway")}"`);
+        if (q.get("checklist") && !pathways.has(q.get("checklist"))) uerr(`"${u.title}" links to unknown pathway "${q.get("checklist")}"`);
         if (q.get("entry") && !ids.has(q.get("entry"))) uerr(`"${u.title}" links to unknown entry "${q.get("entry")}"`);
       }
     }

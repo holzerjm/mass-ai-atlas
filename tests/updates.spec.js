@@ -30,8 +30,10 @@ test("every Try it link lands inside the atlas", async ({ page, baseURL }) => {
     await page.goto("about:blank");   // a hash-only link is otherwise a same-page move with no response
     const res = await page.goto(new URL(u.try, baseURL).href);
     expect(res.ok(), u.try).toBe(true);
-    const pathway = new URLSearchParams(u.try.split("#")[0].split("?")[1] || "").get("pathway");
+    const params = new URLSearchParams(u.try.split("#")[0].split("?")[1] || "");
+    const pathway = params.get("pathway") || params.get("checklist");
     if(pathway) await expect(page.locator(`.pw-pick[data-pathway="${pathway}"]`)).toHaveAttribute("aria-pressed", "true");
+    if(params.get("checklist")) await expect(page.locator("#slBody .sl-step").first()).toBeVisible();
   }
 });
 
@@ -148,6 +150,15 @@ test.describe("the banner, for someone who hasn't read the newest update", () =>
     await page.goto(`./?list=${DATA[0].id}`);
     await waitForApp(page);
     await page.waitForTimeout(400);
+    await expect(page.locator("#newBannerText")).not.toContainText(NEWEST.title);
+  });
+
+  test("a checklist link isn't interrupted either", async ({ page }) => {
+    const pathways = yaml.load(fs.readFileSync(path.join(ROOT, "data", "pathways.yml"), "utf8"), { schema: yaml.CORE_SCHEMA }) || [];
+    test.skip(!pathways.length, "this copy of the atlas has no pathways");
+    await page.goto(`./?checklist=${pathways[0].id}#journey`);
+    await waitForApp(page);
+    await expect(page.locator("#slBody .sl-step").first()).toBeVisible();
     await expect(page.locator("#newBannerText")).not.toContainText(NEWEST.title);
   });
 });
