@@ -187,6 +187,136 @@ test.describe("pathways", () => {
 
 // The file adds to the Journey and nothing depends on it. deploy.yml sends the page before
 // data/, so a visitor can load a new page a moment before its file arrives.
+// A pathway says what kind of thing to do at each step. As a checklist it is something to work
+// through and print: the same steps and organizations, each with its first move and whether it
+// is taking applications. It opens in the shortlist's dialog, and its link names the pathway.
+test.describe("a pathway as a checklist", () => {
+  test.skip(!PATHS.length, "this copy of the atlas has no pathways");
+  const rows = page => page.locator("#slBody .sl-row:not(.sl-more)");
+  const close = page => page.locator("#shortlistModal .modal-head .sl-x").click();
+  const show = (page, p) => page.evaluate(p => { jrStage = p.stage; jrPathway = p.id; renderStepper(); renderJourney(); }, { stage: p.stage, id: p.id });
+
+  test("every pathway opens as a checklist, with its steps and organizations in the Journey's order", async ({ page }) => {
+    await openJourney(page);
+    for(const p of PATHS){
+      await show(page, p);
+      const steps = await page.locator(".pw-step h5").allTextContents();
+      const names = await page.locator(".pw-name").allTextContents();
+      await page.locator(".pw-check").click();
+      await expect(page.locator("#slTitle")).toHaveText(p.title);
+      await expect(page.locator("#slBody .sl-lead")).toHaveText(p.lead);
+      await expect(page.locator("#slBody .sl-step")).toHaveText(steps.map((s, i) => `${i + 1}. ${s}`));
+      await expect(rows(page).locator(".sl-main > a b")).toHaveText(names);
+      await expect(page.locator("#slBody .sl-more")).toHaveCount(p.steps.filter(s => s.more).length);
+      await close(page);
+      await expect(page.locator("#shortlistModal")).toBeHidden();
+    }
+  });
+
+  // Real entries get known values here, so a deadline passing or a line being rewritten can't
+  // change this test.
+  test("a checklist row says whether applications are open, and gives the first move", async ({ page }) => {
+    await openJourney(page);
+    const [a, b, c] = [...DATA].sort((x, y) => x.name.localeCompare(y.name)).map(x => x.id);
+    await page.evaluate(([a, b, c]) => {
+      for(const id of [a, b, c]){ for(const k of ["applyBy", "applyNote", "applyUrl", "firstMove"]) delete byId[id][k]; }
+      byId[a].applyBy = "2099-01-01"; byId[a].applyNote = "Spring cohort"; byId[a].firstMove = "Register for the next open night.";
+      byId[b].applyNote = "Reopens in spring";
+    }, [a, b, c]);
+    await drawPathway(page, [{ do: "A step", why: "Why", entries: [a, b, c] }]);
+    await page.locator(".pw-check").click();
+    const row = id => page.locator("#slBody .sl-row").filter({ has: page.getByRole("link", { name: byId[id].name, exact: true }) });
+    await expect(row(a).locator(".sl-status")).toHaveText("⏳ Apply by January 1, 2099 · Spring cohort");
+    await expect(row(a).locator(".sl-move")).toHaveText("First move: Register for the next open night.");
+    await expect(row(b).locator(".sl-status")).toHaveText("⏸ Closed · Reopens in spring");
+    await expect(row(b).locator(".sl-status")).toHaveClass(/\bclosed\b/);
+    await expect(row(c).locator(".sl-status, .sl-move")).toHaveCount(0);
+  });
+
+  test("a step that points to the Directory is a row of the checklist, with the step's own link", async ({ page }) => {
+    const p = PATHS.find(x => x.steps.some(s => s.more));
+    test.skip(!p, "no pathway has a step that points to the Directory");
+    await openJourney(page, `./?pathway=${p.id}#journey`);
+    const hrefs = await page.locator(".pw-step .pw-more").evaluateAll(as => as.map(a => a.getAttribute("href")));
+    await page.locator(".pw-check").click();
+    expect(await page.locator("#slBody .sl-more a").evaluateAll(as => as.map(a => a.getAttribute("href")))).toEqual(hrefs);
+    await expect(page.locator("#slBody .sl-more a").first()).toHaveText(/^See all \d+ in the Directory →$/);
+  });
+
+  test("Save all puts the checklist's organizations in the shortlist, and the checklist stays", async ({ page }) => {
+    const p = PATHS[0], ids = p.steps.flatMap(s => s.entries || []);
+    await openJourney(page, `./?pathway=${p.id}#journey`);
+    await page.locator(".pw-check").click();
+    await expect(page.locator("#slAdopt")).toHaveText("★ Save all to my shortlist");
+    // opening a checklist saves nothing: the organizations are the pathway's until someone asks
+    expect(await page.evaluate(() => localStorage.getItem("toa-atlas-stars"))).toBeNull();
+    await page.locator("#slAdopt").click();
+    await expect(page.locator("#slAdopt")).toHaveText("★ Saved to my shortlist");
+    await expect(page.locator("#slTitle")).toHaveText(p.title);
+    expect(JSON.parse(await page.evaluate(() => localStorage.getItem("toa-atlas-stars"))).sort()).toEqual([...ids].sort());
+    await expect(page.locator("#starCount")).toHaveText(String(ids.length));
+  });
+
+  // The link names the pathway and not its organizations, so it stays right when the pathway
+  // changes. Like an open entry, an open checklist is in the address, and leaves it when closed.
+  test("a checklist's link names its pathway, opens over that pathway, and leaves the address when closed", async ({ page, baseURL }) => {
+    const p = PATHS[PATHS.length - 1];
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "clipboard", { value: { writeText: t => { window.__copied = t; return Promise.resolve(); } } });
+    });
+    const link = new URL(`./?checklist=${p.id}#journey`, baseURL).href;
+    await page.goto(link);
+    await waitForApp(page);
+    await expect(page.locator("#shortlistModal")).toBeVisible();
+    await expect(page.locator("#slTitle")).toHaveText(p.title);
+    await expect(pick(page, p.id)).toHaveAttribute("aria-pressed", "true");
+    expect(new URL(page.url()).searchParams.get("checklist")).toBe(p.id);
+    await page.locator("#slShare").click();
+    expect(await page.evaluate(() => window.__copied)).toBe(link);
+    await close(page);
+    await expect(page.locator("#shortlistModal")).toBeHidden();
+    expect(new URL(page.url()).searchParams.get("checklist")).toBeNull();
+    expect(new URL(page.url()).searchParams.get("pathway")).toBe(p.id);
+    await page.reload();
+    await waitForApp(page);
+    await page.waitForTimeout(800);   // a checklist link opens 500 ms after the pathways load
+    await expect(page.locator("#shortlistModal")).toBeHidden();
+  });
+
+  test("the button puts the checklist in the address, so a reload brings it back", async ({ page }) => {
+    const p = PATHS[0];
+    await openJourney(page, `./?pathway=${p.id}#journey`);
+    await page.locator(".pw-check").click();
+    expect(new URL(page.url()).searchParams.get("checklist")).toBe(p.id);
+    await page.reload();
+    await waitForApp(page);
+    await expect(page.locator("#shortlistModal")).toBeVisible();
+    await expect(page.locator("#slTitle")).toHaveText(p.title);
+  });
+
+  test("an unknown ?checklist= opens nothing and leaves the address clean", async ({ page }) => {
+    await page.goto("./?checklist=no-such-pathway#journey");
+    await waitForApp(page);
+    await expect(page.locator(".pw-pick").first()).toBeVisible();
+    await page.waitForTimeout(800);
+    await expect(page.locator("#shortlistModal")).toBeHidden();
+    expect(new URL(page.url()).searchParams.get("checklist")).toBeNull();
+  });
+
+  test("printed, a checklist keeps its steps, has a box beside each row, and says where it came from", async ({ page, baseURL }) => {
+    const p = PATHS[0];
+    await openJourney(page, `./?pathway=${p.id}#journey`);
+    await page.locator(".pw-check").click();
+    await expect(page.locator("#slBody .sl-source")).toBeHidden();
+    await page.emulateMedia({ media: "print" });
+    await expect(page.locator("#slBody .sl-step").first()).toBeVisible();
+    await expect(page.locator("#slBody .sl-source")).toBeVisible();
+    await expect(page.locator("#slBody .sl-source")).toHaveText(`From the Mass AI Atlas: ${new URL(`./?checklist=${p.id}#journey`, baseURL).href}`);
+    await expect(page.locator("#shortlistModal .modal-actions")).toBeHidden();
+    expect(await rows(page).first().evaluate(el => getComputedStyle(el, "::before").content)).toContain("☐");
+  });
+});
+
 test.describe("without data/pathways.yml", () => {
   test.use({ expectedHttpErrors: [/\/data\/pathways\.yml/] });
 

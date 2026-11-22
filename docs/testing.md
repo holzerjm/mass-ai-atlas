@@ -271,6 +271,14 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | a step lists its organizations by closing date, then by name | someone's place in a step becoming a judgment. Real entries get fixed statuses, so a deadline passing can't change the result |
 | | a closed program says so in a step | a closed program reading like an open one, or like one with no information |
 | | a funder that takes pitches says so in a step | a pathway hiding what the entry shows |
+| | every pathway opens as a checklist, in the Journey's order | the checklist drifting from the pathway it came from: its title, lead, steps as headings, and organizations must be the Journey's, in the same order, for every pathway |
+| | a checklist row says whether applications are open, and gives the first move | a checklist that names organizations and not what to do or by when. Real entries get known values, so a deadline passing can't change the result |
+| | a step that points to the Directory is a row of the checklist | a step with no named organizations vanishing from the checklist. Its link must be the step's own |
+| | Save all puts the checklist's organizations in the shortlist | opening a checklist saving something nobody asked for, or Save all swapping the checklist for a flat list |
+| | a checklist's link names its pathway, opens over that pathway, and leaves the address when closed | a link that lists organizations and goes stale when the pathway changes, or an address that reopens a checklist someone closed |
+| | the button puts the checklist in the address | a reload losing the open checklist |
+| | an unknown `?checklist=` | a stale or mistyped link opening an empty dialog, or staying in the address |
+| | printed, a checklist keeps its steps, has a box beside each row, and says where it came from | the printout losing its headings or tick boxes, or a sheet of paper with no way back to the page |
 | | a chosen pathway goes into the link | a shared pathway opening at the wrong one, or a link that keeps a pathway after a new stage is chosen or the Journey is left |
 | | a link to a pathway that doesn't exist | a stale link breaking the Journey |
 | | a pathway can be chosen by keyboard | the focus falling off the page when a pathway redraws |
@@ -282,6 +290,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | the longest pathway fits a phone | a pathway forcing the page sideways at 390 px |
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
 | | a shortlist row carries the entry's first move | the printed checklist saying where an organization is and not what to do there. The line must show on screen and in print, and a row whose entry has none must show nothing |
+| | a shortlist row says whether applications are open | a saved list that doesn't show what is open or what closes when. The words are the pathway card's, and a row says nothing where the atlas has no status |
 | | `?list=` of unknown ids | a stale list link breaking the page |
 | `events.spec.js` | `/events/` loads and lists events | the events page breaking |
 | | "→ on the atlas" link | the events page → atlas drawer hand-off |
@@ -323,7 +332,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | it stays compact | the file growing until web tools cut it |
 | | it says the town and who serves the whole state | an assistant holding only this file not knowing where a "Kendall Sq" address is, or that a state program serves founders far from its pin. A line must carry `town:` exactly when the address leaves the town out, and "serves all of Massachusetts" exactly on the marked entries |
 | `updates.spec.js` | every update, newest first | the page drifting from `data/updates.yml`, or a date out of order |
-| | every Try it link lands inside the atlas | a `try` link pointing at something that isn't there. A pathway link must open that pathway |
+| | every Try it link lands inside the atlas | a `try` link pointing at something that isn't there. A pathway link must open that pathway, and a checklist link must open that checklist |
 | | a Try it link on the page opens what it says | the page building the wrong address from a `try` value |
 | | new organizations by month, and where the record starts | the first month in `added` being counted as new. That month is when the field began, so 116 "new" organizations would be false |
 | | a new organization's link opens its entry | a name on the page leading nowhere |
@@ -335,6 +344,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | its link opens the updates page, and counts as reading it | the banner coming back after someone followed it |
 | | a newer update beats last month's dismissal | a month saved before updates existed hiding a new one |
 | | a shared shortlist link isn't interrupted | the banner covering what someone was sent to see |
+| | a checklist link isn't interrupted either | the same, for a link to a pathway's checklist |
 | | a first visit gets the tour | news about what changed reaching someone who hasn't seen any of it |
 | | the tour mentions applying, and points at the pathways | the tour falling behind the page again. Its text is hand-written, so nothing else notices |
 | | two presses on the tour's Next at once draw one step | a quick second press drawing two steps. The tour draws a step 180 ms after a press, and until 2026-11 a second press inside that time drew the skipped step first, with its title beside the next step's number, and left its target outlined until the next press. The page records the card each time it is drawn, because the second draw covers what the first one wrote |
@@ -402,7 +412,7 @@ loader the page uses (`atlas-data.js`), exactly as
 `a11y.spec.js` runs [axe-core](https://github.com/dequelabs/axe-core) against
 WCAG 2.0/2.1 A and AA rules on: the map, galaxy, journey and directory views,
 an open entry drawer, a closed program's and a funder's drawer, the drawer of an entry with a first
-move, Compare, a founder pathway with open and closed programs, a shared shortlist with a first move in it,
+move, Compare, a founder pathway with open and closed programs, a pathway's checklist, a shared shortlist with a first move in it,
 the first-visit tour card, the what's-new banner, the Ask your own AI dialog, the events page,
 the credits page and the updates page, each in both the dark and the light theme; and the galaxy's keyboard
 list and search with a category open and results showing, in the dark theme.

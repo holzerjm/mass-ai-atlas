@@ -62,6 +62,11 @@ const SCANS = [
   { name: "directory view", url: "./#directory" },
   { name: "entry drawer", url: `./?entry=${entry.id}`, include: "#drawer" },
   { name: "shared shortlist", url: `./?list=${listed}`, include: "#shortlistModal" },
+  // a pathway as a checklist: the same dialog with step headings, statuses in three colours and a Directory row
+  { name: "pathway checklist", url: "./?checklist=fund-equity-free#journey", include: "#shortlistModal",
+    prepare: page => expect(page.locator("#slBody .sl-step").first()).toBeVisible() },
+  { name: "pathway checklist (light theme)", url: "./?checklist=fund-equity-free#journey", include: "#shortlistModal",
+    theme: "light", prepare: page => expect(page.locator("#slBody .sl-step").first()).toBeVisible() },
   // The atlas in the light theme, scanned since 2026-11. Until then it failed 21 to 34 times per
   // view: category colours as text on white, the site footer's grey on its dark band, and footer
   // links told apart by colour alone.
