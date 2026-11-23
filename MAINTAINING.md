@@ -413,6 +413,9 @@ prompt points at, `atlas-ai.txt`, on every deploy.
   not the address, not storage, not the network. Don't add links that open a named assistant
   with the prompt filled in. They would put a founder's words in a URL, and favor one vendor.
 - **Organizations go A to Z,** so a position depends on nothing but a name.
+- **Each pathway carries its checklist link** (`?checklist=<id>#journey`), in the form the page
+  makes, so an assistant that starts from a pathway can hand over a list to work through. It is a
+  link and not advice, so it belongs in the file. A test ties the two forms together.
 - **The file's last line is "End of file".** Web tools can cut a long page without saying so, and
   a file cut at M would quietly lose everything after it. Keep that line, and the prompt's line
   that asks for it.

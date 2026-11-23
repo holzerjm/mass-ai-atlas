@@ -325,6 +325,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | | the dialog fits a phone | the dialog running off the screen at 390 px |
 | | `atlas-ai.txt` lists every organization, A to Z | an entry missing, or the order depending on anything but the name |
 | | it carries every pathway, with entries that exist | a pathway dropped, or a step naming something that isn't there |
+| | it gives each pathway the link that opens it as a checklist | an assistant that starts from a pathway with no checklist link to hand over, or one that opens nothing because the page and the file disagree on its form |
 | | it ends where it says it does | the last line or the count going missing, so an assistant couldn't tell it read only part |
 | | it holds no instructions for an assistant | rules creeping into the file. They belong in the prompt a founder reads |
 | | it shows the same application status as the page | the file and the page disagreeing about what's open |

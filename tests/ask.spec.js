@@ -164,6 +164,21 @@ test.describe("atlas-ai.txt", () => {
       for(const id of m[1].split(", ")) expect(byId[id], id).toBeTruthy();
   });
 
+  // A pathway's checklist is a page of its own, so the file hands out its link. The page makes that
+  // link itself (checklistUrl), so the two must agree on the form, and the link must name a pathway.
+  test("gives each pathway the link that opens it as a checklist, as the page makes it", async ({ page }) => {
+    await page.goto("./");
+    const made = await page.evaluate(() => checklistUrl("some-pathway"));
+    const form = made.slice(made.indexOf("?"));
+    expect(form).toBe("?checklist=some-pathway#journey");
+    const site = text.match(/^Source: (\S+) \(/m)[1];   // the file's own address, which a copy of the atlas changes
+    for(const p of PATHWAYS)
+      expect(text, p.id).toContain(`\nChecklist: ${site}${form.replace("some-pathway", p.id)}\n`);
+    expect(text.match(/^Checklist: /gm)).toHaveLength(PATHWAYS.length);
+    const head = text.slice(0, text.indexOf("## Pathways"));
+    expect(head).toContain('"Checklist:" under a pathway is the link that opens it on the atlas as a list');
+  });
+
   test("says how many it holds, and ends where it says it does", () => {
     expect(text).toContain(`${DATA.length} organizations and ${PATHWAYS.length} pathways`);
     expect(text.trimEnd().endsWith("\nEnd of file")).toBe(true);
