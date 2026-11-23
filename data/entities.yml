@@ -2483,7 +2483,8 @@
   tags: [seed, founders]
   stages: [2, 4]
   offers: [funding, mentorship, community]
-  applyNote: Deadline set for each Investor Forum
+  applyBy: '2027-01-14'
+  applyNote: Jan 26 Investor Forum; closes 5 PM
   applyUrl: https://www.tieboston.org/angels
   added: 2026-06
   lastVerified: 2026-08
@@ -3555,7 +3556,7 @@
   stages: [1, 2, 4]
   links: [sbxi]
   offers: [grants, mentorship, community]
-  applyNote: 'Cycles: fall, spring, and summer'
+  applyNote: New teams join in fall or spring
   applyUrl: https://sandbox.mit.edu/applynow
   added: 2026-08
   lastVerified: 2026-08
