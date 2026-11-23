@@ -243,7 +243,8 @@ opens a **draft PR** with a review checklist. It never publishes (merge does tha
 
 **Automatic since 2026-08-29** — merging to `main` is publishing.
 `.github/workflows/deploy.yml` fires on pushes touching `index.html`, `atlas-data.js`, `data/`,
-`map-style-dark.json`, `events/`, `credits/` or `updates/` (plus manual `workflow_dispatch` runs): it re-validates
+`map-style-dark.json`, `events/`, `credits/`, `updates/`, or one of the scripts that build what it uploads
+(the exporters, the page builders and `load-data.js`, `today.js`) (plus manual `workflow_dispatch` runs): it re-validates
 `data/`, rebuilds the exports, share pages, sitemap and events page, rsyncs them with the page,
 loader, map style, data files, credits page and updates page to the origin server, and posts a summary (new/updated entry
 names, count, links) to the TOA Slack, or a failure alert, which also covers a run that is

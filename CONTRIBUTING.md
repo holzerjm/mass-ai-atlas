@@ -142,7 +142,9 @@ Use this path for a change outside `data/`, such as an issue labelled
      HTML report, `npx playwright show-report`, marks it "allowlist entry unused".
    - **The deploy list.** The deploy publishes only the files and folders that
      [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) names. If you add a file
-     the live site needs, add it to that upload list and to the `paths:` filter.
+     the live site needs, add it to that upload list and to the `paths:` filter. If you add a
+     script that builds a file it uploads, add the script to `paths:` too: `tests/deploy-filter.spec.js`
+     fails if you don't.
 5. **Run what CI runs.**
 
    ```bash

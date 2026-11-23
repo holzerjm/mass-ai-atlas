@@ -23,7 +23,26 @@ name: Deploy to TOA site
 on:
   push:
     branches: [main]
-    paths: ["index.html", "atlas3d.html", "atlas-data.js", "data/**", "map-style-dark.json", "events/**", "credits/**", "updates/**"]
+    # What the steps below upload, and the scripts that build some of it: a change to one of
+    # those changes a deployed file (atlas.json, atlas.csv, atlas-ai.txt, the share pages, the
+    # events page), so it deploys. tests/deploy-filter.spec.js checks that this list names
+    # every script the build steps run, and what those scripts require.
+    paths:
+      - "index.html"
+      - "atlas3d.html"
+      - "atlas-data.js"
+      - "data/**"
+      - "map-style-dark.json"
+      - "events/**"
+      - "credits/**"
+      - "updates/**"
+      - "scripts/build-events-page.js"
+      - "scripts/build-pages.js"
+      - "scripts/export-ai.js"
+      - "scripts/export-csv.js"
+      - "scripts/export-json.js"
+      - "scripts/load-data.js"
+      - "scripts/today.js"
   workflow_dispatch:
 
 # One deploy at a time. Without this, two quick merges start two runs that upload
