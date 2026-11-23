@@ -191,21 +191,27 @@ The robot checks structure against the schemas in `data/` (no duplicates, valid
 category, MA coordinates, `https` links, etc.). It does **not** know whether the org is *real and relevant* — that part
 is your judgment, next.
 
+A second job, **pre-check (advice only)**, does the machine half of the checklist below, for the entries the pull
+request changes: does the website work, does the pin match the address, does the town match the pin, is it a
+duplicate, and is the date current. Its report is in the job's **Summary**: open **Details** on the job. ✅ looks
+right, ⚠️ look at it, 💬 a machine couldn't settle it. A ⚠️ also shows as a note on its line in **Files
+changed**. It never blocks a merge, and a red ✗ there is worth a look and nothing more.
+
 ### Step 3 — Read the actual change
 
 1. Click the **Files changed** tab. Added lines are green, removed lines are red.
-2. Sanity-check the new entry against this short checklist:
+2. Sanity-check the new entry against this short checklist (the pre-check answers the five marked *pre-check*; check its 💬s and its ⚠️s, and don't take a ✅ for your own look):
 
    - [ ] **Real, active, Massachusetts** organization relevant to AI founders
    - [ ] **Factual, neutral description** — no marketing hype or unverifiable superlatives
-   - [ ] **Website works** and is the official one (click it)
+   - [ ] **Website works** and is the official one (click it) · *pre-check*
    - [ ] **Right category** and the **pin location looks correct** (paste the lat/lng into
-         Google Maps if unsure)
+         Google Maps if unsure) · *pre-check* for the pin, not the category
    - [ ] **`town` is the city or town the pin sits in** — the robot checks the spelling,
-         not whether it's the right one
-   - [ ] **No duplicate** of an org already in the atlas
+         not whether it's the right one · *pre-check* asks the Census Bureau which town the pin is in
+   - [ ] **No duplicate** of an org already in the atlas · *pre-check*
    - [ ] **Carries a current `lastVerified`** (this month, or close to it) — it should
-         reflect when the org was actually checked
+         reflect when the org was actually checked · *pre-check*
    - [ ] If the author is **affiliated** with the org, they disclosed it (that's allowed —
          just expected to be stated)
 
