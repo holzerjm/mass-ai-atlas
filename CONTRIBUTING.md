@@ -171,6 +171,9 @@ Use this path for a change outside `data/`, such as an issue labelled
   which run the same tests in Safari's engine, won't hold up your pull request
 - On your first pull request, the checks wait until a maintainer approves them, so "no
   checks reported" means waiting, not failing
+- The **pre-check (advice only)** reads the entries you changed and says what a machine can: does the website answer, does the
+  pin match the address and the town, is there a duplicate, is the date current. It never blocks your pull request. Fix a ⚠️ if
+  it is right, and ignore it if it isn't
 - One maintainer approval merges, and **merging is publishing**: a GitHub Action
   re-checks the data and updates the live site within about a minute
   (see [MAINTAINING.md](MAINTAINING.md), Part 3)

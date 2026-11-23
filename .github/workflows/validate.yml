@@ -49,6 +49,34 @@ jobs:
       # none of them depends on what data/ holds, so a data edit cannot fail them.
       - name: KPI script tests
         run: node --test test/kpi.test.js
+      # scripts/precheck.js, below, and what it stands on. Offline, like the KPI tests.
+      - name: Pre-check script tests
+        run: node --test test/precheck.test.js
       - name: Freshness report (informational, never fails the build)
         continue-on-error: true
         run: node scripts/stale.js >> "$GITHUB_STEP_SUMMARY"
+
+  # Advice for a reviewer, never a gate. For each entry a pull request changes it answers 5 of the 8
+  # questions in MAINTAINING.md (Part 2, Step 3): does the website work, does the pin match the
+  # address, does the town match the pin, is it a duplicate, is the date current. It reads public
+  # websites and the Census Bureau's geocoder, so it is a job of its own, with its own time limit,
+  # and it can neither fail the build nor hold up the required "validate" check. The report is in
+  # the job summary; a warning also marks the line in the file.
+  precheck:
+    name: pre-check (advice only)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2   # the pull request's merge commit, and its first parent: the branch it goes into
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Pre-check the entries this pull request changes
+        run: node scripts/precheck.js --base "HEAD^1" --annotations

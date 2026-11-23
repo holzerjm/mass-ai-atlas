@@ -116,6 +116,9 @@ test/data-refactor-equivalence.test.js  one-time check that data/ matches the ol
 scripts/stale.js                  freshness report — entries longest unverified
 scripts/kpi.js                    KPI summary: geography, freshness and its forecast, review
 test/kpi.test.js                  tests for scripts/kpi.js (node --test, offline)
+scripts/precheck.js               advice on a pull request's changed entries (website, pin, town, duplicate, date)
+scripts/probe.js, scripts/geo.js  one URL's health, and Census Bureau lookups, for the checks above
+test/precheck.test.js             tests for scripts/precheck.js (node --test, offline)
 scripts/export-csv.js             export the dataset to a spreadsheet-friendly CSV
 scripts/export-ai.js              export a compact text file for a founder's own AI assistant
 scripts/issue-to-entry.js         the suggestion bot's form parser / entry builder

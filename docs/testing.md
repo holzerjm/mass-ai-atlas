@@ -11,7 +11,7 @@ Two checks, both added in v2.0 Part A (2026-09-30):
    live site is serving exactly the files in your checkout. You run it by hand,
    with `npm run verify:live`: no workflow runs it, `deploy.yml` included.
 
-One script also has tests of its own, in `test/`: see [Script tests](#script-tests-test).
+Two scripts also have tests of their own, in `test/`: see [Script tests](#script-tests-test).
 
 The atlas itself is still buildless: `index.html` + `data/*.yml` open in a browser
 with no npm step. `package.json` exists only for this tooling — nothing in it
@@ -506,6 +506,7 @@ built-in runner runs them in a few seconds:
 
 ```sh
 node --test test/kpi.test.js
+node --test test/precheck.test.js
 ```
 
 Most of them hand small made-up inputs to the functions the script exports: the split by
@@ -518,6 +519,13 @@ itself: with GitHub left out, with no `gh` and no git at all, and from a saved r
 Those assert only what is true of any valid atlas, in a full clone or a shallow one, so
 an edit to `data/` cannot fail them. In CI they run in the `validate` job, which makes
 them part of the one required check.
+
+`scripts/precheck.js`, the pre-check, has tests too. It takes its network from the caller, so these hand
+it a fake one: what changed in a pull request, each of the five checks and when it runs (a change to a
+tag alone has nothing for a machine), a network that doesn't answer (always a note, never a warning), an
+address that isn't a plain public https page (never fetched), the Census Bureau's "1 Broadway" that is
+really 1 Broadway Ct, the report's escaping (a pull request's words can't add a column, raw HTML or a log
+command), and the script itself, run on a copy of the repository, which exits 0 whatever it meets.
 
 `test/data-refactor-equivalence.test.js` is a one-time check from the October 2026 data
 refactor. Nothing runs it.
@@ -535,7 +543,8 @@ there either.
 
 | Workflow | Job | What it does |
 |---|---|---|
-| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s or `atlas3d.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit the pages it updates); then `node --test test/kpi.test.js`, the [script tests](#script-tests-test); then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
+| Validate atlas data | `validate` | `node scripts/validate.js`; then `node scripts/lint-copy.js`, which fails if user-visible copy in `index.html`, `events/index.html`, `README.md` or `HACKATHON.md` hand-types an organisation count or a curation month; then `node scripts/build-events-page.js`, failing if the rebuilt `events/index.html` differs from the committed one (run that script and commit what it writes) or the generator can no longer run; then `node scripts/loader-version.js`, failing if the version in `index.html`'s or `atlas3d.html`'s `atlas-data.js?v=` no longer matches the file (run it with `--write` and commit the pages it updates); then `node --test test/kpi.test.js`, the [script tests](#script-tests-test), and `node --test test/precheck.test.js`; then `node scripts/stale.js` as a freshness report, which is informational and never fails the build |
+| Validate atlas data | `pre-check (advice only)` | On a pull request: `node scripts/precheck.js` on the entries it changes. It answers 5 of the 8 questions in MAINTAINING.md's checklist (the website, the pin, the town, a duplicate, the date), reads public websites and the Census Bureau's geocoder, and writes to the job summary. A warning also marks its line in `data/entities.yml`. `continue-on-error`, with a limit of 8 minutes, so it can't fail a build or hold up `validate` |
 | Browser tests | `e2e (1 of 2)`, `e2e (2 of 2)`, `webkit, report only (1 of 2)`, `webkit, report only (2 of 2)` | Four jobs at once: each browser runs half the suite per job with `npm run test:e2e -- --shard=N/2`, with `ATLAS_BROWSER` set to `chromium` or `webkit`, inside Playwright's image (`mcr.microsoft.com/playwright`, both browsers and their system libraries built in, its tag kept equal to `@playwright/test`'s version); on failure each uploads `playwright-report/` as **playwright-report-1** or **-2**, or **playwright-report-webkit-1** or **-2**, kept 7 days |
 
 **Only `validate` is a required status check** on `main`. Browser tests runs and reports
