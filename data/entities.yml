@@ -1226,11 +1226,11 @@
 - id: crabi
   name: CRABI Robotics
   cat: startup
-  loc: Boston
-  town: Boston
+  loc: Medford
+  town: Medford
   approx: true
-  lat: 42.353
-  lng: -71.05
+  lat: 42.4242
+  lng: -71.1093
   url: https://www.crabi-robotics.com
   desc: Autonomous hull-cleaning robots that grip and clean ships in transit — sea-trialed in Boston Harbor. Shipping group C Transport Maritime is an investor and pilot partner.
   why: Two Boston teams racing to automate hull cleaning says something about this harbor.
@@ -2021,10 +2021,11 @@
   lng: -71.1915
   url: https://www.2l.vc
   desc: Pre-seed and seed fund backing AI-native and AI-empowered startups across the US and Israel, founded by MassChallenge founder John Harthorne.
-  why: First checks from the founder of MassChallenge, written explicitly for AI-native companies — one of the few area funds whose entire thesis is early AI.
+  why: Pre-seed and seed checks from the founder of MassChallenge, for AI-native and AI-empowered startups.
   facts: [[Stage, Pre-seed and seed], [Focus, 'AI-native startups, US and Israel']]
   tags: [pre-seed, AI-native]
   stages: [4]
+  links: [masschallenge]
   offers: [funding]
   added: 2026-08
   lastVerified: 2026-08
@@ -2302,9 +2303,8 @@
   cat: vc
   loc: 131 Dartmouth St, Boston
   town: Boston
-  approx: true
-  lat: 42.3471
-  lng: -71.076
+  lat: 42.3467
+  lng: -71.0756
   url: https://www.lama.vc
   desc: A $50M seed fund and venture studio operating from Boston and Tel Aviv, backing AI-native cybersecurity and IT-infrastructure companies from inception.
   why: Purpose-built for cybersecurity-and-AI founders, with LPs drawn from partners at Insight, Battery, Bessemer and CRV.
@@ -2471,15 +2471,15 @@
 - id: tie
   name: TiE Boston Angels
   cat: angel
-  loc: Cambridge
+  loc: One Broadway, 14th Floor, Cambridge
   town: Cambridge
-  approx: true
-  lat: 42.365
-  lng: -71.09
+  lat: 42.3629
+  lng: -71.0838
   url: https://www.tieboston.org/
-  desc: Angel arm of TiE Boston, one of the region's largest entrepreneur networks.
+  desc: Angel arm of TiE Boston, a nonprofit network of entrepreneurs.
   why: Mentorship + capital + a giant founder community in one membership.
   firstMove: Register your startup through Apply to Present on its Angels page; its leadership team selects who presents at each Investor Forum.
+  facts: [[Stage, Pre-seed to Series A]]
   tags: [seed, founders]
   stages: [2, 4]
   offers: [funding, mentorship, community]
