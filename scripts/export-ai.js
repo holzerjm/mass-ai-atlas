@@ -65,6 +65,9 @@ function entry(d) {
   return lines.join("\n");
 }
 
+// The link that opens a pathway on the atlas as a checklist, as checklistUrl() in index.html makes it.
+const checklist = p => `${SITE}?checklist=${encodeURIComponent(p.id)}#journey`;
+
 function pathway(p) {
   const steps = p.steps.map((s, i) => {
     const ids = (s.entries || []).filter(id => byId[id]);
@@ -72,7 +75,7 @@ function pathway(p) {
     const more = s.more ? ` See also every ${[s.more.need, s.more.cat && CATS[s.more.cat].label].filter(Boolean).join(" ")} entry at this stage.` : "";
     return `${i + 1}. ${s.do}. ${s.why}${who}${more}`;
   });
-  return [`### ${stageName[p.stage]}: ${p.title}`, p.lead, ...steps].join("\n");
+  return [`### ${stageName[p.stage]}: ${p.title}`, p.lead, `Checklist: ${checklist(p)}`, ...steps].join("\n");
 }
 
 const list = [...DATA].sort((a, b) => a.name.localeCompare(b.name));
@@ -90,6 +93,7 @@ const text = [
   `"town:" gives the city or town an organization's map pin is in, where its address names only a neighborhood, a campus or no fixed place. "${STATEWIDE}" marks a state body, or a program or network that runs across the state, by its own description, wherever its pin is.`,
   "Applications: \"open, rolling\" means taking applications now, \"apply by\" gives the next deadline, \"closed\" means not now, and \"takes pitches\" means a funder's own page invites pitches, with no set application process. With no Applications line, the atlas has no information, which doesn't mean there's no way in.",
   `"First move:" is the first thing a founder does to get in, as the organization's own page gives it. ${DATA.filter(d => d.firstMove).length} of the ${DATA.length} have one so far. Without one, the way in is on the organization's site.`,
+  `"Checklist:" under a pathway is the link that opens it on the atlas as a list to work through, print or share: its steps, and each organization's first move and application status.`,
   `Stages: ${STAGES.map(s => `${s.t} (${s.s})`).join(", ")}.`,
   "",
   "## Pathways",
