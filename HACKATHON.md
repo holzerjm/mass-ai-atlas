@@ -56,7 +56,7 @@ is deliberate, and it is why you can read the whole thing in an afternoon.
 
 When someone opens the page:
 
-1. The browser loads `index.html` — one hand-written file, HTML + CSS + vanilla JS, ~205 KB.
+1. The browser loads `index.html` — one hand-written file, HTML + CSS + vanilla JS, ~255 KB.
 2. It fetches six files from `data/`: three data files and their three JSON Schemas.
 3. `atlas-data.js` parses the YAML and validates every file **in the browser**.
 4. On failure the page shows a banner. On success the data becomes globals and the app runs.
@@ -67,12 +67,13 @@ build artifact in between.
 
 | Piece | What it is |
 |---|---|
-| `index.html` | the entire application, about 2,700 lines |
+| `index.html` | the atlas, about 3,300 lines |
+| `atlas3d.html` | 3D Lenses, a page of its own that reads the same data |
 | `data/entities.yml` | the organizations, plus `categories.yml` (11), `stages.yml` (5), and the Journey's `pathways.yml` |
 | `data/*.schema.yml` | JSON Schema for each — these are a safety control, not just a type check |
 | `atlas-data.js` | the shared loader, used by the page and by every script |
 | `scripts/` | validate, exports, link check, freshness rota, the events pipeline |
-| `tests/` | more than 100 Playwright tests over the four views, deep links, search, filters, the Galaxy on phones, keyboard use, the shortlist, events, credits, and accessibility in both themes |
+| `tests/` | more than 350 Playwright tests over the four views, deep links, search, filters, the Galaxy on phones, keyboard use, the shortlist, events, credits, and accessibility in both themes |
 
 Map stack: Leaflet 1.9.4 with a MapLibre GL 5.24.0 vector basemap from OpenFreeMap (keyless),
 markercluster 1.5.3. All from CDNs — there is nothing to bundle.
@@ -103,7 +104,8 @@ it, read the published dataset instead of scraping:
 
 - `/ecosystem/atlas.json` — every entry plus the category and stage definitions, in a
   versioned envelope. The `schema` field is bumped on any breaking change, so you can detect one.
-- `/ecosystem/atlas.csv` — the same records as 22 columns.
+- `/ecosystem/atlas.csv` — the same records as 23 columns.
+- `/ecosystem/atlas-ai.txt` — every organization and pathway as compact plain text, for an AI assistant.
 - `/ecosystem/events.json` — AI events in the next 10 days.
 
 ## Make it yours
