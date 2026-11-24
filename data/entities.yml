@@ -1233,7 +1233,7 @@
   lng: -71.1093
   url: https://www.crabi-robotics.com
   desc: Autonomous hull-cleaning robots that grip and clean ships in transit — sea-trialed in Boston Harbor. Shipping group C Transport Maritime is an investor and pilot partner.
-  why: Two Boston teams racing to automate hull cleaning says something about this harbor.
+  why: Two Boston-area teams racing to automate hull cleaning says something about this harbor.
   tags: [robotics, climate]
   stages: []
   links: []
@@ -2448,26 +2448,6 @@
   offers: [funding]
   added: 2026-06
   lastVerified: 2026-11
-- id: mit-angels
-  name: MIT Alumni Angels of Boston
-  cat: angel
-  loc: Cambridge
-  town: Cambridge
-  approx: true
-  lat: 42.362
-  lng: -71.087
-  url: https://www.mitalumniangels.com/
-  desc: Angel network of MIT alumni backing MIT-connected founders.
-  why: Warmest possible audience for an MIT-affiliated pitch.
-  firstMove: Fill out the form on its Apply page; a committee member replies if there is a fit, and it strongly prefers MIT-affiliated companies.
-  tags: [MIT]
-  stages: [4]
-  offers: [funding, community]
-  applyBy: rolling
-  applyNote: Prefers MIT-affiliated startups
-  applyUrl: https://www.mitalumniangels.com/apply-now
-  added: 2026-06
-  lastVerified: 2026-08
 - id: tie
   name: TiE Boston Angels
   cat: angel

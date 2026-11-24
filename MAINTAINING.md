@@ -315,7 +315,7 @@ To keep those honest, do a small sweep about once a month:
    An organization can close, move, or stop fitting its step.
 
 `--cycle 12` sizes that list from the dataset, so it keeps pace as the atlas grows:
-every entry comes round within a year without anyone re-tuning a number. At 228
+every entry comes round within a year without anyone re-tuning a number. At 227
 entries that is **19 re-checks a month, about half an hour**. A fixed `--queue`
 quietly stops covering everything as soon as entries outrun it — at 13 a month it
 would now take **18 months** to come round, against a 12-month threshold.
@@ -635,6 +635,7 @@ the reasoning is open rather than a silent judgment.
 | **Mass General Brigham Artificial Intelligence and Digital Innovation Fund** | AI is in its name, and the money is real: a $30 million commitment made in 2020, with first checks of $0.5 million to $1.5 million. But it is not a fund a founder applies to. Its page asks for a contract with Mass General Brigham, signed or under negotiation, by the time it invests. It counts three investments to date and shows nothing dated after 2020. Revisit if it posts a new investment, or opens to companies the health system does not already buy from. |
 | **InnoVenture Labs** (formerly North Shore InnoVentures, Beverly) | Real: a nonprofit incubator at the Cummings Center. But it describes itself as a biotech and cleantech incubator, and its home page does not mention AI. |
 | **UMass Lowell Innovation Hub** | Its web address now leads to M2D2, the Massachusetts Medical Device Development Center and Biotech Incubator, which serves medical-device and biotech companies and makes no AI claim on its page. UMass Lowell's NERVE Center and its Office of New Venture Development are listed. |
+| **MIT Alumni Angels of Boston** | Listed until November 2026, then removed. Its site and pitch form are still up, and it describes quarterly pitch events, but the newest one on its events page is from December 12, 2023 (read in November 2026). A listing implies a way in, and this one showed no sign of still working. Revisit if it posts a new event. |
 | **MIT Proto Ventures** | MIT's venture studio, real and active. But its own site labels artificial intelligence a former channel, with geothermal and fusion and clean energy as the current ones. A founder cannot apply to it either: MIT hires a venture builder for each channel, who works with MIT researchers. Revisit if it opens an AI channel again. |
 | **Beacon Angels** | Real and active: a Boston-based angel group that invests $50,000 to $400,000 and meets each month in Woburn. But its pages make no AI claim, and invited presenters pay a registration fee that it calls non-waivable. |
 | **Dorm Room Fund** | Real, and it backs student founders at Massachusetts schools with first checks of $90,000 to $500,000. But its site names no office here: its student investors work from their campuses. A pin implies a presence, as with Y Combinator, and its companies belong in the atlas as their own entries. |

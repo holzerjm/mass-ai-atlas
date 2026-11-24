@@ -156,7 +156,7 @@
   steps:
     - do: Talk to angel groups
       why: Angel groups often invest together, so one good meeting can reach several. Some favor their own alumni, so check the fit first.
-      entries: [bha, hbsaa, hub-angels, launchpad, mit-angels, tie, walnut]
+      entries: [bha, hbsaa, hub-angels, launchpad, tie, walnut]
     - do: Compare accelerators that invest
       why: You trade equity for a check, mentors, and a deadline. Compare what each one takes and what it gives you.
       entries: [auxilium, c10, ssc, techstars]
