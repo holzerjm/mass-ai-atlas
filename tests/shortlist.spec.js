@@ -79,6 +79,28 @@ test("a shortlist row says whether applications are open, and nothing where the 
   await expect(rows.nth(1).locator(".sl-status")).toHaveCount(0);
 });
 
+// An organization that closes leaves the atlas, and a visitor may have starred it. The header's
+// count, the list and the link to share must agree on what is left.
+test("a starred entry that has left the atlas isn't counted, listed, or shared", async ({ page }) => {
+  await page.addInitScript(ids => localStorage.setItem("toa-atlas-stars", JSON.stringify(ids)), [a.id, "left-the-atlas"]);
+  await page.goto("./#directory");
+  await waitForApp(page);
+  await expect(page.locator("#starNav")).toBeVisible();
+  await expect(page.locator("#starCount")).toHaveText("1");
+  await page.evaluate(() => openShortlist());
+  await expect(page.locator("#shortlistModal .sl-row")).toHaveCount(1);
+  expect(await page.evaluate(() => shortlistIds())).toEqual([a.id]);
+
+  // starring and unstarring others keeps the old star stored, in case the entry comes back
+  await page.evaluate(id => toggleStar(id), b.id);
+  await expect(page.locator("#starCount")).toHaveText("2");
+  expect(JSON.parse(await page.evaluate(() => localStorage.getItem("toa-atlas-stars"))).sort()).toEqual([a.id, b.id, "left-the-atlas"].sort());
+
+  // and with nothing else starred, the header shows no star at all
+  await page.evaluate(ids => ids.forEach(id => toggleStar(id)), [a.id, b.id]);
+  await expect(page.locator("#starNav")).toBeHidden();
+});
+
 test("a ?list= of only unknown ids opens nothing and breaks nothing", async ({ page }) => {
   await page.goto("./?list=no-such-org,also-missing");
   await waitForApp(page);
