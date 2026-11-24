@@ -10,26 +10,30 @@ The living map of Massachusetts' AI ecosystem — built by the community for the
 [The Open Accelerator](https://the-open-accelerator.com) (an initiative between the
 MA AI Hub, Red Hat & IBM).
 
-[![A 23-second tour: searching the Map over the Boston area, an entry's drawer with the places to meet nearby, the Map filtered to what a founder needs, the Galaxy of connections, the Founder Journey, and the Directory answering a founder's sentence](docs/demo.gif)](https://the-open-accelerator.com/ecosystem/)
+[![A 29-second tour: searching the Map over the Boston area, an entry's drawer with the places to meet nearby, the Map filtered to what a founder needs, the Galaxy of connections, the Founder Journey, a pathway opened as a checklist with each organization's first move, and the Directory answering a founder's sentence](docs/demo.gif)](https://the-open-accelerator.com/ecosystem/)
 
 **Four ways to explore the Massachusetts AI ecosystem:**
 
 - 🗺️ **Map** — every VC, lab, accelerator and community pinned across Massachusetts
 - ✨ **Galaxy** — an animated network of how the ecosystem connects (spinouts, funds, hosts)
-- 🧭 **Founder Journey** — from first spark to scale: hand-written pathways, with an ordered list of what to do next and why
-- 📇 **Directory** — search in your own words, with category, need, and stage filters
+- 🧭 **Founder Journey** — from first spark to scale: hand-written pathways, with an ordered list of what to do next and why, which you can open as a checklist to print or share
+- 📇 **Directory** — search in your own words or by city, with category, need, stage, and date-added filters
 
 The [What's new page](https://the-open-accelerator.com/ecosystem/updates/) lists recent features,
 with a link to try each one, and new organizations by month. **Ask your own AI** writes a prompt
 for the assistant you already use, so it can answer from the atlas's data. The atlas runs no AI itself.
+[3D Lenses](https://the-open-accelerator.com/ecosystem/atlas3d.html) shows on a 3D map how complete
+the atlas's record of each organization is, with a link from every gap to the line of data behind it.
 
 Each entry's drawer says what the organization offers founders, shows when a maintainer
 last verified it and when it was added, and under **places to meet** lists the cafés, quick
-bites and quieter spots within a five-minute walk.
+bites and quieter spots within a five-minute walk. Some also give **your first move**, the
+first thing to do to get in, taken from the organization's own page.
 Every entry and view is linkable — `?entry=csail` opens straight to an organization,
 `#galaxy` to a view (there's a 🔗 Copy link button in each entry's drawer). Filters are
 linkable too: `?need=compute&stage=3` opens the map and the Directory with them set, and
-`?added=3` shows what was added in the last three months.
+`?added=3` shows what was added in the last three months. So are pathways:
+`?checklist=build-compute#journey` opens one as a checklist.
 
 > **Building on this as a template?** Start with [HACKATHON.md](HACKATHON.md): setup, the
 > architecture on one page, where to extend it, and what to change because it is still
@@ -55,9 +59,9 @@ The maintenance scripts (`scripts/`) need Node 20+ and the two npm dependencies
 
 ## Deploy
 
-**Merging is publishing.** A GitHub Action deploys `index.html`, `atlas-data.js`,
+**Merging is publishing.** A GitHub Action deploys `index.html`, `atlas3d.html`, `atlas-data.js`,
 `data/`, the map style, the events page, the credits page and the updates page to [the live site](https://the-open-accelerator.com/ecosystem/) on every
-merge to `main` that touches them — it re-validates the data first, then rsyncs to
+merge to `main` that touches them or the scripts that build them — it re-validates the data first, then rsyncs to
 the server and posts a summary to the TOA Slack. (Not GitHub Pages.)
 
 Manual fallback, from a checkout with SSH access to the server:
@@ -98,6 +102,7 @@ merge.
 ```
 index.html                        the app — one file of HTML/CSS/vanilla JS (Leaflet +
                                   MapLibre GL & web fonts via CDN; TOA-branded)
+atlas3d.html                      3D Lenses: how sure the atlas is about each entry, on a 3D map
 data/entities.yml                 the dataset — this is what you edit
 data/categories.yml, stages.yml   the categories and founder stages
 data/pathways.yml                 hand-written routes through the Founder Journey
@@ -119,11 +124,14 @@ test/kpi.test.js                  tests for scripts/kpi.js (node --test, offline
 scripts/precheck.js               advice on a pull request's changed entries (website, pin, town, duplicate, date)
 scripts/probe.js, scripts/geo.js  one URL's health, and Census Bureau lookups, for the checks above
 test/precheck.test.js             tests for scripts/precheck.js (node --test, offline)
+scripts/export-json.js            export the whole dataset as JSON, in a versioned envelope
 scripts/export-csv.js             export the dataset to a spreadsheet-friendly CSV
 scripts/export-ai.js              export a compact text file for a founder's own AI assistant
 scripts/issue-to-entry.js         the suggestion bot's form parser / entry builder
 scripts/fetch-events.js           events aggregator — feeds /ecosystem/events/ weekly
 scripts/build-events-page.js      assembles events/index.html (generated — see docs/)
+scripts/build-pages.js            a share page per entry, a crawlable index and a sitemap, at deploy
+scripts/record-demo.js            re-records docs/demo.gif, the tour at the top of this page
 scripts/trigger-weekly-events.sh  server-side cron that starts the weekly refresh (GitHub cron is late)
 scripts/sync-to-site.sh           manual deploy fallback (CI normally deploys on merge)
 .github/ISSUE_TEMPLATE/           suggest & flag forms

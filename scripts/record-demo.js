@@ -58,9 +58,8 @@ const W = 1200, H = 750, DPR = 2;
 // The budget is 10 MB, which keeps the README quick to load. A clean capture
 // leaves the still parts of the page identical from frame to frame, and the GIF stores
 // only what changed: a hold costs 1-3 KB a frame, the Galaxy's drift about 120 KB, a
-// map flight about 300 KB. So motion drives the size, then the palette: 10 fps x ~23 s
-// x 1200 px x 256 colours lands around 9 MB, 128 colours around 7.4, and 12 fps at 256
-// colours goes over 10.
+// map flight about 300 KB. So motion drives the size, then the palette: 10 fps x ~29 s
+// x 1200 px x 256 colours lands around 9 MB.
 const WIDTH  = Math.round(num("--width", W, 100, W * DPR));
 const FPS    = num("--fps", 10, 1, 50);
 const COLORS = Math.round(num("--colors", 256, 2, 256));
@@ -197,8 +196,23 @@ const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ["ignore", "pipe", "p
     await click("#mapNote .filter-clear", { settle: 600 });
   });
   // A tab click jumps the page to the top: re-pin after.
-  for (const [name, sel, hold] of [["galaxy", "Galaxy", 1900], ["journey", "Founder Journey", 1700], ["directory", "Directory", 600]])
-    await step(name, async () => { await pin(); await click(`.tab:has-text("${sel}")`, { settle: 600 }); await pin(); await page.waitForTimeout(hold); });
+  const view = (name, sel, hold) =>
+    step(name, async () => { await pin(); await click(`.tab:has-text("${sel}")`, { settle: 600 }); await pin(); await page.waitForTimeout(hold); });
+  await view("galaxy", "Galaxy", 1900);
+  await view("journey", "Founder Journey", 1700);
+  // A pathway opens as a checklist: its steps in order, who is taking applications, and each
+  // one's first move. Its button sits under the steps, so the page jumps there, off camera.
+  await step("pick a stage",  () => click('.step[data-n="3"]', { settle: 1100 }));
+  await step("checklist",     async () => {
+    await page.evaluate(() => document.querySelector(".pw-check").scrollIntoView({ block: "center", behavior: "instant" }));
+    await click(".pw-check", { settle: 2900 });
+  });
+  await step("close checklist", async () => {
+    await click("#shortlistModal .sl-x", { settle: 200 });
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));   // so pin()'s glide is as short as for the other views
+    await page.waitForTimeout(300);
+  });
+  await view("directory", "Directory", 600);
   // A founder's sentence, in their words: the page says these are the closest entries.
   await step("sentence",      async () => {
     await click("#dirSearch", { settle: 250 });
@@ -223,7 +237,7 @@ const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ["ignore", "pipe", "p
   const skew = Math.min(...frames.map(f => f.got - f.t));
   const shown = frames.map(f => f.t + skew);
 
-  // Keep the action, drop the holds: the whole 43 s tour would be about 20 MB.
+  // Keep the action, drop the holds: the whole 54 s tour would be about 22 MB.
   // A beat runs from `lead` seconds after its step starts to `tail` before it ends, on
   // the frames' own clock. After a tab click, pin() has the page parked again by about
   // 3.4 s into the step, so each view's beat starts at 3.6.
@@ -234,6 +248,7 @@ const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ["ignore", "pipe", "p
   const windows = [
     beat("frame map", 0.6, 0.2), beat("search", 0.1, 0.0), beat("places to meet", 0.1, 0.6),
     beat("need on map", 1.6, 1.6), beat("galaxy", 3.6, 0.0), beat("journey", 3.6, 0.3),
+    beat("pick a stage", 0.7, 0.0), beat("checklist", 0.6, 0.0),
     beat("directory", 3.6, 0.0), beat("sentence", 0.5, 0.0),
   ];
   // Play each window in real time at FPS: every tick takes the frame on screen then.
