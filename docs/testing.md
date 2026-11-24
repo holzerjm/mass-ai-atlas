@@ -291,6 +291,7 @@ was not: until 2026-11 its scan could land inside a fade, and the scans now wait
 | `shortlist.spec.js` | `?list=` restores the shared list, and it survives | the d37a30c bug: opening an entry from a shared shortlist, closing it, or switching views rewrote the URL without `?list=`, so a reload or a forwarded link showed nothing. Also: viewing someone's list never writes it into your own saved stars |
 | | a shortlist row carries the entry's first move | the printed checklist saying where an organization is and not what to do there. The line must show on screen and in print, and a row whose entry has none must show nothing |
 | | a shortlist row says whether applications are open | a saved list that doesn't show what is open or what closes when. The words are the pathway card's, and a row says nothing where the atlas has no status |
+| | a starred entry that has left the atlas | the header's star count saying one more than the list shows, after an organization someone starred is removed. Its star stays stored, in case the entry returns |
 | | `?list=` of unknown ids | a stale list link breaking the page |
 | `events.spec.js` | `/events/` loads and lists events | the events page breaking |
 | | "→ on the atlas" link | the events page → atlas drawer hand-off |

@@ -3008,14 +3008,17 @@ function toggleStar(id){
   saveStars(); syncStarUI();
 }
 function syncStarUI(){
-  const n = starSet.size;
+  const n = starredIds().length;
   const btn = $("starNav");
   btn.style.display = n ? "" : "none";
   $("starCount").textContent = n;
   if(typeof renderCards === "function") renderCards();
   if($("shortlistModal").style.display !== "none") renderShortlist(shortlistIds());
 }
-function shortlistIds(){ return sharedList || [...starSet]; }
+// A saved id can outlive its entry: an organization that closes leaves the atlas. Its star stays
+// stored, in case the entry returns, but the count, the list and the share link leave it out.
+function starredIds(){ return [...starSet].filter(id=>Object.hasOwn(byId, id)); }
+function shortlistIds(){ return sharedList || starredIds(); }
 
 // One organization in the shortlist dialog: where it is, whether it's taking applications, and
 // its first move. The list prints with a box to tick beside each row.
